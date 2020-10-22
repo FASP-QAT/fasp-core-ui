@@ -21,7 +21,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Link } from "react-router-dom";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -57,9 +57,9 @@ export default class InventoryTurns extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
-           loading: true
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            loading: true
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -94,23 +94,66 @@ export default class InventoryTurns extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ loading: false, message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -304,9 +347,9 @@ export default class InventoryTurns extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -324,7 +367,7 @@ export default class InventoryTurns extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
+        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -412,7 +455,7 @@ export default class InventoryTurns extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label), this.formatter(ele.totalConsumption), this.formatter(ele.avergeStock), this.formatter(ele.noOfMonths), this.formatterDouble(ele.inventoryTurns)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.totalConsumption), this.formatter(ele.avergeStock), this.formatter(ele.noOfMonths), this.formatterDouble(ele.inventoryTurns)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -439,7 +482,7 @@ export default class InventoryTurns extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
-        var dt = new Date(`${value.year}`, `${value.month-1}`, 1)
+        var dt = new Date(`${value.year}`, `${value.month - 1}`, 1)
         costOfInventoryInput.dt = dt
         this.setState({ singleValue2: value, costOfInventoryInput }, () => {
             this.formSubmit();
@@ -547,7 +590,7 @@ export default class InventoryTurns extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -591,7 +634,7 @@ export default class InventoryTurns extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        loading:false
+                        loading: false
                     })
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
@@ -607,7 +650,7 @@ export default class InventoryTurns extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            loading:false
+                            loading: false
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
@@ -616,14 +659,14 @@ export default class InventoryTurns extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-                       var proList = []
+                        var proList = []
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
                         planningunitRequest.onerror = function (event) {
                             // Handle errors!
                             this.setState({
-                                loading:false
+                                loading: false
                             })
                         };
                         planningunitRequest.onsuccess = function (e) {
@@ -635,100 +678,101 @@ export default class InventoryTurns extends Component {
                                     proList[j++] = myResult[i]
                                 }
                             }
-                       
-                        var data = []
 
-                        var TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 12
-                        var m = this.getMonthArray(startDate)
-                        console.log('proList', proList)
-                        proList.map(planningUnit => {
-                            var endingBalanceArray = [];
-                            var monthcnt = 0;
-                            var totalConsumption = 0;
-                            var totalClosingBalance = 0;
-                            var reportList=[]
-                            for (var n = 0; n < 12; n++) {
-                               var dtstr = m[n].startDate
-                                var enddtStr = m[n].endDate
-                               
-                                var dt = dtstr
-                                var list = programJson.supplyPlan.filter(c => c.planningUnitId ==planningUnit.planningUnit.id && c.transDate == dt)
-                                //console.log(dtstr, ' ', enddtStr,' list',list)
-                                reportList=[...reportList,...list]
-                            if(list.length>0){
-                                if(document.getElementById("includePlanningShipments").value.toString() == 'true'){
-                                endingBalanceArray[n] = list[0].closingBalance
-                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty==null?0:list[0].consumptionQty)
-                                totalClosingBalance=totalClosingBalance+parseInt(list[0].closingBalance)
-                                monthcnt++
-                                // if(list[0].consumptionQty>0|| list[0].closingBalance>0){
-                                //     monthcnt++
-                                    
+                            var data = []
+
+                            var TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 12
+                            var m = this.getMonthArray(startDate)
+                            console.log('proList', proList)
+                            proList.map(planningUnit => {
+                                var endingBalanceArray = [];
+                                var monthcnt = 0;
+                                var totalConsumption = 0;
+                                var totalClosingBalance = 0;
+                                var reportList = []
+                                for (var n = 0; n < 12; n++) {
+                                    var dtstr = m[n].startDate
+                                    var enddtStr = m[n].endDate
+
+                                    var dt = dtstr
+                                    var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dt)
+                                    //console.log(dtstr, ' ', enddtStr,' list',list)
+                                    reportList = [...reportList, ...list]
+                                    if (list.length > 0) {
+                                        if (document.getElementById("includePlanningShipments").value.toString() == 'true') {
+                                            endingBalanceArray[n] = list[0].closingBalance
+                                            totalConsumption = totalConsumption + parseInt(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
+                                            totalClosingBalance = totalClosingBalance + parseInt(list[0].closingBalance)
+                                            monthcnt++
+                                            // if(list[0].consumptionQty>0|| list[0].closingBalance>0){
+                                            //     monthcnt++
+
+                                            // }
+                                        } else {
+                                            endingBalanceArray[n] = list[0].closingBalanceWps
+                                            totalConsumption = totalConsumption + parseInt(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
+                                            monthcnt++
+                                            // totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
+                                            // if(list[0].consumptionQty>0|| list[0].closingBalanceWps>0){
+                                            //     monthcnt++
+
+                                            // }
+                                        }
+                                    } else {
+                                        endingBalanceArray[n] = ''
+                                    }
+
+
+
+
+                                }
+
+
+
+                                // var totalmonthincalculation = 0
+                                // console.log(endingBalanceArray)
+
+                                // for (var i = 0; i < endingBalanceArray.length; i++) {
+                                //     totalClosingBalance += endingBalanceArray[i]
+                                //     if (endingBalanceArray[i] != '') {
+                                //         totalmonthincalculation++;
+                                //     }
                                 // }
-                            }else{
-                                endingBalanceArray[n] = list[0].closingBalanceWps
-                                totalConsumption = totalConsumption + parseInt(list[0].consumptionQty==null?0:list[0].consumptionQty)
-                                monthcnt++
-                                // totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
-                                // if(list[0].consumptionQty>0|| list[0].closingBalanceWps>0){
-                                //     monthcnt++
-                                   
-                                // }
-                            }}else{
-                                endingBalanceArray[n] = ''
-                            }  
-                            
-                          
-                                
 
-                            }
+                                console.log(reportList)
+                                var avergeStock = monthcnt > 0 ? totalClosingBalance / (monthcnt) : 0
 
-                             
-                          
-                            // var totalmonthincalculation = 0
-                            // console.log(endingBalanceArray)
 
-                            // for (var i = 0; i < endingBalanceArray.length; i++) {
-                            //     totalClosingBalance += endingBalanceArray[i]
-                            //     if (endingBalanceArray[i] != '') {
-                            //         totalmonthincalculation++;
-                            //     }
-                            // }
-
-console.log(reportList)
-                            var avergeStock =monthcnt>0? totalClosingBalance / (monthcnt):0
-
-                          
                                 var json = {
                                     totalConsumption: totalConsumption,
                                     planningUnit: planningUnit.planningUnit,
                                     avergeStock: avergeStock,
                                     noOfMonths: monthcnt,
-                                    inventoryTurns: avergeStock>0?this.roundN(totalConsumption / avergeStock):0
+                                    inventoryTurns: avergeStock > 0 ? this.roundN(totalConsumption / avergeStock) : 0
 
                                 }
                                 data.push(json)
-                           
 
-                        })
-                        console.log(data)
-                        this.setState({
-                            costOfInventory: data
-                            , message: ''
-                        }, () => {
-                            this.buildJExcel();
-                        });
-                    }.bind(this)
+
+                            })
+                            console.log(data)
+                            this.setState({
+                                costOfInventory: data
+                                , message: ''
+                            }, () => {
+                                this.buildJExcel();
+                            });
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             } else {
                 this.setState({ loading: true })
-var inputJson={
-    "programId":this.state.CostOfInventoryInput.programId,
-    "versionId":this.state.CostOfInventoryInput.versionId,
-    "dt":moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
-    "includePlannedShipments":this.state.CostOfInventoryInput.includePlanningShipments.toString()=="true"?1:0
-}
+                var inputJson = {
+                    "programId": this.state.CostOfInventoryInput.programId,
+                    "versionId": this.state.CostOfInventoryInput.versionId,
+                    "dt": moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
+                    "includePlannedShipments": this.state.CostOfInventoryInput.includePlanningShipments.toString() == "true" ? 1 : 0
+                }
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.inventoryTurns(inputJson).then(response => {
                     console.log("costOfInentory=====>", response.data);
@@ -737,7 +781,46 @@ var inputJson={
                     }, () => {
                         this.buildJExcel();
                     });
-                });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
             }
         } else if (this.state.CostOfInventoryInput.programId == 0) {
             this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.common.selectProgram') }, () => {
@@ -801,7 +884,7 @@ var inputJson={
             },
             {
                 dataField: 'planningUnit.label',
-                text:  i18n.t('static.planningunit.planningunit'),
+                text: i18n.t('static.planningunit.planningunit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -874,11 +957,7 @@ var inputJson={
         }
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
@@ -905,7 +984,7 @@ var inputJson={
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                        <FormGroup className="col-md-3 pl-0">
+                                            <FormGroup className="col-md-3 pl-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
@@ -949,7 +1028,7 @@ var inputJson={
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e)}}
+                                                            onChange={(e) => { this.dataChange(e) }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -969,7 +1048,7 @@ var inputJson={
                                                             name="includePlanningShipments"
                                                             id="includePlanningShipments"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e);  }}
+                                                            onChange={(e) => { this.dataChange(e); }}
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>
@@ -980,7 +1059,7 @@ var inputJson={
                                             </FormGroup>
 
 
-                                           
+
                                         </div>
                                     </div>
                                 </Form>

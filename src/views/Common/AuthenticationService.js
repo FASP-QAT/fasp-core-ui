@@ -888,7 +888,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/programProduct/addProgramProduct/:programId":
+                // case "/programProduct/addProgramProduct/:programId":
+                case "/programProduct/addProgramProduct":
                     if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
                         return true;
                     }
@@ -1152,9 +1153,9 @@ class AuthenticationService {
                     }
                     break;
                 case "/quantimed/quantimedImport":
-                    // if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
-                    return true;
-                    // }
+                    if (bfunction.includes("ROLE_BF_QUANTIMED_IMPORT")) {
+                        return true;
+                    }
                     break;
                 default:
                     console.log("default case");
@@ -1237,9 +1238,9 @@ class AuthenticationService {
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1250,6 +1251,14 @@ class AuthenticationService {
         } else {
             return "en";
         }
+    }
+    setRecordCount(count) {
+        var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
+        localStorage.setItem('sesRecordCount', count);
+        localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } }));
+        localStorage.setItem('sesProgramId', "");
+        localStorage.setItem('sesPlanningUnitId', "");
     }
 
     getIconAndStaticLabel(val) {

@@ -28,7 +28,7 @@ export default class ConsumptionDetails extends React.Component {
         super(props);
         this.options = props.options;
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate=moment(Date.now()).add(18,'months').startOf('month').format("YYYY-MM-DD")
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
         this.state = {
             loading: true,
             programList: [],
@@ -39,7 +39,7 @@ export default class ConsumptionDetails extends React.Component {
             timeout: 0,
             showConsumption: 0,
             consumptionChangedFlag: 0,
-            rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             regionList: [],
@@ -81,6 +81,7 @@ export default class ConsumptionDetails extends React.Component {
         }
         if (cont == true) {
             this.setState({ rangeValue: value, consumptionChangedFlag: 0 })
+            localStorage.setItem("sesRangeValue", JSON.stringify(value));
             this.formSubmit(this.state.planningUnit, value);
         }
     }
@@ -185,7 +186,7 @@ export default class ConsumptionDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId;
+                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -228,6 +229,7 @@ export default class ConsumptionDetails extends React.Component {
                 planningUnit: "",
             })
             if (programId != 0) {
+                localStorage.setItem("sesProgramId", programId);
                 var db1;
                 var storeOS;
                 var regionList = [];
@@ -297,7 +299,7 @@ export default class ConsumptionDetails extends React.Component {
                                 regionList: regionList, loading: false
                             })
 
-                            var planningUnitIdProp = this.props.match.params.planningUnitId;
+                            var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                 this.setState({
@@ -344,9 +346,15 @@ export default class ConsumptionDetails extends React.Component {
             var consumptionType = document.getElementById("consumptionType").value;
             var showActive = document.getElementById("showActive").value;
             if (planningUnitId != 0) {
+                localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("consumptionTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
+                    var roleList = AuthenticationService.getLoggedInUserRole();
+                    console.log("RoleList------------>", roleList);
+                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        document.getElementById("addRowButtonId").style.display = "none";
+                    }
                 }
                 var db1;
                 getDatabase();
@@ -381,9 +389,9 @@ export default class ConsumptionDetails extends React.Component {
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var bdl = shipmentList[sl].batchInfoList;
                             for (var bd = 0; bd < bdl.length; bd++) {
-                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo);
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                                 if (index == -1) {
-                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId)[0];
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"))[0];
                                     batchList.push(batchDetailsToPush);
                                 }
                             }
@@ -656,7 +664,7 @@ export default class ConsumptionDetails extends React.Component {
                     <ModalFooter>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
-                            {this.refs.consumptionChild != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            {this.refs.consumptionChild != undefined && <Button id="consumptionBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>

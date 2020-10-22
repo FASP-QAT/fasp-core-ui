@@ -11,7 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { LABEL_REGEX } from '../../Constants.js';
 
 import i18n from '../../i18n'
-const initialValues = {
+let initialValues = {
   fundingSourceId: [],
   subFundingSource: "",
   fundingSourceCode: "",
@@ -247,8 +247,10 @@ class AddFundingSourceComponent extends Component {
     }
   }
   Capitalize(str) {
+    var reg = /^[1-9]\d*(\.\d+)?$/
     if (str != null && str != "") {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+      // return str.charAt(0).toUpperCase() + str.slice(1);
+      return (!(reg.test(str)) ? str.charAt(0).toUpperCase() + str.slice(1) : str)
     } else {
       return "";
     }
@@ -466,7 +468,7 @@ class AddFundingSourceComponent extends Component {
 
                           <FormGroup>
                             <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
-                            <FormGroup check inline>
+                            <FormGroup check inline className="ml-5">
                               <Input
                                 className="form-check-input"
                                 type="radio"

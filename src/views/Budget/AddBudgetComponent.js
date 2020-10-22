@@ -47,7 +47,7 @@ const validationSchema = function (values, t) {
             // .transform((o, v) => parseFloat(v.replace(/,/g, '')))
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
-            .matches(/^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,10}(\.\d{1,4})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
@@ -627,7 +627,8 @@ class AddBudgetComponent extends Component {
                                                             id="budget"
                                                             bsSize="sm"
                                                             valid={!errors.budget && this.state.budget.label.label_en != ''}
-                                                            invalid={touched.budget && !!errors.budget}
+                                                            // invalid={touched.budget && !!errors.budget}
+                                                            invalid={(touched.budget && !!errors.budget) || (touched.budget && this.state.budget.label.label_en == '')}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.budget.label.label_en}
@@ -821,6 +822,7 @@ class AddBudgetComponent extends Component {
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check" disabled={!isValid}></i>{i18n.t('static.common.submit')}</Button> */}
 
                                                         &nbsp;
                                                     </FormGroup>

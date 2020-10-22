@@ -11,10 +11,10 @@ import UnitService from '../../api/UnitService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
-    unitId: [],
+let initialValues = {
+    unitId: '',
     label: '',
-    forecastingUnitId: [],
+    forecastingUnitId: '',
     multiplier: ''
 }
 const entityname = i18n.t('static.planningunit.planningunit');

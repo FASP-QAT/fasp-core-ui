@@ -688,7 +688,7 @@ import ProcurementUnitService from "../../api/ProcurementUnitService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
-const initialValues = {
+let initialValues = {
     procurementUnitName: '',
     planningUnitId: '',
     multiplier: '',

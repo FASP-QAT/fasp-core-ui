@@ -109,7 +109,6 @@ export default class AddForecastingUnitComponent extends Component {
         }, 8000);
     }
 
-
     dataChange(event) {
         let { forecastingUnit } = this.state
         if (event.target.name === "label") {
@@ -322,12 +321,12 @@ export default class AddForecastingUnitComponent extends Component {
 
     getProductCategoryByRealmId() {
         let realmId = document.getElementById("realmId").value;
-        if (realmId != 0) {
+        if (realmId != "") {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    console.log("productCategory------>", response.data.slice(1))
                     this.setState({
-                        productcategories: response.data.slice(1)
+                        productcategories: response.data.slice(1),
                     })
                 }).catch(
                     error => {
@@ -517,7 +516,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             required
                                                             value={this.state.forecastingUnit.realm.id}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
@@ -529,8 +528,8 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="tracerCategoryId"
                                                             id="tracerCategoryId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId && this.state.forecastingUnit.tracerCategory.id != ''}
-                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            valid={!errors.tracerCategoryId && this.state.forecastingUnit.tracerCategory.id != ''}
+                                                            invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
@@ -548,8 +547,8 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="productCategoryId"
                                                             id="productCategoryId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId && this.state.forecastingUnit.productCategory.id != ''}
-                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            valid={!errors.productCategoryId && this.state.forecastingUnit.productCategory.id != ''}
+                                                            invalid={touched.productCategoryId && !!errors.productCategoryId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required

@@ -94,7 +94,7 @@ const options = {
           return x1 + x2;
 
         }
-      
+
       },
 
     }, {
@@ -122,7 +122,7 @@ const options = {
           return x1 + x2;
 
         }
-      
+
       },
       gridLines: {
         color: 'rgba(171,171,171,1)',
@@ -222,8 +222,8 @@ class StockStatus extends Component {
       versions: [],
       show: false,
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
     };
     this.filterData = this.filterData.bind(this);
@@ -244,21 +244,22 @@ class StockStatus extends Component {
   }
   formatAmc = value => {
     return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
-}
+  }
 
   formatter = value => {
-if(value!=null){
-    var cell1 = value
-    cell1 += '';
-    var x = cell1.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    if (value != null) {
+      var cell1 = value
+      cell1 += '';
+      var x = cell1.split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
     }
-    return x1 + x2;}
-    else{
+    else {
       return ''
     }
   }
@@ -270,13 +271,13 @@ if(value!=null){
     return moment(value).format('MMM YY')
   }
 
-  addDoubleQuoteToRowContent=(arr)=>{
-    return arr.map(ele=>'"'+ele+'"')
- }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
+  }
 
- rowtextFormatClassName=(row)=> {
-  return (!row.actualConsumption) ? 'textcolor-purple' : '';
-}
+  rowtextFormatClassName = (row) => {
+    return (!row.actualConsumption) ? 'textcolor-purple' : '';
+  }
 
   exportCSV() {
 
@@ -290,14 +291,14 @@ if(value!=null){
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
-    
-  
+
+
     const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
     i18n.t('static.report.actual').replaceAll(' ', '%20'),
     i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-    (i18n.t('static.shipment.qty')+" | "+i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.amc').replaceAll(' ', '%20'),
@@ -305,13 +306,13 @@ if(value!=null){
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'),ele.openingBalance,  ele.actualConsumption ? '' : ele.consumptionQty,ele.actualConsumption ?ele.consumptionQty:'', ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.actualConsumption ? '' : ele.consumptionQty, ele.actualConsumption ? ele.consumptionQty : '', ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
-        item.shipmentQty +" | " +item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) 
+        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment==null?'':ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos)])));
+      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos)])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -406,17 +407,17 @@ if(value!=null){
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual'),
     i18n.t('static.shipment.qty'),
-    (i18n.t('static.shipment.qty')+" | "+i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')),
     i18n.t('static.report.adjustmentQty'),
     i18n.t('static.supplyPlan.endingBalance'),
     i18n.t('static.report.amc'),
     i18n.t('static.report.mos')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption?'': this.formatter(ele.consumptionQty), ele.actualConsumption?this.formatter(ele.consumptionQty):'', this.formatter(ele.shipmentQty),
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption ? '' : this.formatter(ele.consumptionQty), ele.actualConsumption ? this.formatter(ele.consumptionQty) : '', this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
-           item.shipmentQty+ " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) )
+          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang))
       }).join(' \n')
         , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos))]);
 
@@ -478,7 +479,7 @@ if(value!=null){
             })
           }.bind(this);
           programRequest.onsuccess = function (event) {
-            
+
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
@@ -496,13 +497,13 @@ if(value!=null){
                 console.log(dtstr, ' ', enddtStr)
                 var dt = dtstr
                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-console.log(list)
+                console.log(list)
                 if (list.length > 0) {
-                  var shiplist = shipmentList.filter(c => c.receivedDate==null ||c.receivedDate==""?(c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr):(c.receivedDate >= dt && c.receivedDate <= enddtStr))
-var totalShipmentQty=0;
-shiplist.map(elt=>{
-  totalShipmentQty=totalShipmentQty+parseInt(elt.shipmentQty)
-})
+                  var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+                  var totalShipmentQty = 0;
+                  shiplist.map(elt => {
+                    totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
+                  })
                   var json = {
                     dt: new Date(from, month - 1),
                     consumptionQty: list[0].consumptionQty,
@@ -511,7 +512,7 @@ shiplist.map(elt=>{
                     shipmentInfo: shiplist,
                     adjustment: list[0].adjustmentQty,
                     closingBalance: list[0].closingBalance,
-                    openingBalance:list[0].openingBalance,
+                    openingBalance: list[0].openingBalance,
                     mos: list[0].mos,
                     amc: list[0].amc,
                     minMos: list[0].minStockMoS,
@@ -526,9 +527,9 @@ shiplist.map(elt=>{
                     shipmentInfo: [],
                     adjustment: 0,
                     closingBalance: 0,
-                    openingBalance:'',
+                    openingBalance: '',
                     mos: '',
-                    amc:'',
+                    amc: '',
                     minMos: '',
                     maxMos: ''
                   }
@@ -616,25 +617,68 @@ shiplist.map(elt=>{
               this.setState({
                 stockStatusList: [], loading: false
               })
-
               if (error.message === "Network Error") {
-                this.setState({ message: error.message, loading: false });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
                   case 412:
-                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
                     break;
                   default:
-                    this.setState({ loading: false, message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
                     break;
                 }
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       stockStatusList: [], loading: false
+        //     })
+
+        //     if (error.message === "Network Error") {
+        //       this.setState({ message: error.message, loading: false });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+        //           break;
+        //         default:
+        //           this.setState({ loading: false, message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
       }
     } else if (programId == 0) {
       this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
@@ -664,23 +708,66 @@ shiplist.map(elt=>{
               programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message, loading: false });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ loading: false, message: 'static.unkownError' });
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       programs: [], loading: false
+      //     }, () => { this.consolidatedProgramList() })
+      //     if (error.message === "Network Error") {
+      //       this.setState({ message: error.message, loading: false });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+      //           break;
+      //         default:
+      //           this.setState({ loading: false, message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
     } else {
       console.log('offline')
@@ -894,30 +981,72 @@ shiplist.map(elt=>{
             }, () => {
               this.filterData();
             })
-          })
-            .catch(
-              error => {
+          }).catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
                 this.setState({
-                  planningUnits: [],
-                })
-                if (error.message === "Network Error") {
-                  this.setState({ message: error.message });
-                } else {
-                  switch (error.response ? error.response.status : "") {
-                    case 500:
-                    case 401:
-                    case 404:
-                    case 406:
-                    case 412:
-                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                      break;
-                    default:
-                      this.setState({ message: 'static.unkownError' });
-                      break;
-                  }
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
                 }
               }
-            );
+            }
+          );
+          // .catch(
+          //   error => {
+          //     this.setState({
+          //       planningUnits: [],
+          //     })
+          //     if (error.message === "Network Error") {
+          //       this.setState({ message: error.message });
+          //     } else {
+          //       switch (error.response ? error.response.status : "") {
+          //         case 500:
+          //         case 401:
+          //         case 404:
+          //         case 406:
+          //         case 412:
+          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+          //           break;
+          //         default:
+          //           this.setState({ message: 'static.unkownError' });
+          //           break;
+          //       }
+          //     }
+          //   }
+          // );
         }
       }
     });
@@ -1003,7 +1132,7 @@ shiplist.map(elt=>{
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#042e6a',
+          backgroundColor: '#002f6c',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1022,7 +1151,7 @@ shiplist.map(elt=>{
           label: i18n.t('static.supplyPlan.shipped'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#7372cb',
+          backgroundColor: '#006789',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1041,7 +1170,7 @@ shiplist.map(elt=>{
           label: i18n.t('static.supplyPlan.ordered'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor:  '#20a8d8',
+          backgroundColor: '#205493',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1057,7 +1186,7 @@ shiplist.map(elt=>{
         },
         {
           label: i18n.t('static.supplyPlan.planned'),
-          backgroundColor: '#a5c5ec',
+          backgroundColor: '#a7c6ed',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -1117,7 +1246,7 @@ shiplist.map(elt=>{
           type: "line",
           yAxisID: 'B',
           label: i18n.t('static.report.mos'),
-          borderColor: '#205493',
+          borderColor: '#118b70',
           backgroundColor: 'transparent',
           ticks: {
             fontSize: 2,
@@ -1134,7 +1263,7 @@ shiplist.map(elt=>{
           yAxisID: 'A',
           label: i18n.t('static.supplyPlan.consumption'),
           backgroundColor: 'transparent',
-          borderColor: '#f45c45',
+          borderColor: '#ba0c2f',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
@@ -1146,10 +1275,10 @@ shiplist.map(elt=>{
           data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
         },
         {
-          label:i18n.t('static.report.stock'),
+          label: i18n.t('static.report.stock'),
           yAxisID: 'A',
           type: 'line',
-          borderColor: '#d0cece',
+          borderColor: '#cfcdc9',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
@@ -1171,11 +1300,7 @@ shiplist.map(elt=>{
 
     return (
       <div className="animated fadeIn" >
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
@@ -1312,11 +1437,11 @@ shiplist.map(elt=>{
 
                     <thead>
                       <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="4"> {i18n.t('static.report.stock')} </th> </tr><tr>
-                      <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
-                      <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
-                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
-                       <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty')+" | "+(i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
+                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
@@ -1336,23 +1461,23 @@ shiplist.map(elt=>{
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].openingBalance)}
                             </td>
-                           
-                            <td  className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
+
+                            <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
                               {this.state.stockStatusList[idx].actualConsumption ? '' : this.formatter(this.state.stockStatusList[idx].consumptionQty)}
                             </td> <td>
 
-{this.state.stockStatusList[idx].actualConsumption?this.formatter(this.state.stockStatusList[idx].consumptionQty):''}
-</td>
+                              {this.state.stockStatusList[idx].actualConsumption ? this.formatter(this.state.stockStatusList[idx].consumptionQty) : ''}
+                            </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty )+`   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}`}</td></tr>)
+                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
-                           
+
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].adjustment)}
                             </td>
@@ -1365,7 +1490,7 @@ shiplist.map(elt=>{
                             <td>
                               {this.roundN(this.state.stockStatusList[idx].mos)}
                             </td>
-                        
+
                           </tr>)
 
                       }

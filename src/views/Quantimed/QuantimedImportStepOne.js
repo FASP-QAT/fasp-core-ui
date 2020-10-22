@@ -125,7 +125,9 @@ class QuantimedImportStepOne extends Component {
     componentDidMount() {
         bsCustomFileInput.init();
         AuthenticationService.setupAxiosInterceptors();
-
+        this.setState({
+            loading: true
+        })
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -298,7 +300,7 @@ class QuantimedImportStepOne extends Component {
                                             <CardBody>
 
                                                 <FormGroup id="fileImportDiv">
-                                                    <Col md="3">
+                                                    <Col md="4">
                                                         <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.quantimed.quantimedImportSelectFileLabel')}<span class="red Reqasterisk">*</span></Label>
                                                     </Col>
                                                     <Col xs="12" md="4" className="custom-file">

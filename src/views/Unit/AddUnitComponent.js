@@ -140,7 +140,7 @@ class AddUnitComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        dimensions: response.data, loading: false
+                        dimensions: response.data, loading: false,
                     })
                 } else {
 
@@ -191,7 +191,6 @@ class AddUnitComponent extends Component {
                     }
                 }
             );
-
     }
 
     submitHandler = event => {

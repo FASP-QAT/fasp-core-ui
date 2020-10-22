@@ -33,21 +33,37 @@ const initialValuesSix = {
 const validationSchemaSix = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.program.validprogramtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        airFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        seaFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
+        airFreightPerc: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validairfreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        seaFreightPerc: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
         // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
-        plannedToSubmittedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validplantosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
-        submittedToApprovedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
-        approvedToShippedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
+        plannedToSubmittedLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validplantosubmittext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        submittedToApprovedLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validsubmittoapprovetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        approvedToShippedLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         monthsInFutureForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
         monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -56,12 +72,21 @@ const validationSchemaSix = function (values) {
             .integer().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required((i18n.t('static.pipeline.entershelflife'))).min(0, i18n.t('static.program.validvaluetext')),
 
-        arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.arrivedToDeliveredLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        shippedToArrivedBySeaLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
-        shippedToArrivedByAirLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.shippedToArrivedByAirLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+        arrivedToDeliveredLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.arrivedToReceivedLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedBySeaLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedByAirLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         // healthAreaId: Yup.string()
         //     .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
@@ -328,7 +353,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.report.plannedToSubmitLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.plannedToSubmittedLeadTime && this.props.items.program.plannedToSubmittedLeadTime != ''}
@@ -356,7 +381,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.approvedToShippedLeadTime && this.props.items.program.approvedToShippedLeadTime != ''}

@@ -12,7 +12,7 @@ import {
     SECRET_KEY, DATE_FORMAT_CAP,
     MONTHS_IN_PAST_FOR_SUPPLY_PLAN,
     TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
-    PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION
+    PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION
 } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProductService from '../../api/ProductService';
@@ -104,23 +104,66 @@ export default class ExpiredInventory extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ loading: false, message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -340,30 +383,72 @@ export default class ExpiredInventory extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             }
         });
@@ -398,7 +483,7 @@ export default class ExpiredInventory extends Component {
             // "shipmentStatusId": document.getElementById("shipmentStatusId").value,
             "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
             "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-            "includePlannedShipment": document.getElementById("includePlanningShipments").value.toString() == 'true'?1:0
+            "includePlannedShipment": document.getElementById("includePlanningShipments").value.toString() == 'true' ? 1 : 0
 
         }
 
@@ -450,17 +535,17 @@ export default class ExpiredInventory extends Component {
                         var data = []
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
-                           var list1= ele.batchDetails.filter(c => c.expiredQty>0 && (c.expiryDate >= startDate && c.expiryDate <= endDate))
-                           list1.map(ele1=>{
-                              // ele1.createdDate=ele.transDate
-                            var json = {
-                                planningUnit: pu.planningUnit,
-                                batchInfo: ele1,
-                                expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true'?ele1.expiredQty:ele1.expiredQtyWps,
-                                program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
-                            }
-                            data.push(json)
-                        })
+                            var list1 = ele.batchDetails.filter(c => c.expiredQty > 0 && (c.expiryDate >= startDate && c.expiryDate <= endDate))
+                            list1.map(ele1 => {
+                                // ele1.createdDate=ele.transDate
+                                var json = {
+                                    planningUnit: pu.planningUnit,
+                                    batchInfo: ele1,
+                                    expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps,
+                                    program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
+                                }
+                                data.push(json)
+                            })
                         })
                         console.log(data)
                         this.setState({
@@ -489,23 +574,68 @@ export default class ExpiredInventory extends Component {
                                 this.buildJExcel();
                             });
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message, loading: false });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ loading: false, message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             outPutList: []
+                //         }, () => {
+                //             this.buildJExcel();
+                //         });
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message, loading: false });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ loading: false, message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
             }
         } else if (programId == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] }, () => {
@@ -524,9 +654,9 @@ export default class ExpiredInventory extends Component {
 
         }
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV = (columns) => {
 
         var csvRow = [];
@@ -544,7 +674,7 @@ export default class ExpiredInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo,ele.batchInfo.autoGenerated==true?i18n.t('static.program.yes'):i18n.t('static.program.no'),(this.dateformatter( ele.batchInfo.createdDate)).replaceAll(' ', '%20'),(this.dateformatter(ele.batchInfo.expiryDate)).replaceAll(' ', '%20')])));
+        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatter(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(Math.ceil(moment(new Date(ele.batchInfo.expiryDate)).diff(new Date(ele.batchInfo.createdDate), 'months', true))), (this.dateformatter(ele.batchInfo.expiryDate)).replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -632,7 +762,7 @@ export default class ExpiredInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.outPutList.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated==true?i18n.t('static.program.yes'):i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), this.dateformatter(ele.batchInfo.expiryDate)]);
+        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), Math.ceil(moment(new Date(ele.batchInfo.expiryDate)).diff(new Date(ele.batchInfo.createdDate), 'months', true)), this.dateformatter(ele.batchInfo.expiryDate)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -646,7 +776,7 @@ export default class ExpiredInventory extends Component {
         addFooters(doc)
         doc.save(i18n.t('static.report.expiredInventory') + ".pdf")
     }
-   
+
 
     buildJExcel() {
         let outPutList = this.state.outPutList;
@@ -659,11 +789,11 @@ export default class ExpiredInventory extends Component {
             data[0] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[1] = this.formatter(outPutList[j].expiredQty)
             data[2] = outPutList[j].batchInfo.batchNo
-            data[3] = outPutList[j].batchInfo.autoGenerated==true?i18n.t('static.program.yes'):i18n.t('static.program.no')
+            data[3] = outPutList[j].batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no')
             // data[4] = outPutList[j].batchInfo.createdDate
             data[4] = (outPutList[j].batchInfo.createdDate ? moment(outPutList[j].batchInfo.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
-            // data[5] = outPutList[j].batchInfo.expiryDate
-            data[5] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[5] = Math.ceil(moment(new Date(outPutList[j].batchInfo.expiryDate)).diff(new Date(outPutList[j].batchInfo.createdDate), 'months', true))
+            data[6] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`${DATE_FORMAT_CAP}`) : null)
 
             outPutListArray[count] = data;
             count++;
@@ -690,7 +820,7 @@ export default class ExpiredInventory extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.supplyPlan.expiredQty'),
+                    title: i18n.t('static.report.expiredQty'),
                     type: 'text',
                     readOnly: true
                 },
@@ -705,7 +835,12 @@ export default class ExpiredInventory extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.report.createdDate'),
+                    title: i18n.t('static.report.batchstartdt'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.shelfLife'),
                     type: 'text',
                     readOnly: true
                 },
@@ -721,7 +856,7 @@ export default class ExpiredInventory extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -807,7 +942,7 @@ export default class ExpiredInventory extends Component {
             },
             {
                 dataField: 'expiredQty',
-                text: i18n.t('static.supplyPlan.expiredQty'),
+                text: i18n.t('static.report.expiredQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -849,7 +984,7 @@ export default class ExpiredInventory extends Component {
 
             }, {
                 dataField: 'batchInfo.createdDate',
-                text: i18n.t('static.report.createdDate'),
+                text: i18n.t('static.report.batchstartdt'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -857,6 +992,21 @@ export default class ExpiredInventory extends Component {
                 formatter: (cellContent, row) => {
                     return (
                         (row.batchInfo.createdDate ? moment(row.batchInfo.createdDate).format(`${DATE_FORMAT_CAP}`) : null)
+                        // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
+                    );
+                }
+
+            },
+            {
+                dataField: 'batchInfo.shelfLife',
+                text: i18n.t('static.report.shelfLife'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+                formatter: (cellContent, row) => {
+                    return (
+                        (moment(new Date(row.batchInfo.expiryDate)).diff(new Date(row.batchInfo.createdDate), 'months', true))
                         // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
                 }
@@ -913,11 +1063,7 @@ export default class ExpiredInventory extends Component {
                     this.setState({ message: message })
                 }} />*/}
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
@@ -951,7 +1097,7 @@ export default class ExpiredInventory extends Component {
                         <div className="TableCust" >
                             <div ref={ref}>
                                 {/* <Form > */}
-                                <Col md="10 pl-0">
+                                <Col md="12 pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>

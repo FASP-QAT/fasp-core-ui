@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -59,11 +59,15 @@ class ProcurementAgentExport extends Component {
             planningUnits: [],
             planningUnitValues: [],
             planningUnitLabels: [],
+            procurementAgentValues: [],
+            procurementAgentLabels: [],
+            fundingSourceValues: [],
+            fundingSourceLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth()  },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
         }
         this.formatLabel = this.formatLabel.bind(this);
@@ -93,23 +97,66 @@ class ProcurementAgentExport extends Component {
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -189,23 +236,66 @@ class ProcurementAgentExport extends Component {
                             procurementAgents: [], loading: false
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             procurementAgents: [], loading: false
+            //         }, () => { this.consolidatedProcurementAgentList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -420,30 +510,72 @@ class ProcurementAgentExport extends Component {
                         }, () => {
                             this.fetchData();
                         })
-                    })
-                        .catch(
-                            error => {
+                    }).catch(
+                        error => {
+                            this.setState({
+                                planningUnits: [],
+                            })
+                            if (error.message === "Network Error") {
                                 this.setState({
-                                    planningUnits: [],
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError' });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
                 }
             }
         });
@@ -458,6 +590,31 @@ class ProcurementAgentExport extends Component {
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+    handleProcurementAgentChange = (procurementAgentIds) => {
+        procurementAgentIds = procurementAgentIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            procurementAgentValues: procurementAgentIds.map(ele => ele),
+            procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+
+    handleFundingSourceChange = (fundingSourceIds) => {
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
 
             this.fetchData()
@@ -490,9 +647,9 @@ class ProcurementAgentExport extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV(columns) {
 
         let viewby = document.getElementById("viewById").value;
@@ -500,15 +657,17 @@ class ProcurementAgentExport extends Component {
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
         if (viewby == 1) {
-            csvRow.push(i18n.t('static.procurementagent.procurementagent') + ' , ' + (document.getElementById("procurementAgentId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            this.state.procurementAgentLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         } else if (viewby == 2) {
-            csvRow.push(i18n.t('static.budget.fundingsource') + ' , ' + (document.getElementById("fundingSourceId").selectedOptions[0].text).replaceAll(' ', '%20'))
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
 
         csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        this.state.planningUnitLabels.map(ele =>
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+        this.state.planningUnitValues.map(ele =>
+            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (((ele.label).toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push(i18n.t('static.program.isincludeplannedshipment').replaceAll(' ', '%20') + ' , ' + (document.getElementById("isPlannedShipmentId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
@@ -534,7 +693,7 @@ class ProcurementAgentExport extends Component {
         } else if (viewby == 2) {
             this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
         } else {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
         }
 
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
@@ -595,30 +754,33 @@ class ProcurementAgentExport extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-
+                    let poslen = 0
                     if (viewby == 1) {
-                        doc.text(i18n.t('static.procurementagent.procurementagent') + ' : ' + document.getElementById("procurementAgentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                            align: 'left'
-                        })
+                        var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 110, procurementAgentText)
+                        poslen = 110 + procurementAgentText.length * 10
                     } else if (viewby == 2) {
-                        doc.text(i18n.t('static.budget.fundingsource') + ' : ' + document.getElementById("fundingSourceId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                            align: 'left'
-                        })
+                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 110, fundingSourceText)
+                        poslen = 110 + fundingSourceText.length * 10
+
                     }
-
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    console.log(poslen)
+                    poslen = poslen + 20
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, poslen, {
                         align: 'left'
                     })
-
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    poslen = poslen + 20
+                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, poslen, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                    poslen = poslen + 20
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("isPlannedShipmentId").selectedOptions[0].text, doc.internal.pageSize.width / 8, poslen, {
                         align: 'left'
                     })
-
+                    poslen = poslen + 20
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 190, planningText)
+                    doc.text(doc.internal.pageSize.width / 8, poslen, planningText)
 
 
                 }
@@ -643,25 +805,25 @@ class ProcurementAgentExport extends Component {
         let data = [];
         if (viewby == 1) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code,ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else if (viewby == 2) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code,ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else {
             columns.splice(0, 2);
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         }
-        let startY = 200 + (this.state.planningUnitValues.length * 3)
+        let startY = 220 + (this.state.planningUnitValues.length * 3)
         let content = {
             margin: { top: 80, bottom: 70 },
             startY: startY,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 76, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 65, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 148 },
-                2: { cellWidth: 157.89 },
+                0: { cellWidth: 149 },
+                3: { cellWidth: 157.89 },
             }
         };
         if (viewby != 2 && viewby != 1) {
@@ -837,7 +999,7 @@ class ProcurementAgentExport extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -872,8 +1034,8 @@ class ProcurementAgentExport extends Component {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let viewby = document.getElementById("viewById").value;
-        let procurementAgentId = document.getElementById("procurementAgentId").value;
-        let fundingSourceId = document.getElementById("fundingSourceId").value;
+        let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let isPlannedShipmentId = document.getElementById("isPlannedShipmentId").value;
 
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
@@ -881,7 +1043,7 @@ class ProcurementAgentExport extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
         if (viewby == 1) {
-            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && procurementAgentId > 0) {
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0) {
                 if (versionId.includes('Local')) {
                     planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value))
                     var db1;
@@ -933,7 +1095,7 @@ class ProcurementAgentExport extends Component {
                                 })
                             }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                
+
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -956,47 +1118,50 @@ class ProcurementAgentExport extends Component {
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
                                     isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
                                 }
-
-                                const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
-                                // const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-                                // EXPECTED_DELIVERY_DATE
-                                // console.log("startDate===>", startDate);
-                                // console.log("stopDate===>", endDate);
-                                const dateFilter = procurementAgentFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'));
-                                console.log("dateFilter====>", dateFilter);
                                 let data = [];
-                                let planningUnitFilter = [];
-                                for (let i = 0; i < planningUnitIds.length; i++) {
-                                    for (let j = 0; j < dateFilter.length; j++) {
-                                        if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
-                                            planningUnitFilter.push(dateFilter[j]);
+                                this.state.procurementAgentValues.map(p => {
+                                    var procurementAgentId = p.value
+                                    const procurementAgentFilter = isPlannedShipment.filter(c => c.procurementAgent.id == procurementAgentId);
+                                    // const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+                                    // EXPECTED_DELIVERY_DATE
+                                    // console.log("startDate===>", startDate);
+                                    // console.log("stopDate===>", endDate);
+                                    const dateFilter = procurementAgentFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'));
+                                    console.log("dateFilter====>", dateFilter);
+
+                                    let planningUnitFilter = [];
+                                    for (let i = 0; i < planningUnitIds.length; i++) {
+                                        for (let j = 0; j < dateFilter.length; j++) {
+                                            if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+                                                planningUnitFilter.push(dateFilter[j]);
+                                            }
                                         }
                                     }
-                                }
-                                // console.log("offline data----", planningUnitFilter);
-                                for (let j = 0; j < planningUnitFilter.length; j++) {
-                                    // console.log("hi===>", parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)));
-                                    let freight = 0;
-                                    if (planningUnitFilter[j].shipmentMode === "Air") {
-                                        freight = airFreight;
-                                    } else {
-                                        freight = seaFreight;
+                                    // console.log("offline data----", planningUnitFilter);
+                                    for (let j = 0; j < planningUnitFilter.length; j++) {
+                                        // console.log("hi===>", parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)));
+                                        let freight = 0;
+                                        if (planningUnitFilter[j].shipmentMode === "Air") {
+                                            freight = airFreight;
+                                        } else {
+                                            freight = seaFreight;
+                                        }
+                                        let json = {
+                                            "active": true,
+                                            "shipmentId": planningUnitFilter[j].shipmentId,
+                                            "procurementAgent": planningUnitFilter[j].procurementAgent,
+                                            "fundingSource": planningUnitFilter[j].fundingSource,
+                                            "planningUnit": planningUnitFilter[j].planningUnit,
+                                            "qty": planningUnitFilter[j].shipmentQty,
+                                            "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                            "freightPerc": isNaN(parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                            "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                            "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+                                            "currency": planningUnitFilter[j].currency
+                                        }
+                                        data.push(json);
                                     }
-                                    let json = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilter[j].shipmentId,
-                                        "procurementAgent": planningUnitFilter[j].procurementAgent,
-                                        "fundingSource": planningUnitFilter[j].fundingSource,
-                                        "planningUnit": planningUnitFilter[j].planningUnit,
-                                        "qty": planningUnitFilter[j].shipmentQty,
-                                        "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "freightPerc": isNaN(parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
-                                        "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
-                                        "currency": planningUnitFilter[j].currency
-                                    }
-                                    data.push(json);
-                                }
+                                })
                                 console.log("data----->", data);
                                 var planningUnitsinData = data.map(q => q.planningUnit.id);
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
@@ -1036,6 +1201,7 @@ class ProcurementAgentExport extends Component {
                                     // }
                                     filteredData.push(myJson);
                                 }
+
                                 console.log("filteredData=====>", filteredData);
                                 this.setState({
                                     data: filteredData
@@ -1058,7 +1224,7 @@ class ProcurementAgentExport extends Component {
                         includePlannedShipments = false;
                     }
                     var inputjson = {
-                        procurementAgentId: procurementAgentId,
+                        procurementAgentIds: procurementAgentIds,
                         programId: programId,
                         versionId: versionId,
                         startDate: new moment(startDate),
@@ -1089,23 +1255,71 @@ class ProcurementAgentExport extends Component {
                                     this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             data: [], loading: false
+                    //         }, () => {
+                    //             this.consolidatedProgramList();
+                    //             this.consolidatedProcurementAgentList();
+                    //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                    //             this.el.destroy();
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message, loading: false });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError', loading: false });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
 
 
                 }
@@ -1127,14 +1341,14 @@ class ProcurementAgentExport extends Component {
                     this.el.destroy();
                 })
 
-            } else if (procurementAgentId == 0) {
+            } else if (this.state.procurementAgentValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                 })
             }
         } else if (viewby == 2) {
-            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && fundingSourceId > 0) {
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0) {
                 if (versionId.includes('Local')) {
                     planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value))
                     var db1;
@@ -1186,7 +1400,7 @@ class ProcurementAgentExport extends Component {
                                 })
                             }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                
+
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -1209,48 +1423,50 @@ class ProcurementAgentExport extends Component {
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
                                     isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
                                 }
-
-                                const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
-
-                                // const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
-
-                                const dateFilter = fundingSourceFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'));
-                                console.log("DB LIST---", dateFilter);
-                                console.log("SELECTED LIST---", planningUnitIds);
-
                                 let data = [];
-                                let planningUnitFilter = [];
-                                for (let i = 0; i < planningUnitIds.length; i++) {
-                                    for (let j = 0; j < dateFilter.length; j++) {
-                                        if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
-                                            planningUnitFilter.push(dateFilter[j]);
+                                this.state.map.fundingSourceValues.map(f => {
+                                    var fundingSourceId
+                                    const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
+
+                                    // const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
+
+                                    const dateFilter = fundingSourceFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'));
+                                    console.log("DB LIST---", dateFilter);
+                                    console.log("SELECTED LIST---", planningUnitIds);
+
+
+                                    let planningUnitFilter = [];
+                                    for (let i = 0; i < planningUnitIds.length; i++) {
+                                        for (let j = 0; j < dateFilter.length; j++) {
+                                            if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
+                                                planningUnitFilter.push(dateFilter[j]);
+                                            }
                                         }
                                     }
-                                }
 
-                                console.log("offline data----", planningUnitFilter);
-                                for (let j = 0; j < planningUnitFilter.length; j++) {
-                                    let freight = 0;
-                                    if (planningUnitFilter[j].shipmentMode === "Air") {
-                                        freight = airFreight;
-                                    } else {
-                                        freight = seaFreight;
+                                    console.log("offline data----", planningUnitFilter);
+                                    for (let j = 0; j < planningUnitFilter.length; j++) {
+                                        let freight = 0;
+                                        if (planningUnitFilter[j].shipmentMode === "Air") {
+                                            freight = airFreight;
+                                        } else {
+                                            freight = seaFreight;
+                                        }
+                                        let json = {
+                                            "active": true,
+                                            "shipmentId": planningUnitFilter[j].shipmentId,
+                                            "fundingSource": planningUnitFilter[j].fundingSource,
+                                            "planningUnit": planningUnitFilter[j].planningUnit,
+                                            "qty": planningUnitFilter[j].shipmentQty,
+                                            "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                            "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                            "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
+                                            "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
+                                            "currency": planningUnitFilter[j].currency
+                                        }
+                                        data.push(json);
                                     }
-                                    let json = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilter[j].shipmentId,
-                                        "fundingSource": planningUnitFilter[j].fundingSource,
-                                        "planningUnit": planningUnitFilter[j].planningUnit,
-                                        "qty": planningUnitFilter[j].shipmentQty,
-                                        "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
-                                        "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
-                                        "currency": planningUnitFilter[j].currency
-                                    }
-                                    data.push(json);
-                                }
-
+                                })
                                 var planningUnitsinData = data.map(q => q.planningUnit.id);
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
@@ -1311,7 +1527,7 @@ class ProcurementAgentExport extends Component {
                         includePlannedShipments = false;
                     }
                     var inputjson = {
-                        fundingSourceId: fundingSourceId,
+                        fundingSourceIds: fundingSourceIds,
                         programId: programId,
                         versionId: versionId,
                         startDate: new moment(startDate),
@@ -1342,23 +1558,72 @@ class ProcurementAgentExport extends Component {
 
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             data: [], loading: false
+                    //         }, () => {
+                    //             this.consolidatedProgramList();
+                    //             this.consolidatedFundingSourceList();
+                    //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                    //             this.el.destroy();
+
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message, loading: false });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError', loading: false });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
 
 
                 }
@@ -1380,7 +1645,7 @@ class ProcurementAgentExport extends Component {
                     this.el.destroy();
                 })
 
-            } else if (fundingSourceId == 0) {
+            } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -1440,7 +1705,7 @@ class ProcurementAgentExport extends Component {
                                 })
                             }.bind(this);
                             program1Request.onsuccess = function (event) {
-                                
+
                                 var programResult = [];
                                 programResult = program1Request.result;
                                 let airFreight = 0;
@@ -1585,23 +1850,71 @@ class ProcurementAgentExport extends Component {
                                     this.el.destroy();
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-                                        case 500:
+
                                         case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
                                         case 404:
                                         case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
+                                            break;
                                         case 412:
-                                            this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode),
+                                                loading: false
+                                            });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError', loading: false });
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
                                             break;
                                     }
                                 }
                             }
                         );
+                    // .catch(
+                    //     error => {
+                    //         this.setState({
+                    //             data: [], loading: false
+                    //         }, () => {
+                    //             this.consolidatedProgramList();
+                    //             this.consolidatedProcurementAgentList();
+                    //             this.el = jexcel(document.getElementById("tableDiv"), '');
+                    //             this.el.destroy();
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({ message: error.message, loading: false });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
+                    //                 case 500:
+                    //                 case 401:
+                    //                 case 404:
+                    //                 case 406:
+                    //                 case 412:
+                    //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode) });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({ message: 'static.unkownError', loading: false });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
 
 
                 }
@@ -1706,23 +2019,66 @@ class ProcurementAgentExport extends Component {
                             fundingSources: [], loading: false
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError', loading: false });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             fundingSources: [], loading: false
+            //         }, () => { this.consolidatedFundingSourceList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -1991,11 +2347,7 @@ class ProcurementAgentExport extends Component {
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
@@ -2163,57 +2515,43 @@ class ProcurementAgentExport extends Component {
 
                                 <FormGroup className="col-md-3" id="procurementAgentDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                    <div className="controls ">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="procurementAgentId"
-                                                id="procurementAgentId"
-                                                bsSize="sm"
-                                                onChange={this.fetchData}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {procurementAgents.length > 0
-                                                    && procurementAgents.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.procurementAgentId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="procurementAgentId"
+                                            id="planningUnitId"
+                                            bsSize="procurementAgentId"
+                                            value={this.state.procurementAgentValues}
+                                            onChange={(e) => { this.handleProcurementAgentChange(e) }}
+                                            options={procurementAgents.length > 0
+                                                && procurementAgents.map((item, i) => {
+                                                    return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
+                                                }, this)}
+                                        />
 
-                                            </Input>
-
-                                        </InputGroup>
                                     </div>
                                 </FormGroup>
-
                                 <FormGroup className="col-md-3" id="fundingSourceDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
-                                    <div className="controls ">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="fundingSourceId"
-                                                id="fundingSourceId"
-                                                bsSize="sm"
-                                                onChange={this.fetchData}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {fundingSources.length > 0
-                                                    && fundingSources.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.fundingSourceId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="fundingSourceId"
+                                            id="fundingSourceId"
+                                            bsSize="md"
+                                            value={this.state.fundingSourceValues}
+                                            onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                            options={fundingSources.length > 0
+                                                && fundingSources.map((item, i) => {
+                                                    return (
+                                                        { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                    )
+                                                }, this)}
+                                        />
 
-                                            </Input>
-
-                                        </InputGroup>
                                     </div>
                                 </FormGroup>
+
 
 
 

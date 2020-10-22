@@ -17,7 +17,7 @@ import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 
-const initialValues = {
+let initialValues = {
   realmId: '',
   healthAreaName: '',
   realmCountryId: [],
@@ -338,7 +338,7 @@ export default class AddHealthAreaComponent extends Component {
       .then(response => {
         console.log("realm list---", response.data);
         this.setState({
-          realms: response.data, loading: false
+          realms: response.data, loading: false,
         })
       }).catch(
         error => {
@@ -402,8 +402,9 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    if (e.target.value != 0) {
-      HealthAreaService.getRealmCountryList(e.target.value)
+    let realmId = e.target.value;
+    if (realmId != "") {
+      HealthAreaService.getRealmCountryList(realmId)
         .then(response => {
           console.log("Realm Country List list---", response.data);
           if (response.status == 200) {
@@ -466,7 +467,7 @@ export default class AddHealthAreaComponent extends Component {
       this.setState({
         realmCountryId: '',
         realmCountryList: [],
-        loading: false
+        loading: false,
       })
     }
   }
@@ -512,7 +513,7 @@ export default class AddHealthAreaComponent extends Component {
                   healthAreaName: this.state.healthArea.label.label_en,
                   healthAreaCode: this.state.healthArea.healthAreaCode,
                   realmId: this.state.healthArea.realm.id,
-                  realmCountryId: this.state.healthArea.realmCountryArray
+                  realmCountryId: this.state.realmCountryId
                 }}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -608,7 +609,7 @@ export default class AddHealthAreaComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
                               onBlur={handleBlur}
                               type="select" name="realmId" id="realmId">
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
                             <FormFeedback>{errors.realmId}</FormFeedback>
@@ -633,6 +634,7 @@ export default class AddHealthAreaComponent extends Component {
                               multi
                               options={this.state.realmCountryList}
                               value={this.state.realmCountryId}
+                            // value={this.state.healthArea.realmCountryArray}
                             />
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>

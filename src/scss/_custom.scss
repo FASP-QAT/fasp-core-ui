@@ -446,6 +446,12 @@ label.arrow_label:after {
 .Select--multi .Select-value-icon:hover {
   color: #212721 !important;
 }
+.Select--multi .Select-value-label {
+  border-bottom-right-radius: 2px;
+  border-top-right-radius: 2px;
+  cursor: default;
+  padding: 2px 4px!important;
+}
 .form-check-inline .form-check-input {
   margin-left: 2rem;
 }
@@ -662,6 +668,31 @@ label.arrow_label:after {
 .jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
+}
+
+.shipmentNotActive{
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
+.shipmentEmergencyNotAccount{
+  color: red !important;
+  background-color: #D3D3D3 !important;
+}
+
+.shipmentEmergencyAccount{
+  color: red !important;
+  background-color: #FFF !important;
+}
+
+.shipmentNotEmergencyNotAccount{
+  color: #000 !important;
+  background-color: #D3D3D3 !important;
+}
+
+.shipmentNotEmergencyAccount{
+  color:#000 !important;
+  background-color: #FFF !important;
 }
 
 .whitebtnColor .btn-info {
@@ -1502,7 +1533,7 @@ h5,
 }
 .icon-wrapper i {
   margin: 0 auto;
-  font-size: 20px;
+  font-size: 24px;
   position: relative;
   z-index: 5;
 }
@@ -2639,6 +2670,11 @@ input::placeholder {
     color: #20a8d8;
     font-size: 14px;
   }
+
+  .scenarioListIcon{
+    color: #20a8d8;
+    font-size: 18px;
+  }
   ///year Range picker
 
   .ant-picker {
@@ -2881,7 +2917,7 @@ input::placeholder {
 }
 
 .readonly{
-  background-color: #cfcdc9;
+  background-color: #cfcdc9!important;
 }
 
 
@@ -3223,11 +3259,14 @@ border-radius: 2em;
   // margin-bottom: -5px!important;
   
 }
+.Select-input>input{
+  padding: 8px 0 3px!important;
+}
 .Select-control {
   border-radius: 0.2rem!important;
   // border: 1px solid #e4e7ea!important;
   color: #697069!important;
-  height: 0px!important;
+  height: 27px!important;
   // border: none!important;
    background-color:transparent!important;
 }
@@ -3328,13 +3367,16 @@ border-radius: 2em;
   background: transparent!important;
 } 
 .was-validated .form-control:valid, .form-control.is-valid {
-  background-size: calc(0.75em + 30px) calc(0.75em + 0.375rem)!important;
+  background-size: calc(0.75em + 38px) calc(0.75em + 0.375rem)!important;
 }
 .was-validated .form-control:invalid, .form-control.is-invalid {
-  background-size: calc(0.75em + 30px) calc(0.75em + 0.375rem)!important;
+  background-size: calc(0.75em + 38px) calc(0.75em + 0.375rem)!important;
 }
-.Select-clear {
-  padding-right: 14px;
+// .Select-clear {
+//   padding-right: 20px;
+// }
+.Select--multi .Select-clear-zone {
+  left: -18px;
 }
 .inlineMargin
 {
@@ -3476,8 +3518,20 @@ margin-left: -45px;
   }
 }
 
+.localProcurementEmergencyComment{
+    background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurement.png');
+    background-repeat: no-repeat,no-repeat;
+    background-position: top right,top left;
+}
+
+.localProcurementAgent{
+    background-image:url('/src/assets/img/localProcurement.png');
+    background-repeat: no-repeat;
+    background-position: top left;
+}
+
 .emergencyComment{
-    background-image:url('/src/assets/img/emergencyComment.png');
+  background-image:url('/src/assets/img/emergencyComment.png');
     background-repeat: no-repeat;
     background-position: top right;
 }
@@ -3560,22 +3614,24 @@ margin-left: -45px;
 
 .quantimedProgressbartext1 {
   // left: 7px;
-  left: -2%;
-  transform: translateX(18%) scale(1);
+  left: 0%;
+  transform: translateX(-7%) scale(1);
 }
 .quantimedProgressbartext2 {
   // left: 16%;
-  left: 28%;
-  transform: translateX(18%) scale(1);
+  left: 33.3333%;
+  transform: translateX(-43%) scale(1);
 }
 .quantimedProgressbartext3 {
   // left: 16%;
-  left: 61%;
-  // transform: translateX(18%) scale(1);
+  left: 64.5%;
+  // transform: translateX(18%) scale(1);  
 }
+
+
 .quantimedProgressbartext4 {
   // left: 16%;
-  left: 92.5%;
+  left: 94%;
   transform: translateX(18%) scale(1);
 }
 .en-btnlogin{
@@ -3591,6 +3647,9 @@ margin-left: -45px;
     line-height: 1.5;
     width: 100%;
 }
+.werehousecapacitySearchposition{
+  margin-top: -49px;
+ } 
 
 .qat-problemListSearch{
   margin-top:-4%;
@@ -3604,4 +3663,12 @@ margin-left: -45px;
 }
 .problemList-yellow{
 background-color: yellow;
+}
+.pipelineimportfile{
+  margin-top: -10px;
+}
+.custom-file-input-btn {
+  color: #fff!important;
+  background-color: #20a8d8!important;
+  border-radius: 0px  5px 5px 0px;
 }

@@ -51,39 +51,40 @@ const validationSchema = function (values) {
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validairfreighttext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.string()
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number()
         //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validplantosubmittext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validsubmittoapprovetext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByAirLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.shippedToArrivedByAirLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         arrivedToDeliveredLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.arrivedToDeliveredLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()

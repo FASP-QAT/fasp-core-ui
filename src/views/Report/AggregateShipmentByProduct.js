@@ -163,9 +163,9 @@ class AggregateShipmentByProduct extends Component {
             message: '',
             outPutList: [],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate:{year:  new Date().getFullYear()-3, month: new Date().getMonth()+2},
-            maxDate:{year:  new Date().getFullYear()+3, month: new Date().getMonth()},
-            
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+
 
 
         };
@@ -195,9 +195,9 @@ class AggregateShipmentByProduct extends Component {
         }
         return x1 + x2;
     }
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV(columns) {
 
         var csvRow = [];
@@ -212,10 +212,10 @@ class AggregateShipmentByProduct extends Component {
 
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [this. addDoubleQuoteToRowContent(headers)]
+        var A = [this.addDoubleQuoteToRowContent(headers)]
 
         this.state.outPutList.map(
-            ele => A.push(this. addDoubleQuoteToRowContent([
+            ele => A.push(this.addDoubleQuoteToRowContent([
                 // (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.productCost,
@@ -371,7 +371,7 @@ class AggregateShipmentByProduct extends Component {
             // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
         ]);
         let content = {
-            margin: { top: 40,bottom:50 },
+            margin: { top: 40, bottom: 50 },
             startY: 200,
             head: [headers],
             body: data,
@@ -544,23 +544,66 @@ class AggregateShipmentByProduct extends Component {
                             programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: []
+            //         }, () => { this.consolidatedProgramList() })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             console.log('offline')
@@ -574,7 +617,7 @@ class AggregateShipmentByProduct extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -663,7 +706,7 @@ class AggregateShipmentByProduct extends Component {
 
         var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -713,7 +756,7 @@ class AggregateShipmentByProduct extends Component {
                 var db1;
                 var storeOS;
                 getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -763,23 +806,66 @@ class AggregateShipmentByProduct extends Component {
                                 planningUnits: [],
                             })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             planningUnits: [],
+                //         })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
             }
         });
 
@@ -799,7 +885,7 @@ class AggregateShipmentByProduct extends Component {
                 var storeOS;
                 getDatabase();
                 var regionList = [];
-                var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext')
@@ -905,7 +991,7 @@ class AggregateShipmentByProduct extends Component {
 
                 ReportService.AggregateShipmentByProduct(inputjson)
                     .then(response => {
-                        console.log("RESP------",response.data)
+                        console.log("RESP------", response.data)
                         this.setState({
                             data: response.data
                         }, () => { this.consolidatedProgramList() })
@@ -915,23 +1001,66 @@ class AggregateShipmentByProduct extends Component {
                                 data: []
                             }, () => { this.consolidatedProgramList() })
                             if (error.message === "Network Error") {
-                                this.setState({ message: error.message });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-                                    case 500:
+
                                     case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
                                     case 404:
                                     case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
+                                        break;
                                     case 412:
-                                        this.setState({ message: i18n.t(error.response.data.messageCode) });
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode),
+                                            loading: false
+                                        });
                                         break;
                                     default:
-                                        this.setState({ message: 'static.unkownError' });
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
                                         break;
                                 }
                             }
                         }
                     );
+                // .catch(
+                //     error => {
+                //         this.setState({
+                //             data: []
+                //         }, () => { this.consolidatedProgramList() })
+                //         if (error.message === "Network Error") {
+                //             this.setState({ message: error.message });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+                //                 case 500:
+                //                 case 401:
+                //                 case 404:
+                //                 case 406:
+                //                 case 412:
+                //                     this.setState({ message: i18n.t(error.response.data.messageCode) });
+                //                     break;
+                //                 default:
+                //                     this.setState({ message: 'static.unkownError' });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
 
             }
@@ -957,7 +1086,7 @@ class AggregateShipmentByProduct extends Component {
     }
     componentDidMount() {
         // if (navigator.onLine) {
-            this.getPrograms();
+        this.getPrograms();
 
 
         // } else {
@@ -1293,9 +1422,7 @@ class AggregateShipmentByProduct extends Component {
 
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
@@ -1357,7 +1484,7 @@ class AggregateShipmentByProduct extends Component {
 
                                                     <Picker
                                                         ref="pickRange"
-                                                        years={{min: this.state.minDate, max: this.state.maxDate}}
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         //theme="light"

@@ -7,6 +7,7 @@ import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js';
 export default class MapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -93,9 +94,10 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //reorder frequency
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
+            var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -113,9 +115,10 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //min month of stock
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
+            var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -133,9 +136,10 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //month in future amc
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
+            var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -153,9 +157,10 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //month in past amc
             var col = ("F").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(5, y);
+            var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -173,16 +178,17 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //procuementAgent lead time
             var col = ("G").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(6, y);
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -193,9 +199,10 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //shelf life
             var col = ("H").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(7, y);
+            var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -213,16 +220,17 @@ export default class MapPlanningUnits extends Component {
                 }
 
             }
-
+            //catelog price
             var col = ("I").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(8, y);
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -281,8 +289,10 @@ export default class MapPlanningUnits extends Component {
 
             }
         }
+        //reoder frequency
         if (x == 2) {
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -299,8 +309,9 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        //min month of stock
         if (x == 3) {
-            var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -317,8 +328,9 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        //month in future amc
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -335,8 +347,9 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        //month in past amc
         if (x == 5) {
-            var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -353,15 +366,17 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        //procurementAgent lead time
         if (x == 6) {
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -371,8 +386,10 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        //Shelf life
         if (x == 7) {
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -389,16 +406,18 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        //Catelog price
         if (x == 8) {
             // var reg = /^[0-9]+.[0-9]+$/;
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));

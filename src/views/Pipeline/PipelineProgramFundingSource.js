@@ -9,6 +9,7 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
 export default class PipelineProgramFundingSource extends Component {
     constructor(props) {
         super(props);
@@ -98,7 +99,7 @@ export default class PipelineProgramFundingSource extends Component {
     }
 
     saveFundingSource() {
-        var list = this.state.FundingSourceList;
+        var list = this.state.fundingSourceList;
         var json = this.el.getJson();
         var fundingSourceArray = []
         console.log(json.length)
@@ -203,12 +204,13 @@ export default class PipelineProgramFundingSource extends Component {
                                                 readonly: true
                                             }
                                         ],
-                                        pagination: 10,
+                                        pagination:localStorage.getItem("sesRecordCount"),
+                                        contextMenu: false,
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,
                                         wordWrap: true,
-                                        paginationOptions: [10, 25, 50, 100],
+                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         // position: 'top',
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
@@ -218,7 +220,7 @@ export default class PipelineProgramFundingSource extends Component {
                                         copyCompatibility: true,
                                         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                         text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                             show: '',
                                             entries: '',
                                         },

@@ -333,7 +333,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 
 import i18n from '../../i18n';
 import { boolean } from 'yup';
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 
 
 
@@ -501,7 +501,7 @@ export default class CountryListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             // tableOverflow: true,

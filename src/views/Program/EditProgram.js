@@ -38,7 +38,7 @@ let initialValues = {
     healthAreaId: '',
     programNotes: '',
     regionId: [],
-    uniqueCode:''
+    uniqueCode: ''
 }
 
 const validationSchema = function (values) {
@@ -55,39 +55,40 @@ const validationSchema = function (values) {
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.string()
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validairfreighttext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number()
         //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToSubmittedLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validplantosubmittext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validsubmittoapprovetext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByAirLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         arrivedToDeliveredLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validapprovetoshiptext'))
-            .min(0, i18n.t('static.program.validvaluetext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
+            .min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
@@ -483,9 +484,9 @@ export default class EditProgram extends Component {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[3];
-            program.programCode = dname.replace(new_string,"").concat(event.target.value.toUpperCase());
-            this.state.uniqueCode=event.target.value.toUpperCase()
-        } 
+            program.programCode = dname.replace(new_string, "").concat(event.target.value.toUpperCase());
+            this.state.uniqueCode = event.target.value.toUpperCase()
+        }
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
         }
@@ -1017,7 +1018,7 @@ export default class EditProgram extends Component {
             var uniqueCode = splitCode[3];
             this.setState({
                 program: response.data,
-                uniqueCode:uniqueCode
+                uniqueCode: uniqueCode
             })
             initialValues = {
                 programName: getLabelText(this.state.program.label, lang),
@@ -1037,7 +1038,7 @@ export default class EditProgram extends Component {
                 healthAreaId: this.state.program.healthArea.id,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray,
-                uniqueCode:this.state.uniqueCode
+                uniqueCode: this.state.uniqueCode
             }
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)

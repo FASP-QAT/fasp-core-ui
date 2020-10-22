@@ -499,7 +499,7 @@ import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 
 
 const entityname = i18n.t('static.procurementagent.procurementagent')
@@ -740,19 +740,19 @@ class ListProcurementAgentComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetime'),
+                    title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtime'),
+                    title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
                     type: 'text',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
                     type: 'text',
-                    readOnly: true
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
@@ -782,7 +782,7 @@ class ListProcurementAgentComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1036,14 +1036,14 @@ class ListProcurementAgentComponent extends Component {
             },
             {
                 dataField: 'submittedToApprovedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetime'),
+                text: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
                 dataField: 'approvedToShippedLeadTime',
-                text: i18n.t('static.procurementagent.procurementagentapprovetoshippedtime'),
+                text: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'

@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { JEXCEL_PAGINATION_OPTION, SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
 
 export default class PipelineProgramShipment extends Component {
 
@@ -408,7 +409,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 7) {
-
+            var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -443,6 +444,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 9) {
+            var reg = /^[0-9\b]+$/;
             var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -626,8 +628,9 @@ export default class PipelineProgramShipment extends Component {
                                     .then(response => {
                                         if (response.status == 200) {
                                             // console.log(response.data)
+                                            var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE);
                                             this.setState({
-                                                dataSourceList: response.data.map(ele => ({
+                                                dataSourceList: dataSourceFilterList.map(ele => ({
                                                     name: getLabelText(ele.label, this.state.lang),
                                                     id: ele.dataSourceId
                                                 }))
@@ -1006,25 +1009,25 @@ export default class PipelineProgramShipment extends Component {
         this.el.destroy();
 
         var data = this.state.pipelineShipmentData.map((item, index) => [
-            item.planningUnit, 
-            item.dataSource, 
-            item.procurementAgent, 
-            item.fundingSource, 
-            item.shipmentStatus, 
-            item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode, 
-            item.quantity, 
-            item.rate, 
+            item.planningUnit,
+            item.dataSource,
+            item.procurementAgent,
+            item.fundingSource,
+            item.shipmentStatus,
+            item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode,
+            item.quantity,
+            item.rate,
             // item.freightCost == 0 ? item.quantity * this.props.items.program.seaFreightPerc : item.freightCost, 
-            item.freightCost,
+            parseFloat(item.freightCost).toFixed(2),
             // item.quantity * item.rate, 
-            item.productCost, 
-            moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), 
-            moment(item.orderedDate).format("YYYY-MM-DD"), 
-            moment(item.plannedDate).format("YYYY-MM-DD"), 
-            moment(item.submittedDate).format("YYYY-MM-DD"), 
+            parseFloat(item.productCost).toFixed(2),
+            moment(item.expectedDeliveryDate).format("YYYY-MM-DD"),
+            moment(item.orderedDate).format("YYYY-MM-DD"),
+            moment(item.plannedDate).format("YYYY-MM-DD"),
+            moment(item.submittedDate).format("YYYY-MM-DD"),
             moment(item.approvedDate).format("YYYY-MM-DD"),
-            moment(item.shippedDate).format("YYYY-MM-DD"), 
-            moment(item.arrivedDate).format("YYYY-MM-DD"), 
+            moment(item.shippedDate).format("YYYY-MM-DD"),
+            moment(item.arrivedDate).format("YYYY-MM-DD"),
             moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
         // json[0] = data;
         var options = {
@@ -1098,12 +1101,14 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.supplyPlan.submittedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT }
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    type: 'hidden',
 
                 }, {
                     title: i18n.t('static.supplyPlan.approvedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT }
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    type: 'hidden',
 
                 }, {
                     title: i18n.t('static.shipment.shipdate'),
@@ -1113,7 +1118,8 @@ export default class PipelineProgramShipment extends Component {
                 }, {
                     title: i18n.t('static.supplyPlan.arrivedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT }
+                    options: { format: JEXCEL_DATE_FORMAT },
+                    type: 'hidden',
 
                 }, {
                     title: i18n.t('static.shipment.receiveddate'),
@@ -1133,12 +1139,12 @@ export default class PipelineProgramShipment extends Component {
                 }
 
             ],
-            pagination: 10,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
-            paginationOptions: [10, 25, 50],
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1146,8 +1152,9 @@ export default class PipelineProgramShipment extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
+            contextMenu: false,
             text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                 show: '',
                 entries: '',
             },
@@ -1252,9 +1259,50 @@ export default class PipelineProgramShipment extends Component {
 
     }
     SubmitProgram() {
-        this.SubmitShipment()
-        PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
+        // this.SubmitShipment()
+        this.loaded()
+        this.setState({loading:true});
+        var data = this.el.getJson().map(ele => ({
+            "shipmentId": null,
+            "procurementUnit": null,
+            "planningUnit": ele[0],
+            "dataSource": ele[1],
+            "procurementAgent": ele[2],
+            "fundingSource": ele[3],
+            "shipmentStatus": ele[4],
+            "shipmentMode": ele[5],
+            "suggestedQty": ele[6],
+            "quantity": ele[6],
+            "rate": ele[7],
+            "freightCost": ele[8],
+            "productCost": ele[9],
+            "expectedDeliveryDate": ele[10],
+            "orderedDate": ele[11],
+            "plannedDate": ele[12],
+            "submittedDate": ele[13],
+            "approvedDate": ele[14],
+            "shippedDate": ele[15],
+            "arrivedDate": ele[16],
+            "receivedDate": ele[17],
+            "notes": ele[18],
+            "accountFlag": false,
+            "erpFlag": false,
+            "versionId": 0,
+
+            "active": true
+        }))
+        console.log(JSON.stringify(data))
+        PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
             .then(response => {
+                console.log("==========>", response.data)
+                this.setState({
+                    message: response.data.messageCode,
+                    changedData: false, 
+                    // loading: true
+                }, () => console.log("=====", this.state));
+
+                // PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
+                //     .then(response => {
                 // var planningUnitListFinalInventory = response.data;
                 // console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
                 // var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
@@ -1265,61 +1313,105 @@ export default class PipelineProgramShipment extends Component {
                 //         pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
                 //     });
                 // } else {
-                    PipelineService.submitProgram(this.props.match.params.pipelineId)
-                        .then(response => {
-                            console.log(response.data.messageCode)
-                            this.setState({
-                                message: response.data.messageCode,
-                                changedData: false, loading: false
-                            })
-                            this.props.history.push({
-                                pathname: `/pipeline/pieplineProgramList`
-                            });
-                        }
-                        ).catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                PipelineService.submitProgram(this.props.match.params.pipelineId)
+                    .then(response => {
+                        console.log(response.data.messageCode)
+                        this.setState({
+                            message: response.data.messageCode,
+                            changedData: false, loading: false
+                        })
+                        this.props.history.push(
+                            // {
+                            // pathname: `/pipeline/pieplineProgramList`
+                            '/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess')
+                            // }
+                        );
+                    }
+                    ).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
 
 
-                    console.log('You have submitted the program');
+                console.log('You have submitted the program');
                 // }
+
+                // }).catch(
+                //     error => {
+                //         if (error.message === "Network Error") {
+                //             this.setState({
+                //                 message: 'static.unkownError',
+                //                 loading: false
+                //             });
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
+
+                //                 case 401:
+                //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                //                     break;
+                //                 case 403:
+                //                     this.props.history.push(`/accessDenied`)
+                //                     break;
+                //                 case 500:
+                //                 case 404:
+                //                 case 406:
+                //                     this.setState({
+                //                         message: error.response.data.messageCode,
+                //                         loading: false
+                //                     });
+                //                     break;
+                //                 case 412:
+                //                     this.setState({
+                //                         message: error.response.data.messageCode,
+                //                         loading: false
+                //                     });
+                //                     break;
+                //                 default:
+                //                     this.setState({
+                //                         message: 'static.unkownError',
+                //                         loading: false
+                //                     });
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
             }).catch(
                 error => {
@@ -1361,7 +1453,6 @@ export default class PipelineProgramShipment extends Component {
                     }
                 }
             );
-
 
 
 

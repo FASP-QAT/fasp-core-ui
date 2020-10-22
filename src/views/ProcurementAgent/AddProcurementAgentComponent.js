@@ -16,7 +16,7 @@ import reactCSS from 'reactcss'
 import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.procurementagent.procurementagent')
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     procurementAgentCode: "",
     procurementAgentName: "",
@@ -44,13 +44,13 @@ const validationSchema = function (values) {
         //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         submittedToApprovedLeadTime: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
         // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
         ,
         approvedToShippedLeadTime: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount')),
@@ -345,7 +345,7 @@ class AddProcurementAgentComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: response.data, loading: false,
                     })
                 } else {
                     this.setState({
@@ -624,7 +624,7 @@ class AddProcurementAgentComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                         <Input type="number"
@@ -643,7 +643,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtime')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                         <Input type="number"
@@ -661,7 +661,7 @@ class AddProcurementAgentComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
                                                         <FormGroup check inline className="procurementAgentradiomargin">
                                                             <Input
@@ -695,7 +695,7 @@ class AddProcurementAgentComponent extends Component {
                                                                 {i18n.t('static.program.no')}
                                                             </Label>
                                                         </FormGroup>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>

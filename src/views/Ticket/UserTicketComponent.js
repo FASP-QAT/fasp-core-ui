@@ -16,9 +16,12 @@ import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
 import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 
+let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
+let summaryText_2 = "Add / Update User"
+const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: "Add / Update User",
-    realm: "",
+    summary: summaryText_1,
+    realm: selectedRealm,
     name: "",
     emailId: "",
     phoneNumber: "",
@@ -101,10 +104,9 @@ export default class UserTicketComponent extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            lang: localStorage.getItem('lang'),
+        this.state = {            
             user: {
-                summary: 'Add / Update User',
+                summary: summaryText_1,
                 realm: "",
                 name: "",
                 emailId: "",
@@ -113,6 +115,7 @@ export default class UserTicketComponent extends Component {
                 language: "",
                 notes: ''
             },
+            lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
             roleList: [],
@@ -120,7 +123,7 @@ export default class UserTicketComponent extends Component {
             realmId: '',
             roleId: '',
             languageId: '',
-            loading: false
+            loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -134,7 +137,7 @@ export default class UserTicketComponent extends Component {
             user.summary = event.target.value;
         }
         if (event.target.name == "realm") {
-            user.realm = event.target.options[event.target.selectedIndex].innerHTML;
+            user.realm = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
             this.setState({
                 realmId: event.target.value
             })
@@ -221,13 +224,13 @@ export default class UserTicketComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();
 
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        languages: response.data
+                        languages: response.data, loading: false
                     })
                 } else {
                     this.setState({
@@ -241,18 +244,38 @@ export default class UserTicketComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -261,10 +284,24 @@ export default class UserTicketComponent extends Component {
 
         RealmService.getRealmListAll()
             .then(response => {
-                if (response.status == 200) {
+                if (response.status == 200) {                    
                     this.setState({
-                        realms: response.data
-                    })
+                        realms: response.data,
+                        realmId: selectedRealm, loading: false
+                    });
+                    if (selectedRealm !== "") {
+                        this.setState({
+                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        })
+    
+                        let { user } = this.state;
+                        user.realm = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        this.setState({
+                            user
+                        }, () => {                               
+    
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -277,18 +314,38 @@ export default class UserTicketComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -317,18 +374,38 @@ export default class UserTicketComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
@@ -399,6 +476,8 @@ export default class UserTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
+                            this.state.user.summary = summaryText_2;
+                            this.state.user.userLanguageCode = this.state.lang;
                             JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -420,17 +499,46 @@ export default class UserTicketComponent extends Component {
                                 }
                                 this.props.togglehelp();
                                 this.props.toggleSmall(this.state.message);
-                            })
-                                .catch(
-                                    error => {
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), loading: false
-                                        },
-                                            () => {
-                                                this.hideSecondComponent();
-                                            });
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
                                     }
-                                );
+                                }
+                            );
                         }}
                         render={
                             ({
@@ -483,7 +591,7 @@ export default class UserTicketComponent extends Component {
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required>
-                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                <option value="">{i18n.t('static.common.select')}</option>
                                                 {realmList}
                                             </Input>
                                             <FormFeedback className="red">{errors.realm}</FormFeedback>

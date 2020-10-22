@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -85,7 +85,7 @@ class SupplyPlanVersionAndReview extends Component {
             message: '',
             programLst: [],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
 
@@ -122,7 +122,7 @@ class SupplyPlanVersionAndReview extends Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
-      }
+    }
 
 
     buildJexcel() {
@@ -221,7 +221,7 @@ class SupplyPlanVersionAndReview extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -327,7 +327,7 @@ class SupplyPlanVersionAndReview extends Component {
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
-                    countries: response.data.map(ele=>ele.realmCountry), loading: false
+                    countries: response.data.map(ele => ele.realmCountry), loading: false
                 })
             }).catch(
                 error => {
@@ -335,23 +335,66 @@ class SupplyPlanVersionAndReview extends Component {
                         countries: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ loading: false, message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ loading: false, message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             countries: [], loading: false
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ loading: false, message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ loading: false, message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
     filterProgram = () => {
@@ -384,27 +427,73 @@ class SupplyPlanVersionAndReview extends Component {
                     this.setState({
                         programs: [], loading: false
                     },
-                    () => {
-                      this.hideSecondComponent();
-                    })
+                        () => {
+                            this.hideSecondComponent();
+                        })
                     if (error.message === "Network Error") {
-                        this.setState({ loading: false, message: error.message });
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
-                            case 500:
+
                             case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
                             case 404:
                             case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
+                                break;
                             case 412:
-                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
                                 break;
                             default:
-                                this.setState({ loading: false, message: 'static.unkownError' });
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
                                 break;
                         }
                     }
                 }
             );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             programs: [], loading: false
+        //         },
+        //             () => {
+        //                 this.hideSecondComponent();
+        //             })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ loading: false, message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+        //                     break;
+        //                 default:
+        //                     this.setState({ loading: false, message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
     getVersionTypeList() {
@@ -414,7 +503,46 @@ class SupplyPlanVersionAndReview extends Component {
             this.setState({
                 versionTypeList: response.data, loading: false
             })
-        })
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
     getStatusList() {
         // AuthenticationService.setupAxiosInterceptors();
@@ -423,30 +551,72 @@ class SupplyPlanVersionAndReview extends Component {
             this.setState({
                 statuses: response.data, loading: false
             })
-        })
-            .catch(
-                error => {
+        }).catch(
+            error => {
+                this.setState({
+                    statuses: [], loading: false
+                })
+                if (error.message === "Network Error") {
                     this.setState({
-                        statuses: [], loading: false
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ loading: false, message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ loading: false, message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ loading: false, message: 'static.unkownError' });
-                                break;
-                        }
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
                     }
                 }
-            );
+            }
+        );
+        // .catch(
+        //     error => {
+        //         this.setState({
+        //             statuses: [], loading: false
+        //         })
+        //         if (error.message === "Network Error") {
+        //             this.setState({ loading: false, message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ loading: false, message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ loading: false, message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
     fetchData() {
@@ -478,23 +648,70 @@ class SupplyPlanVersionAndReview extends Component {
                                 this.el.destroy();
                             })
                         if (error.message === "Network Error") {
-                            this.setState({ loading: false, message: error.message });
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
-                                case 500:
+
                                 case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
                                 case 404:
                                 case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
                                 case 412:
-                                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
                                     break;
                                 default:
-                                    this.setState({ loading: false, message: 'static.unkownError' });
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
                                     break;
                             }
                         }
                     }
                 );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             matricsList: [], loading: false
+            //         },
+            //             () => {
+            //                 this.el = jexcel(document.getElementById("tableDiv"), '');
+            //                 this.el.destroy();
+            //             })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ loading: false, message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
         }
         else if (countryId == 0) {
             this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext') },
@@ -513,9 +730,9 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
 
-    addDoubleQuoteToRowContent=(arr)=>{
-        return arr.map(ele=>'"'+ele+'"')
-     }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
     exportCSV(columns) {
 
         var csvRow = [];
@@ -877,11 +1094,7 @@ class SupplyPlanVersionAndReview extends Component {
         }
         return (
             <div className="animated fadeIn" >
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
+                <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 

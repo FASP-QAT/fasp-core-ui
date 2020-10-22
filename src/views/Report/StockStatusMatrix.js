@@ -35,10 +35,10 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626" },
-{ text: i18n.t('static.report.lowstock'), color: "#f48521" },
-{ text: i18n.t('static.report.okaystock'), color: "#118b70" },
-{ text: i18n.t('static.report.overstock'), color: "#edb944" }];
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+{ text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
+{ text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
@@ -49,6 +49,7 @@ export default class StockStatusMatrix extends React.Component {
       productCategories: [],
       planningUnits: [],
       data: [],
+      selData: [],
       programs: [],
       versions: [],
       includePlanningShipments: true,
@@ -136,7 +137,39 @@ export default class StockStatusMatrix extends React.Component {
       this.filterData()
     })
   }
+  filterDataAsperstatus = () => {
+    let stockStatusId = document.getElementById("stockStatusId").value;
+    console.log(stockStatusId)
+    var filteredData = []
+    if (stockStatusId != -1) {
 
+      this.state.selData.map(ele => {
+        console.log(ele)
+        var min = ele.minMonthsOfStock
+        var reorderFrequency = ele.reorderFrequency
+        if (stockStatusId == 0){ if((ele.jan!= null && ele.feb!= null && ele.mar!= null && ele.apr!= null && ele.may!= null && ele.jun!= null && ele.jul!= null && ele.aug!= null && ele.sep!= null && ele.oct!= null && ele.nov!= null && ele.dec!= null) && ((this.roundN(ele.jan) == 0 )||( this.roundN(ele.feb) == 0 )||( this.roundN(ele.mar) == 0 )||( this.roundN(ele.apr) == 0 )||( this.roundN(ele.may) == 0 )||( this.roundN(ele.jun) == 0 )||( this.roundN(ele.jul) == 0 )||( this.roundN(ele.aug) == 0 )||( this.roundN(ele.sep) == 0 )||( this.roundN(ele.oct) == 0 )||( this.roundN(ele.nov) == 0 )||( this.roundN(ele.dec) == 0))) {
+          console.log('in 0')
+          filteredData.push(ele)
+        }} else if (stockStatusId == 1 ){if((ele.jan!= null && ele.feb!= null && ele.mar!= null && ele.apr!= null && ele.may!= null && ele.jun!= null && ele.jul!= null && ele.aug!= null && ele.sep!= null && ele.oct!= null && ele.nov!= null && ele.dec!= null)&&((this.roundN(ele.jan)!= 0 && this.roundN(ele.feb)!= 0 && this.roundN(ele.mar)!= 0 && this.roundN(ele.apr)!= 0 && this.roundN(ele.may)!= 0 && this.roundN(ele.jun)!= 0 && this.roundN(ele.jul)!= 0 && this.roundN(ele.aug)!= 0 && this.roundN(ele.sep)!= 0 && this.roundN(ele.oct)!= 0 && this.roundN(ele.nov)!= 0 && this.roundN(ele.dec)!= 0))&&((this.roundN(ele.jan) < min )||( this.roundN(ele.feb) < min )||( this.roundN(ele.mar) < min )||( this.roundN(ele.apr) < min )||( this.roundN(ele.may) < min )||( this.roundN(ele.jun) < min )||( this.roundN(ele.jul) < min )||( this.roundN(ele.aug) < min )||( this.roundN(ele.sep) < min )||( this.roundN(ele.oct) < min )||( this.roundN(ele.nov) < min )||( this.roundN(ele.dec) <min))) {
+          console.log('in 1')
+          filteredData.push(ele)
+        }} else if (stockStatusId == 3){ if((this.roundN(ele.jan) > (min + reorderFrequency) )||( this.roundN(ele.feb) > (min + reorderFrequency) )||( this.roundN(ele.mar) > (min + reorderFrequency) )||( this.roundN(ele.apr) > (min + reorderFrequency) )||( this.roundN(ele.may) > (min + reorderFrequency) )||( this.roundN(ele.jun) > (min + reorderFrequency) )||( this.roundN(ele.jul) > (min + reorderFrequency) )||( this.roundN(ele.aug) > (min + reorderFrequency) )||( this.roundN(ele.sep) > (min + reorderFrequency) )||( this.roundN(ele.oct) > (min + reorderFrequency) )||( this.roundN(ele.nov) > (min + reorderFrequency) )||( this.roundN(ele.dec) > (min + reorderFrequency))) {
+          console.log('in 2')
+          filteredData.push(ele)
+        }} else if (stockStatusId == 2){if((this.roundN(ele.jan) < (min + reorderFrequency) && this.roundN(ele.jan) > min )||( this.roundN(ele.feb) < (min + reorderFrequency) && this.roundN(ele.feb) > min)||( this.roundN(ele.mar) < (min + reorderFrequency)&& this.roundN(ele.mar) > min )||( this.roundN(ele.apr) < (min + reorderFrequency)&& this.roundN(ele.apr) > min)||( this.roundN(ele.may) < (min + reorderFrequency) && this.roundN(ele.may) > min)||( this.roundN(ele.jun) < (min + reorderFrequency)&& this.roundN(ele.jun) > min )||( this.roundN(ele.jul) < (min + reorderFrequency) && this.roundN(ele.jul) > min)||( this.roundN(ele.aug) < (min + reorderFrequency)&& this.roundN(ele.aug) > min )||( this.roundN(ele.sep) < (min + reorderFrequency)&& this.roundN(ele.sep) > min )||( this.roundN(ele.oct) < (min + reorderFrequency) && this.roundN(ele.act) > min)||( this.roundN(ele.nov) < (min + reorderFrequency)&& this.roundN(ele.nov) > min )||( this.roundN(ele.dec) < (min + reorderFrequency)&& this.roundN(ele.dec) > min)) {
+          console.log('in 3')
+          filteredData.push(ele)
+        }}
+      });
+    } else{
+      filteredData = this.state.selData
+    }
+    console.log(filteredData)
+    this.setState({
+      data: filteredData
+    })
+
+  }
   filterData() {
     //console.log('In filter data---' + this.state.rangeValue.from.year)
     let startDate = this.state.startYear + '-01-01';
@@ -252,9 +285,9 @@ export default class StockStatusMatrix extends React.Component {
 
               }
               this.setState({
-                data: data,
+                selData: data,
                 message: '', loading: false
-              }, () => { console.log(this.state.data) })
+              }, () => { this.filterDataAsperstatus() })
             })
           }.bind(this)
 
@@ -299,35 +332,80 @@ export default class StockStatusMatrix extends React.Component {
             console.log("data---", response.data)
 
             this.setState({
-              data: response.data,
+              selData: response.data,
               message: '', loading: false
+            }, () => {
+              this.filterDataAsperstatus()
             })
 
 
           }).catch(
             error => {
               this.setState({
-                data: [], loading: false
+                selData: [], data: [], loading: false
               })
-
               if (error.message === "Network Error") {
-                this.setState({ message: error.message, loading: false });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
+                    break;
                   case 412:
-                    this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
                     break;
                   default:
-                    this.setState({ loading: false, message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
                     break;
                 }
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       data: [], loading: false
+        //     })
+
+        //     if (error.message === "Network Error") {
+        //       this.setState({ message: error.message, loading: false });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //           break;
+        //         default:
+        //           this.setState({ loading: false, message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
 
 
 
@@ -337,13 +415,13 @@ export default class StockStatusMatrix extends React.Component {
 
       }
     } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), selData: [], data: [] });
 
     }
   }
@@ -420,23 +498,66 @@ export default class StockStatusMatrix extends React.Component {
                 productCategories: []
               })
               if (error.message === "Network Error") {
-                this.setState({ message: error.message });
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
               } else {
                 switch (error.response ? error.response.status : "") {
-                  case 500:
+
                   case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
                   case 404:
                   case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
+                    break;
                   case 412:
-                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
+                      loading: false
+                    });
                     break;
                   default:
-                    this.setState({ message: 'static.unkownError' });
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
                     break;
                 }
               }
             }
           );
+        // .catch(
+        //   error => {
+        //     this.setState({
+        //       productCategories: []
+        //     })
+        //     if (error.message === "Network Error") {
+        //       this.setState({ message: error.message });
+        //     } else {
+        //       switch (error.response ? error.response.status : "") {
+        //         case 500:
+        //         case 401:
+        //         case 404:
+        //         case 406:
+        //         case 412:
+        //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+        //           break;
+        //         default:
+        //           this.setState({ message: 'static.unkownError' });
+        //           break;
+        //       }
+        //     }
+        //   }
+        // );
       }
 
 
@@ -459,23 +580,66 @@ export default class StockStatusMatrix extends React.Component {
               programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
-              this.setState({ loading: false, message: error.message });
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
             } else {
               switch (error.response ? error.response.status : "") {
-                case 500:
+
                 case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
                 case 404:
                 case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
+                  break;
                 case 412:
-                  this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                  });
                   break;
                 default:
-                  this.setState({ loading: false, message: 'static.unkownError' });
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
                   break;
               }
             }
           }
         );
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       programs: [], loading: false
+      //     }, () => { this.consolidatedProgramList() })
+      //     if (error.message === "Network Error") {
+      //       this.setState({ loading: false, message: error.message });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+      //           break;
+      //         default:
+      //           this.setState({ loading: false, message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
     } else {
       this.setState({ loading: false })
@@ -644,7 +808,7 @@ export default class StockStatusMatrix extends React.Component {
     }, () => {
 
       if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+        this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
       } else {
         if (versionId.includes('Local')) {
           const lan = 'en';
@@ -694,30 +858,72 @@ export default class StockStatusMatrix extends React.Component {
             }, () => {
               this.filterData();
             })
-          })
-            .catch(
-              error => {
+          }).catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
                 this.setState({
-                  planningUnits: [],
-                })
-                if (error.message === "Network Error") {
-                  this.setState({ message: error.message });
-                } else {
-                  switch (error.response ? error.response.status : "") {
-                    case 500:
-                    case 401:
-                    case 404:
-                    case 406:
-                    case 412:
-                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-                      break;
-                    default:
-                      this.setState({ message: 'static.unkownError' });
-                      break;
-                  }
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
                 }
               }
-            );
+            }
+          );
+          // .catch(
+          //   error => {
+          //     this.setState({
+          //       planningUnits: [],
+          //     })
+          //     if (error.message === "Network Error") {
+          //       this.setState({ message: error.message });
+          //     } else {
+          //       switch (error.response ? error.response.status : "") {
+          //         case 500:
+          //         case 401:
+          //         case 404:
+          //         case 406:
+          //         case 412:
+          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
+          //           break;
+          //         default:
+          //           this.setState({ message: 'static.unkownError' });
+          //           break;
+          //       }
+          //     }
+          //   }
+          // );
         }
       }
     });
@@ -756,6 +962,7 @@ export default class StockStatusMatrix extends React.Component {
     this.state.planningUnitLabels.map(ele =>
       csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.dashboard.stockstatusmain') + ' , ' + document.getElementById("stockStatusId").selectedOptions[0].text).replaceAll(' ', '%20'))
 
     csvRow.push('')
     csvRow.push('')
@@ -767,7 +974,7 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id,(getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -830,9 +1037,12 @@ export default class StockStatusMatrix extends React.Component {
           doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
+          doc.text(i18n.t('static.dashboard.stockstatusmain') + ' : ' + document.getElementById("stockStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+            align: 'left'
+          })
 
           var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 150, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 170, planningText)
 
         }
 
@@ -852,7 +1062,7 @@ export default class StockStatusMatrix extends React.Component {
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     let header = []
 
-    header = [[{ content: i18n.t('static.report.qatPID'), rowSpan: 2, styles: { halign: 'center' } },{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
+    header = [[{ content: i18n.t('static.report.qatPID'), rowSpan: 2, styles: { halign: 'center' } }, { content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.dashboard.unit'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.common.min'), rowSpan: 2, styles: { halign: 'center' } },
     { content: i18n.t('static.program.reorderFrequencyInMonths'), rowSpan: 2, styles: { halign: 'center' } },
@@ -873,9 +1083,9 @@ export default class StockStatusMatrix extends React.Component {
       { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
     ]
     let data;
-    data = this.state.data.map(ele => [ele.planningUnit.id,getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
+    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
 
-    var startY = 170 + (this.state.planningUnitValues.length * 3)
+    var startY = 180 + (this.state.planningUnitValues.length * 3)
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,
@@ -899,8 +1109,8 @@ export default class StockStatusMatrix extends React.Component {
     return getLabelText(cell, this.state.lang);
   }
   roundN = num => {
-   
-    if (num == null ) {
+
+    if (num == null) {
       return ''
     } else {
       return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
@@ -910,7 +1120,7 @@ export default class StockStatusMatrix extends React.Component {
     console.log(value)
     if (value != null) {
       value = this.roundN(value)
-      if (value==0) {
+      if (value == 0) {
         return { backgroundColor: legendcolor[0].color }
       } else if (min > value) {
         return { backgroundColor: legendcolor[1].color }
@@ -918,7 +1128,7 @@ export default class StockStatusMatrix extends React.Component {
 
         return { backgroundColor: legendcolor[3].color }
       } else {
-        return {backgroundColor: legendcolor[2].color}
+        return { backgroundColor: legendcolor[2].color }
 
       }
     }
@@ -999,7 +1209,7 @@ export default class StockStatusMatrix extends React.Component {
         align: 'center',
         headerAlign: 'center',
         style: { align: 'center' }
-    },
+      },
       {
         dataField: 'planningUnit.label',
         text: i18n.t('static.planningunit.planningunit'),
@@ -1170,11 +1380,7 @@ export default class StockStatusMatrix extends React.Component {
     return (
 
       <div className="animated">
-        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-          this.setState({ message: message })
-        }} loading={(loading) => {
-          this.setState({ loading: loading })
-        }} />
+        <AuthenticationServiceComponent history={this.props.history} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
@@ -1182,7 +1388,7 @@ export default class StockStatusMatrix extends React.Component {
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
               <a className="card-header-action">
-                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleStockStatusOverTime() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleStockStatusMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
               </a>
               {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '} */}
               {this.state.data.length > 0 && <div className="card-header-actions">
@@ -1272,6 +1478,33 @@ export default class StockStatusMatrix extends React.Component {
                       >
                         <option value="true">{i18n.t('static.program.yes')}</option>
                         <option value="false">{i18n.t('static.program.no')}</option>
+                      </Input>
+
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+                <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
+                  <div className="controls ">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="stockStatusId"
+                        id="stockStatusId"
+                        bsSize="sm"
+                        onChange={(e) => { this.filterDataAsperstatus() }}
+                      >
+
+                        <option value="-1">{i18n.t('static.common.all')}</option>
+                        {legendcolor.length > 0
+                          && legendcolor.map((item, i) => {
+                            return (
+                              <option key={i} value={item.value}>
+                                {item.text}
+                              </option>
+                            )
+                          }, this)
+                        }
                       </Input>
 
                     </InputGroup>

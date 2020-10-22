@@ -345,7 +345,7 @@ import jexcel from 'jexcel';
 import moment from 'moment';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
 const entityname = i18n.t('static.fundingsource.fundingsource');
 
 
@@ -490,7 +490,7 @@ class FundingSourceListComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: JEXCEL_DEFAULT_PAGINATION,
+            pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
             tableOverflow: true,

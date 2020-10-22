@@ -154,6 +154,7 @@ export default class AddDataSource extends Component {
                 this.setState({
                     realms: response.data, loading: false
                 })
+
             })
             .catch(
                 error => {
@@ -204,8 +205,7 @@ export default class AddDataSource extends Component {
 
 
     getDataSourceTypeByRealmId(e) {
-
-        // AuthenticationService.setupAxiosInterceptors();
+        // AuthenticationService.setupAxiosInterceptors();        
         if (e.target.value != 0) {
             DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
                 .then(response => {
@@ -265,6 +265,7 @@ export default class AddDataSource extends Component {
     getProgramByRealmId(e) {
         // AuthenticationService.setupAxiosInterceptors();
         console.log("e.target.value---", e.target.value);
+        let realmId = this.state.realm.id;
         if (e.target.value != 0) {
             ProgramService.getProgramList(e.target.value)
                 .then(response => {
@@ -459,7 +460,10 @@ export default class AddDataSource extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmId && this.state.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
+                                                            onChange={(e) => {
+                                                                handleChange(e); this.dataChange(e);
+                                                                this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e)
+                                                            }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.realm.id}
@@ -528,7 +532,7 @@ export default class AddDataSource extends Component {
                                                     <FormGroup>
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
                                                     </FormGroup>
