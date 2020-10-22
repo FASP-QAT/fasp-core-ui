@@ -1214,5 +1214,11 @@
     "static.quantimed.importData": "Importer des données",
     "static.quantimed.mapAtLeastOnePlanningUnitValidationText": "Mapper au moins une unité de planification",
     "static.ticket.openIssues": "Ouvert Problèmes",
-    "static.uploadfile.Browse":"Feuilleter"
+    "static.uploadfile.Browse":"Feuilleter",
+    "static.common.notesvalidation": "Veuillez saisir des notes",
+    "static.mt.confirmDelink": "Voulez-vous vraiment supprimer le lien?",
+    "static.commit.qatshipmentId": "ID de l'envoi QAT",
+    "static.supplyPlan.mtshipmentStatus": "Statut",
+    "static.supplyPlan.mtexpectedDeliveryDate": "date de réception",
+    "static.shipment.delinkingsuccess": "L'expédition a bien été dissociée"
 }

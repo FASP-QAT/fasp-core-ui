@@ -447,64 +447,69 @@ export default class ShipmentDelinking extends Component {
     }
     delinkShipment() {
         let notes = document.getElementById("notesTxt").value;
-        this.setState({ loading: true })
-        ManualTaggingService.delinkShipment(this.state.shipmentId, notes)
-            .then(response => {
-                console.log("link response===", response);
-                this.setState({
-                    message: i18n.t('static.shipment.delinkingsuccess'),
-                    color: 'green',
-                    haslink: true,
-                    loading: false
+        if (notes != "") {
+            this.setState({ loading: true })
+            ManualTaggingService.delinkShipment(this.state.shipmentId, notes)
+                .then(response => {
+                    console.log("link response===", response);
+                    this.setState({
+                        message: i18n.t('static.shipment.delinkingsuccess'),
+                        color: 'green',
+                        haslink: true,
+                        loading: false
 
-                }, () => {
-                    this.hideSecondComponent();
-                    document.getElementById('div2').style.display = 'block';
-                    this.filterData();
-                });
+                    }, () => {
+                        this.hideSecondComponent();
+                        document.getElementById('div2').style.display = 'block';
+                        this.filterData();
+                    });
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-        this.toggleLarge();
-
+                );
+            this.toggleLarge();
+        } else {
+            this.setState({
+                enterNotes: i18n.t('static.common.notesvalidation')
+            })
+        }
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -830,6 +835,8 @@ export default class ShipmentDelinking extends Component {
     toggleLarge = () => {
         this.setState({
             manualTag: !this.state.manualTag,
+            enterNotes: "",
+            notes: false
         })
     }
 
@@ -1183,13 +1190,13 @@ export default class ShipmentDelinking extends Component {
                                             <h4>{i18n.t('static.mt.confirmDelink')}</h4>
                                         </div>
                                         <div className="col-md-12 float-right">
-                                            <Button className="float-right mr-1" color="secondary Gobtn btn-sm" onClick={() => { this.dataChange("yes") }}>{i18n.t('static.program.yes')}</Button>
                                             <Button className="float-right mr-1" color="secondary Gobtn btn-sm" onClick={() => { this.dataChange("no") }}>{i18n.t('static.program.no')}</Button>
+                                            <Button className="float-right mr-1" color="secondary Gobtn btn-sm" onClick={() => { this.dataChange("yes") }}>{i18n.t('static.program.yes')}</Button>
                                         </div>
                                     </div>
                                     {this.state.notes &&
                                         <FormGroup className="col-md-12">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.notes')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -1202,7 +1209,10 @@ export default class ShipmentDelinking extends Component {
                                                     </Input>
                                                 </InputGroup>
                                             </div>
-                                        </FormGroup>}
+                                        </FormGroup>
+
+                                    }
+                                    <h5 style={{ color: 'red', marginLeft: '16px', marginTop: '-12px' }}>{i18n.t(this.state.enterNotes)}</h5>
 
                                 </Col>
 

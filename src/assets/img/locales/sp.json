@@ -1214,5 +1214,11 @@
     "static.ticket.openIssues": "Abierto Cuestiones",
     "static.uploadfile.Browse":"Vistazo",
     "static.jexcel.search": "Buscar",
-    "static.jexcel.clear": "Claro"
+    "static.jexcel.clear": "Claro",
+    "static.common.notesvalidation": "Por favor ingrese notas",
+    "static.mt.confirmDelink": "¿Estás seguro de que quieres desvincular?",
+    "static.commit.qatshipmentId": "ID de envío de QAT",
+    "static.supplyPlan.mtshipmentStatus": "Estado",
+    "static.supplyPlan.mtexpectedDeliveryDate": "Recibir fecha",
+    "static.shipment.delinkingsuccess": "Envío desvinculado correctamente"
 }

@@ -891,7 +891,7 @@
     "static.commit.consumptionId": "Consumption ID",
     "static.commit.inventoryId": "Inventory ID",
     "static.commit.shipmentId": "Shipment ID",
-    "static.commit.qatshipmentId": "QAT Shipment ID",
+    "static.commit.qatshipmentId": "QAT Shipment Id",
     "static.commit.differenceBetweenVersions": "Difference between versions",
     "static.commit.newDataCurrentVersion": "New data from current version",
     "static.commit.newDataLatestVersion": "New data from latest version",
@@ -1425,14 +1425,14 @@
     "static.report.shippedToArrivedSeaLeadTime": "'Shipped to Arrived' sea lead time ",
     "static.shipment.dateIsLesserThanPrevDate": "Selected date is less than the date selected in prev columns.",
     "static.dataentry.notesMaxLength": "Maximum 600 charaters only",
-    "static.report.erpOrder":"ERP Order",
-    "static.report.localprocurement":"Local Procurement",
-    "static.report.orderNo":"Procurer Order ID",
+    "static.report.erpOrder": "ERP Order",
+    "static.report.localprocurement": "Local Procurement",
+    "static.report.orderNo": "Procurer Order ID",
     "static.ticket.openIssues": "Open Issues",
-    "static.uploadfile.Browse":"Browse",
-    "static.inventory.inventoryQunatity":"Inventory Qunatity (ARU)",
-    "static.inventory.adjustmentQunatity":"Adjustment Qunatity (ARU)",
-    "static.inventory.inventoryQunatityPU":"Inventory Qunatity (QAT Planning Unit)",
-    "static.inventory.adjustmentQunatityPU":"Adjustment Qunatity (QAT Planning Unit)"
-
+    "static.uploadfile.Browse": "Browse",
+    "static.inventory.inventoryQunatity": "Inventory Qunatity (ARU)",
+    "static.inventory.adjustmentQunatity": "Adjustment Qunatity (ARU)",
+    "static.inventory.inventoryQunatityPU": "Inventory Qunatity (QAT Planning Unit)",
+    "static.inventory.adjustmentQunatityPU": "Adjustment Qunatity (QAT Planning Unit)",
+    "static.common.notesvalidation": "Please enter notes"
 }
