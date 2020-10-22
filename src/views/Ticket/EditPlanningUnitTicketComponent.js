@@ -157,7 +157,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        if (this.props.items.userRealmId != -1) {
+        if (this.props.items.userRealmId > 0) {
             PlanningUnitService.getPlanningUnitByRealmId(this.props.items.userRealmId).then(response => {
                 console.log(response.data)
                 var unitList = [];
@@ -210,7 +210,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
                 }
             );
         } else {
-            PlanningUnitService.getAllPlanningUnitList.then(response => {
+            PlanningUnitService.getAllPlanningUnitList().then(response => {
                 console.log(response.data)
                 var unitList = [];
                 for (var i = 0; i < response.data.length; i++) {

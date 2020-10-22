@@ -159,7 +159,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
 
-        if (this.props.items.userRealmId != -1) {
+        if (this.props.items.userRealmId > 0) {
             ForecastingUnitService.getForcastingUnitByRealmId(this.props.items.userRealmId).then(response => {
                 if (response.status == 200) {
                     console.log("response------->" + response);

@@ -14,8 +14,9 @@ import PoroductCategoryService from '../../api/PoroductCategoryService';
 
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory"))
 let summaryText_2 = "Edit Planning Unit Category"
-const initialValues = {
+let initialValues = {
     summary: summaryText_1,
+    realmName: "",
     planningUnitCategoryName: "",
     notes: ""
 }
@@ -25,6 +26,8 @@ const validationSchema = function (values) {
         summary: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
+        realmName: Yup.string()
+            .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         planningUnitCategoryName: Yup.string()
             .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.product.productcategory')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.product.productcategory'))))),
         notes: Yup.string()
@@ -61,6 +64,7 @@ export default class EditProductCategoryTicketComponent extends Component {
         this.state = {
             planningUnitCategory: {
                 summary: summaryText_1,
+                realmName: "",
                 planningUnitCategoryName: "",
                 notes: ""
             },
@@ -68,11 +72,14 @@ export default class EditProductCategoryTicketComponent extends Component {
             message: '',
             planningUnitCategories: [],
             planningUnitCategoryId: '',
+            realmId: '',
+            realms: [],
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getProductCategory = this.getProductCategory.bind(this);
     }
 
     dataChange(event) {
@@ -80,9 +87,15 @@ export default class EditProductCategoryTicketComponent extends Component {
         if (event.target.name == "summary") {
             planningUnitCategory.summary = event.target.value;
         }
+        if (event.target.name == "realmName") {
+            planningUnitCategory.realmName = event.target.value !== "" ? this.state.realms.filter(c => c.realmId == event.target.value)[0].label.label_en : "";
+            this.setState({
+                realmId: event.target.value
+            })
+        }
         if (event.target.name == "planningUnitCategoryName") {
             var outText = "";
-            if(event.target.value !== "") {
+            if (event.target.value !== "") {
                 var planningUnitCategoryT = this.state.planningUnitCategories.filter(c => c.payloadId == event.target.value)[0];
                 outText = planningUnitCategoryT.payload.realm.label.label_en + " | " + planningUnitCategoryT.payload.label.label_en;
             }
@@ -122,25 +135,26 @@ export default class EditProductCategoryTicketComponent extends Component {
             }
         }
     }
-
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
-        PoroductCategoryService.getProductCategoryListByRealmId(this.props.items.userRealmId)
 
+        RealmService.getRealmListAll()
             .then(response => {
-                console.log("response product category list ====>", response.data);
-                if (response.status == 200) {
-                    console.log("planningUnitCategories", response.data)
+                this.setState({
+                    realms: response.data,
+                    realmId: this.props.items.userRealmId, loading: false
+                });
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        planningUnitCategories: response.data, loading: false
-                    });
-                    this.setState({ loading: false });
-
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
-                    this.hideSecondComponent();
+
+                    let { planningUnitCategory } = this.state;
+                    planningUnitCategory.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
+                    this.setState({
+                        planningUnitCategory
+                    }, () => {
+                        this.getProductCategory(this.props.items.userRealmId)
+                    })
                 }
             }).catch(
                 error => {
@@ -184,6 +198,70 @@ export default class EditProductCategoryTicketComponent extends Component {
             );
     }
 
+    getProductCategory(realmId) {
+        // AuthenticationService.setupAxiosInterceptors();        
+        
+        if (realmId !== "") {
+            PoroductCategoryService.getProductCategoryListByRealmId(realmId)
+
+                .then(response => {
+                    console.log("response product category list ====>", response.data);
+                    if (response.status == 200) {
+                        console.log("planningUnitCategories", response.data)
+                        this.setState({
+                            planningUnitCategories: response.data, loading: false
+                        });
+                        this.setState({ loading: false });
+
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        })
+                        this.hideSecondComponent();
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+    }
+
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -198,11 +276,13 @@ export default class EditProductCategoryTicketComponent extends Component {
     resetClicked() {
         let { planningUnitCategory } = this.state;
         // planningUnitCategory.summary = '';
+        planningUnitCategory.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         planningUnitCategory.planningUnitCategoryName = '';
         planningUnitCategory.notes = '';
         this.setState({
             planningUnitCategory: planningUnitCategory,
-            planningUnitCategoryId: ''
+            planningUnitCategoryId: '',
+            realmId: this.props.items.userRealmId
         },
             () => { });
     }
@@ -211,13 +291,31 @@ export default class EditProductCategoryTicketComponent extends Component {
 
         const { planningUnitCategories } = this.state;
 
-        let planningUnitCategoryList = planningUnitCategories.length > 0
-            && planningUnitCategories.map((item, i) => {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
                 return (
-                    <option key={i} value={item.payloadId}>
-                        {getLabelText(item.payload.label, this.state.lang)}
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
+            }, this);
+
+        let planningUnitCategoryList = planningUnitCategories.length > 0
+            && planningUnitCategories.map((item, i) => {
+                if(item.level > 1) {
+                    return (
+                        <option key={i} value={item.payloadId}>
+                            {getLabelText(item.payload.label, this.state.lang)}
+                        </option>
+                    )
+                } else {
+                    return (
+                        <option key={i} value={item.payloadId} disabled={true}>
+                            {getLabelText(item.payload.label, this.state.lang)}
+                        </option>
+                    )
+                }                
             }, this);
 
 
@@ -228,7 +326,13 @@ export default class EditProductCategoryTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            planningUnitCategoryName: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -323,6 +427,21 @@ export default class EditProductCategoryTicketComponent extends Component {
                                                 value={this.state.planningUnitCategory.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="select" name="realmName" id="realmName"
+                                                bsSize="sm"
+                                                valid={!errors.realmName && this.state.planningUnitCategory.realmName != ''}
+                                                invalid={touched.realmName && !!errors.realmName}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategory(e.target.value) }}
+                                                onBlur={handleBlur}
+                                                value={this.state.realmId}
+                                                required >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {realmList}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
                                             <Label for="planningUnitCategoryName">{i18n.t('static.product.productcategory')}<span class="red Reqasterisk">*</span></Label>
