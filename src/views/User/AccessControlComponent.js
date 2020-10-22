@@ -1175,6 +1175,7 @@ class AccessControlComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             lang: localStorage.getItem('lang'),
             // user: this.props.location.state.user,
             countries: [],
@@ -1209,6 +1210,7 @@ class AccessControlComponent extends Component {
 
     }
     hideSecondComponent() {
+
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -1594,6 +1596,9 @@ class AccessControlComponent extends Component {
         };
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
+        this.setState({
+            loading: false
+        })
     }
     addRow() {
 
@@ -1667,19 +1672,28 @@ class AccessControlComponent extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    });
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    });
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
-                                    });
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
                                     break;
                             }
                         }
@@ -2120,31 +2134,45 @@ class AccessControlComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Card>
 
-                    {/* <CardHeader>
-                        <i className="icon-note"></i><strong>{i18n.t('static.user.accessControl')}</strong>{' '}
-                    </CardHeader> */}
-                    <CardBody className="p-0">
+                        {/* <CardHeader>
+    <i className="icon-note"></i><strong>{i18n.t('static.user.accessControl')}</strong>{' '}
+</CardHeader> */}
+                        <CardBody className="p-0">
 
-                        <Col xs="12" sm="12">
+                            <Col xs="12" sm="12">
 
-                            <div id="paputableDiv" >
+                                <div id="paputableDiv" >
+
+                                </div>
+                            </Col>
+                        </CardBody>
+                        <CardFooter>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+        &nbsp;
+</FormGroup>
+                        </CardFooter>
+                    </Card>
+                </div>
+
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
 
                             </div>
-                        </Col>
-                    </CardBody>
-                    <CardFooter>
-                        <FormGroup>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-                            &nbsp;
-                </FormGroup>
-                    </CardFooter>
-                </Card>
+                        </div>
+                    </div>
+                </div>
 
 
             </div >

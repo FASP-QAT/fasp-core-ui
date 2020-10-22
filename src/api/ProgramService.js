@@ -101,7 +101,13 @@ class ProgramService {
         );
     }
     updateProgramStatus(json, reviewedProblemList) {
-        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/${json.currentVersion.notes}`, reviewedProblemList, {}
+
+        var obj = {
+            reviewedProblemList: reviewedProblemList,
+            notes: json.currentVersion.notes
+        }
+
+        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/`, obj, {}
         );
     }
 
