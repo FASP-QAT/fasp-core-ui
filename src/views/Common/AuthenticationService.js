@@ -14,18 +14,18 @@ class AuthenticationService {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
-            console.log("offline value---", value);
+            // console.log("offline value---", value);
             if (localStorage.key(i).includes("user-")) {
                 let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                console.log("offline user---", user);
+                // console.log("offline user---", user);
                 let decryptedEmailId = user.emailId;
-                console.log("offline decryptedEmailId---", decryptedEmailId);
+                // console.log("offline decryptedEmailId---", decryptedEmailId);
                 if (decryptedEmailId.toUpperCase() == emailId.toUpperCase()) {
-                    console.log("offline equals---");
+                    // console.log("offline equals---");
                     localStorage.setItem("tempUser", user.userId);
-                    console.log("offline user id---", localStorage.getItem("tempUser"));
+                    // console.log("offline user id---", localStorage.getItem("tempUser"));
                     decryptedPassword = user.password;
-                    console.log("offline decryptedPassword---", decryptedPassword);
+                    // console.log("offline decryptedPassword---", decryptedPassword);
                 }
             }
 
@@ -37,14 +37,14 @@ class AuthenticationService {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         let syncExpiresOn = moment(decryptedUser.syncExpiresOn);
-        console.log("syncExpiresOn---", syncExpiresOn);
+        // console.log("syncExpiresOn---", syncExpiresOn);
         var curDate = moment(new Date());
         const diff = curDate.diff(syncExpiresOn, 'days');
         // const diffDuration = moment.duration(diff);
-        console.log("diff---", diff);
+        // console.log("diff---", diff);
         // console.log("diffDuration---",diffDuration)
         // console.log("Days:", diffDuration.days());
-        console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
+        // console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
         if (diff < 30) {
             return false;
         }
@@ -75,7 +75,7 @@ class AuthenticationService {
                 //     }
                 // }
             }
-            console.log("decryptedUser.roles---" + decryptedUser.roleList);
+            // console.log("decryptedUser.roles---" + decryptedUser.roleList);
             return decryptedUser.roleList;
         }
     }
@@ -114,10 +114,10 @@ class AuthenticationService {
 
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("get realm id decryptedCurUser---", decryptedCurUser);
-        console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
+        // console.log("get realm id decryptedCurUser---", decryptedCurUser);
+        // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log("get realm id decryptedUser---", decryptedUser);
+        // console.log("get realm id decryptedUser---", decryptedUser);
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
@@ -194,9 +194,9 @@ class AuthenticationService {
     setupAxiosInterceptors() {
         // axios.defaults.headers.common['Authorization'] = '';
         // delete axios.defaults.headers.common['Authorization'];
-        console.log("############## Going to call axios interceptos################", localStorage.getItem('curUser'));
+        // console.log("############## Going to call axios interceptos################", localStorage.getItem('curUser'));
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            console.log("Inside set up axios");
+            // console.log("Inside set up axios");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let basicAuthHeader = 'Bearer ' + decryptedToken
@@ -345,16 +345,16 @@ class AuthenticationService {
             var lastActionTaken = moment(lastActionTakenStorage);
             // console.log("lastActionTakenStorage---", lastActionTakenStorage);
             var curDate = moment(new Date());
-            console.log("curdate:", curDate);
+            // console.log("curdate:", curDate);
             const diff = curDate.diff(lastActionTaken);
             const diffDuration = moment.duration(diff);
-            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-            console.log("Days:", diffDuration.days());
-            console.log("Hours:", diffDuration.hours());
-            console.log("Minutes:", diffDuration.minutes());
-            console.log("Seconds:", diffDuration.seconds());
+            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            // console.log("Days:", diffDuration.days());
+            // console.log("Hours:", diffDuration.hours());
+            // console.log("Minutes:", diffDuration.minutes());
+            // console.log("Seconds:", diffDuration.seconds());
             if (diffDuration.minutes() < 30) {
-                console.log("last action taken less than 30 minutes");
+                // console.log("last action taken less than 30 minutes");
                 return true;
             }
             return false;
@@ -413,7 +413,7 @@ class AuthenticationService {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             let businessFunctions = decryptedUser.businessFunctionList;
-            console.log("decryptedUser.businessfunctions--->>>>" + decryptedUser.businessFunctionList);
+            // console.log("decryptedUser.businessfunctions--->>>>" + decryptedUser.businessFunctionList);
             return businessFunctions;
         }
         return "";
@@ -431,7 +431,7 @@ class AuthenticationService {
         for (let i = 0; i < businessFunctionList.length; i++) {
             bfunction.push(businessFunctionList[i]);
         }
-        console.log("bfuntion---", bfunction);
+        // console.log("bfuntion---", bfunction);
         return bfunction;
     }
     authenticatedRoute(route) {
@@ -445,10 +445,10 @@ class AuthenticationService {
                 console.log("token not available");
                 return true;
             }
-            console.log("going to check bf functions");
+            // console.log("going to check bf functions");
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-            console.log("route bfunction--->", bfunction);
-            console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
+            // console.log("route bfunction--->", bfunction);
+            // console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
             switch (route) {
                 case "/user/addUser":
                     if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
@@ -1044,9 +1044,9 @@ class AuthenticationService {
                     }
                     break;
                 case "/program/deleteLocalProgram":
-                    console.log("Going to check if condition")
+                    // console.log("Going to check if condition")
                     if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
-                        console.log("Going to check if condition")
+                        // console.log("Going to check if condition")
                         return true;
                     }
                     break;
@@ -1238,9 +1238,9 @@ class AuthenticationService {
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1259,6 +1259,8 @@ class AuthenticationService {
         localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } }));
         localStorage.setItem('sesProgramId', "");
         localStorage.setItem('sesPlanningUnitId', "");
+        // localStorage.setItem('sesLocalVersionChange', false);
+        localStorage.setItem("sesLatestProgram", false);
     }
 
     getIconAndStaticLabel(val) {

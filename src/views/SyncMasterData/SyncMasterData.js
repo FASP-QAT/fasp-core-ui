@@ -292,7 +292,7 @@ export default class SyncMasterData extends Component {
             }
         }
 
-         this.refs.programListChild.checkNewerVersions();
+        this.refs.programListChild.checkNewerVersions();
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
 
         if (valid) {

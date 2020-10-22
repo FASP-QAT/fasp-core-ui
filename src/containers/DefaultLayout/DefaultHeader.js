@@ -107,16 +107,17 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           </Online>
-          {/* <Online> */}
+          <Online>
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {localStorage.getItem("sesLocalVersionChange") == "true" &&
+                {console.log("localStorage.getItem(sesLocalVersionChange)----"+localStorage.getItem("sesLocalVersionChange"))}
+                {localStorage.getItem("sesLocalVersionChange") === "true" &&
                   <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
-                {localStorage.getItem("sesLocalVersionChange") == "false" &&
+                {localStorage.getItem("sesLocalVersionChange") === "false" &&
                   <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
               </NavLink>
             </NavItem>
-          {/* </Online> */}
+          </Online>
           <NavItem className="">
             <span className="nav-link">
               <a href={`${API_URL}/file/qatUserGuide`}>
