@@ -1697,7 +1697,7 @@ class ShipmentSummery extends Component {
                                                 <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'left' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>

@@ -39,7 +39,7 @@ export default class QatProblemActions extends Component {
 
     qatProblemActions(programId) {
         // alert(programId);
-        // console.log("program id===>",programId);
+        // //console.log("program id===>",programId);
         var problemActionList = [];
         var db1;
         var storeOS;
@@ -47,7 +47,7 @@ export default class QatProblemActions extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             var realmId = AuthenticationService.getRealmId();
-            // console.log("QPA 1====>", realmId);
+            // //console.log("QPA 1====>", realmId);
             var programList = [];
             var programRequestList = [];
             var versionIDs = [];
@@ -67,7 +67,7 @@ export default class QatProblemActions extends Component {
 
             };
             getRequest.onsuccess = function (event) {
-                // console.log("get request===>",getRequest.result);
+                // //console.log("get request===>",getRequest.result);
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
@@ -78,19 +78,19 @@ export default class QatProblemActions extends Component {
                 var latestVersionProgramList = [];
 
                 // for (var i = 0; i < getRequest.result.length; i++) {
-                // console.log("QPA 2=====>  in for");
+                // //console.log("QPA 2=====>  in for");
                 // if (getRequest.result[i].userId == userId) {
                 var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                // console.log("QPA 2====>", programJson);
+                // //console.log("QPA 2====>", programJson);
                 programList.push(programJson);
                 programRequestList.push(getRequest.result);
                 versionIDs.push(getRequest.result.version);
                 // }
 
                 // }
-                // console.log("program list=====>",programList)
+                // //console.log("program list=====>",programList)
 
                 // for (var d = 0; d < programList.length; d++) {
                 //     var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
@@ -105,7 +105,7 @@ export default class QatProblemActions extends Component {
 
                 // }
                 // programList = latestVersionProgramList;
-                // console.log("QPA 3====>", programList);
+                // //console.log("QPA 3====>", programList);
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
@@ -162,7 +162,7 @@ export default class QatProblemActions extends Component {
                             }
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
-                            console.log("+++++++++++++", puRequest.result);
+                            //console.log("+++++++++++++", puRequest.result);
                             var planningUnitListAll = puRequest.result;
                             if (programList.length == 0) {
 
@@ -206,15 +206,15 @@ export default class QatProblemActions extends Component {
 
 
                                     for (var pp = 0; pp < programList.length; pp++) {
-                                        // console.log("=====>in for====>", programList[pp]);
+                                        // //console.log("=====>in for====>", programList[pp]);
                                         var versionID = versionIDs[pp];
                                         var problemActionIndex = 0;
                                         problemActionList = programList[pp].problemReportList;
-                                        // console.log("problemActionList=====>", problemActionList);
+                                        // //console.log("problemActionList=====>", problemActionList);
                                         problemActionIndex = programList[pp].problemReportList.length;
                                         var regionList = programList[pp].regionList;
                                         problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
-                                        // console.log("test=====>problem List===>", problemList);
+                                        // //console.log("test=====>problem List===>", problemList);
                                         planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                         // for (var r = 0; r < regionList.length; r++) {
                                         for (var p = 0; p < planningUnitList.length; p++) {
@@ -236,8 +236,8 @@ export default class QatProblemActions extends Component {
                                                         if (problemActionList[prob] != undefined) {
                                                             var myStartDate1 = moment(problemActionList[prob].dt).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                             var myEndDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-                                                            // console.log("myStartDate1====>", myStartDate1);
-                                                            // console.log("myEndDate1====>", myEndDate1);
+                                                            // //console.log("myStartDate1====>", myStartDate1);
+                                                            // //console.log("myEndDate1====>", myEndDate1);
                                                             var filteredConsumptionList1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate1 && c.actualFlag.toString() == "true" && c.active == true);
                                                             var index1 = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
@@ -247,8 +247,8 @@ export default class QatProblemActions extends Component {
                                                                     && c.realmProblem.problem.problemId == 1
                                                                 // && c.versionId == versionID
                                                             );
-                                                            // console.log("filteredConsumptionList1====>", filteredConsumptionList1);
-                                                            // console.log("index1====>", index1);
+                                                            // //console.log("filteredConsumptionList1====>", filteredConsumptionList1);
+                                                            // //console.log("index1====>", index1);
 
                                                             if (filteredConsumptionList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                                 var filterObj = problemActionList[index1];
@@ -304,7 +304,7 @@ export default class QatProblemActions extends Component {
                                                             // && c.versionId == versionID
                                                         );
                                                         if (filteredConsumptionList.length == 0) {
-                                                            // console.log("index====>", index);
+                                                            // //console.log("index====>", index);
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -387,7 +387,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                // console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
+                                                                // //console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
                                                                 let tempProblemTransObj = {
@@ -452,7 +452,7 @@ export default class QatProblemActions extends Component {
                                                                 && c.realmProblem.problem.problemId == 2
                                                             // && c.versionId == versionID
                                                         );
-                                                        // console.log("prob====>", prob)
+                                                        // //console.log("prob====>", prob)
                                                         if (problemActionList[prob] != undefined) {
                                                             var myStartDateInventory1 = moment(problemActionList[prob].dt).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
                                                             var myEndDateInventory1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
@@ -598,7 +598,7 @@ export default class QatProblemActions extends Component {
                                                         } else {
                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // problemActionList[index].isFound = 0;
-                                                                //console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
+                                                                ////console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
                                                                 let tempProblemTransObj = {
@@ -647,7 +647,7 @@ export default class QatProblemActions extends Component {
                                                 if (problemList[prob].problem.problemId == 3) {
                                                     // 3 shipment which have received date in past but status is not yet received
                                                     var shipmentList = programList[pp].shipmentList;
-                                                    // console.log("shipmentList=======>", shipmentList);
+                                                    // //console.log("shipmentList=======>", shipmentList);
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                                     var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7 && c.active == true);
                                                     if (filteredShipmentList.length > 0) {
@@ -779,7 +779,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 } else {
                                                                     // make shipmentStatus resolved=============
-                                                                    //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                    ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
                                                                     var filterObj = problemActionList[kb];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -1033,7 +1033,7 @@ export default class QatProblemActions extends Component {
                                                         } else {
                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // problemActionList[index].isFound = 0;
-                                                                // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
+                                                                // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
                                                                 let tempProblemTransObj = {
@@ -1082,7 +1082,7 @@ export default class QatProblemActions extends Component {
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                                     var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                                                    // console.log("submited status list===>", filteredShipmentList);
+                                                    // //console.log("submited status list===>", filteredShipmentList);
                                                     if (filteredShipmentList.length > 0) {
                                                         var shipmentIdsFromShipmnetList = [];
                                                         for (var s = 0; s < filteredShipmentList.length; s++) {
@@ -1126,7 +1126,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("submittedDate=====>", submittedDate);
+                                                          //  //console.log("submittedDate=====>", submittedDate);
                                                             if ((moment(submittedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                 if (filteredShipmentList[s].shipmentId != 0) {
                                                                     shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
@@ -1253,7 +1253,7 @@ export default class QatProblemActions extends Component {
 
                                                                 } else {
                                                                     // make shipmentStatus resolved=============
-                                                                    //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                    ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
                                                                     var filterObj = problemActionList[kb];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -1346,7 +1346,7 @@ export default class QatProblemActions extends Component {
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                                     var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                                                    // console.log("approved status list===>", filteredShipmentList);
+                                                    // //console.log("approved status list===>", filteredShipmentList);
                                                     if (filteredShipmentList.length > 0) {
 
                                                         var shipmentIdsFromShipmnetList = [];
@@ -1392,7 +1392,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("approvedDate=====>", approvedDate);
+                                                            ////console.log("approvedDate=====>", approvedDate);
 
                                                             if ((moment(approvedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
@@ -1520,7 +1520,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 } else {
                                                                     // make shipmentStatus resolved=============
-                                                                    //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                    ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
                                                                     var filterObj = problemActionList[kb];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -1613,7 +1613,7 @@ export default class QatProblemActions extends Component {
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                                     var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
-                                                    // console.log("shipped status list===>", filteredShipmentList);
+                                                    // //console.log("shipped status list===>", filteredShipmentList);
 
                                                     if (filteredShipmentList.length > 0) {
 
@@ -1660,7 +1660,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("shippedDate=====>", shippedDate);
+                                                         //   //console.log("shippedDate=====>", shippedDate);
 
                                                             if ((moment(shippedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
@@ -1788,7 +1788,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 } else {
                                                                     // make shipmentStatus resolved=============
-                                                                    //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                    ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
                                                                     var filterObj = problemActionList[kb];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -1881,7 +1881,7 @@ export default class QatProblemActions extends Component {
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                                     var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
-                                                    console.log("approved status list===>", filteredShipmentList);
+                                                  //  //console.log("approved status list===>", filteredShipmentList);
                                                     if (filteredShipmentList.length > 0) {
                                                         var shipmentIdsFromShipmnetList = [];
 
@@ -1926,7 +1926,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                            console.log("arrivedDate=====>", arrivedDate);
+                                                           // //console.log("arrivedDate=====>", arrivedDate);
                                                             if ((moment(arrivedDate).format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
                                                                 if (filteredShipmentList[s].shipmentId != 0) {
@@ -2053,7 +2053,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 } else {
                                                                     // make shipmentStatus resolved=============
-                                                                    //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                    ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
                                                                     var filterObj = problemActionList[kb];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -2144,7 +2144,7 @@ export default class QatProblemActions extends Component {
                                                 if (problemList[prob].problem.problemId == 10) {
 
                                                     for (var r = 0; r < regionList.length; r++) {
-                                                        // console.log("planning unit====>********", planningUnitId);
+                                                        // //console.log("planning unit====>********", planningUnitId);
                                                         var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                         var numberOfMonthsInFuture = problemList[prob].data1;
                                                         if (planningUnitObj.forecastingUnit.tracerCategory.id == 17 || planningUnitObj.forecastingUnit.tracerCategory.id == 3) {
@@ -2183,7 +2183,7 @@ export default class QatProblemActions extends Component {
                                                                     for (var i = 0; i < consumptionList1.length; i++) {
                                                                         conQtyArray1.push(consumptionList1[i].consumptionQty);
                                                                     }
-                                                                    // console.log("consumptionArray====>", conQtyArray);
+                                                                    // //console.log("consumptionArray====>", conQtyArray);
                                                                     // ======================
                                                                     var a1 = conQtyArray1;
                                                                     var check1 = false;
@@ -2258,7 +2258,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var i = 0; i < consumptionList.length; i++) {
                                                                     conQtyArray.push(consumptionList[i].consumptionQty);
                                                                 }
-                                                                // console.log("consumptionArray====>", conQtyArray);
+                                                                // //console.log("consumptionArray====>", conQtyArray);
                                                                 // ======================
                                                                 var a = conQtyArray;
                                                                 var check = false;
@@ -2278,7 +2278,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
                                                                 if (check == true) {
-                                                                    // console.log("flag problem=====>");
+                                                                    // //console.log("flag problem=====>");
                                                                     if (index == -1) {
                                                                         var json = {
                                                                             problemReportId: 0,
@@ -2358,9 +2358,9 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
                                                                 else {
-                                                                    console.log("dont flag problem=====>");
+                                                                    //console.log("dont flag problem=====>");
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                        // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
+                                                                        // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
                                                                         let tempProblemTransObj = {
@@ -2408,40 +2408,40 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             // var a = [10, 10, 10, 50, 50, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 100, 100, 100];
                                                             // var check = false;
-                                                            // console.log("length=====", a.length);
+                                                            // //console.log("length=====", a.length);
                                                             // for (var i = 0; i < a.length - 3; i++) {
-                                                            //     console.log("---------------");
-                                                            //     console.log(a[i]);
+                                                            //     //console.log("---------------");
+                                                            //     //console.log(a[i]);
                                                             //     var one = a[i];
-                                                            //     console.log(a[i + 1]);
+                                                            //     //console.log(a[i + 1]);
                                                             //     var two = a[i + 1];
-                                                            //     console.log(a[i + 2]);
+                                                            //     //console.log(a[i + 2]);
                                                             //     var three = a[i + 2];
-                                                            //     console.log(a[i + 3]);
+                                                            //     //console.log(a[i + 3]);
                                                             //     var four = a[i + 3];
-                                                            //     console.log("---------------");
+                                                            //     //console.log("---------------");
                                                             //     if ((one == two) && (two == three) && (three == four) && (four == one)) {
                                                             //         check = true;
                                                             //         break;
                                                             //     }
                                                             // }
 
-                                                        }// console.log(check);
+                                                        }// //console.log(check);
                                                     }
                                                 }
                                                 // Dynamic forecasting for  tracer category  tc for 12, MALARIA*****************
                                                 if (problemList[prob].problem.problemId == 14) {
                                                     for (var r = 0; r < regionList.length; r++) {
-                                                        // console.log("planning unit====>********", planningUnitId);
+                                                        // //console.log("planning unit====>********", planningUnitId);
                                                         var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
-                                                        // console.log("planningUnitObj====>", planningUnitObj);
+                                                        // //console.log("planningUnitObj====>", planningUnitObj);
                                                         var numberOfMonthsInFuture = problemList[prob].data1;
                                                         if (planningUnitObj.forecastingUnit.tracerCategory.id == 12) {
                                                             var consumptionList = programList[pp].consumptionList;
                                                             consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                             var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                             var myEndDate = moment(Date.now()).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
-                                                            // console.log("startDate===>", myStartDate, "stopDate====>", myEndDate);
+                                                            // //console.log("startDate===>", myStartDate, "stopDate====>", myEndDate);
                                                             consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate && c.active == true);
                                                             var index = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
@@ -2472,7 +2472,7 @@ export default class QatProblemActions extends Component {
                                                                     for (var i = 0; i < consumptionList1.length; i++) {
                                                                         conQtyArray1.push(consumptionList1[i].consumptionQty);
                                                                     }
-                                                                    // console.log("consumptionArray====>", conQtyArray);
+                                                                    // //console.log("consumptionArray====>", conQtyArray);
                                                                     // ======================
                                                                     var a1 = conQtyArray1;
                                                                     var check1 = false;
@@ -2545,7 +2545,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var i = 0; i < consumptionList.length; i++) {
                                                                     conQtyArray.push(consumptionList[i].consumptionQty);
                                                                 }
-                                                                // console.log("consumptionArray====>", conQtyArray);
+                                                                // //console.log("consumptionArray====>", conQtyArray);
                                                                 // ======================
                                                                 var a = conQtyArray;
                                                                 var check = false;
@@ -2565,7 +2565,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
                                                                 if (check == true) {
-                                                                    // console.log("flag problem=====>");
+                                                                    // //console.log("flag problem=====>");
                                                                     if (index == -1) {
                                                                         var json = {
                                                                             problemReportId: 0,
@@ -2645,9 +2645,9 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
                                                                 else {
-                                                                    // console.log("dont flag problem=====>");
+                                                                    // //console.log("dont flag problem=====>");
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                        // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
+                                                                        // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
                                                                         let tempProblemTransObj = {
@@ -2701,17 +2701,17 @@ export default class QatProblemActions extends Component {
                                                 // Dynamic forecasting for  tracer category  tc for 25, VMMC*****************
                                                 if (problemList[prob].problem.problemId == 15) {
                                                     for (var r = 0; r < regionList.length; r++) {
-                                                        // console.log("planning unit====>********", planningUnitId);
+                                                        // //console.log("planning unit====>********", planningUnitId);
                                                         var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
-                                                        // console.log("planningUnitObj====>", planningUnitObj);
+                                                        // //console.log("planningUnitObj====>", planningUnitObj);
                                                         var numberOfMonthsInFuture = problemList[prob].data1;
                                                         if (planningUnitObj.forecastingUnit.tracerCategory.id == 25) {
                                                             var consumptionList = programList[pp].consumptionList;
                                                             consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
-                                                            // console.log("consumptionList===>", consumptionList);
+                                                            // //console.log("consumptionList===>", consumptionList);
                                                             var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                             var myEndDate = moment(Date.now()).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
-                                                            // console.log("startDate===>", myStartDate, "stopDate====>", myEndDate);
+                                                            // //console.log("startDate===>", myStartDate, "stopDate====>", myEndDate);
                                                             consumptionList = consumptionList.filter(c => c.consumptionDate >= myStartDate && c.consumptionDate <= myEndDate && c.active == true);
                                                             var index = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
@@ -2743,7 +2743,7 @@ export default class QatProblemActions extends Component {
                                                                     for (var i = 0; i < consumptionList1.length; i++) {
                                                                         conQtyArray1.push(consumptionList1[i].consumptionQty);
                                                                     }
-                                                                    // console.log("consumptionArray====>", conQtyArray);
+                                                                    // //console.log("consumptionArray====>", conQtyArray);
                                                                     // ======================
                                                                     var a1 = conQtyArray1;
                                                                     var check1 = false;
@@ -2816,14 +2816,14 @@ export default class QatProblemActions extends Component {
                                                                 for (var i = 0; i < consumptionList.length; i++) {
                                                                     conQtyArray.push(consumptionList[i].consumptionQty);
                                                                 }
-                                                                // console.log("consumptionArray====>", conQtyArray);
+                                                                // //console.log("consumptionArray====>", conQtyArray);
                                                                 // ======================
                                                                 var a = conQtyArray;
                                                                 var check = false;
                                                                 var currArray = [];
                                                                 var spanLength = problemList[prob].data2 - 1;
-                                                                // console.log("length=====", a.length);
-                                                                // console.log("spanLength=====", spanLength);
+                                                                // //console.log("length=====", a.length);
+                                                                // //console.log("spanLength=====", spanLength);
                                                                 for (var i = 0; i < a.length - spanLength; i++) {
                                                                     var currArray = [];
                                                                     for (var j = 0; j < problemList[prob].data2; j++) {
@@ -2838,7 +2838,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
                                                                 if (check == true) {
-                                                                    // console.log("flag problem=====>");
+                                                                    // //console.log("flag problem=====>");
                                                                     if (index == -1) {
                                                                         var json = {
                                                                             problemReportId: 0,
@@ -2918,9 +2918,9 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
                                                                 else {
-                                                                    // console.log("dont flag problem=====>");
+                                                                    // //console.log("dont flag problem=====>");
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                        // console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
+                                                                        // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
                                                                         var filterObj = problemActionList[index];
                                                                         var transList = filterObj.problemTransList;
                                                                         let tempProblemTransObj = {
@@ -2972,7 +2972,7 @@ export default class QatProblemActions extends Component {
                                                 }
 
                                                 // ***********************===================problem conditions  end here ====================
-                                                // console.log("problemList[prob]problemList[prob]problemList[prob]=====>", problemList[prob]);
+                                                // //console.log("problemList[prob]problemList[prob]problemList[prob]=====>", problemList[prob]);
                                                 if (problemList[prob].problem.problemId == 11) {
                                                     // problem for mos is less then min having shipments within lead time 0-6 months ============
                                                     var mosArray = [];
@@ -3016,19 +3016,19 @@ export default class QatProblemActions extends Component {
                                                             });
 
                                                     }
-                                                    // console.log("planningUnitId====>", planningUnitId);
-                                                    console.log("mosArray============>$@##", mosArray);
+                                                    // //console.log("planningUnitId====>", planningUnitId);
+                                                    //console.log("mosArray============>$@##", mosArray);
                                                     // for loop on array mosArray
                                                     var monthWithMosLessThenMin = '';
                                                     for (var element = 0; element < mosArray.length; element++) {
-                                                        // console.log("mos element===>", mosArray[element]);
+                                                        // //console.log("mos element===>", mosArray[element]);
                                                         if (mosArray[element].mos < mosArray[element].minForMonths) {
                                                             monthWithMosLessThenMin = mosArray[element].month;
                                                             break;
                                                         } else {
                                                         }
                                                     }
-                                                    console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin);
+                                                    //console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin);
                                                     var index = problemActionList.findIndex(
                                                         c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                             // && c.region.id == regionList[r].regionId
@@ -3079,19 +3079,19 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // console.log("planningUnitId====>", planningUnitId);
-                                                        console.log("mosArray============>$@##", mosArray1);
+                                                        // //console.log("planningUnitId====>", planningUnitId);
+                                                        //console.log("mosArray============>$@##", mosArray1);
                                                         // for loop on array mosArray
                                                         var monthWithMosLessThenMin1 = '';
                                                         for (var element = 0; element < mosArray1.length; element++) {
-                                                            // console.log("mos element===>", mosArray[element]);
+                                                            // //console.log("mos element===>", mosArray[element]);
                                                             if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
                                                                 monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                 break;
                                                             } else {
                                                             }
                                                         }
-                                                        console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin1);
+                                                        //console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin1);
                                                         var index1 = problemActionList.findIndex(
                                                             c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
                                                                 // && c.region.id == regionList[r].regionId
@@ -3151,18 +3151,18 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     if (monthWithMosLessThenMin != '') {
-                                                        // console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                        // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                         var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                         var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                        // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                        // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
 
                                                         var shipmentListForMonths = programList[pp].shipmentList;
                                                         var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                        // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                        // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
 
 
                                                         if (filteredShipmentListForMonths.length > 0) {
-                                                            // console.log("flag a problem mos is less then min and have shipment withing lead times");
+                                                            // //console.log("flag a problem mos is less then min and have shipment withing lead times");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -3241,15 +3241,15 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            console.log("dont falg problem mos is not less then min ");
+                                                            //console.log("dont falg problem mos is not less then min ");
                                                         }
                                                     } else {
-                                                        console.log("no months with MOS less then min ===#########");
-                                                        // console.log("index*************>", index);
-                                                        // console.log("versionId************", versionID);
+                                                        //console.log("no months with MOS less then min ===#########");
+                                                        // //console.log("index*************>", index);
+                                                        // //console.log("versionId************", versionID);
 
                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                            console.log("//////at this point resolve the problem.");
+                                                            //console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -3293,7 +3293,7 @@ export default class QatProblemActions extends Component {
 
                                                 if (problemList[prob].problem.problemId == 16) {
                                                     // Inventory is above max with shipment(s) in the next 1-6 months. Critical = High============
-                                                    // console.log("in problem id======>16", problemList[prob].data1, "====", problemList[prob].data2);
+                                                    // //console.log("in problem id======>16", problemList[prob].data1, "====", problemList[prob].data2);
                                                     var mosArray = [];
                                                     // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                     // problemList[prob].data1=0
@@ -3337,13 +3337,13 @@ export default class QatProblemActions extends Component {
                                                             });
 
                                                     }
-                                                    // console.log("planningUnitId====>", planningUnitId);
-                                                    // console.log("mosArray============>$@##", mosArray);
+                                                    // //console.log("planningUnitId====>", planningUnitId);
+                                                    // //console.log("mosArray============>$@##", mosArray);
                                                     // for loop on array mosArray
                                                     // var monthWithMosLessThenMin = '';
                                                     var monthWithMosGreaterThenMax = '';
                                                     for (var element = 0; element < mosArray.length; element++) {
-                                                        // console.log("mos element===>", mosArray[element]);
+                                                        // //console.log("mos element===>", mosArray[element]);
                                                         if (mosArray[element].mos > mosArray[element].maxForMonths) {
                                                             monthWithMosGreaterThenMax = mosArray[element].month;
                                                             break;
@@ -3401,13 +3401,13 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // console.log("planningUnitId====>", planningUnitId);
-                                                        // console.log("mosArray============>$@##", mosArray);
+                                                        // //console.log("planningUnitId====>", planningUnitId);
+                                                        // //console.log("mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         // var monthWithMosLessThenMin = '';
                                                         var monthWithMosGreaterThenMax1 = '';
                                                         for (var element = 0; element < mosArray1.length; element++) {
-                                                            // console.log("mos element===>", mosArray[element]);
+                                                            // //console.log("mos element===>", mosArray[element]);
                                                             if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1) {
                                                                 monthWithMosGreaterThenMax1 = mosArray1[element].month1;
                                                                 break;
@@ -3470,15 +3470,15 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     if (monthWithMosGreaterThenMax != '') {
-                                                        // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                        // //console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
                                                         var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
                                                         var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
-                                                        // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                        // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                         var shipmentListForMonths = programList[pp].shipmentList;
                                                         var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                        // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                        // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                         if (filteredShipmentListForMonths.length > 0) {
-                                                            console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                            //console.log("flag a problem mos is greater then max and have shipment withing lead times");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -3557,12 +3557,12 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            console.log("dont falg problem mos is not greater then max ####### ");
+                                                            //console.log("dont falg problem mos is not greater then max ####### ");
                                                         }
                                                     } else {
-                                                        // console.log("no months with MOS greater then max ===#########");
+                                                        // //console.log("no months with MOS greater then max ===#########");
                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                            // console.log("//////at this point resolve the problem. ###########");
+                                                            // //console.log("//////at this point resolve the problem. ###########");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -3607,14 +3607,14 @@ export default class QatProblemActions extends Component {
                                                 if (problemList[prob].problem.problemId == 17) {
 
                                                     // problem for mos less then min and no shipment in coming  6 months 
-                                                    // console.log("in problem id======>17", problemList[prob].data1, "====", problemList[prob].data2);
+                                                    // //console.log("in problem id======>17", problemList[prob].data1, "====", problemList[prob].data2);
 
                                                     var mosArray = [];
                                                     // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                     // problemList[prob].data1=0
                                                     // problemList[prob].data2=6
                                                     for (var mosCounter = problemList[prob].data1; mosCounter <= problemList[prob].data2; mosCounter++) {
-                                                        // console.log("mosCounter====>", mosCounter);
+                                                        // //console.log("mosCounter====>", mosCounter);
                                                         var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                         var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                         var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -3650,12 +3650,12 @@ export default class QatProblemActions extends Component {
                                                             });
 
                                                     }
-                                                    // console.log("planningUnitId====>", planningUnitId);
-                                                    // console.log("mosArray============>$@##", mosArray);
+                                                    // //console.log("planningUnitId====>", planningUnitId);
+                                                    // //console.log("mosArray============>$@##", mosArray);
                                                     // for loop on array mosArray
                                                     var monthWithMosLessThenMin = '';
                                                     for (var element = 0; element < mosArray.length; element++) {
-                                                        // console.log("mos element===>", mosArray[element]);
+                                                        // //console.log("mos element===>", mosArray[element]);
                                                         if (mosArray[element].mos < mosArray[element].minForMonths) {
                                                             monthWithMosLessThenMin = mosArray[element].month;
                                                             break;
@@ -3678,7 +3678,7 @@ export default class QatProblemActions extends Component {
                                                         // problemList[prob].data1=0
                                                         // problemList[prob].data2=6
                                                         for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
-                                                            // console.log("mosCounter====>", mosCounter);
+                                                            // //console.log("mosCounter====>", mosCounter);
                                                             var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                             var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                             var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
@@ -3712,12 +3712,12 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // console.log("planningUnitId====>", planningUnitId);
-                                                        // console.log("mosArray============>$@##", mosArray);
+                                                        // //console.log("planningUnitId====>", planningUnitId);
+                                                        // //console.log("mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         var monthWithMosLessThenMin1 = '';
                                                         for (var element = 0; element < mosArray1.length; element++) {
-                                                            // console.log("mos element===>", mosArray[element]);
+                                                            // //console.log("mos element===>", mosArray[element]);
                                                             if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
                                                                 monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                 break;
@@ -3782,15 +3782,15 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     if (monthWithMosLessThenMin != '') {
-                                                        // console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                        // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                         var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                         var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                        // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                        // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                         var shipmentListForMonths = programList[pp].shipmentList;
                                                         var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                        // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                        // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                         if (filteredShipmentListForMonths.length == 0) {
-                                                            // console.log("flag a problem mos is less then min and dont have shipment withing lead times");
+                                                            // //console.log("flag a problem mos is less then min and dont have shipment withing lead times");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -3870,12 +3870,12 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            console.log("dont falg problem mos is  less then min but have shipment in lead times ");
+                                                            //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
                                                         }
                                                     } else {
-                                                        console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                        //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                            // console.log("//////at this point resolve the problem.");
+                                                            // //console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -3920,13 +3920,13 @@ export default class QatProblemActions extends Component {
                                                 if (problemList[prob].problem.problemId == 18) {
 
                                                     // problem for mos is less then min having shipments within lead time 7-18 months ============
-                                                    // console.log("in problem id======>18", problemList[prob].data1, "====", problemList[prob].data2);
+                                                    // //console.log("in problem id======>18", problemList[prob].data1, "====", problemList[prob].data2);
                                                     var mosArray = [];
                                                     // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                     // problemList[prob].data1=0
                                                     // problemList[prob].data2=6
                                                     for (var mosCounter18 = parseInt(problemList[prob].data1); mosCounter18 <= parseInt(problemList[prob].data2); mosCounter18++) {
-                                                        // console.log("mosCounter18====>", mosCounter18);
+                                                        // //console.log("mosCounter18====>", mosCounter18);
                                                         var m = moment(Date.now()).add(mosCounter18, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                         var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                         var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -3962,12 +3962,12 @@ export default class QatProblemActions extends Component {
                                                             });
 
                                                     }
-                                                    // console.log("planningUnitId====>", planningUnitId);
-                                                    // console.log("mosArray============>$@##", mosArray);
+                                                    // //console.log("planningUnitId====>", planningUnitId);
+                                                    // //console.log("mosArray============>$@##", mosArray);
                                                     // for loop on array mosArray
                                                     var monthWithMosLessThenMin = '';
                                                     for (var element = 0; element < mosArray.length; element++) {
-                                                        // console.log("mos element===>", mosArray[element]);
+                                                        // //console.log("mos element===>", mosArray[element]);
                                                         if (mosArray[element].mos < mosArray[element].minForMonths) {
                                                             monthWithMosLessThenMin = mosArray[element].month;
                                                             break;
@@ -3991,7 +3991,7 @@ export default class QatProblemActions extends Component {
                                                         // problemList[prob].data1=0
                                                         // problemList[prob].data2=6
                                                         for (var mosCounter181 = parseInt(problemList[prob].data1); mosCounter181 <= parseInt(problemList[prob].data2); mosCounter181++) {
-                                                            // console.log("mosCounter18====>", mosCounter18);
+                                                            // //console.log("mosCounter18====>", mosCounter18);
                                                             var m1 = moment(Date.now()).add(mosCounter181, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                             var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                             var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
@@ -4025,12 +4025,12 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // console.log("planningUnitId====>", planningUnitId);
-                                                        // console.log("mosArray============>$@##", mosArray);
+                                                        // //console.log("planningUnitId====>", planningUnitId);
+                                                        // //console.log("mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         var monthWithMosLessThenMin1 = '';
                                                         for (var element = 0; element < mosArray1.length; element++) {
-                                                            // console.log("mos element===>", mosArray[element]);
+                                                            // //console.log("mos element===>", mosArray[element]);
                                                             if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
                                                                 monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                 break;
@@ -4094,15 +4094,15 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     if (monthWithMosLessThenMin != '') {
-                                                        // console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                        // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                         var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                         var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                        // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                        // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                         var shipmentListForMonths = programList[pp].shipmentList;
                                                         var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                        // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                        // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                         if (filteredShipmentListForMonths.length > 0) {
-                                                            // console.log("flag a problem mos is less then min and have shipment withing lead times");
+                                                            // //console.log("flag a problem mos is less then min and have shipment withing lead times");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -4181,12 +4181,12 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            console.log("dont falg problem mos is not less then min ");
+                                                            //console.log("dont falg problem mos is not less then min ");
                                                         }
                                                     } else {
-                                                        // console.log("no months with MOS less then min ===#########");
+                                                        // //console.log("no months with MOS less then min ===#########");
                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                            // console.log("//////at this point resolve the problem.");
+                                                            // //console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -4230,13 +4230,13 @@ export default class QatProblemActions extends Component {
                                                 }
                                                 if (problemList[prob].problem.problemId == 19) {
                                                     // Inventory is above max with shipment(s) in the next 7-18 months. Critical = High============
-                                                    // console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
+                                                    // //console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
                                                     var mosArray = [];
                                                     // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                     // problemList[prob].data1=0
                                                     // problemList[prob].data2=6
                                                     for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
-                                                        // console.log("mosCounter====>", mosCounter);
+                                                        // //console.log("mosCounter====>", mosCounter);
                                                         var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                         var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                         var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -4271,13 +4271,13 @@ export default class QatProblemActions extends Component {
                                                             });
 
                                                     }
-                                                    // console.log("planningUnitId====>", planningUnitId);
-                                                    // console.log("mosArray============>$@##", mosArray);
+                                                    // //console.log("planningUnitId====>", planningUnitId);
+                                                    // //console.log("mosArray============>$@##", mosArray);
                                                     // for loop on array mosArray
                                                     // var monthWithMosLessThenMin = '';
                                                     var monthWithMosGreaterThenMax = '';
                                                     for (var element = 0; element < mosArray.length; element++) {
-                                                        // console.log("mos element===>", mosArray[element]);
+                                                        // //console.log("mos element===>", mosArray[element]);
                                                         if (mosArray[element].mos > mosArray[element].maxForMonths) {
                                                             monthWithMosGreaterThenMax = mosArray[element].month;
                                                             break;
@@ -4300,7 +4300,7 @@ export default class QatProblemActions extends Component {
                                                         // problemList[prob].data1=0
                                                         // problemList[prob].data2=6
                                                         for (var mosCounter1 = parseInt(problemList[prob].data1); mosCounter1 <= parseInt(problemList[prob].data2); mosCounter1++) {
-                                                            // console.log("mosCounter====>", mosCounter);
+                                                            // //console.log("mosCounter====>", mosCounter);
                                                             var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                             var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                             var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
@@ -4335,13 +4335,13 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // console.log("planningUnitId====>", planningUnitId);
-                                                        // console.log("mosArray============>$@##", mosArray);
+                                                        // //console.log("planningUnitId====>", planningUnitId);
+                                                        // //console.log("mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         // var monthWithMosLessThenMin = '';
                                                         var monthWithMosGreaterThenMax1 = '';
                                                         for (var element = 0; element < mosArray1.length; element++) {
-                                                            // console.log("mos element===>", mosArray[element]);
+                                                            // //console.log("mos element===>", mosArray[element]);
                                                             if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1) {
                                                                 monthWithMosGreaterThenMax1 = mosArray1[element].month1;
                                                                 break;
@@ -4407,15 +4407,15 @@ export default class QatProblemActions extends Component {
                                                     }
 
                                                     if (monthWithMosGreaterThenMax != '') {
-                                                        // console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                        // //console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
                                                         var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
                                                         var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
-                                                        // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                        // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                         var shipmentListForMonths = programList[pp].shipmentList;
                                                         var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                        // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                        // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                         if (filteredShipmentListForMonths.length > 0) {
-                                                            // console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                            // //console.log("flag a problem mos is greater then max and have shipment withing lead times");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -4494,12 +4494,12 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            console.log("dont falg problem mos is not greater then max ####### ");
+                                                            //console.log("dont falg problem mos is not greater then max ####### ");
                                                         }
                                                     } else {
-                                                        // console.log("no months with MOS greater then max ===#########");
+                                                        // //console.log("no months with MOS greater then max ===#########");
                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                            // console.log("//////at this point resolve the problem. ###########");
+                                                            // //console.log("//////at this point resolve the problem. ###########");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -4544,14 +4544,14 @@ export default class QatProblemActions extends Component {
                                                 if (problemList[prob].problem.problemId == 20) {
 
                                                     // problem for mos less then min and no shipment in future 7 to 18 months 
-                                                    // console.log("in problem id======>20", problemList[prob].data1, "====", problemList[prob].data2);
+                                                    // //console.log("in problem id======>20", problemList[prob].data1, "====", problemList[prob].data2);
 
                                                     var mosArray = [];
                                                     // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                     // problemList[prob].data1=0
                                                     // problemList[prob].data2=6
                                                     for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
-                                                        // console.log("mosCounter====>", mosCounter);
+                                                        // //console.log("mosCounter====>", mosCounter);
                                                         var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                         var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                         var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -4590,12 +4590,12 @@ export default class QatProblemActions extends Component {
                                                             });
 
                                                     }
-                                                    // console.log("planningUnitId====>", planningUnitId);
-                                                    // console.log("mosArray============>$@##", mosArray);
+                                                    // //console.log("planningUnitId====>", planningUnitId);
+                                                    // //console.log("mosArray============>$@##", mosArray);
                                                     // for loop on array mosArray
                                                     var monthWithMosLessThenMin = '';
                                                     for (var element = 0; element < mosArray.length; element++) {
-                                                        // console.log("mos element===>", mosArray[element]);
+                                                        // //console.log("mos element===>", mosArray[element]);
                                                         if (mosArray[element].mos < mosArray[element].minForMonths) {
                                                             monthWithMosLessThenMin = mosArray[element].month;
                                                             break;
@@ -4618,7 +4618,7 @@ export default class QatProblemActions extends Component {
                                                         // problemList[prob].data1=0
                                                         // problemList[prob].data2=6
                                                         for (var mosCounter1 = parseInt(problemList[prob].data1); mosCounter1 <= parseInt(problemList[prob].data2); mosCounter1++) {
-                                                            // console.log("mosCounter====>", mosCounter);
+                                                            // //console.log("mosCounter====>", mosCounter);
                                                             var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                             var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                             var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
@@ -4657,12 +4657,12 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // console.log("planningUnitId====>", planningUnitId);
-                                                        // console.log("mosArray============>$@##", mosArray);
+                                                        // //console.log("planningUnitId====>", planningUnitId);
+                                                        // //console.log("mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         var monthWithMosLessThenMin1 = '';
                                                         for (var element = 0; element < mosArray1.length; element++) {
-                                                            // console.log("mos element===>", mosArray[element]);
+                                                            // //console.log("mos element===>", mosArray[element]);
                                                             if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
                                                                 monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                 break;
@@ -4729,15 +4729,15 @@ export default class QatProblemActions extends Component {
 
 
                                                     if (monthWithMosLessThenMin != '') {
-                                                        // console.log("min mos month from array ======>", monthWithMosLessThenMin);
+                                                        // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
                                                         var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                         var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                        // console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                        // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                         var shipmentListForMonths = programList[pp].shipmentList;
                                                         var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                        // console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                        // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                         if (filteredShipmentListForMonths.length == 0) {
-                                                            // console.log("flag a problem mos is less then min and dont have shipment withing lead times");
+                                                            // //console.log("flag a problem mos is less then min and dont have shipment withing lead times");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -4817,12 +4817,12 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                             }
                                                         } else {
-                                                            console.log("dont falg problem mos is  less then min but have shipment in lead times ");
+                                                            //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
                                                         }
                                                     } else {
-                                                        // console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                        // //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                            // console.log("//////at this point resolve the problem.");
+                                                            // //console.log("//////at this point resolve the problem.");
                                                             var filterObj = problemActionList[index];
                                                             var transList = filterObj.problemTransList;
                                                             let tempProblemTransObj = {
@@ -4872,15 +4872,15 @@ export default class QatProblemActions extends Component {
                                                         var tMinusOneDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
                                                         var tMinusTwoDate = moment(Date.now()).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
                                                         var tMinusThreeDate = moment(Date.now()).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
-                                                        // console.log("tMinusOneDate--->",tMinusOneDate);
-                                                        // console.log("tMinusOneDate--->",tMinusTwoDate);
-                                                        // console.log("tMinusOneDate--->",tMinusThreeDate);
+                                                        // //console.log("tMinusOneDate--->",tMinusOneDate);
+                                                        // //console.log("tMinusOneDate--->",tMinusTwoDate);
+                                                        // //console.log("tMinusOneDate--->",tMinusThreeDate);
                                                         var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                         var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                         var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                        // console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
-                                                        // console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
-                                                        // console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+                                                        // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
+                                                        // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
+                                                        // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
                                                         var index = problemActionList.findIndex(
                                                             c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                                 && c.region.id == regionList[r].regionId
@@ -4898,15 +4898,15 @@ export default class QatProblemActions extends Component {
                                                             var tMinusOneDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
                                                             var tMinusTwoDate1 = moment(problemActionList[prob].dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
                                                             var tMinusThreeDate1 = moment(problemActionList[prob].dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
-                                                            // console.log("tMinusOneDate--->",tMinusOneDate);
-                                                            // console.log("tMinusOneDate--->",tMinusTwoDate);
-                                                            // console.log("tMinusOneDate--->",tMinusThreeDate);
+                                                            // //console.log("tMinusOneDate--->",tMinusOneDate);
+                                                            // //console.log("tMinusOneDate--->",tMinusTwoDate);
+                                                            // //console.log("tMinusOneDate--->",tMinusThreeDate);
                                                             var consumptionListFortMinusOneDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                             var consumptionListFortMinusTwoDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                             var consumptionListFortMinusThreeDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                            // console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
-                                                            // console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
-                                                            // console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+                                                            // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
+                                                            // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
+                                                            // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
                                                             var index1 = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
                                                                     && c.region.id == regionList[r].regionId
@@ -4965,7 +4965,7 @@ export default class QatProblemActions extends Component {
                                                         }
 
                                                         if (consumptionListFortMinusOneDate.length > 0 && consumptionListFortMinusThreeDate.length > 0 && consumptionListFortMinusTwoDate.length == 0) {
-                                                            // console.log("rais prob--------");
+                                                            // //console.log("rais prob--------");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -5046,9 +5046,9 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
-                                                            // console.log("dont rais prob--------");
+                                                            // //console.log("dont rais prob--------");
                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                // console.log("resolve the problem problem id 21");
+                                                                // //console.log("resolve the problem problem id 21");
                                                                 // problemActionList[index].isFound = 0;
                                                                 var filterObj = problemActionList[index];
                                                                 var transList = filterObj.problemTransList;
@@ -5101,7 +5101,7 @@ export default class QatProblemActions extends Component {
 
                                         programList[pp].problemReportList = paList;
                                         programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
-                                        // console.log("programRequestList[pp]=====", programRequestList[pp]);
+                                        // //console.log("programRequestList[pp]=====", programRequestList[pp]);
                                         var putRequest = problemOs.put(programRequestList[pp]);
                                         putRequest.onerror = function (event) {
                                             this.setState({
@@ -5116,7 +5116,7 @@ export default class QatProblemActions extends Component {
                                         putRequest.onsuccess = function (event) {
                                             // this.setState({executionStatus:1});
                                             // return executionStatus;
-                                            console.log("time taken in sec===>", performance.now());
+                                            //console.log("time taken in sec===>", performance.now());
                                             // this.props.updateState(false);
                                             // this.props.fetchData(false);
                                             if (this.props.updateState != undefined) {
@@ -5125,7 +5125,7 @@ export default class QatProblemActions extends Component {
                                             }
 
                                         }.bind(this);
-                                        console.log("problemList for each program=====>", problemActionList);
+                                        //console.log("problemList for each program=====>", problemActionList);
                                     }
 
                                 }.bind(this);

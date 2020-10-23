@@ -249,13 +249,14 @@ export default class PipelineProgramSetup extends Component {
         // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
         var planningUnits = this.refs.child.savePlanningUnits();
         var checkValidation = this.refs.child.checkValidation();
+        this.refs.child.startLoading();
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
                     // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
                     //     if (response.status == "200") {
-
+                    this.refs.child.stopLoading();
                     if (checkValidation == true) {
 
                         PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId).
@@ -282,6 +283,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepEight').style.display = 'none';
                     }
                     else {
+                        this.refs.child.stopLoading();
                         alert(i18n.t('static.message.saveValidData'));
                     }
 
@@ -294,12 +296,14 @@ export default class PipelineProgramSetup extends Component {
 
 
                 } else {
+                    this.refs.child.stopLoading();
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
             }
             ).catch(error => {
+                this.refs.child.stopLoading();
                 alert(i18n.t('pipeline.garbageDataValidation'));
 
             });
@@ -309,12 +313,14 @@ export default class PipelineProgramSetup extends Component {
     finishedStepThree() {
         var datasources = this.refs.datasourcechild.saveDataSource();
         var checkValidation = this.refs.datasourcechild.checkValidation();
+        this.refs.datasourcechild.startLoading();
         // console.log("consumption save------>",consumption);
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempDataSource(datasources, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
                 if (response.status == "200") {
+                    this.refs.datasourcechild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({
                             pipelineProgramSetupPer: 43.48, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -333,9 +339,11 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepEight').style.display = 'none';
                     }
                     else {
+                        this.refs.datasourcechild.stopLoading();
                         alert(i18n.t('static.message.saveValidData'));
                     }
                 } else {
+                    this.refs.datasourcechild.stopLoading();
                     this.setState({
                         message: response.data.messageCode
                     })
@@ -346,12 +354,14 @@ export default class PipelineProgramSetup extends Component {
     finishedStepFour = () => {
         var consumption = this.refs.fundingSourceChild.saveFundingSource();
         var checkValidation = this.refs.fundingSourceChild.checkValidation();
+        this.refs.fundingSourceChild.startLoading();
         // console.log("consumption save------>",consumption);
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempFundingSource(consumption, this.props.match.params.pipelineId).
             then(response => {
                 // console.log("consumption add response--->", response);
                 if (response.status == "200") {
+                    this.refs.fundingSourceChild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({
                             pipelineProgramSetupPer: 58.12, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -371,6 +381,7 @@ export default class PipelineProgramSetup extends Component {
 
                     }
                     else {
+                        this.refs.fundingSourceChild.stopLoading();
                         alert(i18n.t('static.message.saveValidData'));
                         // this.setState({ pipelineProgramSetupPer: 75, inventoryStatus: true });
                         // document.getElementById('stepOne').style.display = 'none';
@@ -380,6 +391,7 @@ export default class PipelineProgramSetup extends Component {
                         // document.getElementById('stepFive').style.display = 'none';
                     }
                 } else {
+                    this.refs.fundingSourceChild.stopLoading();
                     this.setState({
                         message: response.data.messageCode
                     })
@@ -393,10 +405,11 @@ export default class PipelineProgramSetup extends Component {
         var checkValidation = this.refs.procurementAgentChild.checkValidation();
         console.log("inventory-----data---", inventory);
         // AuthenticationService.setupAxiosInterceptors();
+        this.refs.procurementAgentChild.startLoading();
         PipelineService.addQatTempProcurementAgent(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
-
+                    this.refs.procurementAgentChild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({
                             pipelineProgramSetupPer: 72.4, planningUnitStatus: false, consumptionStatus: true, inventoryStatus: false,
@@ -415,10 +428,12 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepSeven').style.display = 'none';
                         document.getElementById('stepEight').style.display = 'none';
                     } else {
+                        this.refs.procurementAgentChild.stopLoading();
                         alert(i18n.t('static.message.saveValidData'));
                     }
 
                 } else {
+                    this.refs.procurementAgentChild.stopLoading();
                     this.setState({
                         message: response.data.messageCode
                     })
@@ -430,10 +445,11 @@ export default class PipelineProgramSetup extends Component {
         var checkValidation = this.refs.consumptionChild.checkValidation();
         console.log("inventory-----data---", consumption);
         // AuthenticationService.setupAxiosInterceptors();
+        this.refs.consumptionChild.startLoading();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
-
+                    this.refs.consumptionChild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({
                             pipelineProgramSetupPer: 86.68, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: true,
@@ -452,15 +468,18 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepSeven').style.display = 'block';
                         document.getElementById('stepEight').style.display = 'none';
                     } else {
+                        this.refs.consumptionChild.stopLoading();
                         alert(i18n.t('static.message.saveValidData'));
                     }
 
                 } else {
+                    this.refs.consumptionChild.stopLoading();
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
             }).catch(error => {
+                this.refs.consumptionChild.stopLoading();
                 alert(i18n.t('pipeline.garbageDataValidation'));
 
             });
@@ -470,10 +489,12 @@ export default class PipelineProgramSetup extends Component {
         var checkValidation = this.refs.inventoryChild.checkValidation();
         console.log("inventory-----data---", inventory);
         // AuthenticationService.setupAxiosInterceptors();
+        this.refs.inventoryChild.startLoading();
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
                     console.log("save indentory date====>", response);
+                    this.refs.inventoryChild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({
                             pipelineProgramSetupPer: 101, planningUnitStatus: false, consumptionStatus: false, inventoryStatus: false,
@@ -492,6 +513,7 @@ export default class PipelineProgramSetup extends Component {
                         document.getElementById('stepSeven').style.display = 'none';
                         document.getElementById('stepEight').style.display = 'block';
                     } else {
+                        this.refs.inventoryChild.stopLoading();
                         alert(i18n.t('static.message.saveValidData'));
                         // this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
                         // document.getElementById('stepOne').style.display = 'none';
@@ -502,11 +524,13 @@ export default class PipelineProgramSetup extends Component {
                     }
 
                 } else {
+                    this.refs.inventoryChild.stopLoading();
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
             }).catch(error => {
+                this.refs.inventoryChild.stopLoading();
                 alert(i18n.t('pipeline.garbageDataValidation'));
 
             });
