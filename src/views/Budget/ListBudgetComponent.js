@@ -746,6 +746,7 @@ class ListBudgetComponent extends Component {
       ],
       editable: false,
       license: JEXCEL_PRO_KEY,
+      filters:true,
       text: {
         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
@@ -787,8 +788,6 @@ class ListBudgetComponent extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       onselection: this.selected,
-
-
       oneditionend: this.onedit,
       copyCompatibility: true,
       allowExport: false,

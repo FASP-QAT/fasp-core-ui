@@ -414,6 +414,7 @@ export default class QunatimedImportStepFour extends Component {
                         entries: '',
                     },
                     pagination: localStorage.getItem("sesRecordCount"),
+                    filters:true,
                     search: true,
                     columnSorting: false,
                     tableOverflow: true,

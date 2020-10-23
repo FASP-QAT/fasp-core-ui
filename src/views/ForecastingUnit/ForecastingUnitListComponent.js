@@ -676,6 +676,7 @@ export default class ForecastingUnitListComponent extends Component {
             position: 'top',
             contextMenu: false,
             license: JEXCEL_PRO_KEY,
+            filters:true,
         };
         var forecastingUnitListEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = forecastingUnitListEl;

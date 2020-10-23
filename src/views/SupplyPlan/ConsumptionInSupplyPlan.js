@@ -37,35 +37,35 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     showOnlyErrors() {
-        var checkBoxValue = document.getElementById("showErrors");
-        var elInstance = this.state.consumptionEl;
-        var json = elInstance.getJson();
-        var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-        if (json.length < showOption) {
-            showOption = json.length;
-        }
-        if (checkBoxValue.checked == true) {
-            console.log("in ncheck box true");
-            for (var j = 0; j < parseInt(showOption); j++) {
-                var rowData = elInstance.getRowData(j);
-                console.log("in for loop", rowData[14], "j--->", j);
-                var asterisk = document.getElementsByClassName("jexcel_content")[0];
-                console.log("asterisk", asterisk);
-                var tr = (asterisk.childNodes[0]).childNodes[2];
-                if (rowData[14].toString() == 1) {
-                    tr.childNodes[j].style.display = "";
-                } else {
-                    tr.childNodes[j].style.display = "none";
-                }
-            }
-        } else {
-            for (var j = 0; j < parseInt(showOption); j++) {
-                var asterisk = document.getElementsByClassName("jexcel_content")[0];
-                console.log("asterisk", asterisk);
-                var tr = (asterisk.childNodes[0]).childNodes[2];
-                tr.childNodes[j].style.display = "";
-            }
-        }
+        // var checkBoxValue = document.getElementById("showErrors");
+        // var elInstance = this.state.consumptionEl;
+        // var json = elInstance.getJson();
+        // var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        // if (json.length < showOption) {
+        //     showOption = json.length;
+        // }
+        // if (checkBoxValue.checked == true) {
+        //     console.log("in ncheck box true");
+        //     for (var j = 0; j < parseInt(showOption); j++) {
+        //         var rowData = elInstance.getRowData(j);
+        //         console.log("in for loop", rowData[14], "j--->", j);
+        //         var asterisk = document.getElementsByClassName("jexcel_content")[0];
+        //         console.log("asterisk", asterisk);
+        //         var tr = (asterisk.childNodes[0]).childNodes[2];
+        //         if (rowData[14].toString() == 1) {
+        //             tr.childNodes[j].style.display = "";
+        //         } else {
+        //             tr.childNodes[j].style.display = "none";
+        //         }
+        //     }
+        // } else {
+        //     for (var j = 0; j < parseInt(showOption); j++) {
+        //         var asterisk = document.getElementsByClassName("jexcel_content")[0];
+        //         console.log("asterisk", asterisk);
+        //         var tr = (asterisk.childNodes[0]).childNodes[2];
+        //         tr.childNodes[j].style.display = "";
+        //     }
+        // }
     }
 
     componentDidMount() {
@@ -172,11 +172,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
                     var paginationOption = false;
                     var searchOption = false;
+                    var filterOption = false;
                     var paginationArray = []
                     if (this.props.consumptionPage == "consumptionDataEntry") {
                         paginationOption = localStorage.getItem("sesRecordCount");
                         searchOption = true;
                         paginationArray = JEXCEL_PAGINATION_OPTION;
+                        filterOption = true;
                     }
 
                     var readonlyRegionAndMonth = true;
@@ -216,7 +218,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         }
                         data[12] = index;
                         data[13] = 0;
-                        data[14] = 0;
+                        // data[14] = 0;
                         consumptionDataArr[j] = data;
                     }
                     if (consumptionList.length == 0 && consumptionEditable) {
@@ -240,7 +242,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[11] = "";
                         data[12] = -1;
                         data[13] = 1;
-                        data[14] = 0;
+                        // data[14] = 0;
                         consumptionDataArr[0] = data;
                     }
                     var options = {
@@ -252,7 +254,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80 },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 80 },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80 },
@@ -276,8 +278,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         allowExport: false,
                         copyCompatibility: true,
                         parseFormulas: true,
-                        // filters: true,
+                        filters: filterOption,
                         license: JEXCEL_PRO_KEY,
+                        onbeforechange: this.beforeChanged,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -500,6 +503,15 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }.bind(this);
     }
 
+    beforeChanged(instance, cell, x, y, value) {
+        if (x == 12) {
+            console.log("---------------->X12 is changing for y", y);
+        }
+        if(x==7){
+            console.log("---------------->X6 is changing for y", y);
+        }
+    }
+
     addRowInJexcel() {
         var obj = this.state.consumptionEl;
         var json = obj.getJson();
@@ -525,7 +537,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[11] = "";
         data[12] = -1;
         data[13] = 1;
-        data[14] = 0;
+        // data[14] = 0;
         obj.insertRow(data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
@@ -617,6 +629,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("consumptionChangedFlag", 1);
         if (x != 13 && rowData[13] != 1) {
             elInstance.setValueFromCoords(13, y, 1, true);
+        }
+        if (x != 12 && x != 13 && rowData[12] == "") {
+            console.log("In if-------------->", rowData[12], "X---------->", x, "Y-------->", y);
+            rowData[12] = -1;
+            elInstance.setValueFromCoords(12, y, -1, true);
+            elInstance.setValueFromCoords(13, y, 1, true);
+            elInstance.setValueFromCoords(7, y, `=F${parseInt(y + 1)}*G${parseInt(y + 1)}`, true)
         }
         if (x == 0) {
             var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
@@ -970,14 +989,20 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         console.log("in check validations")
         var valid = true;
         var elInstance = this.state.consumptionEl;
-        var json = elInstance.getJson();
+        var json = elInstance.getJson(null, true);
+        console.log("Json &&&&&& -------------------->", json);
         var mapArray = [];
         // var adjustmentsQty = 0;
         // var openingBalance = 0;
         // var consumptionQty = 0;
+        console.log("Json---------------->", json);
         for (var y = 0; y < json.length; y++) {
             console.log("y---->", y);
-            var map = new Map(Object.entries(json[y]));
+            var rd = elInstance.getRowData(y);
+            console.log("Rd-------------->", rd);
+            var map = new Map(Object.entries(rd));
+            console.log("Map----------------->", map);
+            console.log("Moment consumption date", moment(map.get("0")).format("YYYY-MM"));
             mapArray.push(map);
 
             var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
@@ -1022,7 +1047,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateConsumption'), elInstance);
                 }
                 valid = false;
-                elInstance.setValueFromCoords(14, y, 1, true);
+                // elInstance.setValueFromCoords(14, y, 1, true);
                 this.props.updateState("consumptionDuplicateError", i18n.t('static.supplyPlan.duplicateConsumption'));
                 this.props.hideSecondComponent();
             } else {
@@ -1035,7 +1060,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
                     if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                         inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
@@ -1048,26 +1073,26 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
 
                 validation = checkValidtion("text", "E", y, rowData[4], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 }
 
                 validation = checkValidtion("number", "F", y, rowData[5], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
                     var batchDetails = rowData[11];
                     var consumptionBatchQty = 0;
@@ -1085,7 +1110,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 validation = checkValidtion("numberNotRequired", "I", y, rowData[8], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
                     if (parseInt(rowData[8]) > 31) {
                         inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
@@ -1105,7 +1130,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                 if (validation == false) {
                     valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
+                    // elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
                     if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                         inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
@@ -1174,7 +1199,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
                     for (var i = 0; i < json.length; i++) {
-                        var map = new Map(Object.entries(json[i]));
+                        var rd = elInstance.getRowData(i);
+                        var map = new Map(Object.entries(rd));
                         if (map.get("13") == 1) {
                             if (moment(map.get("0")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                 minDate = moment(map.get("0")).format("YYYY-MM-DD");
@@ -1191,6 +1217,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.id = map.get("4");
                             consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("6");
                             consumptionDataList[parseInt(map.get("12"))].consumptionRcpuQty = (map.get("5")).toString().replaceAll("\,", "");
+                            console.log("elInstance.getCell(`H${parseInt(i) + 1}`)", elInstance.getCell(`H${parseInt(i) + 1}`));
                             consumptionDataList[parseInt(map.get("12"))].consumptionQty = (elInstance.getCell(`H${parseInt(i) + 1}`).innerText).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("12"))].dayOfStockOut = (map.get("8")).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("12"))].notes = map.get("9");

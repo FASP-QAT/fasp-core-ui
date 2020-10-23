@@ -617,7 +617,7 @@ export default class ShipmentDelinking extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
+            filters:true,
 
             oneditionend: this.onedit,
             copyCompatibility: true,

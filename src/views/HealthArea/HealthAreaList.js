@@ -473,6 +473,7 @@ export default class HealthAreaListComponent extends Component {
             position: 'top',
             contextMenu: false,
             license: JEXCEL_PRO_KEY,
+            filters:true,
         };
         var healthAreasEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = healthAreasEl;

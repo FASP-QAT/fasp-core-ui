@@ -743,6 +743,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     }
                                                 ],
                                                 pagination:localStorage.getItem("sesRecordCount"),
+                                                filters:true,
                                                 contextMenu: false,
                                                 search: true, 
                                                 columnSorting: true,

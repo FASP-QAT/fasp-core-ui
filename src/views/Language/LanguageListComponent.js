@@ -438,7 +438,7 @@ export default class LanguageListComponent extends Component {
                                 allowDeleteRow: false,
                                 onselection: this.selected,
 
-
+                                filters:true,
                                 oneditionend: this.onedit,
                                 copyCompatibility: true,
                                 allowExport: false,

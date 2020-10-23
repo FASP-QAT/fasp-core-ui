@@ -70,6 +70,7 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'text', readOnly: true }
                     ],
                     pagination: localStorage.getItem("sesRecordCount"),
+                    filters:true,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,

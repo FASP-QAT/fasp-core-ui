@@ -471,6 +471,7 @@ export default class PipelineProgramConsumption extends Component {
                                                 title: i18n.t('static.consumption.consumptionqty'),
                                                 type: 'numeric',
                                                 mask: '#,##.00',
+                                                disabledMaskOnEdition: true,
                                                 decimal: '.'
                                             },
                                             {
@@ -507,6 +508,7 @@ export default class PipelineProgramConsumption extends Component {
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         position: 'top',
                                         license: JEXCEL_PRO_KEY,
+                                        filters:true,
                                         text: {
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                             show: '',

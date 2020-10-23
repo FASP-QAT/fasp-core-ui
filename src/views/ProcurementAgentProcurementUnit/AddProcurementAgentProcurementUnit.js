@@ -644,6 +644,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                         ],
                                         pagination: localStorage.getItem("sesRecordCount"),
+                                        filters:true,
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,

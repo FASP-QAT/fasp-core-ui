@@ -82,6 +82,7 @@ export default class DatabaseTranslations extends React.Component {
                         entries: '',
                     },
                     pagination: localStorage.getItem("sesRecordCount"),
+                    filters:true,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
@@ -95,6 +96,9 @@ export default class DatabaseTranslations extends React.Component {
                     tableOverflow: false,
                     onload: this.loaded,
                     license: JEXCEL_PRO_KEY,
+                    allowInsertRow:false,
+                    allowManualInsertRow:false
+
                     // tableHeight: '500px',
                 };
                 this.el = jexcel(document.getElementById("labelTranslationTable"), options);

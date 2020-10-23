@@ -495,6 +495,7 @@ export default class OrganisationListComponent extends Component {
             position: 'top',
             contextMenu: false,
             license: JEXCEL_PRO_KEY,
+            filters:true,
         };
         var organisationsEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = organisationsEl;

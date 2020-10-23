@@ -456,8 +456,7 @@ export default class CurrencyListComponent extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
                             onselection: this.selected,
-
-
+                            filters:true,
                             oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowExport: false,

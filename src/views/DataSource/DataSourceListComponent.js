@@ -735,7 +735,7 @@ export default class DataSourceListComponent extends Component {
             allowDeleteRow: false,
             onselection: this.selected,
             license: JEXCEL_PRO_KEY,
-
+            filters:true,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,

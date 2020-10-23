@@ -858,6 +858,7 @@ export default class ExpiredInventory extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
+            filters:true,
             search: true,
             columnSorting: true,
             tableOverflow: true,

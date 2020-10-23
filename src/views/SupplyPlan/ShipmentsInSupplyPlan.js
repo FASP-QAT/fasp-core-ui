@@ -267,11 +267,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
                                         var paginationOption = false;
                                         var searchOption = false;
+                                        var filterOption = false;
                                         var paginationArray = []
                                         if (this.props.shipmentPage == "shipmentDataEntry") {
                                             paginationOption = localStorage.getItem("sesRecordCount");
                                             searchOption = true;
                                             paginationArray = JEXCEL_PAGINATION_OPTION;
+                                            filterOption = true;
                                         }
                                         console.log("Shipment list------------------------------->", shipmentList);
                                         var erpType = "hidden";
@@ -452,6 +454,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             oneditionstart: this.shipmentEditStart,
                                             allowExport: false,
                                             license: JEXCEL_PRO_KEY,
+                                            filters:filterOption,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                                 show: '',

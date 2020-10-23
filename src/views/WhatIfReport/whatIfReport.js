@@ -2730,20 +2730,6 @@ export default class WhatIfReportComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
-
-    filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[3];
-        console.log("Value", value);
-        if (value != 0) {
-            mylist = this.state.batchInfoList.filter(c => c.id != -1);
-        } else {
-            mylist = this.state.batchInfoList;
-        }
-
-        return mylist;
-    }.bind(this)
-
     // Shipments Functionality
 
     tabPane() {

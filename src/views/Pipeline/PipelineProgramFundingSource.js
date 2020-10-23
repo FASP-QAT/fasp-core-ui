@@ -206,6 +206,7 @@ export default class PipelineProgramFundingSource extends Component {
                                             }
                                         ],
                                         pagination:localStorage.getItem("sesRecordCount"),
+                                        filters:true,
                                         contextMenu: false,
                                         search: true,
                                         columnSorting: true,

@@ -173,11 +173,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
                     var paginationOption = false;
                     var searchOption = false;
+                    var filterOption=false;
                     var paginationArray = []
                     if (this.props.inventoryPage == "inventoryDataEntry") {
                         paginationOption = localStorage.getItem("sesRecordCount");
                         searchOption = true;
                         paginationArray = JEXCEL_PAGINATION_OPTION;
+                        filterOption=true
                     }
 
                     var readonlyRegionAndMonth = true;
@@ -290,6 +292,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         allowManualInsertRow: false,
                         allowExport: false,
                         copyCompatibility: true,
+                        filters:filterOption,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

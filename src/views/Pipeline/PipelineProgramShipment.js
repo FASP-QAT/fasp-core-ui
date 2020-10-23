@@ -1142,6 +1142,7 @@ export default class PipelineProgramShipment extends Component {
 
             ],
             pagination: localStorage.getItem("sesRecordCount"),
+            filters:true,
             search: true,
             columnSorting: true,
             tableOverflow: true,

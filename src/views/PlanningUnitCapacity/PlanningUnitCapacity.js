@@ -779,7 +779,8 @@ class PlanningUnitCapacity extends Component {
             var tableJson = this.el.getJson();
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
+                var rd = this.el.getRowData(i);
+                var map1 = new Map(Object.entries(rd));
                 if (parseInt(map1.get("7")) === 1) {
                     let json = {
                         planningUnitCapacityId: parseInt(map1.get("6")),
@@ -990,6 +991,7 @@ class PlanningUnitCapacity extends Component {
 
             ],
             pagination: localStorage.getItem("sesRecordCount"),
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1002,6 +1004,7 @@ class PlanningUnitCapacity extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
+            oninsertrow: this.onRowInserted,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
@@ -1169,6 +1172,14 @@ class PlanningUnitCapacity extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    onRowInserted(instance, rowNumber, noOfRows, insertBefore) {
+        console.log("RowNumber----------->", rowNumber);
+        (instance.jexcel).setValueFromCoords(6, rowNumber, getLabelText(this.state.planningUnit.label, this.state.lang), true);
+        (instance.jexcel).setValueFromCoords(6, rowNumber, 0, true);
+        (instance.jexcel).setValueFromCoords(7, rowNumber, 1, true);
+
     }
 
 

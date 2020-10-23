@@ -53,6 +53,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
 
                     ],
                     pagination: false,
+                    filters:true,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
