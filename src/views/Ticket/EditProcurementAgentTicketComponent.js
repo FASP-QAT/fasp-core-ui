@@ -200,7 +200,8 @@ export default class EditProcurementAgentTicketComponent extends Component {
         procurementAgent.procurementAgentName = '';
         procurementAgent.notes = '';
         this.setState({
-            procurementAgent
+            procurementAgent: procurementAgent,
+            procurementAgentId: ''
         },
             () => { });
     }

@@ -19,10 +19,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Add Organisation"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmId: selectedRealm,
+    summary: "",
+    realmId: "",
     realmCountryId: '',
     organisationCode: '',
     organisationName: '',
@@ -346,20 +345,20 @@ export default class OrganisationTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realm: selectedRealm, loading: false
+                    realm: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { organisation } = this.state;
-                    organisation.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    organisation.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         organisation
                     }, () => {
 
-                        this.getRealmCountryList(selectedRealm);
+                        this.getRealmCountryList(this.props.items.userRealmId);
 
                     })
                 }
@@ -494,13 +493,15 @@ export default class OrganisationTicketComponent extends Component {
     resetClicked() {
         let { organisation } = this.state;
         // organisation.summary = '';
-        organisation.realmId = '';
+        organisation.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         organisation.realmCountryId = '';
         organisation.organisationName = '';
         organisation.organisationCode = '';
         organisation.notes = '';
         this.setState({
-            organisation
+            organisation: organisation,
+            realm: this.props.items.userRealmId,
+            countryId: ''        
         },
             () => { });
     }
@@ -524,7 +525,15 @@ export default class OrganisationTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmId: this.props.items.userRealmId,
+                            realmCountryId: '',
+                            organisationCode: '',
+                            organisationName: '',
+                            notes: ''
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

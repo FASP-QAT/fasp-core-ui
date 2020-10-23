@@ -16,10 +16,9 @@ import { SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit"))
 let summaryText_2 = "Add Forecasting Unit"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realm: selectedRealm,
+    summary: "",
+    realm: "",
     tracerCategory: "",
     productCategory: "",
     forecastingUnitDesc: "",
@@ -229,20 +228,20 @@ export default class ForecastingUnitTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm, loading: false
+                    realmId: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { forecastingUnit } = this.state;
-                    forecastingUnit.realm = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    forecastingUnit.realm = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         forecastingUnit
                     }, () => {
 
-                        this.getProductCategoryByRealmId(selectedRealm);                        
+                        this.getProductCategoryByRealmId(this.props.items.userRealmId);                        
 
                     })
                 }
@@ -398,6 +397,7 @@ export default class ForecastingUnitTicketComponent extends Component {
     resetClicked() {
         let { forecastingUnit } = this.state;
         // forecastingUnit.summary = '';
+        forecastingUnit.realm = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         forecastingUnit.tracerCategory = '';
         forecastingUnit.productCategory = '';
         forecastingUnit.forecastingUnitDesc = '';
@@ -405,7 +405,11 @@ export default class ForecastingUnitTicketComponent extends Component {
         forecastingUnit.unit = '';
         forecastingUnit.notes = '';
         this.setState({
-            forecastingUnit
+            forecastingUnit: forecastingUnit,
+            realmId: this.props.items.userRealmId,            
+            unitId: '',            
+            tracerCategoryId: '',
+            productCategoryId: ''
         },
             () => { });
     }
@@ -456,7 +460,17 @@ export default class ForecastingUnitTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realm: this.props.items.userRealmId,
+                            tracerCategory: "",
+                            productCategory: "",
+                            forecastingUnitDesc: "",
+                            genericName: "",
+                            unit: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

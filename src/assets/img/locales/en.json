@@ -1434,5 +1434,6 @@
     "static.inventory.adjustmentQunatity": "Adjustment Qunatity (ARU)",
     "static.inventory.inventoryQunatityPU": "Inventory Qunatity (QAT Planning Unit)",
     "static.inventory.adjustmentQunatityPU": "Adjustment Qunatity (QAT Planning Unit)",
-    "static.common.notesvalidation": "Please enter notes"
+    "static.common.notesvalidation": "Please enter notes",    
+    "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them."
 }

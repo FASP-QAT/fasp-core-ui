@@ -17,12 +17,11 @@ import { SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     programName: '',
     programCode: '',
-    realmId: selectedRealm,
+    realmId: "",
     realmCountryId: '',
     regionId: '',
     organisationId: '',
@@ -576,20 +575,20 @@ export default class ProgramTicketComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realmList: response.data,
-                        realmId: selectedRealm, loading: false
+                        realmId: this.props.items.userRealmId, loading: false
                     });
-                    if (selectedRealm !== "") {
+                    if (this.props.items.userRealmId !== "") {
                         this.setState({
-                            realmList: (response.data).filter(c => c.realmId == selectedRealm)
+                            realmList: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
 
                         let { program } = this.state;
-                        program.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        program.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             program
                         }, () => {
 
-                            this.getDependentLists(selectedRealm);                            
+                            this.getDependentLists(this.props.items.userRealmId);                            
 
                         })
                     }
@@ -656,7 +655,7 @@ export default class ProgramTicketComponent extends Component {
         // program.summary = '';
         program.programName = '';
         program.programCode = '';
-        program.realmId = '';
+        program.realmId = this.props.items.userRealmId !== "" ? this.state.realmList.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         program.realmCountryId = '';
         program.regionId = '';
         program.organisationId = '';
@@ -672,7 +671,13 @@ export default class ProgramTicketComponent extends Component {
         program.arrivedToDeliveredLeadTime = '';
         program.notes = '';
         this.setState({
-            program
+            program: program,
+            realmId: this.props.items.userRealmId,            
+            realmCountryId: '',            
+            organisationId: '',
+            healthAreaId: '',
+            programManagerId: '',
+            regionId: ''
         },
             () => { });
     }
@@ -760,7 +765,27 @@ export default class ProgramTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            programName: '',
+                            programCode: '',
+                            realmId: this.props.items.userRealmId,
+                            realmCountryId: '',
+                            regionId: '',
+                            organisationId: '',
+                            healthAreaId: '',
+                            programManager: '',
+                            airFreightPerc: '',
+                            seaFreightPerc: '',
+                            plannedToSubmittedLeadTime: '',
+                            submittedToApprovedLeadTime: '',
+                            approvedToShippedLeadTime: '',
+                            shippedToArrivedByAirLeadTime: '',
+                            shippedToArrivedBySeaLeadTime: '',
+                            arrivedToDeliveredLeadTime: '',
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

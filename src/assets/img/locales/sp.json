@@ -1220,5 +1220,6 @@
     "static.commit.qatshipmentId": "ID de envío de QAT",
     "static.supplyPlan.mtshipmentStatus": "Estado",
     "static.supplyPlan.mtexpectedDeliveryDate": "Recibir fecha",
-    "static.shipment.delinkingsuccess": "Envío desvinculado correctamente"
+    "static.shipment.delinkingsuccess": "Envío desvinculado correctamente",
+    "static.ticket.filesuploadnote": "Si tiene varios archivos, comprímalos y cárguelos."
 }

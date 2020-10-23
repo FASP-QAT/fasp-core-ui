@@ -19,9 +19,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Add Budget"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     programName: "",
     fundingSourceName: "",
     budgetName: "",
@@ -362,7 +361,10 @@ export default class BudgetTicketComponent extends Component {
         budget.stopDate = '';
         budget.notes = '';
         this.setState({
-            budget
+            budget : budget,
+            programId: '',
+            fundingSourceId: '',
+            currencyId: ''
         },
             () => { });
     }
@@ -434,7 +436,17 @@ export default class BudgetTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            programName: "",
+                            fundingSourceName: "",
+                            budgetName: "",
+                            budgetCode: "",
+                            currency: "",
+                            budgetAmount: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

@@ -203,7 +203,8 @@ export default class EditProgramTicketComponent extends Component {
         program.programName = '';
         program.notes = '';
         this.setState({
-            program
+            program: program,
+            programId: ''
         },
             () => { });
     }

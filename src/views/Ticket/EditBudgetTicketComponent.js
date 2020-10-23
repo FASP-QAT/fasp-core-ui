@@ -206,7 +206,8 @@ export default class EditBudgetTicketComponent extends Component {
         budget.budgetName = '';
         budget.notes = '';
         this.setState({
-            budget
+            budget: budget,
+            budgetId: ''
         },
             () => { });
     }
