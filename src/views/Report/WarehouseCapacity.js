@@ -148,10 +148,10 @@ class warehouseCapacity extends Component {
                 doc.setPage(i)
 
                 doc.setPage(i)
-                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 20, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 20, {
                     align: 'center'
                 })
 
@@ -200,12 +200,14 @@ class warehouseCapacity extends Component {
                     if (navigator.onLine) {
                         var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-                        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                         doc.text(doc.internal.pageSize.width / 8, y, planningText)
                         for (var i = 0; i < planningText.length; i++) {
                             if (y > doc.internal.pageSize.height - 100) {
                                 doc.addPage();
                                 y = 80;
 
+                            }else{
+                               y=y+10 
                             }
                         }
                         // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -246,8 +248,8 @@ class warehouseCapacity extends Component {
         ]
         let data = this.state.data.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
         let content = {
-            margin: { top: 90, left: 100, bottom: 80 },
-            startY: 150,
+            margin: { top: 80, bottom:120,left:100 },
+            startY: 90+doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4).length*10+doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length*10+20,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
