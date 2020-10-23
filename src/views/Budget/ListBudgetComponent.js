@@ -746,7 +746,7 @@ class ListBudgetComponent extends Component {
       ],
       editable: false,
       license: JEXCEL_PRO_KEY,
-      filters:true,
+      filters: true,
       text: {
         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         show: '',
@@ -793,7 +793,9 @@ class ListBudgetComponent extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      contextMenu: false,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;

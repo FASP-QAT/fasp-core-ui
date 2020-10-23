@@ -456,13 +456,16 @@ export default class CurrencyListComponent extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
                             onselection: this.selected,
-                            filters:true,
+                            filters: true,
                             oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowExport: false,
                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                             position: 'top',
-                            contextMenu: false,
+                            // contextMenu: false,
+                            contextMenu: function (obj, x, y, e) {
+                                return [];
+                            }.bind(this),
                             license: JEXCEL_PRO_KEY,
                         };
                         var languageEl = jexcel(document.getElementById("tableDiv"), options);

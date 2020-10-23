@@ -10,7 +10,7 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 export default class PipelineProgramFundingSource extends Component {
     constructor(props) {
         super(props);
@@ -205,9 +205,11 @@ export default class PipelineProgramFundingSource extends Component {
                                                 readonly: true
                                             }
                                         ],
-                                        pagination:localStorage.getItem("sesRecordCount"),
-                                        filters:true,
-                                        contextMenu: false,
+                                        pagination: localStorage.getItem("sesRecordCount"),
+                                        filters: true,
+                                        contextMenu: function (obj, x, y, e) {
+                                            return [];
+                                        }.bind(this),
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,

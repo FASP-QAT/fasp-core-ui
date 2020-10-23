@@ -505,9 +505,11 @@ class FundingSourceListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             license: JEXCEL_PRO_KEY,
-            filters:true,
+            filters: true,
         };
         var fundingSourceEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = fundingSourceEl;

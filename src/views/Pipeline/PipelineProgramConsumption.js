@@ -493,7 +493,9 @@ export default class PipelineProgramConsumption extends Component {
                                             // { title: 'Last Modified by', type: 'text', readOnly: true }
                                         ],
                                         pagination: localStorage.getItem("sesRecordCount"),
-                                        contextMenu: false,
+                                        contextMenu: function (obj, x, y, e) {
+                                            return [];
+                                        }.bind(this),
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,
@@ -508,7 +510,7 @@ export default class PipelineProgramConsumption extends Component {
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         position: 'top',
                                         license: JEXCEL_PRO_KEY,
-                                        filters:true,
+                                        filters: true,
                                         text: {
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                             show: '',

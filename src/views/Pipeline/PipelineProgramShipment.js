@@ -1142,7 +1142,7 @@ export default class PipelineProgramShipment extends Component {
 
             ],
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1155,7 +1155,9 @@ export default class PipelineProgramShipment extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                 show: '',
@@ -1265,7 +1267,7 @@ export default class PipelineProgramShipment extends Component {
     SubmitProgram() {
         // this.SubmitShipment()
         this.loaded()
-        this.setState({loading:true});
+        this.setState({ loading: true });
         var data = this.el.getJson().map(ele => ({
             "shipmentId": null,
             "procurementUnit": null,
@@ -1301,7 +1303,7 @@ export default class PipelineProgramShipment extends Component {
                 console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
-                    changedData: false, 
+                    changedData: false,
                     // loading: true
                 }, () => console.log("=====", this.state));
 
