@@ -986,10 +986,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     checkValidationConsumption() {
-        console.log("in check validations")
+        console.log("in check validations &&&&&& -------------------->")
         var valid = true;
         var elInstance = this.state.consumptionEl;
-        var json = elInstance.getJson(null, true);
+        var json = elInstance.getJson(null, false);
         console.log("Json &&&&&& -------------------->", json);
         var mapArray = [];
         // var adjustmentsQty = 0;

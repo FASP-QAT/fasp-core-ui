@@ -556,7 +556,7 @@ export default class CostOfInventory extends Component {
                 {
                     title: i18n.t('static.report.stock'),
                     type: 'number',
-                    mask:'#,###',
+                    mask: '#,###',
                     readOnly: true
                 },
                 {
@@ -582,7 +582,7 @@ export default class CostOfInventory extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -598,7 +598,9 @@ export default class CostOfInventory extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            },
             license: JEXCEL_PRO_KEY,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
