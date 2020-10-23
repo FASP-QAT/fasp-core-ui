@@ -116,24 +116,24 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    console.log("############## Login component did mount #####################");
-   // delete axios.defaults.headers.common["Authorization"];
+    // console.log("############## Login component did mount #####################");
+    delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
-    console.log("--------Going to call version api-----------")
+    // console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
     if (navigator.onLine) {
       LoginService.getApiVersion()
         .then(response => {
-          console.log("--------version api success----------->", response)
+          // console.log("--------version api success----------->", response)
           if (response != null && response != "") {
             this.setState({
               apiVersion: response.data.app.version
 
             })
-            console.log("response---", response.data.app.version)
+            // console.log("response---", response.data.app.version)
           }
         }).catch(error => {
-          console.log("--------version api error----------->", error)
+          // console.log("--------version api error----------->", error)
         })
     } else {
       console.log("############## Offline so can't fetch version #####################");
@@ -158,7 +158,7 @@ class Login extends Component {
   }
 
   incorrectPassmessageHide() {
-    console.log("-----------------incorrectPassmessageHide---------------");
+    // console.log("-----------------incorrectPassmessageHide---------------");
     // setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
     var incorrectPassword = document.getElementById('div2');
@@ -177,11 +177,11 @@ class Login extends Component {
   }
 
   logoutMessagehide() {
-    console.log("-----------logoutMessagehide---------------");
+    // console.log("-----------logoutMessagehide---------------");
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
-    console.log("htnl content....... ", htmlContent);
+    // console.log("htnl content....... ", htmlContent);
     if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum')) {
       logoutMessage.style.color = 'red';
     }
@@ -203,9 +203,6 @@ class Login extends Component {
   }
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
-    console.log("new array-------", newArray)
-    console.log("this.state.dropdownOpen-------", this.state.dropdownOpen)
-    console.log("index-------", i)
     this.setState({
       dropdownOpen: newArray,
     });
@@ -256,7 +253,7 @@ class Login extends Component {
                             LoginService.authenticate(emailId, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                console.log("decoded token---", decoded);
+                                // console.log("decoded token---", decoded);
 
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
@@ -291,11 +288,11 @@ class Login extends Component {
                                       case 401:
                                       case 404:
                                       case 412:
-                                        console.log("Login page 401---");
+                                        // console.log("Login page 401---");
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
-                                        console.log("Login page password expired----------->" + emailId)
+                                        // console.log("Login page password expired----------->" + emailId)
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {
@@ -304,7 +301,7 @@ class Login extends Component {
                                         });
                                         break;
                                       default:
-                                        console.log("Login page unknown error---");
+                                        // console.log("Login page unknown error---");
                                         this.setState({ message: 'static.unkownError' });
                                         break;
                                     }
@@ -314,20 +311,20 @@ class Login extends Component {
 
                           }
                           else {
-                            console.log("offline emailId---", emailId)
+                            // console.log("offline emailId---", emailId)
                             var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
-                            console.log("offline decryptedPassword---", decryptedPassword)
+                            // console.log("offline decryptedPassword---", decryptedPassword)
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
-                                  console.log("offline error---", err)
+                                  // console.log("offline error---", err)
                                   this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
-                                  console.log("offline tempuser---", tempUser)
+                                  // console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  console.log("offline user next---", user)
+                                  // console.log("offline user next---", user)
                                   let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
@@ -347,13 +344,13 @@ class Login extends Component {
 
                                   }
                                 } else {
-                                  console.log("offline invalid credentials---")
+                                  // console.log("offline invalid credentials---")
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
-                              console.log("offline decryptedPassword empty---", decryptedPassword)
+                              // console.log("offline decryptedPassword empty---", decryptedPassword)
                               this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }
@@ -447,8 +444,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                Agency for International Development or the U.S. government.
+                                                                                                                                                                  official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                                  Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

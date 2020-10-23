@@ -724,11 +724,13 @@ export default class ConsumptionDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = bytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programJson);
                         var programJson = {
-
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            // getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version
+                            name: programJson1.programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -944,7 +946,7 @@ export default class ConsumptionDetails extends React.Component {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
                     if (obj.options.allowInsertRow == true && this.el.getValueFromCoords(12, y) != 2) {
                         items.push({
-                            title: i18n.t('static.problemContext.editProblem'), 
+                            title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
                                 let problemStatusId = document.getElementById('problemStatusId').value;
                                 let problemTypeId = document.getElementById('problemTypeId').value;
@@ -1275,9 +1277,9 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
-                    var problemReportFilterList = problemReportList;
+                    var problemReportFilterList = this.state.data;
 
-                    if (problemStatusId == -1) {
+                    if (problemStatusId == -1 && problemTypeId == -1) {
 
                         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
                         this.setState({
@@ -1288,7 +1290,7 @@ export default class ConsumptionDetails extends React.Component {
                                 this.buildJExcel();
                             });
                     }
-                    if (problemStatusId != -1) {
+                    if (problemStatusId != -1 && problemTypeId == -1) {
                         // var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
                         if (problemStatusId == 2) {
                             var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1304,8 +1306,24 @@ export default class ConsumptionDetails extends React.Component {
                             () => {
                                 this.buildJExcel();
                             });
-                    } if (problemTypeId != -1) {
-                        problemReportFilterList = problemReportList.filter(c => c.problemType.id == problemTypeId);
+                    } if (problemStatusId == -1 && problemTypeId != -1) {
+                        problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.problemType.id == problemTypeId);
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: ''
+                        },
+                            () => {
+                                this.buildJExcel();
+                            });
+                    }
+                    if (problemStatusId != -1 && problemTypeId != -1) {
+                        if (problemStatusId == 2) {
+                            var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                            // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                            problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        } else {
+                            problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                        }
                         this.setState({
                             data: problemReportFilterList,
                             message: ''
@@ -1689,7 +1707,7 @@ export default class ConsumptionDetails extends React.Component {
                             </ul>
                         </FormGroup>
                         {/* <div className="ProgramListSearch"> */}
-                        <div id="tableDiv"  style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground qat-problemListSearch">
+                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground qat-problemListSearch">
                         </div>
                         {/* </div> */}
                     </CardBody>

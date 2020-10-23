@@ -15,10 +15,9 @@ import { SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.realmcountrydashboard"))
 let summaryText_2 = "Add Realm Country"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmId: selectedRealm,
+    summary: "",
+    realmId: "",
     countryId: "",
     currencyId: "",
     notes: ""
@@ -152,15 +151,15 @@ export default class RealmCountryTicketComponent extends Component {
                 if (response.status == 200) {
                     this.setState({
                         realms: response.data,
-                        realm: selectedRealm, loading: false
+                        realm: this.props.items.userRealmId, loading: false
                     });
-                    if (selectedRealm !== "") {
+                    if (this.props.items.userRealmId !== "") {
                         this.setState({
-                            realms: (response.data).filter(c => c.realmId == selectedRealm)
+                            realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
 
                         let { realmCountry } = this.state;
-                        realmCountry.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        realmCountry.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             realmCountry
                         }, () => {
@@ -338,12 +337,15 @@ export default class RealmCountryTicketComponent extends Component {
     resetClicked() {
         let { realmCountry } = this.state;
         // realmCountry.summary = '';
-        realmCountry.realmId = '';
+        realmCountry.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         realmCountry.countryId = '';
         realmCountry.currencyId = '';
         realmCountry.notes = '';
         this.setState({
-            realmCountry
+            realmCountry: realmCountry,
+            realm: this.props.items.userRealmId,
+            country: '',
+            currency: ''
         },
             () => { });
     }
@@ -384,7 +386,14 @@ export default class RealmCountryTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmId: this.props.items.userRealmId,
+                            countryId: "",
+                            currencyId: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
