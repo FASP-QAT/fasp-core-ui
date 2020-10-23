@@ -675,8 +675,9 @@ export default class CountryListComponent extends Component {
                             </FormGroup>
                         </Col>
 
-
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div className="mt-1">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
                         </div>
 
 
