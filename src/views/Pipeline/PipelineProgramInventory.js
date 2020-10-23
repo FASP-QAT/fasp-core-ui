@@ -23,8 +23,17 @@ export default class PipelineProgramInventory extends Component {
         this.state = {
             loading: true
         }
+        this.startLoading=this.startLoading.bind(this);
+        this.stopLoading=this.stopLoading.bind(this);
     }
 
+    startLoading(){
+        this.setState({loading:true});
+    }
+    stopLoading(){
+        this.setState({loading:false});
+    }
+    
     dropdownFilter = function (instance, cell, c, r, source) {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
