@@ -22,6 +22,15 @@ export default class PipelineProgramConsumption extends Component {
         this.state = {
             loading: true
         }
+        this.startLoading=this.startLoading.bind(this);
+        this.stopLoading=this.stopLoading.bind(this);
+    }
+
+    startLoading(){
+        this.setState({loading:true});
+    }
+    stopLoading(){
+        this.setState({loading:false});
     }
 
     checkValidation() {
