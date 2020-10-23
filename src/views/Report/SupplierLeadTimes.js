@@ -94,19 +94,19 @@ class SupplierLeadTimes extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
-            data[1] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
-            data[2] = outPutList[j].procurementAgent.code
-            data[3] = outPutList[j].plannedSubmittedLeadTime
-            data[4] = outPutList[j].submittedToApprovedLeadTime
-            data[5] = outPutList[j].approvedToShippedLeadTime
-            data[6] = outPutList[j].shippedToArrivedBySeaLeadTime
+           // data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
+            data[0] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
+            data[1] = outPutList[j].procurementAgent.code
+            data[2] = outPutList[j].plannedSubmittedLeadTime
+            data[3] = outPutList[j].submittedToApprovedLeadTime
+            data[4] = outPutList[j].approvedToShippedLeadTime
+            data[5] = outPutList[j].shippedToArrivedBySeaLeadTime
 
-            data[7] = outPutList[j].shippedToArrivedByAirLeadTime
-            data[8] = outPutList[j].arrivedToDeliveredLeadTime
-            data[9] = outPutList[j].totalSeaLeadTime
-            data[10] = outPutList[j].totalAirLeadTime
-            data[11] = outPutList[j].localProcurementAgentLeadTime
+            data[6] = outPutList[j].shippedToArrivedByAirLeadTime
+            data[7] = outPutList[j].arrivedToDeliveredLeadTime
+            data[8] = outPutList[j].totalSeaLeadTime
+            data[9] = outPutList[j].totalAirLeadTime
+            data[10] = outPutList[j].localProcurementAgentLeadTime
             // data[13] = outPutList[j].
             outPutArray[count] = data;
             count++;
@@ -127,11 +127,7 @@ class SupplierLeadTimes extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                {
-                    title: i18n.t('static.program.program'),
-                    type: 'text',
-                    readOnly: true
-                },
+               
                 {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
@@ -197,9 +193,6 @@ class SupplierLeadTimes extends Component {
             nestedHeaders:[
                
                 [{
-                    title: '',
-                    rowspan: '1',
-                },{
                     title: '',
                     rowspan: '1',
                 },{
@@ -285,7 +278,7 @@ class SupplierLeadTimes extends Component {
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+           //     (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -426,7 +419,7 @@ class SupplierLeadTimes extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
             //  getLabelText(ele.country.label, this.state.lang),
-            getLabelText(ele.program.label, this.state.lang),
+         //   getLabelText(ele.program.label, this.state.lang),
             ele.planningUnit.id,
             getLabelText(ele.planningUnit.label, this.state.lang),
             ele.procurementAgent.code,
@@ -448,11 +441,11 @@ class SupplierLeadTimes extends Component {
             startY: startYtable,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 53, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 57, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 170 },
                 // 1: { cellWidth: 171.89 },
-                2: { cellWidth: 129.89 }
+                1: { cellWidth: 138.89 }
             }
         };
         doc.autoTable(content);
@@ -1421,17 +1414,7 @@ class SupplierLeadTimes extends Component {
             }, this);
         const columns = [
 
-            {
-                dataField: 'program.label',
-                text: i18n.t('static.program.program'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '200px' },
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            }, {
+           {
                 dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
                 sort: true,

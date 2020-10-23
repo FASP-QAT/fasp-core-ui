@@ -1709,10 +1709,12 @@ export default class ConsumptionDetails extends React.Component {
                                 <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
                         </FormGroup>
+                        <div className="qat-problemListSearch">
                         {/* <div className="ProgramListSearch"> */}
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground qat-problemListSearch">
+                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground ">
                         </div>
                         {/* </div> */}
+                        </div>
                     </CardBody>
 
                 </Card>
