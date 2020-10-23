@@ -18,7 +18,7 @@ export default class PipelineProgramDataSource extends Component {
         this.state = {
             dataSourceList: [],
             mapDataSourceEl: '',
-            loading: false
+            loading: true
         }
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);

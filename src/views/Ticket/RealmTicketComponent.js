@@ -12,7 +12,7 @@ import { SPACE_REGEX } from '../../Constants';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Add Realm"
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     realmName: "",
     realmCode: "",
     minMosMinGaurdrail: "",
@@ -190,7 +190,16 @@ export default class RealmTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: "",
+                            realmCode: "",
+                            minMosMinGaurdrail: "",
+                            minMosMaxGaurdrail: "",
+                            maxMosMaxGaurdrail: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({

@@ -195,7 +195,8 @@ export default class EditDataSourceTicketComponent extends Component {
         dataSource.dataSourceName = '';
         dataSource.notes = '';
         this.setState({
-            dataSource
+            dataSource: dataSource,
+            dataSourceId: ''
         },
             () => { });
     }

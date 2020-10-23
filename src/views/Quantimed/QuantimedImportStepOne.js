@@ -271,9 +271,9 @@ class QuantimedImportStepOne extends Component {
                                                 });
                                         }
                                     );
-                                this.setState({
-                                    loading: false
-                                })
+                                // this.setState({
+                                //     loading: false
+                                // })
 
                             }
                         }
@@ -297,7 +297,7 @@ class QuantimedImportStepOne extends Component {
                                     <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                                         <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programForm'>
-                                            <CardBody className="pb-lg-2 pt-lg-2">
+                                            <CardBody>
 
                                                 <FormGroup id="fileImportDiv">
                                                     <Col md="4">
@@ -331,10 +331,10 @@ class QuantimedImportStepOne extends Component {
                                             {/* </CardBody>
                                             <CardFooter className="pb-0 pr-0"> */}
                                             <br></br>
-                                                <FormGroup className="pb-3">
-                                                    <Button color="info" size="md" className="float-right mr-1" type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
+                                                <FormGroup className="">
+                                                    <Button color="info" size="md" className="float-right " type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
                                                 </FormGroup>
-                                        &nbsp;
+                                      
                                     {/* </CardFooter> */}
                                     </CardBody>
                                         </Form>

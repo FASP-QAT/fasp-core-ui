@@ -214,7 +214,8 @@ export default class EditTechnicalAreaTicketComponent extends Component {
         technicalArea.technicalAreaName = '';
         technicalArea.notes = '';
         this.setState({
-            technicalArea
+            technicalArea: technicalArea,
+            technicalAreaId: ''
         },
             () => { });
     }

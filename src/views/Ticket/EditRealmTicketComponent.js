@@ -177,7 +177,8 @@ export default class EditRealmTicketComponent extends Component {
         realm.realmName = '';
         realm.notes = '';
         this.setState({
-            realm
+            realm: realm,
+            realmId: ''
         },
             () => { });
     }

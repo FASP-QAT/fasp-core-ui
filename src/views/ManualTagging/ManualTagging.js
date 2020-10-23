@@ -1680,7 +1680,7 @@ export default class ManualTagging extends Component {
                                     >
                                         {
                                             props => (
-                                                <div className="TableCust">
+                                                <div className="TableCust FortablewidthMannualtaggingtable1">
 
                                                     <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
 
@@ -1704,7 +1704,7 @@ export default class ManualTagging extends Component {
                                     >
                                         {
                                             props => (
-                                                <div className="TableCust">
+                                                <div className="TableCust FortablewidthMannualtaggingtable2">
                                                     {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
