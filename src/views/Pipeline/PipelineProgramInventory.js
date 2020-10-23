@@ -202,7 +202,7 @@ export default class PipelineProgramInventory extends Component {
         }
 
         if (x == 7) {
-           
+
             var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX;
             var col = ("H").concat(parseInt(y) + 1);
             value = value.toString().replaceAll("\,", "");
@@ -459,8 +459,10 @@ export default class PipelineProgramInventory extends Component {
                                         }
                                     ],
                                     pagination: localStorage.getItem("sesRecordCount"),
-                                    filters:true,
-                                    contextMenu: false,
+                                    filters: true,
+                                    contextMenu: function (obj, x, y, e) {
+                                        return [];
+                                    }.bind(this),
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,

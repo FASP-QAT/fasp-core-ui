@@ -11,7 +11,7 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 export default class PipelineProgramDataSource extends Component {
     constructor(props) {
         super(props);
@@ -216,7 +216,7 @@ export default class PipelineProgramDataSource extends Component {
                 DataSourceService.getAllDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
-                            console.log("data source====>",response.data);
+                            console.log("data source====>", response.data);
 
                             // dataSourceListQat = response.data
                             this.setState({ activeDataSourceList: response.data });
@@ -294,9 +294,11 @@ export default class PipelineProgramDataSource extends Component {
                                                         readonly: true
                                                     }
                                                 ],
-                                                pagination:localStorage.getItem("sesRecordCount"),
-                                                filters:true,
-                                                contextMenu: false,
+                                                pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    return [];
+                                                }.bind(this),
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,

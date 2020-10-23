@@ -306,7 +306,7 @@ class ListRoleComponent extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -320,7 +320,10 @@ class ListRoleComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            // contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             license: JEXCEL_PRO_KEY,
         };
         var roleEl = jexcel(document.getElementById("tableDiv"), options);

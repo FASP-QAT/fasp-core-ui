@@ -734,7 +734,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -750,7 +750,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             license: JEXCEL_PRO_KEY,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);

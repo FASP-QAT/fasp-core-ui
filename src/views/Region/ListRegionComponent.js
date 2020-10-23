@@ -489,7 +489,7 @@ class RegionListComponent extends Component {
         headers.push(i18n.t('static.common.status'));
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln==null?'':ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
+        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -587,7 +587,7 @@ class RegionListComponent extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -601,7 +601,9 @@ class RegionListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             license: JEXCEL_PRO_KEY,
 
         };
@@ -750,7 +752,7 @@ class RegionListComponent extends Component {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     this.setState({
-                        realmCountryList: response.data.map(ele=>ele.realmCountry)
+                        realmCountryList: response.data.map(ele => ele.realmCountry)
                     },
                         () => { })
                 } else {

@@ -600,7 +600,7 @@ export default class CostOfInventory extends Component {
             position: 'top',
             contextMenu: function (obj, x, y, e) {
                 return [];
-            },
+            }.bind(this),
             license: JEXCEL_PRO_KEY,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);

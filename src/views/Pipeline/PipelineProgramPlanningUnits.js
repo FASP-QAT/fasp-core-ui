@@ -9,7 +9,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -751,10 +751,12 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
                                                     }
                                                 ],
-                                                pagination:localStorage.getItem("sesRecordCount"),
-                                                filters:true,
-                                                contextMenu: false,
-                                                search: true, 
+                                                pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    return [];
+                                                }.bind(this),
+                                                search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,

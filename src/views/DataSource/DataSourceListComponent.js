@@ -735,13 +735,15 @@ export default class DataSourceListComponent extends Component {
             allowDeleteRow: false,
             onselection: this.selected,
             license: JEXCEL_PRO_KEY,
-            filters:true,
+            filters: true,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var dataSourceEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataSourceEl;

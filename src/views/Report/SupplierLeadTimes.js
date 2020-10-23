@@ -190,21 +190,24 @@ class SupplierLeadTimes extends Component {
                     readOnly: true
                 },
             ],
-            nestedHeaders:[
-               
+            nestedHeaders: [
+
                 [{
                     title: '',
                     rowspan: '1',
-                },{
+                }, {
+                    title: '',
+                    rowspan: '1',
+                }, {
                     title: '',
                     rowspan: '1',
                 },
-                    {
-                        title: i18n.t('static.dashboard.months'),
-                        colspan: '9',
-                    },
+                {
+                    title: i18n.t('static.dashboard.months'),
+                    colspan: '9',
+                },
                 ],
-               
+
             ],
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -213,7 +216,7 @@ class SupplierLeadTimes extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -227,7 +230,9 @@ class SupplierLeadTimes extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             license: JEXCEL_PRO_KEY,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -291,7 +296,7 @@ class SupplierLeadTimes extends Component {
                 ele.arrivedToDeliveredLeadTime,
                 ele.totalSeaLeadTime,
                 ele.totalAirLeadTime,
-                ele.localProcurementAgentLeadTime==null?'':ele.localProcurementAgentLeadTime
+                ele.localProcurementAgentLeadTime == null ? '' : ele.localProcurementAgentLeadTime
 
                 // (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'),
                 // ele.stockAdjustemntQty,

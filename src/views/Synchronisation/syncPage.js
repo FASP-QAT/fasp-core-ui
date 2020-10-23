@@ -160,7 +160,9 @@ export default class syncPage extends Component {
       },
       pagination: false,
       search: false,
-      contextMenu: false,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       columnSorting: false,
       tableOverflow: false,
       wordWrap: true,
@@ -332,7 +334,9 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      contextMenu: false,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       onload: this.loadedResolveConflictsInventory,
       license: JEXCEL_PRO_KEY,
     };
@@ -508,7 +512,9 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      contextMenu: false,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       onload: this.loadedResolveConflictsShipment,
       license: JEXCEL_PRO_KEY,
     };
@@ -1123,7 +1129,7 @@ export default class syncPage extends Component {
                                     ],
                                     pagination: localStorage.getItem("sesRecordCount"),
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                    filters:true,
+                                    filters: true,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -1290,7 +1296,7 @@ export default class syncPage extends Component {
                                       { type: 'hidden', title: 'result of compare' },
                                     ],
                                     pagination: localStorage.getItem("sesRecordCount"),
-                                    filters:true,
+                                    filters: true,
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     search: true,
                                     columnSorting: true,
@@ -1455,7 +1461,7 @@ export default class syncPage extends Component {
                                     ],
                                     pagination: localStorage.getItem("sesRecordCount"),
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                    filters:true,
+                                    filters: true,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
@@ -2723,7 +2729,7 @@ export default class syncPage extends Component {
             { type: 'hidden', title: 'result of compare' },
           ],
           pagination: localStorage.getItem("sesRecordCount"),
-          filters:true,
+          filters: true,
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           search: true,
           columnSorting: true,

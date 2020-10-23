@@ -454,7 +454,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             oneditionstart: this.shipmentEditStart,
                                             allowExport: false,
                                             license: JEXCEL_PRO_KEY,
-                                            filters:filterOption,
+                                            filters: filterOption,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                                                 show: '',
@@ -873,7 +873,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         allowExport: false,
                                                                         onchange: this.shipmentDatesChanged,
                                                                         editable: tableEditable,
-                                                                        contextMenu: false,
+                                                                        contextMenu: function (obj, x, y, e) {
+                                                                            return [];
+                                                                        }.bind(this),
                                                                         license: JEXCEL_PRO_KEY,
                                                                         text: {
                                                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} `,
@@ -3307,7 +3309,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 allowManualInsertRow: false,
                 allowExport: false,
                 editable: tableEditable,
-                contextMenu: false,
+                contextMenu: function (obj, x, y, e) {
+                    return [];
+                }.bind(this),
                 onchange: this.shipmentQtyChanged,
                 license: JEXCEL_PRO_KEY,
                 text: {
@@ -3376,7 +3380,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     allowManualInsertRow: false,
                     allowExport: false,
                     editable: false,
-                    contextMenu: false,
+                    contextMenu: function (obj, x, y, e) {
+                        return [];
+                    }.bind(this),
                     license: JEXCEL_PRO_KEY,
                     text: {
                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
