@@ -1039,10 +1039,10 @@ class Budgets extends Component {
             },
             {
                 dataField: 'program.code',
+                headerAlign: 'center',
                 text: i18n.t('static.program.programCode'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
             },*/
             {
@@ -1290,7 +1290,7 @@ class Budgets extends Component {
                                 >
                                     {
                                         props => (
-                                            <div className="TableCust listBudgetAlignThtd">
+                                            <div>
                                                 <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     {/*<SearchBar {...props.searchProps} />
                                                         <ClearSearchButton {...props.searchProps} />*/}

@@ -101,12 +101,12 @@ class ProgramService {
         );
     }
     updateProgramStatus(json, reviewedProblemList) {
-        
-        var obj={
-            reviewedProblemList:reviewedProblemList,
-            notes:json.currentVersion.notes
+
+        var obj = {
+            reviewedProblemList: reviewedProblemList,
+            notes: json.currentVersion.notes
         }
-       
+
         return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/`, obj, {}
         );
     }
@@ -125,6 +125,12 @@ class ProgramService {
     getProgramDisplayNameUniqueStatus(realmId, programId, programCode) {
         return axios.get(`${API_URL}/api/program/validate/realmId/${realmId}/programId/${programId}/programCode/${programCode}`, {}
         );
+    }
+    checkNewerVersions(json) {
+        console.log("json----------------------------", json);
+        return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
+        );
+
     }
 
 }

@@ -9,7 +9,7 @@ import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { DATE_FORMAT_CAP } from '../../Constants.js';
+import { DATE_FORMAT_CAP, QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../Constants.js';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { Online, Offline } from "react-detect-offline";
@@ -1176,6 +1176,7 @@ class ApplicationDashboard extends Component {
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">
+                <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')}>
                   <div class="h1 text-muted text-left mb-2  ">
                     {/* <i class="fa fa-question-circle icon-color"></i> */}
                     <i><img src={imageHelp} className="" style={{width: '40px', height: '40px', marginTop: '-15px'}}/></i>
@@ -1190,10 +1191,12 @@ class ApplicationDashboard extends Component {
                     </ButtonGroup> */}
                   </div>
 
-                  <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}</div>
-                  <div className="text-count">{this.state.openIssues}</div>
-                  <div className="chart-wrapper mt-4 pb-2" >
+                  
+                    <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}</div>
+                    <div className="text-count">{this.state.openIssues}</div>
+                    <div className="chart-wrapper mt-4 pb-2" >
                   </div>
+                  </a>
                 </CardBody>
               </Card>
             </Col>

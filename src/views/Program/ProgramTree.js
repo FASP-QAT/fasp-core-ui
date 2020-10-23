@@ -27,6 +27,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
+import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
@@ -342,6 +343,7 @@ class Program extends Component {
 
         return (
             <div className="animated fadeIn">
+                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
@@ -532,7 +534,7 @@ class Program extends Component {
                 loading: false, color: "red"
             },
                 () => {
-                    this.hideSecondComponent();
+                    this.hideFirstComponent();
                 })
             // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
@@ -639,6 +641,7 @@ class Program extends Component {
                                             this.hideFirstComponent();
                                             // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
                                             this.setState({ loading: false })
+                                            this.refs.programListChild.checkNewerVersions();
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
@@ -708,6 +711,7 @@ class Program extends Component {
                                                                 loading: false
                                                             })
                                                             this.hideFirstComponent();
+                                                            this.refs.programListChild.checkNewerVersions();
                                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
 
                                                         }.bind(this);
