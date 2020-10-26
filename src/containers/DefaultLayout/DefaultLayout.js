@@ -662,9 +662,10 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name) => {
     if (this.state.name !== name) {
+      console.log("P*** Call indexed db methods0---------------------------")
       this.getProgramData();
-      this.getDownloadedPrograms();
-      this.checkIfLocalProgramVersionChanged();
+      // this.getDownloadedPrograms();
+      // this.checkIfLocalProgramVersionChanged();
       this.setState({
         name
       });
@@ -789,12 +790,13 @@ class DefaultLayout extends Component {
           }
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        // console.log("finalmax---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
+        console.log("P***proList program data---",proList)
         this.setState({
           programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
         }, () => {
           // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
         })
+        this.getDownloadedPrograms();
       }.bind(this);
     }.bind(this)
 
@@ -856,11 +858,13 @@ class DefaultLayout extends Component {
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
+        console.log("P***proList downloaded program data---",proList)
         this.setState({
           downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
         }, () => {
           // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
         })
+        this.checkIfLocalProgramVersionChanged();
       }.bind(this);
     }.bind(this)
 

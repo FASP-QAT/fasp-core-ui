@@ -97,7 +97,7 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          {/* <Online>
+          <Online>
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
@@ -106,18 +106,18 @@ class DefaultHeader extends Component {
                   <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />}
               </NavLink>
             </NavItem>
-          </Online> */}
+          </Online>
           {/* <Online> */}
-            {/* <NavItem className="">
-              <NavLink to="#" className="nav-link">
-                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
-                
-                {this.props.changeIcon &&
-                  <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
-                {!this.props.changeIcon &&
-                  <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
-              </NavLink>
-            </NavItem> */}
+          <NavItem className="">
+            <NavLink to="#" className="nav-link">
+              {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
+
+              {this.props.changeIcon &&
+                <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
+              {!this.props.changeIcon &&
+                <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
+            </NavLink>
+          </NavItem>
           {/* </Online> */}
           <NavItem className="">
             <span className="nav-link">
