@@ -789,6 +789,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -970,33 +971,49 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             {
                                                                 title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                                 type: 'numeric',
-                                                                // mask: '$ #.##,00',
-                                                                // decimal: ',',
+                                                                decimal: '.',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.MOQ'),
                                                                 type: 'number',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro1'),
                                                                 type: 'numeric',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro2'),
                                                                 type: 'numeric',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerContainer'),
                                                                 type: 'numeric',
+                                                                // decimal: '.',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgentPlanningUnit.volume'),
                                                                 type: 'numeric',
+                                                                decimal: '.',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
 
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgentPlanningUnit.weight'),
                                                                 type: 'numeric',
+                                                                decimal: '.',
+                                                                mask: '#,##.00',
+                                                                disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.checkbox.active'),
@@ -1013,7 +1030,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                                                         ],
                                                         pagination: localStorage.getItem("sesRecordCount"),
-                                                        filters:true,
+                                                        filters: true,
                                                         search: true,
                                                         columnSorting: true,
                                                         tableOverflow: true,
@@ -1026,6 +1043,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         onchange: this.changed,
                                                         oneditionend: this.onedit,
                                                         copyCompatibility: true,
+                                                        parseFormulas: true,
+                                                        onpaste: this.onPaste,
                                                         text: {
                                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1158,27 +1177,27 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 }
 
                                                                 if (x) {
-                                                                    if (obj.options.allowComments == true) {
-                                                                        items.push({ type: 'line' });
+                                                                    // if (obj.options.allowComments == true) {
+                                                                    //     items.push({ type: 'line' });
 
-                                                                        var title = obj.records[y][x].getAttribute('title') || '';
+                                                                    //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                                        items.push({
-                                                                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                            onclick: function () {
-                                                                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                            }
-                                                                        });
+                                                                    //     items.push({
+                                                                    //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                    //         onclick: function () {
+                                                                    //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                    //         }
+                                                                    //     });
 
-                                                                        if (title) {
-                                                                            items.push({
-                                                                                title: obj.options.text.clearComments,
-                                                                                onclick: function () {
-                                                                                    obj.setComments([x, y], '');
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    }
+                                                                    //     if (title) {
+                                                                    //         items.push({
+                                                                    //             title: obj.options.text.clearComments,
+                                                                    //             onclick: function () {
+                                                                    //                 obj.setComments([x, y], '');
+                                                                    //             }
+                                                                    //         });
+                                                                    //     }
+                                                                    // }
                                                                 }
                                                             }
 
@@ -1358,7 +1377,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
     addRow = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.props.match.params.procurementAgentId;
         data[1] = "";
@@ -1379,6 +1398,18 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         );
     };
 
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
+                (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(12, data[i].y, 1, true);
+                z = data[i].y;
+            }
+        }
+    }
+
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicatePlanningUnit();
         var validation = this.checkValidation();
@@ -1387,7 +1418,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             this.setState({
                 loading: false
             })
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -1400,13 +1431,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                             id: parseInt(map1.get("0")),
                         },
                         skuCode: map1.get("2"),
-                        catalogPrice: map1.get("3"),
-                        moq: map1.get("4"),
-                        unitsPerPalletEuro1: map1.get("5"),
-                        unitsPerPalletEuro2: map1.get("6"),
-                        unitsPerContainer: map1.get("7"),
-                        volume: map1.get("8"),
-                        weight: map1.get("9"),
+                        catalogPrice: this.el.getValueFromCoords(3, i),
+                        moq: this.el.getValueFromCoords(4, i),
+                        unitsPerPalletEuro1: this.el.getValueFromCoords(5, i),
+                        unitsPerPalletEuro2: this.el.getValueFromCoords(6, i),
+                        unitsPerContainer: this.el.getValueFromCoords(7, i),
+                        volume: this.el.getValueFromCoords(8, i),
+                        weight: this.el.getValueFromCoords(9, i),
                         active: map1.get("10"),
                         procurementAgentPlanningUnitId: parseInt(map1.get("11"))
                     }
@@ -1477,7 +1508,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
 
     checkDuplicatePlanningUnit = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
 
         let tempArray = tableJson;
@@ -1594,6 +1625,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //catelog price
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(3, y);
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
@@ -1617,6 +1649,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //moq
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(4, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
@@ -1634,6 +1667,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per pallet euro1
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(5, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
@@ -1651,6 +1685,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per pallet euro2
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(6, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
@@ -1668,6 +1703,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per container
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(7, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
@@ -1686,6 +1722,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         if (x == 8) {
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             var col = ("I").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(8, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1708,6 +1745,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         if (x == 9) {
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             var col = ("J").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(9, y);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1736,7 +1774,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             // var col = ("L").concat(parseInt(y) + 1);

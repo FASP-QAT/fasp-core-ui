@@ -80,6 +80,7 @@ class RealmCountryRegion extends Component {
         // this.updateRow = this.updateRow.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -161,6 +162,9 @@ class RealmCountryRegion extends Component {
                                 {
                                     title: i18n.t('static.region.capacitycbm'),
                                     type: 'numeric',
+                                    decimal: '.',
+                                    mask: '#,##.00',
+                                    disabledMaskOnEdition: true
                                 },
                                 {
                                     title: i18n.t('static.region.gln'),
@@ -185,7 +189,7 @@ class RealmCountryRegion extends Component {
 
                             ],
                             pagination: localStorage.getItem("sesRecordCount"),
-                            filters:true,
+                            filters: true,
                             search: true,
                             columnSorting: true,
                             tableOverflow: true,
@@ -199,6 +203,8 @@ class RealmCountryRegion extends Component {
                             oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowManualInsertRow: false,
+                            parseFormulas: true,
+                            onpaste: this.onPaste,
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -321,27 +327,27 @@ class RealmCountryRegion extends Component {
                                     }
 
                                     if (x) {
-                                        if (obj.options.allowComments == true) {
-                                            items.push({ type: 'line' });
+                                        // if (obj.options.allowComments == true) {
+                                        //     items.push({ type: 'line' });
 
-                                            var title = obj.records[y][x].getAttribute('title') || '';
+                                        //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                            items.push({
-                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                onclick: function () {
-                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                }
-                                            });
+                                        //     items.push({
+                                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                        //         onclick: function () {
+                                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                        //         }
+                                        //     });
 
-                                            if (title) {
-                                                items.push({
-                                                    title: obj.options.text.clearComments,
-                                                    onclick: function () {
-                                                        obj.setComments([x, y], '');
-                                                    }
-                                                });
-                                            }
-                                        }
+                                        //     if (title) {
+                                        //         items.push({
+                                        //             title: obj.options.text.clearComments,
+                                        //             onclick: function () {
+                                        //                 obj.setComments([x, y], '');
+                                        //             }
+                                        //         });
+                                        //     }
+                                        // }
                                     }
                                 }
 
@@ -471,7 +477,7 @@ class RealmCountryRegion extends Component {
 
     }
     addRow = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
         data[1] = "";
@@ -487,11 +493,24 @@ class RealmCountryRegion extends Component {
         );
     };
 
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
+                (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                z = data[i].y;
+            }
+        }
+    }
+
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicateRegion();
         var validation = this.checkValidation();
         if (validation == true && duplicateValidation == true) {
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -503,7 +522,8 @@ class RealmCountryRegion extends Component {
                             label_en: map1.get("1"),
                         },
                         // capacityCbm: map1.get("2").replace(",", ""),
-                        capacityCbm: map1.get("2").replace(/,/g, ""),
+                        // capacityCbm: map1.get("2").replace(/,/g, ""),
+                        capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
                         gln: (map1.get("3") === '' ? null : map1.get("3")),
                         active: map1.get("4"),
                         realmCountry: {
@@ -577,7 +597,7 @@ class RealmCountryRegion extends Component {
         }
     }
     checkDuplicateRegion = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
 
         let tempArray = tableJson;
@@ -649,6 +669,7 @@ class RealmCountryRegion extends Component {
         // }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
+            value = this.el.getValueFromCoords(2, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             value = value.replace(/,/g, "");
@@ -711,7 +732,7 @@ class RealmCountryRegion extends Component {
 
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);

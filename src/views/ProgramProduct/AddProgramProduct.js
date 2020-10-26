@@ -68,12 +68,12 @@ class AddprogramPlanningUnit extends Component {
         this.changed = this.changed.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-
+        this.onPaste = this.onPaste.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 1];
+        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -320,32 +320,53 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.reorderFrequency'),
-                                                                    type: 'number',
+                                                                    type: 'numeric',
+                                                                    // decimal:'.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
 
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.minMonthOfStock'),
-                                                                    type: 'number'
+                                                                    type: 'numeric',
+                                                                    // decimal:'.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthfutureamc'),
-                                                                    type: 'number'
+                                                                    type: 'numeric',
+                                                                    // decimal:'.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.program.monthpastamc'),
-                                                                    type: 'number'
+                                                                    type: 'numeric',
+                                                                    // decimal:'.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.localProcurementAgentLeadTime'),
-                                                                    type: 'number'
+                                                                    type: 'numeric',
+                                                                    decimal: '.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.report.shelfLife'),
-                                                                    type: 'number'
+                                                                    type: 'numeric',
+                                                                    // decimal:'.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                                    type: 'number'
+                                                                    type: 'numeric',
+                                                                    // decimal:'.',
+                                                                    mask: '#,##.00',
+                                                                    disabledMaskOnEdition: true
                                                                 },
                                                                 {
                                                                     title: 'Id',
@@ -390,7 +411,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 }
                                                             },
                                                             pagination: localStorage.getItem("sesRecordCount"),
-                                                            filters:true,
+                                                            filters: true,
                                                             search: true,
                                                             columnSorting: true,
                                                             tableOverflow: true,
@@ -404,6 +425,8 @@ class AddprogramPlanningUnit extends Component {
                                                             oneditionend: this.onedit,
                                                             copyCompatibility: true,
                                                             allowManualInsertRow: false,
+                                                            parseFormulas: true,
+                                                            onpaste: this.onPaste,
                                                             text: {
                                                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -536,27 +559,27 @@ class AddprogramPlanningUnit extends Component {
                                                                     }
 
                                                                     if (x) {
-                                                                        if (obj.options.allowComments == true) {
-                                                                            items.push({ type: 'line' });
+                                                                        // if (obj.options.allowComments == true) {
+                                                                        //     items.push({ type: 'line' });
 
-                                                                            var title = obj.records[y][x].getAttribute('title') || '';
+                                                                        //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                                            items.push({
-                                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                                onclick: function () {
-                                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                                }
-                                                                            });
+                                                                        //     items.push({
+                                                                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                        //         onclick: function () {
+                                                                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                        //         }
+                                                                        //     });
 
-                                                                            if (title) {
-                                                                                items.push({
-                                                                                    title: obj.options.text.clearComments,
-                                                                                    onclick: function () {
-                                                                                        obj.setComments([x, y], '');
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        }
+                                                                        //     if (title) {
+                                                                        //         items.push({
+                                                                        //             title: obj.options.text.clearComments,
+                                                                        //             onclick: function () {
+                                                                        //                 obj.setComments([x, y], '');
+                                                                        //             }
+                                                                        //         });
+                                                                        //     }
+                                                                        // }
                                                                     }
                                                                 }
 
@@ -775,7 +798,7 @@ class AddprogramPlanningUnit extends Component {
     }
 
     addRowInJexcel = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -795,9 +818,23 @@ class AddprogramPlanningUnit extends Component {
         );
     }
 
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+                (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
+                (instance.jexcel).setValueFromCoords(12, data[i].y, this.state.programId, true);
+                z = data[i].y;
+            }
+        }
+    }
+
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
 
@@ -1049,7 +1086,7 @@ class AddprogramPlanningUnit extends Component {
         //Planning Unit
         if (x == 1) {
             console.log("changed 3");
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1091,6 +1128,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 2) {
             console.log("changed 4");
             // var reg = /^[0-9\b]+$/;
+            value = this.el.getValueFromCoords(2, y);
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1117,6 +1155,7 @@ class AddprogramPlanningUnit extends Component {
         //Min months of stock
         if (x == 3) {
             console.log("changed 5");
+            value = this.el.getValueFromCoords(3, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
@@ -1144,6 +1183,7 @@ class AddprogramPlanningUnit extends Component {
         //Months in future for AMC
         if (x == 4) {
             console.log("changed 6");
+            value = this.el.getValueFromCoords(4, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
@@ -1171,6 +1211,7 @@ class AddprogramPlanningUnit extends Component {
         //Months in past for AMC
         if (x == 5) {
             console.log("changed 7");
+            value = this.el.getValueFromCoords(5, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
@@ -1199,6 +1240,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 6) {
             console.log("changed 8");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            value = this.el.getValueFromCoords(6, y);
             var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1226,6 +1268,7 @@ class AddprogramPlanningUnit extends Component {
         //Shelf life
         if (x == 7) {
             console.log("changed 9");
+            value = this.el.getValueFromCoords(7, y);
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
@@ -1254,6 +1297,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 8) {
             console.log("changed 10");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            value = this.el.getValueFromCoords(8, y);
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1292,7 +1336,7 @@ class AddprogramPlanningUnit extends Component {
             this.setState({ loading: true })
             // console.log("validation---true-->");
 
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             console.log("Rows on submit", json)
             var planningUnitArray = []
             console.log("json.length---" + json.length);
@@ -1313,13 +1357,13 @@ class AddprogramPlanningUnit extends Component {
                         planningUnit: {
                             id: map.get("1"),
                         },
-                        reorderFrequencyInMonths: map.get("2"),
-                        minMonthsOfStock: map.get("3"),
-                        monthsInFutureForAmc: map.get("4"),
-                        monthsInPastForAmc: map.get("5"),
-                        localProcurementLeadTime: map.get("6"),
-                        shelfLife: map.get("7"),
-                        catalogPrice: map.get("8"),
+                        reorderFrequencyInMonths: this.el.getValueFromCoords(2, i),
+                        minMonthsOfStock: this.el.getValueFromCoords(3, i),
+                        monthsInFutureForAmc: this.el.getValueFromCoords(4, i),
+                        monthsInPastForAmc: this.el.getValueFromCoords(5, i),
+                        localProcurementLeadTime: this.el.getValueFromCoords(6, i),
+                        shelfLife: this.el.getValueFromCoords(7, i),
+                        catalogPrice: this.el.getValueFromCoords(8, i),
                         active: map.get("10")
                     }
                     planningUnitArray.push(planningUnitJson);

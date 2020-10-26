@@ -528,7 +528,7 @@ export default class ProgramList extends Component {
       },
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
-      filters:true,
+      filters: true,
       search: true,
       columnSorting: true,
       tableOverflow: true,
@@ -568,7 +568,9 @@ export default class ProgramList extends Component {
       //   return items;
       // }.bind(this)
 
-      contextMenu: false
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;

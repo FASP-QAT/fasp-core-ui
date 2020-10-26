@@ -87,7 +87,7 @@ class RealmCountry extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -279,12 +279,13 @@ class RealmCountry extends Component {
                                                     }
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
-                                                filters:true,
+                                                filters: true,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
                                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                                parseFormulas: true,
                                                 position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -294,6 +295,7 @@ class RealmCountry extends Component {
                                                 onfocus: this.focus,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                onpaste: this.onPaste,
                                                 allowManualInsertRow: false,
                                                 license: JEXCEL_PRO_KEY,
                                                 text: {
@@ -415,27 +417,27 @@ class RealmCountry extends Component {
                                                         }
 
                                                         if (x) {
-                                                            if (obj.options.allowComments == true) {
-                                                                items.push({ type: 'line' });
+                                                            // if (obj.options.allowComments == true) {
+                                                            //     items.push({ type: 'line' });
 
-                                                                var title = obj.records[y][x].getAttribute('title') || '';
+                                                            //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                                items.push({
-                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                    onclick: function () {
-                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                    }
-                                                                });
+                                                            //     items.push({
+                                                            //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                            //         onclick: function () {
+                                                            //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                            //         }
+                                                            //     });
 
-                                                                if (title) {
-                                                                    items.push({
-                                                                        title: obj.options.text.clearComments,
-                                                                        onclick: function () {
-                                                                            obj.setComments([x, y], '');
-                                                                        }
-                                                                    });
-                                                                }
-                                                            }
+                                                            //     if (title) {
+                                                            //         items.push({
+                                                            //             title: obj.options.text.clearComments,
+                                                            //             onclick: function () {
+                                                            //                 obj.setComments([x, y], '');
+                                                            //             }
+                                                            //         });
+                                                            //     }
+                                                            // }
                                                         }
                                                     }
 
@@ -663,7 +665,7 @@ class RealmCountry extends Component {
             );
     }
     addRow = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.realm.label.label_en;
         data[1] = "";
@@ -677,11 +679,22 @@ class RealmCountry extends Component {
             data, 0, 1
         );
     };
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realm.label.label_en, true);
+                (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                z = data[i].y;
+            }
+        }
+    }
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicateCountry();
         var validation = this.checkValidation();
         if (validation == true && duplicateValidation == true) {
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -767,7 +780,7 @@ class RealmCountry extends Component {
         }
     }
     checkDuplicateCountry = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
 
         let tempArray = tableJson;
@@ -852,7 +865,7 @@ class RealmCountry extends Component {
 
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(6, y);

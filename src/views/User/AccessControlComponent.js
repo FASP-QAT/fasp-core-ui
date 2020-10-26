@@ -1208,7 +1208,7 @@ class AccessControlComponent extends Component {
         this.filterProgram = this.filterProgram.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
 
@@ -1427,7 +1427,7 @@ class AccessControlComponent extends Component {
 
             ],
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1440,6 +1440,8 @@ class AccessControlComponent extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
+            parseFormulas: true,
+            onpaste: this.onPaste,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1556,27 +1558,27 @@ class AccessControlComponent extends Component {
                     }
 
                     if (x) {
-                        if (obj.options.allowComments == true) {
-                            items.push({ type: 'line' });
+                        // if (obj.options.allowComments == true) {
+                        //     items.push({ type: 'line' });
 
-                            var title = obj.records[y][x].getAttribute('title') || '';
+                        //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                            items.push({
-                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                onclick: function () {
-                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                }
-                            });
+                        //     items.push({
+                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                        //         onclick: function () {
+                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                        //         }
+                        //     });
 
-                            if (title) {
-                                items.push({
-                                    title: obj.options.text.clearComments,
-                                    onclick: function () {
-                                        obj.setComments([x, y], '');
-                                    }
-                                });
-                            }
-                        }
+                        //     if (title) {
+                        //         items.push({
+                        //             title: obj.options.text.clearComments,
+                        //             onclick: function () {
+                        //                 obj.setComments([x, y], '');
+                        //             }
+                        //         });
+                        //     }
+                        // }
                     }
                 }
 
@@ -1615,12 +1617,21 @@ class AccessControlComponent extends Component {
             data, 0, 1
         );
     }
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.user.username, true);
+                z = data[i].y;
+            }
+        }
+    }
     submitForm() {
         var validation = this.checkValidation();
         console.log("validation************", validation);
         if (validation) {
 
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -1676,27 +1687,27 @@ class AccessControlComponent extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
                                     },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
                                     },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                             }
                         }
@@ -2061,7 +2072,7 @@ class AccessControlComponent extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
             //Country
@@ -2159,7 +2170,7 @@ class AccessControlComponent extends Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-        &nbsp;
+                                &nbsp;
 </FormGroup>
                         </CardFooter>
                     </Card>

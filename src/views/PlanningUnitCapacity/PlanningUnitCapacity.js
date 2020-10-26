@@ -777,7 +777,8 @@ class PlanningUnitCapacity extends Component {
         var validation = this.checkValidation();
         console.log("validation************", validation);
         if (validation) {
-            var tableJson = this.el.getJson();
+            // var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var rd = this.el.getRowData(i);
@@ -975,6 +976,7 @@ class PlanningUnitCapacity extends Component {
                 {
                     title: i18n.t('static.planningunit.capacity'),
                     type: 'numeric',
+                    // decimal:'.',
                     mask: '#,##.00',
                     disabledMaskOnEdition: true
                 },
@@ -1537,7 +1539,7 @@ class PlanningUnitCapacity extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("H").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(7, y);
