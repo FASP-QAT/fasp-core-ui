@@ -556,7 +556,7 @@ export default class CostOfInventory extends Component {
                 {
                     title: i18n.t('static.report.stock'),
                     type: 'number',
-                    mask:'#,###',
+                    mask: '#,###',
                     readOnly: true
                 },
                 {
