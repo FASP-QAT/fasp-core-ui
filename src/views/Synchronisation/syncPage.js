@@ -1300,7 +1300,7 @@ export default class syncPage extends Component {
                                     columns: [
                                       { title: i18n.t('static.commit.consumptionId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                      { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
+                                      { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
                                       { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
                                       { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
@@ -1312,7 +1312,7 @@ export default class syncPage extends Component {
                                       { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                                       { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 85 },
                                       { type: 'hidden', title: 'Old data' },
                                       { type: 'hidden', title: 'latest data' },
                                       { type: 'hidden', title: 'downloaded data' },

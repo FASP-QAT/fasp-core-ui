@@ -73,10 +73,10 @@ const pickerLang = {
 }
 let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626" },
-{ text: i18n.t('static.report.lowstock'), color: "#f48521" },
-{ text: i18n.t('static.report.okaystock'), color: "#118b70" },
-{ text: i18n.t('static.report.overstock'), color: "#edb944" }];
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+{ text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
+{ text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
 
 const options = {
   title: {
@@ -173,6 +173,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       planningUnits: [],
       message: '',
       data: [],
+      selData:[],
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
@@ -345,15 +346,15 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   cellstyleWithData = (item) => {
     console.log(item)
-    if (item.outputString == 'OUT') {
+    if (this.roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color }
-    } else if (item.outputString == 'excess') {
-      return { backgroundColor: legendcolor[3].color }
-    } else if (item.outputString == 'low') {
+    }else if (this.roundN(item.mos) != 0&&this.roundN(item.mos) != null && this.roundN(item.mos) <item.minMos) {
       return { backgroundColor: legendcolor[1].color }
-    } else {
+    } else if (this.roundN(item.mos) >=item.minMos && this.roundN(item.mos) <=item.maxMos) {
       return { backgroundColor: legendcolor[2].color }
-    }
+    } else if (this.roundN(item.mos)>item.maxMos) {
+      return { backgroundColor: legendcolor[3].color }
+    } 
   }
 
   exportPDF = () => {
@@ -408,9 +409,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-
+var len=160+(planningText.length*10)
           var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 180, planningText)
+          doc.text(doc.internal.pageSize.width / 8,len , planningText)
 
         }
 
@@ -431,16 +432,16 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
-    var startY = 150 + (this.state.countryValues.length * 2) + 20
+    var startY = 150 + (this.state.countryValues.length * 2) + this.state.tracerCategoryLabels.length*3
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,
       head: headers,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 80 },
+      styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 67 },
       columnStyles: {
-        0: { cellWidth: 181.89 },
-        1: { cellWidth: 180 },
+        1: { cellWidth: 181.89 },
+        2: { cellWidth: 178 },
       }
 
     };
@@ -518,11 +519,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       ReportService.stockStatusAcrossProducts(inputjson)
         .then(response => {
           console.log('response', JSON.stringify(response.data));
-          let planningUnits = [...new Set(response.data.map(ele => ele.planningUnit))]
-          console.log('planningUnits', JSON.stringify(planningUnits));
-          //let programs=[...new Set((response.data.map(ele=> ele.programData.program.code)).flat(1))]
-          let programs = [...new Set((response.data.map(ele => ele.programData.map(ele1 => ele1.program.code))).flat(1))]
-          console.log('programs', JSON.stringify(programs));
           // let data=programs.map(p=>{
           //   planningUnits.map(pu=>
           //     response.data.filter(c=> c.planningUnit.id=pu.planningUnit.id &&c.programData.program.id==p.id)).map(ele=>
@@ -540,15 +536,20 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           //      } )
           //console.log('data',data);
           this.setState({
-            data: response.data, message: '',
-            programs: programs,
-            planningUnits: planningUnits, loading: false
-          })
+            selData: response.data, message: '',
+          loading: false
+          },() => {
+            this.filterDataAsperstatus()
+
+        })
         }).catch(
           error => {
             this.setState({
-              data: [], loading: false
-            })
+              selData: [], loading: false
+            },() => {
+              this.filterDataAsperstatus()
+
+          })
             if (error.message === "Network Error") {
               this.setState({
                 message: 'static.unkownError',
@@ -613,17 +614,78 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       // );
     }
     else if (realmId <= 0) {
-      this.setState({ message: i18n.t('static.common.realmtext'), data: [] });
+      this.setState({ message: i18n.t('static.common.realmtext'), data: [],selData:[] });
 
     } else if (this.state.countryValues.length == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext'), data: [] });
+      this.setState({ message: i18n.t('static.program.validcountrytext'), data: [],selData:[] });
 
     } else {
-      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [] });
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [],selData:[] });
     }
 
 
   }
+
+  filterDataAsperstatus = () => {
+    let stockStatusId = document.getElementById("stockStatusId").value;
+    console.log(stockStatusId)
+    var filteredData = []
+    if (stockStatusId != -1) {
+  
+        this.state.selData.map(ele1 => {
+          var filterProgramData=[]
+          ele1.programData.map(ele=>{
+            console.log(ele)
+            var min = ele.minMos
+            var max = ele.maxMos
+            //  var reorderFrequency = ele.reorderFrequency
+            if (stockStatusId == 0) {
+                if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
+                    console.log('in 0')
+                    filterProgramData.push(ele)
+                }
+            } else if (stockStatusId == 1) {
+                if ((ele.mos != null &&this.roundN(ele.mos) != 0&& this.roundN(ele.mos) < min)) {
+                    console.log('in 1')
+                    filterProgramData.push(ele)
+                }
+            } else if (stockStatusId == 3) {
+                if (this.roundN(ele.mos) > max) {
+                    console.log('in 2')
+                    filterProgramData.push(ele)
+                }
+            } else if (stockStatusId == 2) {
+                if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
+                    console.log('in 3')
+                    filterProgramData.push(ele)
+                }
+            }})
+            if(filterProgramData.length>0){
+filteredData.push({
+  planningUnit:ele1.planningUnit,
+  programData:filterProgramData
+})
+            }
+             
+        });
+    } else {
+        filteredData = this.state.selData
+    }
+    console.log(filteredData)
+    let planningUnits = [...new Set(filteredData.map(ele => ele.planningUnit))]
+    console.log('planningUnits', JSON.stringify(planningUnits));
+    //let programs=[...new Set((response.data.map(ele=> ele.programData.program.code)).flat(1))]
+    let programs = [...new Set((filteredData.map(ele => ele.programData.map(ele1 => ele1.program.code))).flat(1))]
+    console.log('programs', JSON.stringify(programs));
+   
+    this.setState({
+        data: filteredData,
+        programs: programs,
+        planningUnits: planningUnits
+    })
+
+}
+
 
   getCountrys = () => {
     // AuthenticationService.setupAxiosInterceptors();
@@ -949,7 +1011,33 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         </InputGroup>
                       </div>
                     </FormGroup>
+                    <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="stockStatusId"
+                                                            id="stockStatusId"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.filterDataAsperstatus() }}
+                                                        >
 
+                                                            <option value="-1">{i18n.t('static.common.all')}</option>
+                                                            {legendcolor.length > 0
+                                                                && legendcolor.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.value}>
+                                                                            {item.text}
+                                                                        </option>
+                                                                    )
+                                                                }, this)
+                                                            }
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
                     <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
                         {
@@ -978,7 +1066,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             <tr>
                               <th className="text-center" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
                               {
-                                this.state.programs.map(ele => { return (<th className="text-center" style={{ width: '27%' }}>{ele}</th>) })}
+                                this.state.programs.map(ele => { return (<th className="text-center" style={{ width: ((100-27)/this.state.programs.length)+'%' }}>{ele}</th>) })}
                             </tr>
                           </thead>
 

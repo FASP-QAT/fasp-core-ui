@@ -32,6 +32,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import TracerCategoryService from '../../api/TracerCategoryService';
 
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
@@ -42,10 +43,10 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626" },
-{ text: i18n.t('static.report.lowstock'), color: "#f48521" },
-{ text: i18n.t('static.report.okaystock'), color: "#118b70" },
-{ text: i18n.t('static.report.overstock'), color: "#edb944" }];
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+{ text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
+{ text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
 
 class StockStatusAcrossPlanningUnits extends Component {
     constructor(props) {
@@ -56,7 +57,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             versions: [],
             planningUnits: [],
             data: [],
+            selData: [],
             lang: localStorage.getItem('lang'),
+            tracerCategories: [],
             loading: true,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
@@ -65,6 +68,70 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
         this.buildJExcel = this.buildJExcel.bind(this);
     }
+
+    getTracerCategoryList() {
+        var programId = document.getElementById('programId').value;
+        if (programId > 0) {
+
+            let realmId = AuthenticationService.getRealmId();
+            TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+
+                if (response.status == 200) {
+                    this.setState({
+                        tracerCategories: response.data
+                    })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        } else {
+            this.setState({
+                message: i18n.t('static.common.selectProgram'),
+                productCategories: [],
+                tracerCategories: []
+            })
+        }
+    }
+
 
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -180,7 +247,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
             columnStyles: {
-                0: { cellWidth: 161.89 },
+                1: { cellWidth: 161.89 },
             }
         };
         doc.autoTable(content);
@@ -744,6 +811,52 @@ class StockStatusAcrossPlanningUnits extends Component {
         }
     }
 
+    filterDataAsperstatus = () => {
+        let stockStatusId = document.getElementById("stockStatusId").value;
+        console.log(stockStatusId)
+        var filteredData = []
+        if (stockStatusId != -1) {
+
+            this.state.selData.map(ele => {
+                console.log(ele)
+                var min = ele.minMos
+                var max = ele.maxMos
+                //  var reorderFrequency = ele.reorderFrequency
+                if (stockStatusId == 0) {
+                    if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
+                        console.log('in 0')
+                        filteredData.push(ele)
+                    }
+                } else if (stockStatusId == 1) {
+                    if ((ele.mos != null && this.roundN(ele.mos) != 0 && this.roundN(ele.mos) < min)) {
+                        console.log('in 1')
+                        filteredData.push(ele)
+                    }
+                } else if (stockStatusId == 3) {
+                    if (this.roundN(ele.mos) > max) {
+                        console.log('in 2')
+                        filteredData.push(ele)
+                    }
+                } else if (stockStatusId == 2) {
+                    if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
+                        console.log('in 3')
+                        filteredData.push(ele)
+                    }
+                }
+            });
+        } else {
+            filteredData = this.state.selData
+        }
+        console.log(filteredData)
+        this.setState({
+            data: filteredData
+        }, () => { this.buildJExcel(); })
+
+    }
+
+    filterDataAsPertracerCategory=()=>{
+        
+    }
 
 
     fetchData = () => {
@@ -847,7 +960,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             })
                             console.log(data)
                             this.setState({
-                                data: data,
+                                selData: data,
                                 message: ''
                             }, () => {
                                 this.buildJExcel();
@@ -905,14 +1018,15 @@ class StockStatusAcrossPlanningUnits extends Component {
                     .then(response => {
                         console.log(JSON.stringify(response.data));
                         this.setState({
-                            data: response.data, message: ''
+                            selData: response.data, message: ''
                         }, () => {
-                            this.buildJExcel();
+                            this.filterDataAsperstatus()
+
                         });
                     }).catch(
                         error => {
                             this.setState({
-                                data: [], loading: false
+                                selData: [], loading: false
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 this.el.destroy();
@@ -986,14 +1100,14 @@ class StockStatusAcrossPlanningUnits extends Component {
                 // );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
                 // this.buildJExcel();
             });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] }, () => {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [], selData: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
                 // this.buildJExcel();
@@ -1029,7 +1143,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 )
             }, this);
 
-
+            const { tracerCategories } = this.state;
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1272,6 +1386,60 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                         {/*   <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.filterDataAsPertracerCategory}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {tracerCategories.length > 0
+                                                    && tracerCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.tracerCategoryId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                                </FormGroup>*/}
+                            
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="stockStatusId"
+                                                            id="stockStatusId"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.filterDataAsperstatus() }}
+                                                        >
+
+                                                            <option value="-1">{i18n.t('static.common.all')}</option>
+                                                            {legendcolor.length > 0
+                                                                && legendcolor.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.value}>
+                                                                            {item.text}
+                                                                        </option>
+                                                                    )
+                                                                }, this)
+                                                            }
                                                         </Input>
 
                                                     </InputGroup>

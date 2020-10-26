@@ -14,10 +14,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent"))
 let summaryText_2 = "Add Procurement Agent"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     procurementAgentName: '',
     procurementAgentCode: '',
     submittedToApprovedLeadTime: '',
@@ -167,15 +166,15 @@ export default class ProcurementAgentTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm, loading: false
+                    realmId: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { procurementAgent } = this.state;
-                    procurementAgent.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    procurementAgent.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         procurementAgent
                     }, () => {
@@ -238,13 +237,14 @@ export default class ProcurementAgentTicketComponent extends Component {
     resetClicked() {
         let { procurementAgent } = this.state;
         // procurementAgent.summary = '';
-        procurementAgent.realmName = '';
+        procurementAgent.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         procurementAgent.procurementAgentCode = '';
         procurementAgent.procurementAgentName = '';
         procurementAgent.submittedToApprovedLeadTime = '';
         procurementAgent.approvedToShippedLeadTime = '';
         this.setState({
-            procurementAgent
+            procurementAgent: procurementAgent,
+            realmId: this.props.items.userRealmId
         },
             () => { });
     }
@@ -395,7 +395,17 @@ export default class ProcurementAgentTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            procurementAgentName: '',
+                            procurementAgentCode: '',
+                            submittedToApprovedLeadTime: '',
+                            approvedToShippedLeadTime: '',
+                            localProcurementAgent: false,
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -628,7 +638,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

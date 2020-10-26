@@ -83,3 +83,4 @@ export const ACTUAL_CONSUMPTION_MONTHS_IN_PAST = 6
 export const FORECASTED_CONSUMPTION_MONTHS_IN_PAST = 4
 export const INVENTORY_MONTHS_IN_PAST = 6
 export const USD_CURRENCY_ID = 1
+export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.net/servicedesk/customer/portals'

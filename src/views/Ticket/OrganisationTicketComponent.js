@@ -19,10 +19,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Add Organisation"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmId: selectedRealm,
+    summary: "",
+    realmId: "",
     realmCountryId: '',
     organisationCode: '',
     organisationName: '',
@@ -346,20 +345,20 @@ export default class OrganisationTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realm: selectedRealm, loading: false
+                    realm: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { organisation } = this.state;
-                    organisation.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    organisation.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         organisation
                     }, () => {
 
-                        this.getRealmCountryList(selectedRealm);
+                        this.getRealmCountryList(this.props.items.userRealmId);
 
                     })
                 }
@@ -494,13 +493,15 @@ export default class OrganisationTicketComponent extends Component {
     resetClicked() {
         let { organisation } = this.state;
         // organisation.summary = '';
-        organisation.realmId = '';
+        organisation.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         organisation.realmCountryId = '';
         organisation.organisationName = '';
         organisation.organisationCode = '';
         organisation.notes = '';
         this.setState({
-            organisation
+            organisation: organisation,
+            realm: this.props.items.userRealmId,
+            countryId: ''        
         },
             () => { });
     }
@@ -524,7 +525,15 @@ export default class OrganisationTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmId: this.props.items.userRealmId,
+                            realmCountryId: '',
+                            organisationCode: '',
+                            organisationName: '',
+                            notes: ''
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -693,7 +702,7 @@ export default class OrganisationTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

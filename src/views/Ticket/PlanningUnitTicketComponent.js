@@ -12,11 +12,15 @@ import ForecastingUnitService from '../../api/ForecastingUnitService';
 import { SPACE_REGEX } from '../../Constants';
 import getLabelText from '../../CommonComponent/getLabelText';
 
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
+import '../Forms/ValidationForms/ValidationForms.css'
+
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Add Planning Unit"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     planningUnitDesc: "",
     forecastingUnitDesc: "",
     unit: "",
@@ -34,7 +38,7 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.product.productnametext')),
         forecastingUnitDesc: Yup.string()
-            .required(i18n.t('static.planningunit.forcastingunittext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.forecastingunit.forecastingunit')))),
+            .required(i18n.t('static.planningunit.forcastingunittext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.forecastingunit.forecastingunit')))).nullable(),
         unit: Yup.string()
             .required(i18n.t('static.procurementUnit.validUnitIdText')),
         multiplier: Yup.string()
@@ -85,6 +89,7 @@ export default class PlanningUnitTicketComponent extends Component {
             message: '',
             units: [],
             forecastingUnits: [],
+            forecastingUnitList: [],
             unitId: '',
             forecastingUnitId: '',
             loading: true
@@ -92,6 +97,7 @@ export default class PlanningUnitTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeForecastingUnit = this.changeForecastingUnit.bind(this);
     }
 
     dataChange(event) {
@@ -124,6 +130,29 @@ export default class PlanningUnitTicketComponent extends Component {
             planningUnit
         }, () => { })
     };
+
+    changeForecastingUnit(event) {        
+        if (event === null) {
+            let { planningUnit } = this.state;
+            planningUnit.forecastingUnitDesc = ''
+            this.setState({
+                planningUnit: planningUnit,
+                forecastingUnitId: ''
+            });
+        } else {
+            let { planningUnit } = this.state;
+            var outText = "";
+            if (event.value !== "") {
+                var forecastingUnitT = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.value)[0];
+                outText = forecastingUnitT.label.label_en;
+            }
+            planningUnit.forecastingUnitDesc = outText;
+            this.setState({
+                planningUnit: planningUnit,
+                forecastingUnitId: event.value
+            });
+        }
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -161,8 +190,14 @@ export default class PlanningUnitTicketComponent extends Component {
                     })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
+                        var unitList = [];
+                        for (var i = 0; i < response.data.length; i++) {
+                            unitList[i] = { value: response.data[i].forecastingUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                        }
                         this.setState({
-                            forecastingUnits: response.data, loading: false
+                            forecastingUnits: response.data,
+                            forecastingUnitList: unitList,
+                            loading: false
                         })
                     })
                 }
@@ -237,7 +272,9 @@ export default class PlanningUnitTicketComponent extends Component {
         planningUnit.multiplier = '';
         planningUnit.notes = '';
         this.setState({
-            planningUnit
+            planningUnit: planningUnit,
+            unitId: '',
+            forecastingUnitId: ''
         },
             () => { });
     }
@@ -253,15 +290,15 @@ export default class PlanningUnitTicketComponent extends Component {
                     </option>
                 )
             }, this);
-        const { forecastingUnits } = this.state;
-        let forecastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.forecastingUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // const { forecastingUnits } = this.state;
+        // let forecastingUnitList = forecastingUnits.length > 0
+        //     && forecastingUnits.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.forecastingUnitId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
         return (
             <div className="col-md-12">
@@ -270,7 +307,15 @@ export default class PlanningUnitTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            planningUnitDesc: "",
+                            forecastingUnitDesc: "",
+                            unit: "",
+                            multiplier: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -308,7 +353,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                
+
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -351,7 +396,9 @@ export default class PlanningUnitTicketComponent extends Component {
                                 isSubmitting,
                                 isValid,
                                 setTouched,
-                                handleReset
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
                             }) => (
                                     <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                         < FormGroup >
@@ -366,9 +413,9 @@ export default class PlanningUnitTicketComponent extends Component {
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
-                                        < FormGroup >
+                                        < FormGroup className="Selectcontrol-bdrNone">
                                             <Label for="forecastingUnitDesc">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
+                                            {/* <Input type="select" name="forecastingUnitDesc" id="forecastingUnitDesc"
                                                 bsSize="sm"
                                                 valid={!errors.forecastingUnitDesc && this.state.planningUnit.forecastingUnitDesc != ''}
                                                 invalid={touched.forecastingUnitDesc && !!errors.forecastingUnitDesc}
@@ -378,7 +425,29 @@ export default class PlanningUnitTicketComponent extends Component {
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {forecastingUnitList}
-                                            </Input>
+                                            </Input> */}
+
+                                            <Select
+                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                    { 'is-valid': !errors.forecastingUnitDesc && this.state.planningUnit.forecastingUnitDesc != '' },
+                                                    { 'is-invalid': (touched.forecastingUnitDesc && !!errors.forecastingUnitDesc) }
+                                                )}
+                                                bsSize="sm"
+                                                name="forecastingUnitDesc"
+                                                id="forecastingUnitDesc"
+                                                isClearable={true}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFieldValue("forecastingUnitDesc", e);
+                                                    this.changeForecastingUnit(e);
+                                                }}
+                                                onBlur={() => setFieldTouched("forecastingUnitDesc", true)}
+                                                required
+                                                min={1}
+                                                options={this.state.forecastingUnitList}
+                                                value={this.state.forecastingUnitId}
+                                            />
+
                                             <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
@@ -434,7 +503,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

@@ -818,7 +818,7 @@ label.arrow_label:after {
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
 // listBudgetAlignThtd 
-.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
@@ -2615,7 +2615,12 @@ input::placeholder {
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(7){ width:20px !important; }
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(12){ width:4% !important; }
   .prodCatlogAlignThtd .react-bootstrap-table .table thead tr th:nth-child(14){ width:7% !important; word-break: break-all;}
- 
+  .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(4){ width: 120px !important; }
+  .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 120px !important; }
+  .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 120px !important; }
+
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 165px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(7){ width: 165px !important; }
   .expand-button {
     position: relative;
   }
@@ -3373,6 +3378,9 @@ border-radius: 2em;
 .Select--multi .Select-clear-zone {
   left: -18px;
 }
+.Select-clear-zone{
+  left:-18px;
+}
 .inlineMargin
 {
 margin-left: -45px;
@@ -3649,7 +3657,7 @@ margin-left: -45px;
  } 
 
 .qat-problemListSearch{
-  margin-top:-4%;
+  margin-top:-40px;
 }
 
 .problemList-red{

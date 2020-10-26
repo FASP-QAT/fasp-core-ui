@@ -12,6 +12,8 @@ import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import AuthenticationService from '../Common/AuthenticationService.js';
+import ProgramService from "../../api/ProgramService"
 const ref = React.createRef();
 
 class DeleteLocalProgramComponent extends Component {
@@ -32,7 +34,21 @@ class DeleteLocalProgramComponent extends Component {
 
     this.getPrograms = this.getPrograms.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
+    this.checkNewerVersions = this.checkNewerVersions.bind(this);
 
+  }
+  checkNewerVersions(programs) {
+    if (navigator.onLine) {
+      console.log("T***going to call check newer versions")
+      if (navigator.onLine) {
+        AuthenticationService.setupAxiosInterceptors()
+        ProgramService.checkNewerVersions(programs)
+          .then(response => {
+            localStorage.removeItem("sesLatestProgram");
+            localStorage.setItem("sesLatestProgram", response.data);
+          })
+      }
+    }
   }
 
   confirmDeleteLocalProgram = () => {
@@ -180,7 +196,8 @@ class DeleteLocalProgramComponent extends Component {
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
-      var proList = []
+      var proList = [];
+      var proList1 = []
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -205,12 +222,19 @@ class DeleteLocalProgramComponent extends Component {
               label: programJson1.programCode + "~v" + myResult[i].version,
               value: myResult[i].id
             }
-            proList.push(programJson)
+            proList.push(programJson);
+            var programJson1 = {
+              programId: programJson1.programId,
+              versionId: myResult[i].version
+            }
+
+            proList1.push(programJson1)
           }
         }
         this.setState({
           programs: proList, loading: false
         })
+        this.checkNewerVersions(proList1);
       }.bind(this);
     }.bind(this)
   }
