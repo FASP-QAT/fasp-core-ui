@@ -1429,11 +1429,12 @@
     "static.report.localprocurement": "Local Procurement",
     "static.report.orderNo": "Procurer Order ID",
     "static.ticket.openIssues": "Open Issues",
-    "static.uploadfile.Browse": "Browse",
-    "static.inventory.inventoryQunatity": "Inventory Qunatity (ARU)",
-    "static.inventory.adjustmentQunatity": "Adjustment Qunatity (ARU)",
-    "static.inventory.inventoryQunatityPU": "Inventory Qunatity (QAT Planning Unit)",
-    "static.inventory.adjustmentQunatityPU": "Adjustment Qunatity (QAT Planning Unit)",
+    "static.uploadfile.Browse":"Browse",
+    "static.inventory.inventoryQunatity":"Inventory Quantity (ARU)",
+    "static.inventory.adjustmentQunatity":"Adjustment Quantity (ARU)",
+    "static.inventory.inventoryQunatityPU":"Inventory Quantity (QAT Planning Unit)",
+    "static.inventory.adjustmentQunatityPU":"Adjustment Quantity (QAT Planning Unit)",
+    "static.supplyPlan.stockOut":"Stock Out",
     "static.common.notesvalidation": "Please enter notes",    
     "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them."
 }
