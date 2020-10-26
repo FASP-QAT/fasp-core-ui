@@ -861,11 +861,11 @@ class ProcurementAgentExport extends Component {
             data[0] = (viewby == 1) ? (getLabelText(shipmentCosttList[j].procurementAgent.label, this.state.lang)) : ((viewby == 2) ? (getLabelText(shipmentCosttList[j].fundingSource.label, this.state.lang)) : ({}))
             data[1] = (viewby == 1) ? shipmentCosttList[j].procurementAgent.code : ((viewby == 2) ? shipmentCosttList[j].fundingSource.code : {})
             data[2] = getLabelText(shipmentCosttList[j].planningUnit.label, this.state.lang)
-            data[3] = this.addCommas(shipmentCosttList[j].qty)
-            data[4] = this.addCommas(shipmentCosttList[j].productCost)
+            data[3] = (shipmentCosttList[j].qty)
+            data[4] = (shipmentCosttList[j].productCost)
             data[5] = shipmentCosttList[j].freightPerc.toFixed(2)
-            data[6] = this.addCommas(shipmentCosttList[j].freightCost)
-            data[7] = this.addCommas(shipmentCosttList[j].totalCost)
+            data[6] = (shipmentCosttList[j].freightCost)
+            data[7] = (shipmentCosttList[j].totalCost)
 
             shipmentCostArray[count] = data;
             count++;
@@ -972,27 +972,31 @@ class ProcurementAgentExport extends Component {
                 },
                 {
                     title: i18n.t('static.report.qty'),
-                    type: 'text',
+                    type: 'number',
+                    mask:"#,##",
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.productCost'),
-                    type: 'text',
+                    type: 'number',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightPer'),
-                    type: 'text',
+                    type: 'number',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightCost'),
-                    type: 'text',
+                    type: 'number',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalCost'),
-                    type: 'text',
+                    type: 'number',mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
             ],

@@ -171,7 +171,7 @@ class SupplyPlanVersionAndReview extends Component {
                 },
                 {
                     title: i18n.t('static.report.version'),
-                    type: 'text',
+                    type: 'number',mask: '#,##', 
                     readOnly: true
                 },
                 {

@@ -619,7 +619,7 @@ class StockAdjustmentComponent extends Component {
             data[0] = getLabelText(stockAdjustmentList[j].dataSource.label, this.state.lang)
             data[1] = getLabelText(stockAdjustmentList[j].planningUnit.label, this.state.lang)
             data[2] = new moment(stockAdjustmentList[j].inventoryDate).format('MMM YYYY')
-            data[3] = (stockAdjustmentList[j].stockAdjustemntQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
+            data[3] = (stockAdjustmentList[j].stockAdjustemntQty)
             data[4] = stockAdjustmentList[j].lastModifiedBy.username;
             data[5] = new moment(stockAdjustmentList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`);
             data[6] = stockAdjustmentList[j].notes;
@@ -640,7 +640,7 @@ class StockAdjustmentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 80,80,80,80,120],
+            colWidths: [100, 100, 80, 80, 80, 80, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -660,7 +660,7 @@ class StockAdjustmentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.report.stockAdjustment'),
-                    type: 'text',
+                    type: 'number', mask: '[-]#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {

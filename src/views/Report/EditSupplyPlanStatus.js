@@ -2794,7 +2794,7 @@ class EditSupplyPlanStatus extends Component {
 
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -3493,7 +3493,7 @@ class EditSupplyPlanStatus extends Component {
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 var elInstance = this.state.problemEl;
-                                var json = elInstance.getJson();
+                                var json = elInstance.getJson(null, false);
                                 // console.log("problemList===>", json);
                                 // console.log("program===>", this.state.program);
                                 var reviewedProblemList = [];

@@ -524,7 +524,8 @@ class ProductCatalog extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.forecastingtoPlanningUnitMultiplier'),
-                    type: 'text',
+                    type: 'number',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.planningUnit'),
@@ -536,21 +537,23 @@ class ProductCatalog extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.min'),
-                    type: 'text',
+                    type: 'number',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.reorderFrequencyInMonths'),
-                    type: 'text',
+                    type: 'number',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.shelfLife'),
-                    type: 'text',
+                    type: 'number',mask: '#,##.00', decimal: '.',
                     readOnly: true
                 }, {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'text',
+                    type: 'number',mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {

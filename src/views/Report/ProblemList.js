@@ -853,7 +853,8 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'text',
+                    type: 'number',
+                    mask:"#,##"
                 },
                 {
                     title: i18n.t('static.region.region'),
