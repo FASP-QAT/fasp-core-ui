@@ -9,6 +9,12 @@ import { Container } from 'reactstrap';
 import IdleTimer from 'react-idle-timer';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 import moment from 'moment';
+import CryptoJS from 'crypto-js';
+import {
+  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME
+
+} from '../../Constants.js'
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 
 // routes config
@@ -610,12 +616,18 @@ class DefaultLayout extends Component {
       timeout: 1000 * 1800 * 1,
       showModal: false,
       userLoggedIn: false,
-      isTimedOut: false
+      isTimedOut: false,
+      changeIcon: false,
+      programDataLastModifiedDate: '',
+      downloadedProgramDataLastModifiedDate: ''
     }
     this.idleTimer = null
     this.onAction = this._onAction.bind(this)
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
+    this.getProgramData = this.getProgramData.bind(this);
+    this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
+    this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
@@ -650,7 +662,10 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name) => {
     if (this.state.name !== name) {
-
+      console.log("P*** Call indexed db methods0---------------------------")
+      this.getProgramData();
+      // this.getDownloadedPrograms();
+      // this.checkIfLocalProgramVersionChanged();
       this.setState({
         name
       });
@@ -720,30 +735,183 @@ class DefaultLayout extends Component {
     var id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}`)
   }
+  getProgramData() {
+    console.log("P***get programs called");
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+      var proList = []
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson1 = JSON.parse(programData);
+            console.log("1---programJson1 program id---", programJson1.programId);
+            console.log("1---programData---", programData);
+            console.log("1---programJson1.consumptionList---", programJson1.consumptionList);
+            console.log("1---programJson1.inventoryList---", programJson1.inventoryList);
+            console.log("1---programJson1.shipmentList---", programJson1.shipmentList);
+            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
+            console.log("1---cmax---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+            let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
+            console.log("1---imax---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
+            let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
+            console.log("1---smax---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+            let pmax = moment.max(cmax, imax, smax)
+            console.log("1---pmax---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
+            var programJson = {
+              lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+            }
+            proList.push(programJson)
+          }
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        console.log("P***proList program data---",proList)
+        this.setState({
+          programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        }, () => {
+          // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        })
+        this.getDownloadedPrograms();
+      }.bind(this);
+    }.bind(this)
+
+  }
+  getDownloadedPrograms() {
+    console.log("P***get programs called 1");
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+      var program = transaction.objectStore('downloadedProgramData');
+      var getRequest = program.getAll();
+      var proList = []
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson1 = JSON.parse(programData);
+            console.log("1---programJson program id 1---", programJson1.programId);
+            console.log("1---programData 1---", programData);
+            console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
+            console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
+            console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
+            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
+            console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+            let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
+            console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
+            let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
+            console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+            let pmax = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+            console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
+            var programJson = {
+              lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+            }
+            proList.push(programJson)
+          }
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
+        console.log("P***proList downloaded program data---",proList)
+        this.setState({
+          downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        }, () => {
+          // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        })
+        this.checkIfLocalProgramVersionChanged();
+      }.bind(this);
+    }.bind(this)
+
+  }
+  checkIfLocalProgramVersionChanged() {
+    // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
+    // e.preventDefault();
+    console.log("P***d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
+    console.log("P***d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
+    console.log("P***d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+    localStorage.removeItem("sesLocalVersionChange");
+    if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+      console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+      localStorage.setItem("sesLocalVersionChange", true);
+      this.setState({ changeIcon: true });
+      console.log("P***d--------in if---------------")
+    } else {
+      localStorage.setItem("sesLocalVersionChange", false);
+      this.setState({ changeIcon: false });
+      console.log("P***d--------in else---------------")
+    }
+    //   }
+  }
   // componentDidUpdate() {
   //   console.log("Parent component did update called---",this.refs)
   // }
-  checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
-    // e.preventDefault();
-    console.log("d---this.state.programDataLastModifiedDate---", programDataLastModifiedDate);
-    console.log("d---downloadedProgramDataLastModifiedDate  ", downloadedProgramDataLastModifiedDate);
-    console.log("d---result local version---", moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
-    localStorage.removeItem("sesLocalVersionChange");
-    if (moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
-      console.log("d---hurrey local version changed-------------------------------------------------------------");
-      localStorage.setItem("sesLocalVersionChange", true);
-      console.log("d--------in if---------------")
-    } else {
-      localStorage.setItem("sesLocalVersionChange", false);
-      console.log("d--------in else---------------")
-    }
-  }
+  // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
+  //   // e.preventDefault();
+  //   console.log("d---this.state.programDataLastModifiedDate---", programDataLastModifiedDate);
+  //   console.log("d---downloadedProgramDataLastModifiedDate  ", downloadedProgramDataLastModifiedDate);
+  //   console.log("d---result local version---", moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+  //   localStorage.removeItem("sesLocalVersionChange");
+  //   if (moment(programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+  //     console.log("d---hurrey local version changed-------------------------------------------------------------");
+  //     localStorage.setItem("sesLocalVersionChange", true);
+  //     console.log("d--------in if---------------")
+  //   } else {
+  //     localStorage.setItem("sesLocalVersionChange", false);
+  //     console.log("d--------in else---------------")
+  //   }
+  // }
   render() {
     // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
     return (
       <div className="app">
-        {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>}
+        {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
 
         <IdleTimer
           ref={ref => { this.idleTimer = ref }}
@@ -758,7 +926,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} commitProgram={e => this.goToCommitProgram(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

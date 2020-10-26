@@ -362,6 +362,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[28] = 0;//AC
                                             data[29] = shipmentList[i].active;//AD
                                             data[30] = 0;//AE
+                                            data[31] = shipmentList[i].currency.conversionRateToUsd;//Conversionratetousdenterhere
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentType.value == 1) {
@@ -397,6 +398,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[28] = 1;
                                             data[29] = true;
                                             data[30] = 0;
+                                            data[31] = 1;
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
@@ -432,6 +434,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: "Suggested order Qty" },
                                                 { type: 'hidden', title: "Is changed" },
                                                 { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
+                                                { type: 'hidden' },
                                                 { type: 'hidden' }
                                             ],
                                             pagination: paginationOption,
@@ -721,6 +724,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     var shippedDate = shipmentDates.shippedDate;
                                                                     var arrivedDate = shipmentDates.arrivedDate;
                                                                     var receivedDate = shipmentDates.receivedDate;
+                                                                    if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                        receivedDate = null;
+                                                                    }
+                                                                    if (shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                        arrivedDate = null;
+                                                                    }
+                                                                    if (shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                        shippedDate = null;
+                                                                    }
+                                                                    if (shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                        approvedDate = null;
+                                                                    }
+                                                                    if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS || shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                        submittedDate = null;
+                                                                    }
                                                                     console.log("Shipment Dates", shipmentDates);
                                                                     console.log("Received Date", receivedDate)
                                                                     var addLeadTimes = 0;
@@ -1079,6 +1097,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[28] = 1;
         data[29] = true;
         data[30] = 0;
+        data[31] = 1;
         obj.insertRow(data);
         obj.setValueFromCoords(1, json.length, 0, true);
         obj.setValueFromCoords(10, json.length, 0, true);
@@ -1408,7 +1427,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
                 if (value != "" && value != null && value != "Invalid date") {
                     shipmentDatesJson.receivedDate = moment(value).format("YYYY-MM-DD");
-                    if (shipmentDatesJson.expectedDeliveryDate == "" || shipmentDatesJson.expectedDeliveryDate == null || shipmentDatesJson.expectedDeliveryDate == "Invalid date") {
+                    var lastShipmentStatus = rowData[22];
+                    if (shipmentDatesJson.expectedDeliveryDate == "" || shipmentDatesJson.expectedDeliveryDate == null || shipmentDatesJson.expectedDeliveryDate == "Invalid date" || lastShipmentStatus == "") {
                         shipmentDatesJson.expectedDeliveryDate = moment(value).format("YYYY-MM-DD");
                     }
                 } else {
@@ -1437,16 +1457,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 var shipmentDates = rowData[26];
                 if (value == DELIVERED_SHIPMENT_STATUS) {
-                    if (shipmentDates.receivedDate != "" && shipmentDates.receivedDate != null && shipmentDates.receivedDate != "Invalid date") {
-                        elInstance.setValueFromCoords(4, y, shipmentDates.receivedDate, true);
-                    } else {
-                        elInstance.setValueFromCoords(4, y, moment(Date.now()).format("YYYY-MM-DD"), true);
-                    }
                 } else {
                     if (shipmentDates.expectedDeliveryDate != "" && shipmentDates.expectedDeliveryDate != null && shipmentDates.expectedDeliveryDate != "Invalid date") {
                         elInstance.setValueFromCoords(4, y, shipmentDates.expectedDeliveryDate, true);
                     } else {
-                        elInstance.setValueFromCoords(4, y, "", true);
                     }
                 }
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
@@ -1555,21 +1569,26 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 14) {
             var valid = checkValidtion("text", "O", y, rowData[14], elInstance);
             if (valid == true) {
-                if (rowData[23] == -1 && rowData[14] != "") {
-                    var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
-                    var pricePerUnit = rowData[15];
-                    // if (pricePerUnit.toString() == "") {
-                    console.log("Price per unit", pricePerUnit);
-                    if (procurementAgentPlanningUnit.length > 0) {
-                        console.log("in length greater than 0")
-                        pricePerUnit = parseFloat(procurementAgentPlanningUnit[0].catalogPrice);
-                    } else {
-                        pricePerUnit = this.props.items.catalogPrice;
-                    }
-                    var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
-                    pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
-                    elInstance.setValueFromCoords(15, y, pricePerUnit, true);
-                }
+                var pricePerUnit = rowData[15];
+                var freightCost = rowData[17];
+                var lastConversionRate = rowData[31];
+                var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
+                pricePerUnit = parseFloat((pricePerUnit * lastConversionRate) / conversionRateToUsd).toFixed(2);
+                elInstance.setValueFromCoords(15, y, pricePerUnit, true);
+                elInstance.setValueFromCoords(31, y, conversionRateToUsd, true);
+                // if (rowData[23] == -1 && rowData[14] != "") {
+                //     var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+
+                //     // if (pricePerUnit.toString() == "") {
+                //     console.log("Price per unit", pricePerUnit);
+                //     if (procurementAgentPlanningUnit.length > 0) {
+                //         console.log("in length greater than 0")
+                //         pricePerUnit = parseFloat(procurementAgentPlanningUnit[0].catalogPrice);
+                //     } else {
+                //         pricePerUnit = this.props.items.catalogPrice;
+                //     }
+
+                // }
                 // }
             } else {
                 elInstance.setValueFromCoords(30, y, 1, true);
@@ -1977,7 +1996,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkValidtion("text", "B", y, rowData[1], elInstance);
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
@@ -2042,7 +2061,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation.toString() == "false") {
                     valid = false;
                 }
-                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 }
@@ -2805,6 +2824,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var arrivedDate = shipmentDatesJson.arrivedDate != "" && shipmentDatesJson.arrivedDate != "Invalid date" ? shipmentDatesJson.arrivedDate : null;
                         var receivedDate = shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != "Invalid date" ? shipmentDatesJson.receivedDate : null;
                         var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate != "" && shipmentDatesJson.expectedDeliveryDate != "Invalid date" ? shipmentDatesJson.expectedDeliveryDate : null;
+                        if (shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                            receivedDate = null;
+                        }
+                        if (shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                            arrivedDate = null;
+                        }
+                        if (shipmentStatusId != SHIPPED_SHIPMENT_STATUS || shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                            shippedDate = null;
+                        }
+                        if (shipmentStatusId != APPROVED_SHIPMENT_STATUS || shipmentStatusId != SHIPPED_SHIPMENT_STATUS || shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                            approvedDate = null;
+                        }
+                        if (shipmentStatusId != SUBMITTED_SHIPMENT_STATUS || shipmentStatusId != APPROVED_SHIPMENT_STATUS || shipmentStatusId != SHIPPED_SHIPMENT_STATUS || shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                            submittedDate = null;
+                        }
                         console.log("shipmentDatesJson", shipmentDatesJson);
                         console.log("Received date", receivedDate);
                         console.log("Shipment Received date", shipmentDatesJson.receivedDate);

@@ -27,7 +27,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
-import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+// import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
@@ -55,6 +55,19 @@ class Program extends Component {
             loading: true
         };
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.getPrograms = this.getPrograms.bind(this);
+        this.checkNewerVersions = this.checkNewerVersions.bind(this);
+    }
+    checkNewerVersions(programs) {
+        console.log("T***going to call check newer versions")
+        if (navigator.onLine) {
+            AuthenticationService.setupAxiosInterceptors()
+            ProgramService.checkNewerVersions(programs)
+                .then(response => {
+                    localStorage.removeItem("sesLatestProgram");
+                    localStorage.setItem("sesLatestProgram", response.data);
+                })
+        }
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -328,6 +341,69 @@ class Program extends Component {
         });
     }
 
+    getPrograms() {
+        console.log("T***get programs called");
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            // if (this.props.updateState != undefined) {
+            //     this.props.updateState(false);
+            // }
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red',
+                    loading: false
+                })
+                // if (this.props.updateState != undefined) {
+                //     this.props.updateState(false);
+                // }
+            }.bind(this);
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
+                        console.log("programData---", programData);
+                        var programJson = {
+                            programId: programJson1.programId,
+                            versionId: myResult[i].version
+                        }
+                        proList.push(programJson)
+                    }
+                }
+                // this.setState({
+                //     programs: proList
+                // })
+                this.checkNewerVersions(proList);
+                // if (this.props.updateState != undefined) {
+                //     this.props.updateState(false);
+                //     this.props.fetchData();
+                // }
+            }.bind(this);
+        }.bind(this)
+
+    }
+
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     render() {
@@ -343,7 +419,7 @@ class Program extends Component {
 
         return (
             <div className="animated fadeIn">
-                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
+                {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
@@ -641,7 +717,8 @@ class Program extends Component {
                                             this.hideFirstComponent();
                                             // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
                                             this.setState({ loading: false })
-                                            this.refs.programListChild.checkNewerVersions();
+                                            // this.refs.programListChild.checkNewerVersions();
+                                            this.getPrograms();
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
@@ -711,7 +788,7 @@ class Program extends Component {
                                                                 loading: false
                                                             })
                                                             this.hideFirstComponent();
-                                                            this.refs.programListChild.checkNewerVersions();
+                                                            this.getPrograms();
                                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
 
                                                         }.bind(this);
