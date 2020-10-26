@@ -1432,6 +1432,7 @@
     "static.inventory.inventoryQunatity":"Inventory Qunatity (ARU)",
     "static.inventory.adjustmentQunatity":"Adjustment Qunatity (ARU)",
     "static.inventory.inventoryQunatityPU":"Inventory Qunatity (QAT Planning Unit)",
-    "static.inventory.adjustmentQunatityPU":"Adjustment Qunatity (QAT Planning Unit)"
+    "static.inventory.adjustmentQunatityPU":"Adjustment Qunatity (QAT Planning Unit)",
+    "static.supplyPlan.stockOut":"Stock Out"
 
 }
