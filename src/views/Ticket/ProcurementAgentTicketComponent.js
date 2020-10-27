@@ -164,8 +164,14 @@ export default class ProcurementAgentTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    realms: response.data,
+                    realms: listArray,
                     realmId: this.props.items.userRealmId, loading: false
                 });
                 if (this.props.items.userRealmId !== "") {
@@ -632,6 +638,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.procurementAgent.notes}
                                             // required 
                                             />

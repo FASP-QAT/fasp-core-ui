@@ -454,7 +454,7 @@
     "static.planningunit.planningunit": "Planning Unit",
     "static.dashboard.planningunit": "Planning Unit",
     "static.dashboard.planningunitheader": "Planning Unit",
-    "static.unit.multiplier": "Multiplier",
+    "static.unit.multiplier": "Conversion Factor",
     "static.planningunit.forcastingunittext": "Select Forecasting Unit",
     "static.planningunit.unittext": "Select Unit",
     "static.planningunit.planningunittext": "Enter Planning Unit",
@@ -1325,7 +1325,7 @@
     "static.message.planningUnitAlreadyExists": "Planning Unit aready exist",
     "static.message.negativeInventoryMessage": "Please ensure you do not have negative inventory before you proceed.",
     "static.importProgram.importNewProgram": "Import New program",
-    "static.message.saveValidData": "Saved rows with vaild data. To proceed further validated all rows and continue.",
+    "static.message.saveValidData": "Saved rows with vaild data. To proceed further validate all rows and continue.",
     "static.program.submitProgram": "Submit Program",
     "static.inventory.totalInvontory": "Total Inventory",
     "static.common.pleaseSelect": "Please Select",
@@ -1436,5 +1436,12 @@
     "static.inventory.adjustmentQunatityPU": "Adjustment Qunatity (QAT Planning Unit)",
     "static.common.notesvalidation": "Please enter notes",
     "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them.",
-    "static.program.seemoreprogram": "See more..."
+    "static.program.seemoreprogram": "See more...",
+    "static.supplyPlan.stockOut": "Stock Out",
+    "static.pipeline.shelfLifeValidation": "Number less then 0 and greater then 31 is not allowed.",
+    "static.quantimed.importatleastonerow": "Please select at least one qunatimed data for import",
+    "static.quantimed.conversionFactor": "Conversion Factor",
+    "static.quantimed.regionConversionFactor": "Region Conversion Factor",
+    "static.quantimed.regionPercentage": "Region Conversion Factor (%)",
+    "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecast Consumption Quantity"
 }

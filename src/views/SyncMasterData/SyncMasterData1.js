@@ -429,16 +429,13 @@ export default class SyncMasterData extends Component {
                                         console.log("M sync country transaction start")
                                         var countryObjectStore = countryTransaction.objectStore('country');
                                         var json = (response.countryList);
-                                        console.log("M sync country json---")
+                                        var putRequest="";
                                         for (var i = 0; i < json.length; i++) {
-                                            console.log("M sync country for loop")
-                                            countryObjectStore.put(json[i]);
-                                        }
-                                        console.log("after country set statue ", this.state.syncedMasters);
-                                        console.log("M sync going to update state")
-                                        setTimeout(function () {
+                                            putRequest=countryObjectStore.put(json[i]);
 
-                                        }, 3000);
+                                        }
+                                        console.log("after country set statue 1", this.state.syncedMasters);
+                                        putRequest.onsuccess = function (event) {
                                         this.setState({
                                             syncedMasters: this.state.syncedMasters + 1,
                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -869,6 +866,7 @@ export default class SyncMasterData extends Component {
                                                 })
                                             })
                                         })
+                                    }.bind(this)
                                     } else {
                                         this.setState({
                                             message: response.data.messageCode

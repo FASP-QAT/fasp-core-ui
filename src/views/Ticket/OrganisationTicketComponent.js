@@ -283,68 +283,80 @@ export default class OrganisationTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        CountryService.getCountryListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        countries: response.data, loading: false
-                    })
-                }
-                else {
+        // CountryService.getCountryListAll()
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             var listArray = response.data;
+        //             listArray.sort((a, b) => {
+        //                 var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+        //                 var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+        //                 return itemLabelA > itemLabelB ? 1 : -1;
+        //             });
+        //             this.setState({
+        //                 countries: listArray, loading: false
+        //             })
+        //         }
+        //         else {
 
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             },
+        //                 () => {
+        //                     this.hideSecondComponent();
+        //                 })
+        //         }
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     loading: false
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
 
         UserService.getRealmList()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    realms: response.data,
+                    realms: listArray,
                     realm: this.props.items.userRealmId, loading: false
                 });
                 if (this.props.items.userRealmId !== "") {
@@ -422,10 +434,16 @@ export default class OrganisationTicketComponent extends Component {
             HealthAreaService.getRealmCountryList(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var json = listArray;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i] = { value: json[i].realmCountryId, label: getLabelText(json[i].country.label, this.state.lang) }
                         }
                         this.setState({
                             countryId: '',
@@ -696,6 +714,7 @@ export default class OrganisationTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.organisation.notes}
                                             // required 
                                             />

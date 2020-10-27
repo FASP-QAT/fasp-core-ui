@@ -15,22 +15,22 @@ export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            loading: true
+        }
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
         this.loaded = this.loaded.bind(this);
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.state = {
-            loading: true
-        }
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     checkValidation() {

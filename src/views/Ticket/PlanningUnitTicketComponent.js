@@ -185,17 +185,29 @@ export default class PlanningUnitTicketComponent extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        units: response.data
+                        units: listArray
                     })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         var unitList = [];
-                        for (var i = 0; i < response.data.length; i++) {
-                            unitList[i] = { value: response.data[i].forecastingUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                        for (var i = 0; i < listArray.length; i++) {
+                            unitList[i] = { value: listArray[i].forecastingUnitId, label: getLabelText(listArray[i].label, this.state.lang) }
                         }
                         this.setState({
-                            forecastingUnits: response.data,
+                            forecastingUnits: listArray,
                             forecastingUnitList: unitList,
                             loading: false
                         })
@@ -497,6 +509,7 @@ export default class PlanningUnitTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.planningUnit.notes}
                                             // required 
                                             />
