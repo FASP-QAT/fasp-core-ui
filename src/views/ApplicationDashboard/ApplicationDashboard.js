@@ -292,11 +292,12 @@ class ApplicationDashboard extends Component {
     });
   }
   checkNewerVersions(programs) {
-    // console.log("T***going to call check newer versions")
+    console.log("T***going to call check newer versions dashboard---",programs)
     if (navigator.onLine) {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
+          console.log("T***dashboard program response.data---",response.data);
           localStorage.removeItem("sesLatestProgram");
           localStorage.setItem("sesLatestProgram", response.data);
         })
@@ -353,6 +354,7 @@ class ApplicationDashboard extends Component {
             proList.push(programJson)
           }
         }
+        console.log("T***proList dashboard---",proList)
         // this.setState({
         //     programs: proList
         // })
