@@ -56,6 +56,11 @@ export default class syncPage extends Component {
     this.acceptCurrentChangesShipment = this.acceptCurrentChangesShipment.bind(this);
     this.acceptIncomingChangesShipment = this.acceptIncomingChangesShipment.bind(this);
 
+    this.toggleLargeProblem = this.toggleLargeProblem.bind(this);
+    this.showProblemData = this.showProblemData.bind(this);
+    this.acceptCurrentChangesProblem = this.acceptCurrentChangesProblem.bind(this);
+    this.acceptIncomingChangesProblem = this.acceptIncomingChangesProblem.bind(this);
+
     this.loadedFunctionForMerge = this.loadedFunctionForMerge.bind(this);
     this.loadedFunctionForMergeInventory = this.loadedFunctionForMergeInventory.bind(this)
     this.loadedFunctionForMergeShipment = this.loadedFunctionForMergeShipment.bind(this)
@@ -122,6 +127,15 @@ export default class syncPage extends Component {
     });
     if (oldData != "") {
       this.showShipmentData(oldData, latestData, index);
+    }
+  }
+
+  toggleLargeProblem(oldData, latestData, index, page) {
+    this.setState({
+      conflictsProblem: !this.state.conflictsProblem
+    });
+    if (oldData != "") {
+      this.showProblemData(oldData, latestData, index);
     }
   }
 
@@ -518,6 +532,117 @@ export default class syncPage extends Component {
 
   }
 
+  // Problem functions
+  showProblemData(oldData, latestData, index) {
+    var data = [];
+    data.push(oldData);
+    data.push(latestData);
+    var options = {
+      data: data,
+      colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: 'problemReportId',
+          type: 'text',
+        },
+        {
+          title: 'problemActionIndex',
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.program.programCode'),
+          type: 'text',
+        },
+        {
+          title: i18n.t('static.program.versionId'),
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.region.region'),
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.planningunit.planningunit'),
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.report.month'),
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.report.createdDate'),
+          type: 'text',
+        },
+        {
+          title: i18n.t('static.report.problemDescription'),
+          type: 'text',
+        },
+        {
+          title: i18n.t('static.report.suggession'),
+          type: 'text',
+        },
+        {
+          title: i18n.t('static.report.problemStatus'),
+          type: 'text',
+        },
+        {
+          title: i18n.t('static.program.notes'),
+          type: 'text',
+        },
+        {
+          title: i18n.t('static.common.action'),
+          type: 'hidden',
+        },
+        {
+          title: 'planningUnitId',
+          type: 'hidden',
+        },
+        {
+          title: 'problemId',
+          type: 'hidden',
+        },
+        {
+          title: 'actionUrl',
+          type: 'hidden',
+        },
+        {
+          title: 'criticalitiId',
+          type: 'hidden',
+        },
+        { type: 'hidden', title: 'Old data' },
+        { type: 'hidden', title: 'latest data' },
+        { type: 'hidden', title: 'downloaded data' },
+        { type: 'hidden', title: 'result of compare' },
+      ],
+      text: {
+        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        show: '',
+        entries: '',
+      },
+      pagination: false,
+      search: false,
+      columnSorting: false,
+      tableOverflow: false,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      tableOverflow: false,
+      editable: false,
+      contextMenu: false,
+      onload: this.loadedResolveConflictsProblem
+    };
+    var resolveConflictProblem = jexcel(document.getElementById("resolveConflictsProblemTable"), options);
+    this.el = resolveConflictProblem;
+    this.setState({
+      resolveConflictProblem: resolveConflictProblem,
+      loading: false
+    })
+    document.getElementById("indexProblem").value = index;
+
+  }
+
   loadedResolveConflictsShipment = function (instance) {
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.jexcel;
@@ -621,6 +746,82 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     this.toggleLargeShipment('', '', 0, '');
+    this.setState({ loading: false })
+  }
+
+
+  loadedResolveConflictsProblem = function (instance) {
+    jExcelLoadedFunctionOnlyHideRow(instance);
+    var elInstance = instance.jexcel;
+    var jsonData = elInstance.getJson();
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+    for (var j = 0; j < 17; j++) {
+      var col = (colArr[j]).concat(1);
+      var col1 = (colArr[j]).concat(2);
+      var valueToCompare = (jsonData[0])[j];
+      var valueToCompareWith = (jsonData[1])[j];
+      if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col1, "background-color", "transparent");
+      } else {
+        elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+        elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+      }
+    }
+  }
+
+  acceptCurrentChangesProblem() {
+    this.setState({ loading: true })
+    var resolveConflictsInstance = this.state.resolveConflictProblem;
+    var problemInstance = this.state.mergedProblemListJexcel;
+    var index = document.getElementById("indexProblem").value;
+    problemInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
+    var jsonData = resolveConflictsInstance.getJson();
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+    for (var j = 0; j < 17; j++) {
+      var col = (colArr[j]).concat(parseInt(index) + 1);
+      var valueToCompare = (jsonData[0])[j];
+      var valueToCompareWith = (jsonData[1])[j];
+      if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+        problemInstance.setStyle(col, "background-color", "transparent");
+      } else {
+        problemInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+        problemInstance.setValueFromCoords(20, index, 2, true);
+      }
+    }
+
+    problemInstance.orderBy(20, 0);
+    this.setState({
+      conflictsCount: this.state.conflictsCount - 1
+    })
+    this.toggleLargeProblem('', '', 0, '');
+    this.setState({ loading: false })
+  }
+
+  acceptIncomingChangesProblem() {
+    this.setState({ loading: true })
+    var resolveConflictsInstance = this.state.resolveConflictProblem;
+    var problemInstance = this.state.mergedProblemListJexcel;
+    var index = document.getElementById("indexProblem").value;
+    problemInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
+    var jsonData = resolveConflictsInstance.getJson();
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+    for (var j = 0; j < 17; j++) {
+      var col = (colArr[j]).concat(parseInt(index) + 1);
+      var valueToCompare = (jsonData[0])[j];
+      var valueToCompareWith = (jsonData[1])[j];
+      if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+        problemInstance.setStyle(col, "background-color", "transparent");
+      } else {
+        problemInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+        problemInstance.setValueFromCoords(20, (index), 3, true);
+      }
+    }
+    problemInstance.orderBy(20, 0);
+    this.setState({
+      conflictsCount: this.state.conflictsCount - 1
+    })
+    this.toggleLargeProblem('', '', 0, '');
     this.setState({ loading: false })
   }
 
@@ -1099,7 +1300,7 @@ export default class syncPage extends Component {
                                     columns: [
                                       { title: i18n.t('static.commit.consumptionId'), type: 'text', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
-                                      { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
+                                      { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
                                       { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
                                       { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
@@ -1111,7 +1312,7 @@ export default class syncPage extends Component {
                                       { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                                       { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
                                       { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
+                                      { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 85 },
                                       { type: 'hidden', title: 'Old data' },
                                       { type: 'hidden', title: 'latest data' },
                                       { type: 'hidden', title: 'downloaded data' },
@@ -1602,7 +1803,7 @@ export default class syncPage extends Component {
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[16] != "" && (jsonData[c])[15] != "" && (jsonData[c])[17] != "" && (jsonData[c])[18] != 1) {
+      } else if ((jsonData[c])[16] != "" && (jsonData[c])[15] != "" && (jsonData[c])[18] != 1) {
         var oldData = (jsonData[c])[15];
         var latestData = (jsonData[c])[16];
         var downloadedData = (jsonData[c])[17];
@@ -1614,14 +1815,14 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if (oldData[j] == downloadedData[j]) {
+            if ((jsonData[c])[17] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
               (jsonData[c])[18] = 3;
-            } else if (latestData[j] == downloadedData[j]) {
+            } else if ((jsonData[c])[17] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -1643,7 +1844,7 @@ export default class syncPage extends Component {
         }
 
         // Checking batch details
-        if ((jsonData[c])[16] != "" && (jsonData[c])[15] != "" && (jsonData[c])[17] != "" && (jsonData[c])[18] != 1) {
+        if ((jsonData[c])[16] != "" && (jsonData[c])[15] != "" && (jsonData[c])[18] != 1) {
           if ((oldData[13] == latestData[13]) || (oldData[13] == "" && latestData[13] == null) || (oldData[13] == null && latestData[13] == "")) {
             var col = (colArr[14]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -1651,13 +1852,13 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if (oldData[13] == downloadedData[13]) {
+            if ((jsonData[c])[17] != "" && oldData[13] == downloadedData[13]) {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(13, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
-            } else if (latestData[13] == downloadedData[13]) {
+            } else if ((jsonData[c])[17] != "" && latestData[13] == downloadedData[13]) {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -1713,7 +1914,7 @@ export default class syncPage extends Component {
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[17] != "" && (jsonData[c])[16] != "" && (jsonData[c])[18] != "" && (jsonData[c])[19] != 1) {
+      } else if ((jsonData[c])[17] != "" && (jsonData[c])[16] != "" && (jsonData[c])[19] != 1) {
         var oldData = (jsonData[c])[16];
         var latestData = (jsonData[c])[17];
         var downloadedData = (jsonData[c])[18];
@@ -1725,14 +1926,14 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if (oldData[j] == downloadedData[j]) {
+            if ((jsonData[c])[18] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(19, c, 3, true);
               (jsonData[c])[19] = 3;
-            } else if (latestData[j] == downloadedData[j]) {
+            } else if ((jsonData[c])[18] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -1754,7 +1955,7 @@ export default class syncPage extends Component {
         }
 
         // Checking batch details
-        if ((jsonData[c])[17] != "" && (jsonData[c])[16] != "" && (jsonData[c])[18] != "" && (jsonData[c])[19] != 1) {
+        if ((jsonData[c])[17] != "" && (jsonData[c])[16] != "" && (jsonData[c])[19] != 1) {
           if ((oldData[14] == latestData[14]) || (oldData[14] == "" && latestData[14] == null) || (oldData[14] == null && latestData[14] == "")) {
             var col = (colArr[15]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -1762,13 +1963,13 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if (oldData[14] == downloadedData[14]) {
+            if ((jsonData[c])[18] != "" && oldData[14] == downloadedData[14]) {
               var col = (colArr[15]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(14, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(19, c, 3, true);
-            } else if (latestData[14] == downloadedData[14]) {
+            } else if ((jsonData[c])[18] != "" && latestData[14] == downloadedData[14]) {
               var col = (colArr[15]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -1817,7 +2018,7 @@ export default class syncPage extends Component {
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[28] != "" && (jsonData[c])[29] != "" && (jsonData[c])[30] != "" && (jsonData[c])[31] != 1) {
+      } else if ((jsonData[c])[28] != "" && (jsonData[c])[29] != "" && (jsonData[c])[31] != 1) {
         var oldData = (jsonData[c])[28];
         var latestData = (jsonData[c])[29];
         var downloadedData = (jsonData[c])[30];
@@ -1830,14 +2031,14 @@ export default class syncPage extends Component {
               isChanged: true
             })
             console.log("old-->", oldData[j], "Downloaded---->", downloadedData[j], "Latest--->", latestData[j])
-            if (oldData[j] == downloadedData[j]) {
+            if ((jsonData[c])[30] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(31, c, 3, true);
               (jsonData[c])[31] = 3;
-            } else if (latestData[j] == downloadedData[j]) {
+            } else if ((jsonData[c])[30] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -1859,7 +2060,7 @@ export default class syncPage extends Component {
         }
 
         // Checking batch details
-        if ((jsonData[c])[28] != "" && (jsonData[c])[29] != "" && (jsonData[c])[30] != "" && (jsonData[c])[31] != 1) {
+        if ((jsonData[c])[28] != "" && (jsonData[c])[29] != "" && (jsonData[c])[31] != 1) {
           if ((oldData[26] == latestData[26]) || (oldData[26] == "" && latestData[26] == null) || (oldData[26] == null && latestData[26] == "")) {
             var col = (colArr[27]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -1867,13 +2068,13 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if (oldData[26] == downloadedData[26]) {
+            if ((jsonData[c])[30] != "" && oldData[26] == downloadedData[26]) {
               var col = (colArr[27]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(26, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(31, c, 3, true);
-            } else if (latestData[26] == downloadedData[26]) {
+            } else if ((jsonData[c])[30] != "" && latestData[26] == downloadedData[26]) {
               var col = (colArr[27]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -1928,11 +2129,11 @@ export default class syncPage extends Component {
         this.setState({
           isChanged: true
         })
-      } else if ((jsonData[c])[18] != "" && (jsonData[c])[17] != "" && (jsonData[c])[19] != "" && (jsonData[c])[20] != 1) {
+      } else if ((jsonData[c])[18] != "" && (jsonData[c])[17] != "" && (jsonData[c])[20] != 1) {
         var oldData = (jsonData[c])[17];
         var latestData = (jsonData[c])[18];
         var downloadedData = (jsonData[c])[19];
-        for (var j = 1; j < 17; j++) {
+        for (var j = 0; j < 17; j++) {
           if ((oldData[j] == latestData[j]) || (oldData[j] == "" && latestData[j] == null) || (oldData[j] == null && latestData[j] == "")) {
             var col = (colArr[j]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
@@ -1943,14 +2144,14 @@ export default class syncPage extends Component {
             console.log("OldData[j", oldData[j]);
             console.log("DownloadedDara[j", downloadedData[j]);
             console.log("Latest data[j]", latestData[j]);
-            if (oldData[j] == downloadedData[j]) {
+            if ((jsonData[c])[19] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 3, true);
               (jsonData[c])[20] = 3;
-            } else if (latestData[j] == downloadedData[j]) {
+            } else if ((jsonData[c])[19] != "" && latestData[j] == downloadedData[j]) {
               console.log("latestData[j]", latestData[j]);
               console.log("downloaded", downloadedData[j])
               var col = (colArr[j]).concat(parseInt(c) + 1);
@@ -1959,16 +2160,16 @@ export default class syncPage extends Component {
               elInstance.setValueFromCoords(20, c, 2, true);
               (jsonData[c])[20] = 2;
             } else {
-              // this.setState({
-              //   conflictsCount: this.state.conflictsCount + 1
-              // })
-              // elInstance.setValueFromCoords(20, c, 1, true);
-              // (jsonData[c])[20] = 1;
-              // for (var j = 0; j < colArr.length; j++) {
-              //   var col = (colArr[j]).concat(parseInt(c) + 1);
-              //   elInstance.setStyle(col, "background-color", "transparent");
-              //   elInstance.setStyle(col, "background-color", "yellow");
-              // }
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1
+              })
+              elInstance.setValueFromCoords(20, c, 1, true);
+              (jsonData[c])[20] = 1;
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+              }
             }
           }
         }
@@ -2242,6 +2443,29 @@ export default class syncPage extends Component {
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
+
+        {/* Resolve conflicts modal */}
+        <Modal isOpen={this.state.conflictsProblem}
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+          <ModalHeader toggle={() => this.toggleLargeProblem()} className="modalHeaderSupplyPlan">
+            <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
+            <ul className="legendcommitversion">
+              <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')}</span></li>
+              <li><span className="notawesome  legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+            </ul>
+          </ModalHeader>
+          <ModalBody>
+            <div className="table-responsive RemoveStriped">
+              <div id="resolveConflictsProblemTable" />
+              <input type="hidden" id="indexProblem" />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
+            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+          </ModalFooter>
+        </Modal>
+        {/* Resolve conflicts modal */}
       </div>
     );
   };
@@ -2358,7 +2582,19 @@ export default class syncPage extends Component {
             }
           }
           shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
-          var problemReportList = this.state.mergedProblemListData.filter(c => c.newAdded != true);
+
+          var problemReportList = [];
+          var problemJson = (this.state.mergedProblemListJexcel).getJson();
+          var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+          var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+          for (var c = 0; c < problemJson.length; c++) {
+            if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0]!=0) {
+              problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+            } else if ((problemJson[c])[31] == 3 && (problemJson[c])[0] != 0) {
+              problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+            }
+          }
+          problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c=>c.problemReportId==0))).filter(c => c.newAdded != true);
           console.log("Planning unit list", planningUnitList);
           console.log("Consumption data", consumptionData);
           console.log("InventoryData", inventoryData);
@@ -2546,6 +2782,7 @@ export default class syncPage extends Component {
         var latestProgramDataProblemList = this.state.latestProgramData.problemReportList;
         var oldProgramDataProblemList = oldProgramData.problemReportList;
         var downloadedProgramDataProblemList = this.state.downloadedProgramData.problemReportList;
+        console.log("oldProgramDataProblemList--------------------------->", oldProgramDataProblemList);
         var mergedProblemListData = [];
         var existingProblemReportId = [];
         for (var c = 0; c < oldProgramDataProblemList.length; c++) {
@@ -2575,6 +2812,7 @@ export default class syncPage extends Component {
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
             }
+            console.log("Index-------------->", index);
             // var index = -1;
             if (index == -1) {
               mergedProblemListData.push(oldProgramDataProblemList[c]);
@@ -2585,6 +2823,7 @@ export default class syncPage extends Component {
             }
           }
         }
+        console.log("Existing problem report id", existingProblemReportId);
         // Getting other entries of latest problemList data
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
@@ -2641,7 +2880,7 @@ export default class syncPage extends Component {
           columns: [
             {
               title: 'problemReportId',
-              type: 'hidden',
+              type: 'text',
             },
             {
               title: 'problemActionIndex',
@@ -2730,6 +2969,26 @@ export default class syncPage extends Component {
           },
           contextMenu: function (obj, x, y, e) {
             var items = [];
+            //Resolve conflicts
+            var rowData = obj.getRowData(y)
+            if (rowData[20].toString() == 1) {
+              items.push({
+                title: "Resolve conflicts",
+                onclick: function () {
+                  this.setState({ loading: true })
+                  this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
+                }.bind(this)
+              })
+            }
+
+            // if (rowData[0].toString() > 0) {
+            //   items.push({
+            //     title: "Show version history",
+            //     onclick: function () {
+            //       this.toggleVersionHistory(rowData[13]);
+            //     }.bind(this)
+            //   })
+            // }
             return items;
           }.bind(this)
         };

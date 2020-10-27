@@ -1429,12 +1429,19 @@
     "static.report.localprocurement": "Local Procurement",
     "static.report.orderNo": "Procurer Order ID",
     "static.ticket.openIssues": "Open Issues",
-    "static.uploadfile.Browse": "Browse",
-    "static.inventory.inventoryQunatity": "Inventory Qunatity (ARU)",
-    "static.inventory.adjustmentQunatity": "Adjustment Qunatity (ARU)",
-    "static.inventory.inventoryQunatityPU": "Inventory Qunatity (QAT Planning Unit)",
-    "static.inventory.adjustmentQunatityPU": "Adjustment Qunatity (QAT Planning Unit)",
+    "static.uploadfile.Browse":"Browse",
+    "static.inventory.inventoryQunatity":"Inventory Quantity (ARU)",
+    "static.inventory.adjustmentQunatity":"Adjustment Quantity (ARU)",
+    "static.inventory.inventoryQunatityPU":"Inventory Quantity (QAT Planning Unit)",
+    "static.inventory.adjustmentQunatityPU":"Adjustment Quantity (QAT Planning Unit)",
+    "static.supplyPlan.stockOut":"Stock Out",
     "static.common.notesvalidation": "Please enter notes",    
     "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them.",
-    "static.pipeline.shelfLifeValidation":"Number less then 0 and greater then 31 is not allowed."
+    "static.pipeline.shelfLifeValidation":"Number less then 0 and greater then 31 is not allowed.",
+    "static.quantimed.importatleastonerow": "Please select at least one qunatimed data for import",
+    "static.quantimed.conversionFactor": "Conversion Factor",    
+    "static.quantimed.regionConversionFactor": "Region Conversion Factor",
+    "static.quantimed.regionPercentage": "Region Conversion Factor (%)",
+    "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecast Consumption Quantity"
+
 }

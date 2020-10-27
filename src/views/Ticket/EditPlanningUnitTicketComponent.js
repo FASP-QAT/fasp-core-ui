@@ -160,12 +160,18 @@ export default class EditPlanningUnitTicketComponent extends Component {
         if (this.props.items.userRealmId > 0) {
             PlanningUnitService.getPlanningUnitByRealmId(this.props.items.userRealmId).then(response => {
                 console.log(response.data)
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                                       
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });                
                 var unitList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    unitList[i] = { value: response.data[i].planningUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                for (var i = 0; i < listArray.length; i++) {
+                    unitList[i] = { value: listArray[i].planningUnitId, label: getLabelText(listArray[i].label, this.state.lang) }
                 }
                 this.setState({
-                    planningUnits: response.data,
+                    planningUnits: listArray,
                     planningUnitList: unitList,
                     loading: false
                 });
@@ -212,12 +218,18 @@ export default class EditPlanningUnitTicketComponent extends Component {
         } else {
             PlanningUnitService.getAllPlanningUnitList().then(response => {
                 console.log(response.data)
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                                       
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });                
                 var unitList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    unitList[i] = { value: response.data[i].planningUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                for (var i = 0; i < listArray.length; i++) {
+                    unitList[i] = { value: listArray[i].planningUnitId, label: getLabelText(listArray[i].label, this.state.lang) }
                 }
                 this.setState({
-                    planningUnits: response.data,
+                    planningUnits: listArray,
                     planningUnitList: unitList,
                     loading: false
                 });
@@ -450,13 +462,14 @@ export default class EditPlanningUnitTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.planningUnit.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

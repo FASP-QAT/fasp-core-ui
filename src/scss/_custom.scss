@@ -818,7 +818,7 @@ label.arrow_label:after {
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
 // listBudgetAlignThtd 
-.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
@@ -3378,6 +3378,9 @@ border-radius: 2em;
 .Select--multi .Select-clear-zone {
   left: -18px;
 }
+.Select-clear-zone{
+  left:-18px;
+}
 .inlineMargin
 {
 margin-left: -45px;
@@ -3619,23 +3622,30 @@ margin-left: -45px;
 }
 .quantimedProgressbartext2 {
   // left: 16%;
-  left: 33.3333%;
-  transform: translateX(-43%) scale(1);
+  left: 25%;
+  transform: translateX(-37%) scale(1);
 }
 .quantimedProgressbartext3 {
   // left: 16%;
   // left: 64.5%;
   // transform: translateX(18%) scale(1);  
-  left: 66.6667%;
-    transform: translateX(-69%) scale(1);
+  left: 50%;
+    transform: translateX(-50%) scale(1);
 }
 
 
 .quantimedProgressbartext4 {
   // left: 16%;
-  left: 100%;
-  transform: translateX(-116%) scale(1);
+  left: 75%;
+  transform: translateX(-62%) scale(1);
 }
+
+.quantimedProgressbartext5 {
+  // left: 16%;
+  left: 100%;
+  transform: translateX(-120%) scale(1);
+}
+
 .en-btnlogin{
   color: #002f6c !important;
   background-color: transparent !important;
@@ -3654,7 +3664,7 @@ margin-left: -45px;
  } 
 
 .qat-problemListSearch{
-  margin-top:-4%;
+  margin-top:-40px;
 }
 
 .problemList-red{
