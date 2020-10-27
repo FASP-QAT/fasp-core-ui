@@ -365,10 +365,13 @@ export default class SyncMasterData extends Component {
                                         var countryTransaction = db1.transaction(['country'], 'readwrite');
                                         var countryObjectStore = countryTransaction.objectStore('country');
                                         var json = (response.countryList);
+                                        var putRequest="";
                                         for (var i = 0; i < json.length; i++) {
-                                            countryObjectStore.put(json[i]);
+                                            putRequest=countryObjectStore.put(json[i]);
+
                                         }
                                         console.log("after country set statue 1", this.state.syncedMasters);
+                                        putRequest.onsuccess = function (event) {
                                         this.setState({
                                             syncedMasters: this.state.syncedMasters + 1,
                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -753,6 +756,7 @@ export default class SyncMasterData extends Component {
                                                 })
                                             })
                                         })
+                                    }.bind(this)
                                     } else {
                                         this.setState({
                                             message: response.data.messageCode

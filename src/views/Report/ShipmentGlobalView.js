@@ -439,7 +439,7 @@ class ShipmentGlobalView extends Component {
                 csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
         csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
-        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('"' +((i18n.t   ('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+ '"'))
 
         csvRow.push('')
         csvRow.push('')
@@ -1388,7 +1388,7 @@ class ShipmentGlobalView extends Component {
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
                     console.log("RESP------", response.data);
-
+if( response.data.shipmentList.length!=0){
                     var table1Headers = [];
                     var lab = [];
                     var val = [];
@@ -1438,7 +1438,22 @@ class ShipmentGlobalView extends Component {
                         // console.log("values---", this.state.values);
                         // console.log("DATA--1---", this.state.table1Headers);
                         // console.log("DATA---2--", this.state.table1Body);
-                    })
+                    })}
+                    else{
+                        this.setState({
+                            data: response.data,
+                            shipmentList: response.data.shipmentList,
+                            dateSplitList: response.data.dateSplitList,
+                            countrySplitList: response.data.countrySplitList,
+                            countryShipmentSplitList: response.data.countryShipmentSplitList,
+                            table1Headers: [],
+                            table1Body: [],
+                            lab: [],
+                            val: [],
+                            loading: false
+                        }, () => {}
+                    )
+                    }
                 }).catch(
                     error => {
                         this.setState({

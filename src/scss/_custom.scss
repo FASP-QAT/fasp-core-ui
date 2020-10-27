@@ -818,7 +818,7 @@ label.arrow_label:after {
 .listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
 
 // listBudgetAlignThtd 
-.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: center !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
 .listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
@@ -3378,6 +3378,9 @@ border-radius: 2em;
 .Select--multi .Select-clear-zone {
   left: -18px;
 }
+.Select-clear-zone{
+  left:-18px;
+}
 .inlineMargin
 {
 margin-left: -45px;
@@ -3661,7 +3664,7 @@ margin-left: -45px;
  } 
 
 .qat-problemListSearch{
-  margin-top:-4%;
+  margin-top:-40px;
 }
 
 .problemList-red{

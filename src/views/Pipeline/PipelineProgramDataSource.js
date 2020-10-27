@@ -24,8 +24,16 @@ export default class PipelineProgramDataSource extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.saveDataSource = this.saveDataSource.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.startLoading=this.startLoading.bind(this);
+        this.stopLoading=this.stopLoading.bind(this);
     }
 
+    startLoading(){
+        this.setState({loading:true});
+    }
+    stopLoading(){
+        this.setState({loading:false});
+    }
 
     dropdownFilter = function (instance, cell, c, r, source) {
         console.log('activeDataSourceList', this.state.activeDataSourceList)

@@ -29,7 +29,7 @@ export default class ChangeInLocalProgramVersion extends Component {
             state2: 0,
             state3: 0
         }
-        // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
+        this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
         this.getProgramData = this.getProgramData.bind(this);
         this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
 
@@ -37,30 +37,30 @@ export default class ChangeInLocalProgramVersion extends Component {
     render() {
         return (
             <>
-                {
+                {/* {
                     this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
-                }
+                } */}
             </>
         );
     }
 
-    // checkIfLocalProgramVersionChanged() {
-    //     // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
-    //     // e.preventDefault();
-    //     console.log("d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
-    //     console.log("d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
-    //     console.log("d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
-    //     localStorage.removeItem("sesLocalVersionChange");
-    //     if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
-    //         console.log("d---hurrey local version changed-------------------------------------------------------------");
-    //         localStorage.setItem("sesLocalVersionChange", true);
-    //         console.log("d--------in if---------------")
-    //     } else {
-    //         localStorage.setItem("sesLocalVersionChange", false);
-    //         console.log("d--------in else---------------")
-    //     }
-    //     //   }
-    // }
+    checkIfLocalProgramVersionChanged() {
+        // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
+        // e.preventDefault();
+        console.log("d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
+        console.log("d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
+        console.log("d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+        localStorage.removeItem("sesLocalVersionChange");
+        if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+            console.log("d---hurrey local version changed-------------------------------------------------------------");
+            localStorage.setItem("sesLocalVersionChange", true);
+            console.log("d--------in if---------------")
+        } else {
+            localStorage.setItem("sesLocalVersionChange", false);
+            console.log("d--------in else---------------")
+        }
+        //   }
+    }
 
     componentDidMount() {
         console.log("component did mount change in local program version--------------------------");
@@ -136,7 +136,7 @@ export default class ChangeInLocalProgramVersion extends Component {
                 this.setState({
                     programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
                 }, () => {
-                    this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+                    // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
                 })
             }.bind(this);
         }.bind(this)
@@ -202,7 +202,7 @@ export default class ChangeInLocalProgramVersion extends Component {
                 this.setState({
                     downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
                 }, () => {
-                    this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+                    // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
                 })
             }.bind(this);
         }.bind(this)
