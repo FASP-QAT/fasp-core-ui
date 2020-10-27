@@ -1261,12 +1261,12 @@
     "static.dashboard.supplyPlanWaiting": "Supply Plans Waiting for Approval",
     "static.list.listCountry": "List Realm Country",
     "static.add.addCountry": "Add Realm Country",
-    "static.list.listTechnicalArea": "List TechnicalArea",
-    "static.add.addTechnicalArea": "Add TechnicalArea",
+    "static.list.listTechnicalArea": "List Technical Area",
+    "static.add.addTechnicalArea": "Add Technical Area",
     "static.list.listRegion": "List Region",
     "static.add.addRegion": "Add Region",
-    "static.list.listOrganisation": "List Organisation",
-    "static.add.addOrganisation": "Add Organisation",
+    "static.list.listOrganisation": "List Organization",
+    "static.add.addOrganisation": "Add Organization",
     "static.list.listProgram": "List Program",
     "static.add.totalProgram": "Total Program",
     "static.report.qatProblemActionReport": "QAT Problem Action Report",
@@ -1434,6 +1434,7 @@
     "static.inventory.adjustmentQunatity": "Adjustment Qunatity (ARU)",
     "static.inventory.inventoryQunatityPU": "Inventory Qunatity (QAT Planning Unit)",
     "static.inventory.adjustmentQunatityPU": "Adjustment Qunatity (QAT Planning Unit)",
-    "static.common.notesvalidation": "Please enter notes",    
-    "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them."
+    "static.common.notesvalidation": "Please enter notes",
+    "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them.",
+    "static.program.seemoreprogram": "See more..."
 }

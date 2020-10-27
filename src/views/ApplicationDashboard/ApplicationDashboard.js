@@ -13,6 +13,7 @@ import { DATE_FORMAT_CAP, QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../Constan
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { Online, Offline } from "react-detect-offline";
+import ProgramService from "../../api/ProgramService"
 import {
   Badge,
   Button,
@@ -239,6 +240,8 @@ class ApplicationDashboard extends Component {
     this.editProblem = this.editProblem.bind(this);
     this.nextProgramSlide = this.nextProgramSlide.bind(this);
     this.previousProgramSlide = this.previousProgramSlide.bind(this);
+    this.getPrograms = this.getPrograms.bind(this);
+    this.checkNewerVersions = this.checkNewerVersions.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -288,6 +291,81 @@ class ApplicationDashboard extends Component {
       radioSelected: radioSelected,
     });
   }
+  checkNewerVersions(programs) {
+    // console.log("T***going to call check newer versions")
+    if (navigator.onLine) {
+      // AuthenticationService.setupAxiosInterceptors()
+      ProgramService.checkNewerVersions(programs)
+        .then(response => {
+          localStorage.removeItem("sesLatestProgram");
+          localStorage.setItem("sesLatestProgram", response.data);
+        })
+    }
+  }
+
+  getPrograms() {
+    // console.log("T***get programs called");
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+      // if (this.props.updateState != undefined) {
+      //     this.props.updateState(false);
+      // }
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var program = transaction.objectStore('programData');
+      var getRequest = program.getAll();
+      var proList = []
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red',
+          loading: false
+        })
+        // if (this.props.updateState != undefined) {
+        //     this.props.updateState(false);
+        // }
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson1 = JSON.parse(programData);
+            // console.log("programData---", programData);
+            var programJson = {
+              programId: programJson1.programId,
+              versionId: myResult[i].version
+            }
+            proList.push(programJson)
+          }
+        }
+        // this.setState({
+        //     programs: proList
+        // })
+        this.checkNewerVersions(proList);
+        // if (this.props.updateState != undefined) {
+        //     this.props.updateState(false);
+        //     this.props.fetchData();
+        // }
+      }.bind(this);
+    }.bind(this)
+
+  }
+
   componentDidMount() {
     if (navigator.onLine) {
       if (this.state.id == 1) {
@@ -323,6 +401,7 @@ class ApplicationDashboard extends Component {
           })
       }
     }
+    this.getPrograms();
     DashboardService.openIssues()
       .then(response => {
         console.log("Customer Open Issues===", response);
@@ -1176,11 +1255,11 @@ class ApplicationDashboard extends Component {
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">
-                <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')}>
-                  <div class="h1 text-muted text-left mb-2  ">
-                    {/* <i class="fa fa-question-circle icon-color"></i> */}
-                    <i><img src={imageHelp} className="" style={{width: '40px', height: '40px', marginTop: '-15px'}}/></i>
-                    {/* <ButtonGroup className="float-right">
+                  <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')}>
+                    <div class="h1 text-muted text-left mb-2  ">
+                      {/* <i class="fa fa-question-circle icon-color"></i> */}
+                      <i><img src={imageHelp} className="" style={{ width: '40px', height: '40px', marginTop: '-15px' }} /></i>
+                      {/* <ButtonGroup className="float-right">
                       <Dropdown id='card7' isOpen={this.state.card7} toggle={() => { this.setState({ card7: !this.state.card7 }); }}>
                         <DropdownToggle caret className="p-0" color="transparent">
                         </DropdownToggle>
@@ -1189,13 +1268,13 @@ class ApplicationDashboard extends Component {
                         </DropdownMenu>
                       </Dropdown>
                     </ButtonGroup> */}
-                  </div>
+                    </div>
 
-                  
+
                     <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}</div>
                     <div className="text-count">{this.state.openIssues}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
-                  </div>
+                    </div>
                   </a>
                 </CardBody>
               </Card>

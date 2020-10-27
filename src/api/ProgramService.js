@@ -12,6 +12,14 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+    loadProgramList() {
+        return axios.get(`${API_URL}/api/loadProgram/`, {
+        });
+    }
+    loadMoreProgramList(programId, page) {
+        return axios.get(`${API_URL}/api/loadProgram/programId/${programId}/page/${page}`, {
+        });
+    }
 
     getProgramListForDropDown() {
         return axios.get(`${API_URL}/api/getProgramList/`, {

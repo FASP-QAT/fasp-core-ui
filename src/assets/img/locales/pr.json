@@ -947,5 +947,6 @@
     "static.supplyPlan.mtshipmentStatus": "Status",
     "static.supplyPlan.mtexpectedDeliveryDate": "Data de Recebimento",
     "static.shipment.delinkingsuccess": "Remessa desvinculada com sucesso",
-    "static.ticket.filesuploadnote": "Se você tiver vários arquivos, compacte-os e envie-os."
+    "static.ticket.filesuploadnote": "Se você tiver vários arquivos, compacte-os e envie-os.",
+    "static.program.seemoreprogram": "Ver mais..."
 }
