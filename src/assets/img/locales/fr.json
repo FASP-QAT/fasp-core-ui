@@ -1221,5 +1221,8 @@
     "static.supplyPlan.mtshipmentStatus": "Statut",
     "static.supplyPlan.mtexpectedDeliveryDate": "date de réception",
     "static.shipment.delinkingsuccess": "L'expédition a bien été dissociée",
-    "static.ticket.filesuploadnote": "Si vous avez plusieurs fichiers, veuillez les compresser et les télécharger."
+    "static.ticket.filesuploadnote": "Si vous avez plusieurs fichiers, veuillez les compresser et les télécharger.",
+    "static.quantimed.importatleastonerow": "Veuillez sélectionner au moins une donnée Qunatimed pour l'importation",
+    "static.quantimed.conversionFactor": "Facteur de conversion",
+    "static.quantimed.regionConversionFactor": "Facteur de conversion de région"
 }

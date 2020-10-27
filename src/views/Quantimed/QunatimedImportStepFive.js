@@ -415,7 +415,7 @@ export default class QunatimedImportStepFive extends Component {
                         i18n.t('static.supplyPlan.qatProduct'),
                         i18n.t('static.quantimed.consumptionDate'),
                         i18n.t('static.quantimed.quantimedForecastConsumptionQty'),
-                        i18n.t('static.quantimed.regionPercentage'),
+                        i18n.t('static.quantimed.regionConversionFactor'),
                         i18n.t('static.quantimed.conversionFactor'),
                         i18n.t('static.quantimed.existingconsupmtionqty'),
                         i18n.t('static.quantimed.newconsupmtionqty'),

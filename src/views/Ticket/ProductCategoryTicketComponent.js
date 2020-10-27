@@ -380,6 +380,7 @@ export default class ProductCategoryTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.productCategory.notes}
                                             // required 
                                             />

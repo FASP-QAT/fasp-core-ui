@@ -490,6 +490,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.forecastingUnit.notes}
                                             // required 
                                             />

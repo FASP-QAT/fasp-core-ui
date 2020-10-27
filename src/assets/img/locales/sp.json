@@ -1221,5 +1221,8 @@
     "static.supplyPlan.mtshipmentStatus": "Estado",
     "static.supplyPlan.mtexpectedDeliveryDate": "Recibir fecha",
     "static.shipment.delinkingsuccess": "Envío desvinculado correctamente",
-    "static.ticket.filesuploadnote": "Si tiene varios archivos, comprímalos y cárguelos."
+    "static.ticket.filesuploadnote": "Si tiene varios archivos, comprímalos y cárguelos.",
+    "static.quantimed.importatleastonerow": "Seleccione al menos un dato Qunatimed para importar",
+    "static.quantimed.conversionFactor": "Factor de conversión",    
+    "static.quantimed.regionConversionFactor": "Factor de conversión de región"
 }
