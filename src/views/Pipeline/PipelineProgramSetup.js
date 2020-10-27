@@ -165,8 +165,10 @@ export default class PipelineProgramSetup extends Component {
     endProgramInfoStepFive() {
         console.log("program Data=======>", this.state.program);
         // AuthenticationService.setupAxiosInterceptors();
+        this.refs.programInfoChild.startLoading();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
             if (response.status == "200") {
+                this.refs.programInfoChild.stopLoading();
                 this.setState({
                     pipelineProgramSetupPer: 15, planningUnitStatus: true, consumptionStatus: false, inventoryStatus: false,
                     shipmentStatus: false
@@ -177,6 +179,7 @@ export default class PipelineProgramSetup extends Component {
                 document.getElementById('stepFour').style.display = 'none';
                 document.getElementById('stepFive').style.display = 'none';
             } else {
+                this.refs.programInfoChild.stopLoading();
                 this.setState({
                     message: response.data.messageCode
                 })
@@ -185,11 +188,14 @@ export default class PipelineProgramSetup extends Component {
         ).catch(
             error => {
                 if (error.message === "Network Error") {
+                    this.refs.programInfoChild.stopLoading();
+                    this.refs.programInfoChild.setErrorMessage(i18n.t('static.unkownError'));
                     this.setState({
                         message: 'static.unkownError',
                         loading: false
                     });
                 } else {
+                    this.refs.programInfoChild.stopLoading();
                     switch (error.response ? error.response.status : "") {
 
                         case 401:
@@ -201,12 +207,14 @@ export default class PipelineProgramSetup extends Component {
                         case 500:
                         case 404:
                         case 406:
+                            this.refs.programInfoChild.setErrorMessage(error.response.data.messageCode);
                             this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false
                             });
                             break;
                         case 412:
+                            this.refs.programInfoChild.setErrorMessage(error.response.data.messageCode);
                             this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false
@@ -440,7 +448,10 @@ export default class PipelineProgramSetup extends Component {
                 }
             });
     }
+
+    
     finishedStepSix = () => {
+        this.refs.consumptionChild.startLoading();
         var consumption = this.refs.consumptionChild.saveConsumption();
         var checkValidation = this.refs.consumptionChild.checkValidation();
         console.log("inventory-----data---", consumption);
@@ -1355,7 +1366,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <PipelineProgramDataStepFive backToprogramInfoStepThree={this.backToprogramInfoStepThree} endProgramInfoStepFour={this.endProgramInfoStepFour} items={this.state} updateFieldData={this.updateFieldData}></PipelineProgramDataStepFive>
                                                 </div>
                                                 <div id="pipelineProgramDataStepFive">
-                                                    <PipelineProgramDataStepSix endProgramInfoStepFive={this.endProgramInfoStepFive} backToprogramInfoStepFour={this.backToprogramInfoStepFour} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepSix>
+                                                    <PipelineProgramDataStepSix endProgramInfoStepFive={this.endProgramInfoStepFive} ref="programInfoChild" backToprogramInfoStepFour={this.backToprogramInfoStepFour} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepSix>
                                                     {/* <h3>Program Data</h3>
                                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                     &nbsp;
