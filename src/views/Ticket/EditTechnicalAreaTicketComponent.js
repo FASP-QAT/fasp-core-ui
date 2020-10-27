@@ -136,9 +136,14 @@ export default class EditTechnicalAreaTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     console.log("response---", response.data);
-
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        technicalAreas: response.data, loading: false
+                        technicalAreas: listArray, loading: false
                     })
                 }
                 else {

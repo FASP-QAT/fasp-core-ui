@@ -299,11 +299,17 @@ export default class TechnicalAreaTicketComponent extends Component {
             RealmCountryService.getRealmCountryForProgram(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.realmCountry.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.realmCountry.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var json = listArray;
                         console.log("json", json)
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountry.id, label: json[i].realmCountry.label.label_en }
+                            regList[i] = { value: json[i].realmCountry.id, label: getLabelText(json[i].realmCountry.label, this.state.lang) }
                         }
                         this.setState({
                             countryId: '',

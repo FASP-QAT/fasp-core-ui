@@ -138,8 +138,14 @@ export default class RealmCountryRegionTicketComponent extends Component {
             ProgramService.getRealmCountryList(realmId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            realmCountries: response.data
+                            realmCountries: listArray, loading: false
                         })
                     } else {
                         this.setState({
@@ -221,8 +227,14 @@ export default class RealmCountryRegionTicketComponent extends Component {
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmList: response.data,
+                        realmList: listArray,
                         realmId: this.props.items.userRealmId, loading: false
                     });
                     if (this.props.items.userRealmId !== "") {

@@ -128,8 +128,14 @@ export default class EditProcurementAgentTicketComponent extends Component {
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        procurementAgents: response.data, loading: false
+                        procurementAgents: listArray, loading: false
                     })
                 } else {
                     this.setState({

@@ -135,8 +135,14 @@ export default class EditBudgetTicketComponent extends Component {
                 console.log(response)
                 if (response.status == 200) {
                     console.log("budget after status 200 new console --- ---->", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        budgets: response.data,
+                        budgets: listArray,
                         loading: false
                     });
                 } else {
@@ -220,7 +226,7 @@ export default class EditBudgetTicketComponent extends Component {
         let programList = budgets.length > 0 && budgets.map((item, i) => {
             return (
                 <option key={i} value={item.budgetId}>
-                    {getLabelText(item.program.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                    {getLabelText(item.label, this.state.lang) + " | " + getLabelText(item.program.label, this.state.lang)}
                 </option>
             )
         }, this);

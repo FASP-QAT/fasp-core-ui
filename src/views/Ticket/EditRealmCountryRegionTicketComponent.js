@@ -131,8 +131,14 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
         RegionService.getRegionList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.realmCountry.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.realmCountry.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmCountryRegionList: response.data,
+                        realmCountryRegionList: listArray,
                         loading: false
                     }, () => {
                         console.log("realmCountryRegionList", this.state.realmCountryRegionList)

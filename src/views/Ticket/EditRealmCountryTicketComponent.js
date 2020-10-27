@@ -130,8 +130,14 @@ export default class EditRealmCountryTicketComponent extends Component {
         RealmCountryService.getRealmCountryListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmCountries: response.data,
+                        realmCountries: listArray,
                         loading: false
                     });
                 } else {
@@ -217,7 +223,7 @@ export default class EditRealmCountryTicketComponent extends Component {
             && realmCountries.map((item, i) => {
                 return (
                     <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.realm.label, this.state.lang) + " | " + getLabelText(item.country.label, this.state.lang)}
+                        {getLabelText(item.country.label, this.state.lang) + " | " + getLabelText(item.realm.label, this.state.lang)}
                     </option>
                 )
             }, this);

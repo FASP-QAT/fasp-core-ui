@@ -129,8 +129,14 @@ export default class EditTracerCategoryTicketComponent extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 console.log("response.data----", response.data);
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    tracerCategories: response.data, loading: false
+                    tracerCategories: listArray, loading: false
                 })
             }).catch(
                 error => {

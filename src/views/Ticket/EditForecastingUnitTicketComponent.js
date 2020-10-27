@@ -163,12 +163,18 @@ export default class EditForecastingUnitTicketComponent extends Component {
             ForecastingUnitService.getForcastingUnitByRealmId(this.props.items.userRealmId).then(response => {
                 if (response.status == 200) {
                     console.log("response------->" + response);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     var unitList = [];
-                    for (var i = 0; i < response.data.length; i++) {
-                        unitList[i] = { value: response.data[i].forecastingUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    for (var i = 0; i < listArray.length; i++) {
+                        unitList[i] = { value: listArray[i].forecastingUnitId, label: getLabelText(listArray[i].label, this.state.lang) }
                     }
                     this.setState({
-                        forecastingUnits: response.data,
+                        forecastingUnits: listArray,
                         forecastingUnitList: unitList,
                         loading: false
                     })
@@ -228,12 +234,18 @@ export default class EditForecastingUnitTicketComponent extends Component {
             ForecastingUnitService.getForecastingUnitList().then(response => {
                 if (response.status == 200) {
                     console.log("response------->" + response);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     var unitList = [];
-                    for (var i = 0; i < response.data.length; i++) {
-                        unitList[i] = { value: response.data[i].forecastingUnitId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    for (var i = 0; i < listArray.length; i++) {
+                        unitList[i] = { value: listArray[i].forecastingUnitId, label: getLabelText(listArray[i].label, this.state.lang) }
                     }
                     this.setState({
-                        forecastingUnits: response.data,
+                        forecastingUnits: listArray,
                         forecastingUnitList: unitList,
                         loading: false
                     })
