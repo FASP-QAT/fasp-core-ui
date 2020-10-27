@@ -249,6 +249,7 @@ class Login extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                           var emailId = values.emailId;
                           var password = values.password;
+                          AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
                           if (navigator.onLine) {
                             LoginService.authenticate(emailId, password)
                               .then(response => {

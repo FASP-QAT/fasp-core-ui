@@ -127,8 +127,14 @@ export default class EditRealmTicketComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -323,6 +329,7 @@ export default class EditRealmTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.realm.notes}
                                                 maxLength={600}
                                             // required 
