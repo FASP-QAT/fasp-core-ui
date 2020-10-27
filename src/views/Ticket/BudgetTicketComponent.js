@@ -186,8 +186,15 @@ export default class BudgetTicketComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }
                 else {
@@ -243,8 +250,15 @@ export default class BudgetTicketComponent extends Component {
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
+
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    fundingSources: response.data, loading: false
+                    fundingSources: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -289,8 +303,14 @@ export default class BudgetTicketComponent extends Component {
 
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    currencies: response.data, loading: false
+                    currencies: listArray, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode })
@@ -685,6 +705,7 @@ export default class BudgetTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.budget.notes}
                                             // required 
                                             />

@@ -1436,5 +1436,11 @@
     "static.inventory.adjustmentQunatityPU":"Adjustment Quantity (QAT Planning Unit)",
     "static.supplyPlan.stockOut":"Stock Out",
     "static.common.notesvalidation": "Please enter notes",    
-    "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them."
+    "static.ticket.filesuploadnote": "If you have multiple files, please compress and upload them.",
+    "static.quantimed.importatleastonerow": "Please select at least one qunatimed data for import",
+    "static.quantimed.conversionFactor": "Conversion Factor",    
+    "static.quantimed.regionConversionFactor": "Region Conversion Factor",
+    "static.quantimed.regionPercentage": "Region Conversion Factor (%)",
+    "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecast Consumption Quantity"
+
 }
