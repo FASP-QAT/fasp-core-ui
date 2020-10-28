@@ -131,6 +131,8 @@ export default class QunatimedImportStepTwo extends Component {
                 this.setState({
                     planningUnitListForMultiplier: myResult,
                     loading: false
+                }, () => {
+                    // this.loadTableData();
                 })
             }.bind(this);
         }.bind(this);
@@ -141,6 +143,7 @@ export default class QunatimedImportStepTwo extends Component {
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[5].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
     }
 
     updatePlanningUnitNotFound = function () {

@@ -926,11 +926,11 @@
     "static.quantimed.quantimedImportSelectFileLabel": "Selecione o arquivo Quantimed que deseja importar (.xml)",
     "static.quantimed.quantimedImportSelectProgramLabel": "Selecione o programa para o qual deseja importá-lo",
     "static.quantimed.quantimedImportFinalConfirmText": "Quer importar dados Quantimed?",
-    "static.quantimed.quantimedProductIdLabel": "ID do produto",
-    "static.quantimed.quantimedPlanningUnitLabel": "Quantimed Unidades de planejamento",
+    "static.quantimed.quantimedProductIdLabel": "ID do produto QM",
+    "static.quantimed.quantimedPlanningUnitLabel": "Quantimed unidade",
     "static.quantimed.duplicateQATPlanningUnitFound": "Unidade de planejamento QAT duplicada encontrada",
     "static.quantimed.duplicateQATPlanningUnit": "Unidade de planejamento QAT duplicada",
-    "static.quantimed.consumptionDate": "Data de Consumo",
+    "static.quantimed.consumptionDate": "Mês de consumo",
     "static.quantimed.existingconsupmtionqty": "Quantidade de consumo da previsão existente",
     "static.quantimed.newconsupmtionqty": "Nova quantidade de consumo planejada",
     "static.quantimed.planningUnitNotFoundText": "Unidade de planejamento não encontrada",
@@ -949,6 +949,6 @@
     "static.shipment.delinkingsuccess": "Remessa desvinculada com sucesso",
     "static.ticket.filesuploadnote": "Se você tiver vários arquivos, compacte-os e envie-os.",
     "static.quantimed.importatleastonerow": "Selecione pelo menos um dado Qunatimed para importar",
-    "static.quantimed.conversionFactor": "Fator de conversão",        
-    "static.quantimed.regionConversionFactor": "Fator de conversão regional"
+    "static.quantimed.conversionFactor": "Fator de conversão de unidade",        
+    "static.quantimed.importpercentage": "Porcentagem de importação"
 }
