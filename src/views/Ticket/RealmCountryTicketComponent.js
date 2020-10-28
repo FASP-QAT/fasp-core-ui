@@ -149,8 +149,14 @@ export default class RealmCountryTicketComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data,
+                        realms: listArray,
                         realm: this.props.items.userRealmId, loading: false
                     });
                     if (this.props.items.userRealmId !== "") {
@@ -217,8 +223,14 @@ export default class RealmCountryTicketComponent extends Component {
         CountryService.getCountryListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        countries: response.data, loading: false
+                        countries: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -273,8 +285,14 @@ export default class RealmCountryTicketComponent extends Component {
 
         CurrencyService.getCurrencyListActive().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    currencies: response.data, loading: false
+                    currencies: listArray, loading: false
                 })
             } else {
                 this.setState({
@@ -542,6 +560,7 @@ export default class RealmCountryTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.realmCountry.notes}
                                             // required 
                                             />

@@ -243,11 +243,19 @@ class QuantimedImportStepOne extends Component {
 
                                     if (response.status == 200 || response.status == 201) {
 
+                                        var startDate = new Date(response.data.dtmStart);
+                                        var endDate = new Date(response.data.dtmEnd);
+                                        this.props.items.dtmStartYear = startDate.getFullYear();
+                                        this.props.items.dtmStartMonth = startDate.getMonth() + 1;
+                                        this.props.items.dtmEndYear = endDate.getFullYear();
+                                        this.props.items.dtmEndMonth = endDate.getMonth() + 1;
+
                                         this.setState({
                                             message: "", color: "green", loading: false
                                         },
                                             () => {
                                                 this.props.items.importData = response.data;
+                                                
                                                 this.props.triggerChildAlert();
                                                 this.props.finishedStepOne && this.props.finishedStepOne();
                                             })
@@ -328,15 +336,15 @@ class QuantimedImportStepOne extends Component {
                                                     {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
 
                                                 </FormGroup>
-                                            {/* </CardBody>
+                                                {/* </CardBody>
                                             <CardFooter className="pb-0 pr-0"> */}
-                                            <br></br>
+                                                <br></br>
                                                 <FormGroup className="">
                                                     <Button color="info" size="md" className="float-right " type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
                                                 </FormGroup>
-                                      
-                                    {/* </CardFooter> */}
-                                    </CardBody>
+
+                                                {/* </CardFooter> */}
+                                            </CardBody>
                                         </Form>
                                     </div>
                                     <div style={{ display: this.state.loading ? "block" : "none" }}>

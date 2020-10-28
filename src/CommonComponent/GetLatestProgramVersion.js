@@ -27,6 +27,7 @@ export default class GetLatestProgramVersion extends Component {
     }
 
     checkNewerVersions() {
+        console.log("T***going to call check newer versions")
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(this.state.programs)
@@ -47,7 +48,7 @@ export default class GetLatestProgramVersion extends Component {
     }
 
     getPrograms() {
-        console.log("get programs called");
+        console.log("T***get programs called");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);

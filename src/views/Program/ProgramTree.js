@@ -27,7 +27,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
-import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+// import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
@@ -55,6 +55,85 @@ class Program extends Component {
             loading: true
         };
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.getPrograms = this.getPrograms.bind(this);
+        this.checkNewerVersions = this.checkNewerVersions.bind(this);
+        this.getMoreVersions = this.getMoreVersions.bind(this);
+    }
+    getMoreVersions(programId, pageNo) {
+        // console.log("val---", val);
+        // console.log("programId---", programId);
+        // console.log("pageNo---", pageNo);
+        ProgramService.loadMoreProgramList(programId, pageNo)
+            .then(response => {
+                if (response.status == 200) {
+                    var prgList = this.state.prgList;
+                    var index = prgList.findIndex(c => c.program.id == programId);
+                    prgList[index].versionList = prgList[index].versionList.concat(response.data.versionList);
+                    prgList[index].currentPage = response.data.currentPage;
+                    // console.log("Program List more", response.data);
+                    this.setState({
+                        prgList,
+                        loading: false
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: "red"
+                    })
+                    this.hideFirstComponent()
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    checkNewerVersions(programs) {
+        // console.log("T***going to call check newer versions")
+        if (navigator.onLine) {
+            // AuthenticationService.setupAxiosInterceptors()
+            ProgramService.checkNewerVersions(programs)
+                .then(response => {
+                    localStorage.removeItem("sesLatestProgram");
+                    localStorage.setItem("sesLatestProgram", response.data);
+                })
+        }
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -140,10 +219,10 @@ class Program extends Component {
 
     getTree() {
         this.setState({ loading: true })
-        console.log(this.state.realmId)
+        // console.log(this.state.realmId)
         document.getElementById("treeDiv").style.display = "block";
         // AuthenticationService.setupAxiosInterceptors();
-        console.log("This.state.realmId", this.state.realmId)
+        // console.log("This.state.realmId", this.state.realmId)
         if (this.state.realmId != "" && this.state.realmId > 0) {
             this.setState({
                 message: ""
@@ -151,7 +230,7 @@ class Program extends Component {
             RealmCountryService.getRealmCountryForProgram(this.state.realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("response.data------------>", response.data)
+                        // console.log("response.data------------>", response.data)
                         this.setState({
                             countryList: response.data
                         })
@@ -162,10 +241,11 @@ class Program extends Component {
                         //             this.setState({
                         //                 healthAreaList: response.data
                         //             })
-                        ProgramService.getProgramList()
+                        ProgramService.loadProgramList()
+                            // getProgramList()
                             .then(response => {
                                 if (response.status == 200) {
-                                    console.log("Program List", response.data);
+                                    // console.log("Program List", response.data);
                                     this.setState({
                                         prgList: response.data,
                                         loading: false
@@ -328,6 +408,69 @@ class Program extends Component {
         });
     }
 
+    getPrograms() {
+        // console.log("T***get programs called");
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            // if (this.props.updateState != undefined) {
+            //     this.props.updateState(false);
+            // }
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red',
+                    loading: false
+                })
+                // if (this.props.updateState != undefined) {
+                //     this.props.updateState(false);
+                // }
+            }.bind(this);
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
+                        // console.log("programData---", programData);
+                        var programJson = {
+                            programId: programJson1.programId,
+                            versionId: myResult[i].version
+                        }
+                        proList.push(programJson)
+                    }
+                }
+                // this.setState({
+                //     programs: proList
+                // })
+                this.checkNewerVersions(proList);
+                // if (this.props.updateState != undefined) {
+                //     this.props.updateState(false);
+                //     this.props.fetchData();
+                // }
+            }.bind(this);
+        }.bind(this)
+
+    }
+
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     render() {
@@ -343,7 +486,7 @@ class Program extends Component {
 
         return (
             <div className="animated fadeIn">
-                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
+                {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
@@ -401,13 +544,15 @@ class Program extends Component {
                                                                             <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
-                                                                                    this.state.prgList.filter(c => c.realmCountry.realmCountryId == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).map(item2 => (
+                                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).map(item2 => (
+
                                                                                         <li>
+                                                                                            {/* {item2} */}
                                                                                             <span className="tree_label">
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
-                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.programId} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(".0")} />
-                                                                                                        <label htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(".0")}>{getLabelText(item2.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
+                                                                                                        <label htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
@@ -415,22 +560,36 @@ class Program extends Component {
                                                                                             <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId)}></label>
                                                                                             <ul>
                                                                                                 {
-                                                                                                    this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
-                                                                                                        (item3.versionList).map(item4 => (
-
-                                                                                                            <li><span className="tree_label">
-                                                                                                                <span className="">
-                                                                                                                    <div className="checkbox m-0">
-                                                                                                                        <input type="checkbox" value={item4.versionId} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(item4.versionId)} />
-                                                                                                                        <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                    </div>
+                                                                                                    this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
+                                                                                                        (item3.versionList).map((item4, count) => (
+                                                                                                            <>
+                                                                                                                <li><span className="tree_label">
+                                                                                                                    <span className="">
+                                                                                                                        <div className="checkbox m-0">
+                                                                                                                            <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)} />
+                                                                                                                            <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                        </div>
+                                                                                                                    </span>
                                                                                                                 </span>
-                                                                                                            </span>
-                                                                                                            </li>
+                                                                                                                </li>
+
+                                                                                                                {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
+                                                                                                            </>
 
                                                                                                         ))
-                                                                                                    ))}
+                                                                                                    ))
+                                                                                                }
+
                                                                                             </ul>
+                                                                                            {/* <ul>
+
+                                                                                                {
+                                                                                                    this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
+                                                                                                        (item3.versionList).map(item4 => (
+                                                                                                            <label onClick={this.getMoreVersions(item2.programId, 1)}><a>See More</a></label>
+                                                                                                        ))
+                                                                                                    ))}
+                                                                                            </ul> */}
                                                                                         </li>
 
                                                                                     ))}
@@ -478,36 +637,61 @@ class Program extends Component {
     downloadClicked() {
         this.setState({ loading: true })
         var programCheckboxes = document.getElementsByName("programCheckBox");
+        var versionCheckBox = document.getElementsByClassName("versionCheckBox");
         var checkboxesChecked = [];
         var programCheckedCount = 0;
         var programInvalidCheckedCount = 0;
+        var count = 0;
+        
+        // console.log("versionCheckBox-------------", versionCheckBox);
+        for (var i = 0; i < versionCheckBox.length; i++) {
+            if (versionCheckBox[i].checked) {
+                programCheckedCount = programCheckedCount + 1;
+                // console.log("parent program--------", versionCheckBox[i].dataset.programId);
+                count = count + 1;
+                var json = {
+                    programId: versionCheckBox[i].dataset.programId,
+                    versionId: versionCheckBox[i].value
+                }
+                checkboxesChecked = checkboxesChecked.concat([json]);
+            }
+        }
+        // console.log("checkboxesChecked--------", checkboxesChecked);
         // loop over them all
+        // console.log("programCheckboxes.length---", programCheckboxes.length)
         for (var i = 0; i < programCheckboxes.length; i++) {
             // And stick the checked ones onto an array...
             if (programCheckboxes[i].checked) {
+                // console.log("program checked")
                 programCheckedCount = programCheckedCount + 1;
                 var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
                 // loop over them all
                 if (versionCheckboxes.length > 0) {
-                    var count = 0;
+                    var count1 = 0;
+                    // console.log("versionCheckboxes length > 0")
                     for (var j = 0; j < versionCheckboxes.length; j++) {
                         // And stick the checked ones onto an array...
+                        // console.log("inside for loop")
                         if (versionCheckboxes[j].checked) {
+                            // console.log("versionCheckboxes[j].checked---")
                             count = count + 1;
+                            count1 = count1 + 1;
+                            // console.log("count ---", count)
                             var json = {
                                 programId: programCheckboxes[i].value,
                                 versionId: versionCheckboxes[j].value
                             }
-                            checkboxesChecked.push(json);
+                            // checkboxesChecked = checkboxesChecked.concat([json]);
+                            // console.log("checkboxesChecked inside loop---", checkboxesChecked);
                         }
 
                     }
-                    if (count == 0) {
+                    if (count1 == 0) {
                         var json = {
                             programId: programCheckboxes[i].value,
                             versionId: -1
                         }
-                        checkboxesChecked.push(json);
+                        checkboxesChecked = checkboxesChecked.concat([json]);
                     }
 
                 }
@@ -515,7 +699,7 @@ class Program extends Component {
                 var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
                 // loop over them all
                 if (versionCheckboxes.length > 0) {
-                    var count = 0;
+                    // var count = 0;
                     for (var j = 0; j < versionCheckboxes.length; j++) {
                         // And stick the checked ones onto an array...
                         if (versionCheckboxes[j].checked) {
@@ -537,10 +721,12 @@ class Program extends Component {
                     this.hideFirstComponent();
                 })
             // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
-        } else if (programInvalidCheckedCount > 0) {
-            this.setState({ loading: false })
-            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
-        } else {
+        }
+        // else if (programInvalidCheckedCount > 0) {
+        //     this.setState({ loading: false })
+        //     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
+        // }
+        else {
             console.log("Checl boxes checked array", checkboxesChecked)
             var programThenCount = 0;
             for (var i = 0; i < checkboxesChecked.length; i++) {
@@ -549,16 +735,16 @@ class Program extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
                     ProgramService.getProgramData(checkboxesChecked[i])
                         .then(response => {
-                            console.log("ProgramThenCount", programThenCount)
-                            console.log("Response data", response.data)
+                            // console.log("ProgramThenCount", programThenCount)
+                            // console.log("Response data", response.data)
                             var json = response.data;
-                            console.log("Json-------->", json);
+                            // console.log("Json-------->", json);
                             // console("version befor -1 check",version)
                             var version = json.requestedProgramVersion;
                             if (version == -1) {
                                 version = json.currentVersion.versionId
                             }
-                            console.log("Version", version)
+                            // console.log("Version", version)
                             var db1;
                             getDatabase();
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -574,6 +760,7 @@ class Program extends Component {
                                 getRequest.onsuccess = function (event) {
                                     var myResult = [];
                                     myResult = getRequest.result;
+                                    console.log("myResult---", myResult)
                                     for (var i = 0; i < myResult.length; i++) {
                                         // for (var j = 0; j < json.length; j++) {
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -601,7 +788,7 @@ class Program extends Component {
                                             programData: encryptedText.toString(),
                                             userId: userId
                                         };
-                                        console.log("Item------------>", item);
+                                        // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
                                         programThenCount++;
                                         putRequest.onerror = function (error) {
@@ -617,7 +804,7 @@ class Program extends Component {
                                         }.bind(this);
                                         // }
                                         transactionForSavingData.oncomplete = function (event) {
-                                            console.log("in transaction complete");
+                                            // console.log("in transaction complete");
 
                                             // this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
@@ -632,7 +819,7 @@ class Program extends Component {
 
 
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                            console.log("in transaction complete");
+                                            // console.log("in transaction complete");
                                             this.setState({
                                                 message: 'static.program.downloadsuccess',
                                                 color: 'green',
@@ -641,7 +828,8 @@ class Program extends Component {
                                             this.hideFirstComponent();
                                             // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
                                             this.setState({ loading: false })
-                                            this.refs.programListChild.checkNewerVersions();
+                                            // this.refs.programListChild.checkNewerVersions();
+                                            this.getPrograms();
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
@@ -678,7 +866,7 @@ class Program extends Component {
                                                             programData: encryptedText.toString(),
                                                             userId: userId
                                                         };
-                                                        console.log("Item------------------>", item)
+                                                        // console.log("Item------------------>", item)
                                                         var putRequest = programOverWrite.put(item);
                                                         programThenCount++;
                                                         putRequest.onerror = function (error) {
@@ -711,7 +899,7 @@ class Program extends Component {
                                                                 loading: false
                                                             })
                                                             this.hideFirstComponent();
-                                                            this.refs.programListChild.checkNewerVersions();
+                                                            this.getPrograms();
                                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
 
                                                         }.bind(this);

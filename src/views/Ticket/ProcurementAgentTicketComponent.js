@@ -32,7 +32,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.summarytext')),
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
-        // procurementAgentCode: Yup.string()
+        procurementAgentCode: Yup.string()
+        .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly')),
         // .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
@@ -164,8 +165,14 @@ export default class ProcurementAgentTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    realms: response.data,
+                    realms: listArray,
                     realmId: this.props.items.userRealmId, loading: false
                 });
                 if (this.props.items.userRealmId !== "") {
@@ -539,16 +546,16 @@ export default class ProcurementAgentTicketComponent extends Component {
                                         </FormGroup>
                                         <FormGroup>
                                             <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
-                                            <Input type="text" readOnly={true}
+                                            <Input type="text"
                                                 bsSize="sm"
                                                 name="procurementAgentCode"
                                                 id="procurementAgentCode"
-                                                // valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
-                                                // invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
+                                                valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
+                                                invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
-                                                // required
-                                                maxLength={6}
+                                                required
+                                                maxLength={10}
                                                 value={this.state.procurementAgent.procurementAgentCode}
                                             />
                                             {/* </InputGroupAddon> */}
@@ -632,6 +639,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.procurementAgent.notes}
                                             // required 
                                             />

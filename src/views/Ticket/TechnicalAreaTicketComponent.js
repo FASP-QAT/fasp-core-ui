@@ -42,10 +42,9 @@ const validationSchema = function (values) {
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.healtharea.healthareatext')),
-        // technicalAreaCode: Yup.string()
-        // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-        // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-        // .max(6, 'Display name length should be 6')
+        technicalAreaCode: Yup.string()
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .max(6, i18n.t('static.organisation.organisationcodemax6digittext'))        
         // .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -299,11 +298,17 @@ export default class TechnicalAreaTicketComponent extends Component {
             RealmCountryService.getRealmCountryForProgram(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.realmCountry.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.realmCountry.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var json = listArray;
                         console.log("json", json)
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountry.id, label: json[i].realmCountry.label.label_en }
+                            regList[i] = { value: json[i].realmCountry.id, label: getLabelText(json[i].realmCountry.label, this.state.lang) }
                         }
                         this.setState({
                             countryId: '',
@@ -679,12 +684,13 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         </FormGroup>
                                         < FormGroup >
                                             <Label for="technicalAreaCode">{i18n.t('static.technicalArea.technicalAreaCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="technicalAreaCode" id="technicalAreaCode" readOnly={true}
+                                            <Input type="text" name="technicalAreaCode" id="technicalAreaCode"
                                                 bsSize="sm"
-                                                // valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode !== ""}
-                                                // invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
+                                                valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode !== ""}
+                                                invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={6}
                                                 value={this.state.technicalArea.technicalAreaCode}
                                                 required
                                             />
@@ -698,6 +704,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.technicalArea.notes}
                                             // required 
                                             />

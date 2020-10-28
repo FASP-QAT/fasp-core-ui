@@ -130,8 +130,14 @@ export default class EditDataSourceTicketComponent extends Component {
 
         DataSourceService.getAllDataSourceList().then(response => {
 
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                dataSources: response.data, loading: false
+                dataSources: listArray, loading: false
             })
         })
             .catch(
@@ -209,7 +215,7 @@ export default class EditDataSourceTicketComponent extends Component {
             && dataSources.map((item, i) => {
                 return (
                     <option key={i} value={item.dataSourceId}>
-                        {getLabelText(item.dataSourceType.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang) + " | " + getLabelText(item.dataSourceType.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -342,6 +348,7 @@ export default class EditDataSourceTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.dataSource.notes}
                                             // required 
                                             />
