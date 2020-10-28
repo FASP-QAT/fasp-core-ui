@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardHeader, Col, Container, Jumbotron, Row } from 'reactstrap';
-
+import i18n from '../../i18n'
 export default class AccessDeniedComponent extends Component {
     constructor(props) {
         super(props);
@@ -22,8 +22,8 @@ export default class AccessDeniedComponent extends Component {
                                 <Jumbotron>
                                     <Container>
                                         <div className="col-md-12">
-                                            <h1 className="display-5" style={{color:'#20a8d8'}}><i class="fa fa-lock" aria-hidden="true"></i> Access Denied</h1>
-                                            <p className="lead">You tried to access a page that is protected and you do not have sufficient rights.</p>
+                                            <h1 className="display-5" style={{color:'#20a8d8'}}><i class="fa fa-lock" aria-hidden="true"></i> {i18n.t('static.accessDenied')}</h1>
+                                            <p className="lead">{i18n.t('static.notsufficientaccess')}</p>
                                         </div>
                                     </Container>
                                 </Jumbotron>
