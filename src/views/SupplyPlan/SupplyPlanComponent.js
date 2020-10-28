@@ -1438,6 +1438,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tbody>
 
                                 </Table>
+                                <Table>
+                                    <tbody>
                                 <div className="" >
                                     {
                                         this.state.jsonArrForGraph.length > 0
@@ -1454,6 +1456,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
 
                                 </div>
+                                </tbody>
+                                </Table>
                             </div>
 
                         </div>
