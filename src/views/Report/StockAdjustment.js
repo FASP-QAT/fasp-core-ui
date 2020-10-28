@@ -639,7 +639,7 @@ class StockAdjustmentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [100, 100, 80,80,80,80,120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

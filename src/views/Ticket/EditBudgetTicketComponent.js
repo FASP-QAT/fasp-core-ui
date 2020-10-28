@@ -135,8 +135,14 @@ export default class EditBudgetTicketComponent extends Component {
                 console.log(response)
                 if (response.status == 200) {
                     console.log("budget after status 200 new console --- ---->", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        budgets: response.data,
+                        budgets: listArray,
                         loading: false
                     });
                 } else {
@@ -206,7 +212,8 @@ export default class EditBudgetTicketComponent extends Component {
         budget.budgetName = '';
         budget.notes = '';
         this.setState({
-            budget
+            budget: budget,
+            budgetId: ''
         },
             () => { });
     }
@@ -219,7 +226,7 @@ export default class EditBudgetTicketComponent extends Component {
         let programList = budgets.length > 0 && budgets.map((item, i) => {
             return (
                 <option key={i} value={item.budgetId}>
-                    {getLabelText(item.program.label, this.state.lang) + " | " + getLabelText(item.label, this.state.lang)}
+                    {getLabelText(item.label, this.state.lang) + " | " + getLabelText(item.program.label, this.state.lang)}
                 </option>
             )
         }, this);
@@ -356,6 +363,7 @@ export default class EditBudgetTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.budget.notes}
                                             // required 
                                             />
@@ -363,7 +371,7 @@ export default class EditBudgetTicketComponent extends Component {
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
 
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
 

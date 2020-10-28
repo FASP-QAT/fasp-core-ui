@@ -1697,7 +1697,7 @@ class ShipmentSummery extends Component {
                                                 <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
                                                     <thead>
                                                         <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'left' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
@@ -1814,7 +1814,7 @@ class ShipmentSummery extends Component {
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder==true?i18n.t('static.report.erpOrder'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localprocurement==true?i18n.t('static.report.localprocurement'):'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localProcurement==true?i18n.t('static.report.localprocurement'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo!=null? this.state.shipmentDetailsList[idx].orderNo:'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>

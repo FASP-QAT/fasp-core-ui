@@ -8,7 +8,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -23,6 +23,15 @@ export default class PipelineProgramPlanningUnits extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.savePlanningUnits = this.savePlanningUnits.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
+    }
+
+    startLoading() {
+        this.setState({ loading: true });
+    }
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -60,6 +69,7 @@ export default class PipelineProgramPlanningUnits extends Component {
     loaded() {
         var list = this.state.planningUnitList;
         var json = this.el.getJson();
+        var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
 
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
@@ -87,13 +97,19 @@ export default class PipelineProgramPlanningUnits extends Component {
             var col = ("M").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[12]).toString();
 
-            if (value != "" && value > 0) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            } else {
+            if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
 
@@ -142,15 +158,17 @@ export default class PipelineProgramPlanningUnits extends Component {
             // instance.jexcel.setValue(columnName, '');
         }
         if (x == 4) {
+            console.log("adasdasda==>", value);
             //var reg = /^[0-9\b]+$/;
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (value == 0 || isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -238,7 +256,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         }
         //Local Procurment Lead Time
         if (x == 10) {
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_LEAD_TIME;
             var col = ("K").concat(parseInt(y) + 1);
             console.log('value=>', value)
             if (value == "") {
@@ -246,7 +264,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value) || value < 0)) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -258,17 +276,23 @@ export default class PipelineProgramPlanningUnits extends Component {
         }
         //Shelf Life
         if (x == 11) {
-            var reg = /^[0-9\b]+$/;
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             var col = ("L").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value)) || value > 31 || value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    if (value > 31) { 
+                        this.el.setComments(col, i18n.t('static.pipeline.shelfLifeValidation'));
+                    }else {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    }
+                    // this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -278,14 +302,14 @@ export default class PipelineProgramPlanningUnits extends Component {
         //Catalog Price
         if (x == 12) {
             // var reg = /^[0-9]+.[0-9]+$/;
-            var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("M").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value) || value < 0)) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -339,13 +363,14 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
+            var reg = JEXCEL_DECIMAL_LEAD_TIME;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (value == 0 || isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -439,6 +464,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             //Local procurement lead time
             var col = ("K").concat(parseInt(y) + 1);
+            var reg = JEXCEL_DECIMAL_LEAD_TIME;
             var value = this.el.getValueFromCoords(10, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -446,7 +472,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -460,16 +486,22 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             var col = ("L").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(11, y);
+            // var reg=/^[+-]?[0-9]{1,9}(?:\.[0-9]{1,2})?$/;
+            var reg = JEXCEL_INTEGER_REGEX;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value)) || value > 31 || value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    if (value > 31) { 
+                        this.el.setComments(col, i18n.t('static.pipeline.shelfLifeValidation'));
+                    }else {
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    }
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -480,13 +512,14 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             var col = ("M").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(12, y);
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(regDec.test(value))) {
+                if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -741,9 +774,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
                                                     }
                                                 ],
-                                                pagination:localStorage.getItem("sesRecordCount"),
+                                                pagination: localStorage.getItem("sesRecordCount"),
                                                 contextMenu: false,
-                                                search: true, 
+                                                search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,

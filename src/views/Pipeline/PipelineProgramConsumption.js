@@ -15,13 +15,23 @@ export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            loading: true,
+            abc:true
+        }
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
         this.loaded = this.loaded.bind(this);
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.state = {
-            loading: true
-        }
+    }
+
+    startLoading() {
+        this.setState({ abc:true,loading: true });
+    }
+    stopLoading() {
+        this.setState({ abc:false,loading: false });
     }
 
     checkValidation() {
@@ -288,6 +298,7 @@ export default class PipelineProgramConsumption extends Component {
 
     }
     saveConsumption() {
+        this.setState({abc:true});
         var json = this.el.getJson();
         var list = this.state.consumptionList;
         console.log("consumption json------->", json);
@@ -515,7 +526,8 @@ export default class PipelineProgramConsumption extends Component {
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
                                     this.loaded();
                                     this.setState({
-                                        loading: false
+                                        loading: false,
+                                        abc:false
                                     })
 
                                 }
@@ -838,12 +850,12 @@ export default class PipelineProgramConsumption extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
+                <div className="table-responsive" style={{ display: this.state.abc ? "none" : "block" }}>
 
                     <div id="consumptiontableDiv">
                     </div>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div style={{ display: this.state.abc ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>

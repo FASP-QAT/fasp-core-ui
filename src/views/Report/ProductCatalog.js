@@ -108,7 +108,6 @@ class ProductCatalog extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-                getLabelText(ele.program.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.productCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
@@ -202,7 +201,6 @@ class ProductCatalog extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
-            getLabelText(ele.program.label, this.state.lang),
             getLabelText(ele.productCategory.label, this.state.lang),
             getLabelText(ele.tracerCategory.label, this.state.lang),
             getLabelText(ele.forecastingUnit.label, this.state.lang),
@@ -224,7 +222,12 @@ class ProductCatalog extends Component {
             startY: 200,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 51, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 54.5, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 170 },
+                // 1: { cellWidth: 171.89 },
+                13: { cellWidth: 53 }
+            }
         };
         doc.autoTable(content);
         addHeaders(doc)
@@ -462,20 +465,19 @@ class ProductCatalog extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
-            data[1] = getLabelText(outPutList[j].productCategory.label, this.state.lang)
-            data[2] = getLabelText(outPutList[j].tracerCategory.label, this.state.lang)
-            data[3] = getLabelText(outPutList[j].forecastingUnit.label, this.state.lang)
-            data[4] = getLabelText(outPutList[j].fUnit.label, this.state.lang)
-            data[5] = getLabelText(outPutList[j].genericName, this.state.lang)
-            data[6] = outPutList[j].forecastingtoPlanningUnitMultiplier
-            data[7] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
-            data[8] = getLabelText(outPutList[j].pUnit.label, this.state.lang)
-            data[9] = outPutList[j].minMonthsOfStock
-            data[10] = outPutList[j].reorderFrequencyInMonths
-            data[11] = outPutList[j].shelfLife
-            data[12] = outPutList[j].catalogPrice
-            data[13] = outPutList[j].active;
+            data[0] = getLabelText(outPutList[j].productCategory.label, this.state.lang)
+            data[1] = getLabelText(outPutList[j].tracerCategory.label, this.state.lang)
+            data[2] = getLabelText(outPutList[j].forecastingUnit.label, this.state.lang)
+            data[3] = getLabelText(outPutList[j].fUnit.label, this.state.lang)
+            data[4] = getLabelText(outPutList[j].genericName, this.state.lang)
+            data[5] = outPutList[j].forecastingtoPlanningUnitMultiplier
+            data[6] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
+            data[7] = getLabelText(outPutList[j].pUnit.label, this.state.lang)
+            data[8] = outPutList[j].minMonthsOfStock
+            data[9] = outPutList[j].reorderFrequencyInMonths
+            data[10] = outPutList[j].shelfLife
+            data[11] = outPutList[j].catalogPrice
+            data[12] = outPutList[j].active;
             outPutArray[count] = data;
             count++;
         }
@@ -492,14 +494,10 @@ class ProductCatalog extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [80, 80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
+            colWidths: [ 80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                {
-                    title: i18n.t('static.program.program'),
-                    type: 'text',
-                    readOnly: true
-                },
+                
                 {
                     title: i18n.t('static.dashboard.productcategory'),
                     type: 'text',
@@ -901,16 +899,7 @@ class ProductCatalog extends Component {
 
         const columns = [
            
-            {
-                dataField: 'program.label',
-                text: i18n.t('static.program.program'),
-                sort: true,
-                align: 'left',
-                headerAlign: 'left',
-                formatter: (cell, row) => {
-                    return getLabelText(cell, this.state.lang);
-                }
-            },
+           
             {
                 dataField: 'productCategory.label',
                 text: i18n.t('static.dashboard.productcategory'),

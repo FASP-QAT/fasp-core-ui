@@ -17,12 +17,11 @@ import { SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     programName: '',
     programCode: '',
-    realmId: selectedRealm,
+    realmId: "",
     realmCountryId: '',
     regionId: '',
     organisationId: '',
@@ -251,8 +250,14 @@ export default class ProgramTicketComponent extends Component {
             ProgramService.getProgramManagerList(realmId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = (a.username).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = (b.username).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            programManagerList: response.data
+                            programManagerList: listArray, loading: false
                         })
                     } else {
                         this.setState({
@@ -303,8 +308,14 @@ export default class ProgramTicketComponent extends Component {
             ProgramService.getRealmCountryList(realmId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            realmCountryList: response.data
+                            realmCountryList: listArray, loading: false
                         })
                     } else {
                         this.setState({
@@ -355,8 +366,14 @@ export default class ProgramTicketComponent extends Component {
             ProgramService.getOrganisationList(realmId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            organisationList: response.data
+                            organisationList: listArray, loading: false
                         })
                     } else {
                         this.setState({
@@ -407,8 +424,14 @@ export default class ProgramTicketComponent extends Component {
             ProgramService.getHealthAreaList(realmId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            healthAreaList: response.data
+                            healthAreaList: listArray, loading: false
                         })
                     } else {
                         this.setState({
@@ -463,7 +486,13 @@ export default class ProgramTicketComponent extends Component {
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 if (response.status == 200) {
-                    var json = response.data;
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    var json = listArray;
                     var regList = [];
                     for (var i = 0; i < json.length; i++) {
                         regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
@@ -574,22 +603,28 @@ export default class ProgramTicketComponent extends Component {
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
-                    this.setState({
-                        realmList: response.data,
-                        realmId: selectedRealm, loading: false
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                    if (selectedRealm !== "") {
+                    this.setState({
+                        realmList: listArray,
+                        realmId: this.props.items.userRealmId, loading: false
+                    });
+                    if (this.props.items.userRealmId !== "") {
                         this.setState({
-                            realmList: (response.data).filter(c => c.realmId == selectedRealm)
+                            realmList: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
 
                         let { program } = this.state;
-                        program.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                        program.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             program
                         }, () => {
 
-                            this.getDependentLists(selectedRealm);                            
+                            this.getDependentLists(this.props.items.userRealmId);                            
 
                         })
                     }
@@ -656,7 +691,7 @@ export default class ProgramTicketComponent extends Component {
         // program.summary = '';
         program.programName = '';
         program.programCode = '';
-        program.realmId = '';
+        program.realmId = this.props.items.userRealmId !== "" ? this.state.realmList.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         program.realmCountryId = '';
         program.regionId = '';
         program.organisationId = '';
@@ -672,7 +707,13 @@ export default class ProgramTicketComponent extends Component {
         program.arrivedToDeliveredLeadTime = '';
         program.notes = '';
         this.setState({
-            program
+            program: program,
+            realmId: this.props.items.userRealmId,            
+            realmCountryId: '',            
+            organisationId: '',
+            healthAreaId: '',
+            programManagerId: '',
+            regionId: ''
         },
             () => { });
     }
@@ -760,7 +801,27 @@ export default class ProgramTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            programName: '',
+                            programCode: '',
+                            realmId: this.props.items.userRealmId,
+                            realmCountryId: '',
+                            regionId: '',
+                            organisationId: '',
+                            healthAreaId: '',
+                            programManager: '',
+                            airFreightPerc: '',
+                            seaFreightPerc: '',
+                            plannedToSubmittedLeadTime: '',
+                            submittedToApprovedLeadTime: '',
+                            approvedToShippedLeadTime: '',
+                            shippedToArrivedByAirLeadTime: '',
+                            shippedToArrivedBySeaLeadTime: '',
+                            arrivedToDeliveredLeadTime: '',
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -1095,13 +1156,14 @@ export default class ProgramTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.program.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

@@ -12,6 +12,14 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+    loadProgramList() {
+        return axios.get(`${API_URL}/api/loadProgram/`, {
+        });
+    }
+    loadMoreProgramList(programId, page) {
+        return axios.get(`${API_URL}/api/loadProgram/programId/${programId}/page/${page}`, {
+        });
+    }
 
     getProgramListForDropDown() {
         return axios.get(`${API_URL}/api/getProgramList/`, {
@@ -100,8 +108,14 @@ class ProgramService {
         return axios.get(`${API_URL}/api/versionStatus`, {}
         );
     }
-    updateProgramStatus(json,reviewedProblemList) {
-        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/${json.currentVersion.notes}`,reviewedProblemList,{}
+    updateProgramStatus(json, reviewedProblemList) {
+
+        var obj = {
+            reviewedProblemList: reviewedProblemList,
+            notes: json.currentVersion.notes
+        }
+
+        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/`, obj, {}
         );
     }
 
@@ -115,11 +129,17 @@ class ProgramService {
         );
 
     }
-    
-    getProgramDisplayNameUniqueStatus(realmId,programId,programCode){
+
+    getProgramDisplayNameUniqueStatus(realmId, programId, programCode) {
         return axios.get(`${API_URL}/api/program/validate/realmId/${realmId}/programId/${programId}/programCode/${programCode}`, {}
         );
     }
-    
+    checkNewerVersions(json) {
+        console.log("json----------------------------", json);
+        return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
+        );
+
+    }
+
 }
 export default new ProgramService()

@@ -14,10 +14,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.fundingsource.fundingsource"))
 let summaryText_2 = "Add Funding Source"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     fundingSourceName: "",
     fundingSourceCode: "",
     notes: ""
@@ -33,9 +32,16 @@ const validationSchema = function (values) {
         fundingSourceName: Yup.string()
             .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
-        // fundingSourceCode: Yup.string()
+        fundingSourceCode: Yup.string()
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
         // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
-        // .required(i18n.t('static.fundingsource.fundingsourceCodeText')),        
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
+        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
+        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        // .required(i18n.t('static.fundingsource.fundingsourceCodeText'))
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -86,6 +92,7 @@ export default class FundingSourceTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.CapitalizeCode = this.CapitalizeCode.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
 
@@ -104,7 +111,7 @@ export default class FundingSourceTicketComponent extends Component {
             fundingSource.fundingSourceName = event.target.value;
         }
         if (event.target.name == "fundingSourceCode") {
-            fundingSource.fundingSourceCode = event.target.value;
+            fundingSource.fundingSourceCode = this.Capitalize(event.target.value);
         }
         if (event.target.name == "allowedInBudget") {
             fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
@@ -146,17 +153,23 @@ export default class FundingSourceTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
-                this.setState({
-                    realms: response.data,
-                    realmId: selectedRealm, loading: false
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                if (selectedRealm !== "") {
+                this.setState({
+                    realms: listArray,
+                    realmId: this.props.items.userRealmId, loading: false
+                });
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { fundingSource } = this.state;
-                    fundingSource.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    fundingSource.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         fundingSource
                     }, () => {                        
@@ -219,12 +232,13 @@ export default class FundingSourceTicketComponent extends Component {
     resetClicked() {
         let { fundingSource } = this.state;
         // fundingSource.summary = '';
-        fundingSource.realmName = '';
+        fundingSource.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         fundingSource.fundingSourceName = '';
         fundingSource.fundingSourceCode = '';
         fundingSource.notes = '';
         this.setState({
-            fundingSource
+            fundingSource: fundingSource,
+            realmId: this.props.items.userRealmId
         },
             () => { });
     }
@@ -232,6 +246,14 @@ export default class FundingSourceTicketComponent extends Component {
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
+
+    CapitalizeCode(str) {
+        if (str != null && str != "") {
+            return str.toUpperCase();
         } else {
             return "";
         }
@@ -374,7 +396,14 @@ export default class FundingSourceTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            fundingSourceName: "",
+                            fundingSourceCode: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -476,7 +505,7 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmName && this.state.fundingSource.realmName != ''}
                                                 invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value)}}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >
@@ -499,14 +528,15 @@ export default class FundingSourceTicketComponent extends Component {
                                         </FormGroup>
                                         <FormGroup>
                                             <Label for="fundingSourceCode">{i18n.t('static.fundingsource.fundingsourceCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode" readOnly={true}
+                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode"
                                                 bsSize="sm"
-                                                // valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                // invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
+                                                invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.CapitalizeCode(e.target.value)}}
                                                 onBlur={handleBlur}
+                                                maxLength={7}
                                                 value={this.state.fundingSource.fundingSourceCode}
-                                            // required 
+                                                required
                                             />
                                             <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                                         </FormGroup>
@@ -553,13 +583,14 @@ export default class FundingSourceTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.fundingSource.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

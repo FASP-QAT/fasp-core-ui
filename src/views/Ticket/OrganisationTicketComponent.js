@@ -19,10 +19,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Add Organisation"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmId: selectedRealm,
+    summary: "",
+    realmId: "",
     realmCountryId: '',
     organisationCode: '',
     organisationName: '',
@@ -41,11 +40,9 @@ const validationSchema = function (values) {
         organisationName: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
-        // organisationCode: Yup.string()
-        // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-        // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-        // .required(i18n.t('static.common.displayName'))
-        // .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+        organisationCode: Yup.string()
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -284,82 +281,94 @@ export default class OrganisationTicketComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        CountryService.getCountryListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        countries: response.data, loading: false
-                    })
-                }
-                else {
+        // CountryService.getCountryListAll()
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             var listArray = response.data;
+        //             listArray.sort((a, b) => {
+        //                 var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+        //                 var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+        //                 return itemLabelA > itemLabelB ? 1 : -1;
+        //             });
+        //             this.setState({
+        //                 countries: listArray, loading: false
+        //             })
+        //         }
+        //         else {
 
-                    this.setState({
-                        message: response.data.messageCode
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             },
+        //                 () => {
+        //                     this.hideSecondComponent();
+        //                 })
+        //         }
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     loading: false
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
 
         UserService.getRealmList()
             .then(response => {
-                this.setState({
-                    realms: response.data,
-                    realm: selectedRealm, loading: false
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                if (selectedRealm !== "") {
+                this.setState({
+                    realms: listArray,
+                    realm: this.props.items.userRealmId, loading: false
+                });
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { organisation } = this.state;
-                    organisation.realmId = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    organisation.realmId = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         organisation
                     }, () => {
 
-                        this.getRealmCountryList(selectedRealm);
+                        this.getRealmCountryList(this.props.items.userRealmId);
 
                     })
                 }
@@ -423,10 +432,16 @@ export default class OrganisationTicketComponent extends Component {
             HealthAreaService.getRealmCountryList(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var json = listArray;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i] = { value: json[i].realmCountryId, label: getLabelText(json[i].country.label, this.state.lang) }
                         }
                         this.setState({
                             countryId: '',
@@ -494,13 +509,15 @@ export default class OrganisationTicketComponent extends Component {
     resetClicked() {
         let { organisation } = this.state;
         // organisation.summary = '';
-        organisation.realmId = '';
+        organisation.realmId = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         organisation.realmCountryId = '';
         organisation.organisationName = '';
         organisation.organisationCode = '';
         organisation.notes = '';
         this.setState({
-            organisation
+            organisation: organisation,
+            realm: this.props.items.userRealmId,
+            countryId: ''        
         },
             () => { });
     }
@@ -524,7 +541,15 @@ export default class OrganisationTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmId: this.props.items.userRealmId,
+                            realmCountryId: '',
+                            organisationCode: '',
+                            organisationName: '',
+                            notes: ''
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -668,10 +693,10 @@ export default class OrganisationTicketComponent extends Component {
                                         </FormGroup>
                                         < FormGroup >
                                             <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="organisationCode" id="organisationCode" readOnly={true}
+                                            <Input type="text" name="organisationCode" id="organisationCode"
                                                 bsSize="sm"
-                                                // valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
-                                                // invalid={touched.organisationCode && !!errors.organisationCode}
+                                                valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
+                                                invalid={touched.organisationCode && !!errors.organisationCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.organisation.organisationCode}
@@ -687,13 +712,14 @@ export default class OrganisationTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.organisation.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

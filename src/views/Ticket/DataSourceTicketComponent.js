@@ -13,12 +13,11 @@ import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
-let summaryText_2 = "Add Data Source"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
+const summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
+const summaryText_2 = "Add Data Source"
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     programName: "",
     dataSourceType: "",
     dataSourceName: "",
@@ -161,23 +160,29 @@ export default class DataSourceTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
-                this.setState({
-                    realms: response.data,
-                    realmId: selectedRealm, loading: false
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                if (selectedRealm !== "") {
+                this.setState({
+                    realms: listArray,
+                    realmId: this.props.items.userRealmId, loading: false
+                });
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { dataSource } = this.state;
-                    dataSource.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    dataSource.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         dataSource
                     }, () => {
 
-                        this.getDataSourceTypeByRealmId(selectedRealm);
-                        this.getProgramByRealmId(selectedRealm);
+                        this.getDataSourceTypeByRealmId(this.props.items.userRealmId);
+                        this.getProgramByRealmId(this.props.items.userRealmId);
 
                     })
                 }
@@ -229,8 +234,14 @@ export default class DataSourceTicketComponent extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             DataSourceTypeService.getDataSourceTypeByRealmId(realmId)
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        dataSourceTypes: response.data
+                        dataSourceTypes: listArray
                     })
 
                 }).catch(
@@ -281,8 +292,14 @@ export default class DataSourceTicketComponent extends Component {
         if (realmId != "") {
             ProgramService.getProgramList(realmId)
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data
+                        programs: listArray
                     })
                 }).catch(
                     error => {
@@ -341,13 +358,16 @@ export default class DataSourceTicketComponent extends Component {
     resetClicked() {
         let { dataSource } = this.state;
         // dataSource.summary = '';
-        dataSource.realmName = '';
+        dataSource.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         dataSource.programName = '';
         dataSource.dataSourceType = '';
         dataSource.dataSourceName = '';
         dataSource.notes = '';
         this.setState({
-            dataSource
+            dataSource: dataSource,
+            realmId: this.props.items.userRealmId,
+            programId: '',
+            dataSourceTypeId: ''
         },
             () => { });
     }
@@ -390,7 +410,15 @@ export default class DataSourceTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            programName: "",
+                            dataSourceType: "",
+                            dataSourceName: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -551,13 +579,14 @@ export default class DataSourceTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.dataSource.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>

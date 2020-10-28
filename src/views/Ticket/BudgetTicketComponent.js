@@ -19,9 +19,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Add Budget"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     programName: "",
     fundingSourceName: "",
     budgetName: "",
@@ -187,8 +186,15 @@ export default class BudgetTicketComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }
                 else {
@@ -244,8 +250,15 @@ export default class BudgetTicketComponent extends Component {
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
+
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    fundingSources: response.data, loading: false
+                    fundingSources: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -290,8 +303,14 @@ export default class BudgetTicketComponent extends Component {
 
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    currencies: response.data, loading: false
+                    currencies: listArray, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode })
@@ -362,7 +381,10 @@ export default class BudgetTicketComponent extends Component {
         budget.stopDate = '';
         budget.notes = '';
         this.setState({
-            budget
+            budget : budget,
+            programId: '',
+            fundingSourceId: '',
+            currencyId: ''
         },
             () => { });
     }
@@ -434,7 +456,17 @@ export default class BudgetTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            programName: "",
+                            fundingSourceName: "",
+                            budgetName: "",
+                            budgetCode: "",
+                            currency: "",
+                            budgetAmount: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -673,6 +705,7 @@ export default class BudgetTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.budget.notes}
                                             // required 
                                             />
@@ -680,7 +713,7 @@ export default class BudgetTicketComponent extends Component {
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
 
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
 

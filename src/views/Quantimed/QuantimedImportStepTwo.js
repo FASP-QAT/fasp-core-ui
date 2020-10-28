@@ -63,7 +63,8 @@ export default class QunatimedImportStepTwo extends Component {
             quantimedEl: "",
             programId: '',
             filename: '',
-            procurementAgentPlanningUnitList: []
+            procurementAgentPlanningUnitList: [],
+            planningUnitListForMultiplier: []
         }
 
         this.loadTableData = this.loadTableData.bind(this);
@@ -73,7 +74,7 @@ export default class QunatimedImportStepTwo extends Component {
         this.checkDuplicateCountry = this.checkDuplicateCountry.bind(this);
         this.loaded = this.loaded.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.updateDoNotImport = this.updateDoNotImport.bind(this);
+        this.updatePlanningUnitNotFound = this.updatePlanningUnitNotFound.bind(this);
     }
 
     hideFirstComponent() {
@@ -108,7 +109,33 @@ export default class QunatimedImportStepTwo extends Component {
 
     componentDidMount() {
 
-
+        this.setState({
+            loading: true
+        })
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                this.setState({
+                    planningUnitListForMultiplier: myResult,
+                    loading: false
+                }, () => {
+                    // this.loadTableData();
+                })
+            }.bind(this);
+        }.bind(this);
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -116,17 +143,19 @@ export default class QunatimedImportStepTwo extends Component {
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[5].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
     }
 
-    updateDoNotImport = function() {        
+    updatePlanningUnitNotFound = function () {
         var json = this.el.getJson();
 
         for (var y = 0; y < json.length; y++) {
-            
+
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value == "-1") {                
-                this.el.setStyle(col, "background-color", "pink");                
+            if (value == "-2") {
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
         }
     }
@@ -141,17 +170,22 @@ export default class QunatimedImportStepTwo extends Component {
             var value_C_1 = this.el.getValueFromCoords(2, y);
             for (var z = 0; z < tableJson.length; z++) {
                 var col_C_2 = ("C").concat(parseInt(z) + 1);
-                var value_C_2 = this.el.getValueFromCoords(2, z);                
+                var value_C_2 = this.el.getValueFromCoords(2, z);
                 if (col_C_1 !== col_C_2 && value_C_1 == value_C_2) {
                     hasDuplicate = true;
                 }
             }
 
             var col = ("C").concat(parseInt(y) + 1);
-
-            if (value == "" || value == "-2") {
+            var col_E = ("E").concat(parseInt(y) + 1);
+            var cf = "";
+            if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
-                // this.el.setStyle(col, "background-color", "yellow");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else if (value == "-2") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else if (value == "-1") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -164,8 +198,13 @@ export default class QunatimedImportStepTwo extends Component {
                 this.el.setComments(col, i18n.t('static.quantimed.duplicateQATPlanningUnit'));
             }
             else {
+                var index = this.state.planningUnitListForMultiplier.findIndex(c => c.planningUnitId == value);
+                if(index != -1) {
+                    cf = parseFloat(1 / (this.state.planningUnitListForMultiplier[index].multiplier)).toFixed(4);
+                }
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+
             }
 
             var col_D = ("D").concat(parseInt(y) + 1);
@@ -187,8 +226,8 @@ export default class QunatimedImportStepTwo extends Component {
                 }
             }
 
-            this.el.setValue(col_D, value);
-
+            this.el.setValue(col_D, value);                        
+            this.el.setValueFromCoords(4, y, cf, true);            
         }
     }
 
@@ -204,8 +243,7 @@ export default class QunatimedImportStepTwo extends Component {
                 totalDoNotImport = totalDoNotImport + 1;
             }
         }
-        console.log("totalDoNotImport",totalDoNotImport)
-        console.log("json",json.length)
+        
 
         for (var y = 0; y < json.length; y++) {
             // var value = this.el.getValueFromCoords(2, y);            
@@ -214,9 +252,14 @@ export default class QunatimedImportStepTwo extends Component {
             //Currency
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value == "" || value == "-2") {
+            if (value == "") {
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else if (value == "-2") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
@@ -226,11 +269,11 @@ export default class QunatimedImportStepTwo extends Component {
             // }
         }
 
-        if(totalDoNotImport == (json.length)) {
+        if (totalDoNotImport == (json.length)) {
             alert(i18n.t("static.quantimed.mapAtLeastOnePlanningUnitValidationText"));
             valid = false;
         }
-                
+
         return valid;
     }
 
@@ -267,40 +310,69 @@ export default class QunatimedImportStepTwo extends Component {
         // var duplicateValidation = this.checkDuplicateCountry();
         // var validation = this.checkValidation();
         if (this.checkDuplicateCountry() && this.checkValidation()) {
-            var tableJson = this.el.getJson();
+            this.setState({
+                loading: true
+            })
 
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                this.props.items.importData.products[i].programPlanningUnitId = map1.get("2");
-            }
 
-            for (var i = 0; i < this.props.items.importData.records.length; i++) {
-                for (var j = 0; j < this.props.items.importData.products.length; j++) {
-                    if (this.props.items.importData.records[i].productId === this.props.items.importData.products[j].productId) {
-                        this.props.items.importData.records[i].product = this.props.items.importData.products[j];
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+                var planningunitRequest = planningunitOs.getAll();
+                var planningList = []
+                planningunitRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                planningunitRequest.onsuccess = function (e) {
+                    var myResult = [];
+                    myResult = planningunitRequest.result;
+                    
+                    var tableJson = this.el.getJson();                    
+
+                    for (var i = 0; i < tableJson.length; i++) {
+                        var map1 = new Map(Object.entries(tableJson[i]));
+                        var value = map1.get("2");                        
+                        this.props.items.importData.products[i].programPlanningUnitId = value;                        
                     }
-                }
-            }
 
+                    for (var j = 0; j < this.props.items.importData.products.length; j++) {
+                        var puid = this.props.items.importData.products[j].programPlanningUnitId;
+                        
+                        if (puid != "-1") {
+                            var index = myResult.findIndex(c => c.planningUnitId == puid);                            
+                            if (index != -1) {
+                                var mtp = (myResult[index]).multiplier;
+                                if (mtp > 0) {
+                                    this.props.items.importData.products[j].multiplier = parseFloat(1 / ((myResult[index]).multiplier)).toFixed(4);
+                                } else {
+                                    this.props.items.importData.products[j].multiplier = (myResult[index]).multiplier
+                                }
+                            }
+                        }
+                    }
 
-            // AuthenticationService.setupAxiosInterceptors();
-            // QuantimedImportService.addImportedForecastData(this.props.items.importData).then(response => {
+                    for (var i = 0; i < this.props.items.importData.records.length; i++) {
+                        for (var j = 0; j < this.props.items.importData.products.length; j++) {
+                            if (this.props.items.importData.records[i].productId === this.props.items.importData.products[j].productId) {
+                                this.props.items.importData.records[i].product = this.props.items.importData.products[j];
+                            }
+                        }
+                    }
 
-            //     if (response.status == 200) {
-            this.props.finishedStepTwo();
-            this.props.triggerStepThree();
-            //     }
-            //     else {
+                    this.setState({
+                        loading: false
+                    })
+                    this.props.finishedStepTwo();
+                    this.props.triggerStepThree();
 
-            //         this.setState({
-            //             message: response.data.messageCode
-            //         },
-            //             () => {
+                }.bind(this);
+            }.bind(this)
 
-            //             })
-            //     }
-
-            // })
         }
     }
 
@@ -332,7 +404,7 @@ export default class QunatimedImportStepTwo extends Component {
             var procurementAgentPlanningunitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
             var procurementAgentPlanningunitOs = procurementAgentPlanningunitTransaction.objectStore('procurementAgentPlanningUnit');
             var procurementAgentPlanningunitRequest = procurementAgentPlanningunitOs.getAll();
-            
+
             procurementAgentPlanningunitRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
@@ -346,8 +418,8 @@ export default class QunatimedImportStepTwo extends Component {
                 myResult = procurementAgentPlanningunitRequest.result;
                 this.setState({
                     procurementAgentPlanningUnitList: myResult
-                })           
-                
+                })
+
 
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
@@ -364,7 +436,7 @@ export default class QunatimedImportStepTwo extends Component {
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    
+
                     var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
                     var proList = []
                     for (var i = 0; i < myResult.length; i++) {
@@ -389,10 +461,10 @@ export default class QunatimedImportStepTwo extends Component {
                     this.props.items.qatPlanningList = proList;
 
                     if (this.state.programId !== this.props.items.program.programId || this.state.filename !== this.props.items.program.filename) {
-                        
+
 
                         const { programPlanningUnits } = this.state;
-                        
+
                         let programPlanningUnitsArr = [];
                         var myVar = "";
 
@@ -425,27 +497,36 @@ export default class QunatimedImportStepTwo extends Component {
                         var json = this.props.items.importData.products;
                         var data = [];
                         var products = [];
-                        
-                        for (var i = 0; i < json.length; i++) {                            
-                           
-                            
-                            var index_1 = this.state.procurementAgentPlanningUnitList.findIndex(c => ((c.skuCode).substring(0,12)) == json[i].productId);
+
+                        for (var i = 0; i < json.length; i++) {
+
+
+                            var index_1 = this.state.procurementAgentPlanningUnitList.findIndex(c => ((c.skuCode).substring(0, 12)) == json[i].productId);
                             var selectedPlanningUnitId = "-2";
-                            if(index_1 != -1) {
+                            var conversionFactor = ""
+                            if (index_1 != -1) {
                                 selectedPlanningUnitId = this.state.procurementAgentPlanningUnitList[index_1].planningUnit.id;
                                 var index_2 = this.state.programPlanningUnits.findIndex(c => c.value == selectedPlanningUnitId);
-                                if(index_2 != -1) {
-                                    selectedPlanningUnitId = this.state.programPlanningUnits[index_2].value;                            
+                                if (index_2 != -1) {
+                                    selectedPlanningUnitId = this.state.programPlanningUnits[index_2].value;
+                                    var index_3 = this.state.planningUnitListForMultiplier.findIndex(c => c.planningUnitId == selectedPlanningUnitId);
+                                    if(index_3 != -1) {
+                                        conversionFactor = parseFloat(1 / (this.state.planningUnitListForMultiplier[index_3].multiplier)).toFixed(4);
+                                    } else {
+                                        conversionFactor = "";
+                                    }
                                 } else {
                                     selectedPlanningUnitId = "-2";
-                                }                          
+                                    conversionFactor = "";
+                                }
                             }
-                            
+
                             data = [];
                             data[0] = json[i].productId;// A
                             data[1] = json[i].productName;// B
                             data[2] = selectedPlanningUnitId;// C    
-                            data[3] = selectedPlanningUnitId;// D                    
+                            data[3] = selectedPlanningUnitId;// D  
+                            data[4] = conversionFactor;// E                    
                             products[i] = data;
                         }
                         var options = {
@@ -456,13 +537,15 @@ export default class QunatimedImportStepTwo extends Component {
                                 i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
                                 i18n.t('static.supplyPlan.qatProduct'),
                                 'Previous Program Planning Unit',
+                                i18n.t('static.quantimed.conversionFactor')
                             ],
-                            colWidths: [30, 80, 80, 80],
+                            colWidths: [30, 80, 80, 80, 15],
                             columns: [
                                 { type: 'text', readOnly: true },
                                 { type: 'text', readOnly: true },
-                                { type: 'dropdown', source: programPlanningUnitsArr },
-                                { type: 'hidden' }
+                                { type: 'dropdown', source: programPlanningUnitsArr, autocomplete: true },
+                                { type: 'hidden' },
+                                { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true},
                             ],
                             text: {
                                 // showingPage: 'Showing {0} to {1} of {1}',
@@ -487,12 +570,12 @@ export default class QunatimedImportStepTwo extends Component {
                         };
                         myVar = jexcel(document.getElementById("paputableDiv"), options);
                         this.el = myVar;
-                        
+
                         this.setState({
                             programId: this.props.items.program.programId,
                             filename: this.props.items.program.filename
-                        }, () => {this.updateDoNotImport()})
-                        
+                        }, () => { this.updatePlanningUnitNotFound() })
+
                     }
 
                     this.setState({

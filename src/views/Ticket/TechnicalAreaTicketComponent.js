@@ -20,10 +20,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
-const selectedRealm = (AuthenticationService.getRealmId() !== "" && AuthenticationService.getRealmId() !== -1) ? AuthenticationService.getRealmId() : ""
 const initialValues = {
-    summary: summaryText_1,
-    realmName: selectedRealm,
+    summary: "",
+    realmName: "",
     countryName: "",
     technicalAreaName: "",
     technicalAreaCode: "",
@@ -43,10 +42,9 @@ const validationSchema = function (values) {
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.healtharea.healthareatext')),
-        // technicalAreaCode: Yup.string()
-        // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-        // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-        // .max(6, 'Display name length should be 6')
+        technicalAreaCode: Yup.string()
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .max(6, i18n.t('static.organisation.organisationcodemax6digittext'))        
         // .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -225,19 +223,19 @@ export default class TechnicalAreaTicketComponent extends Component {
             .then(response => {
                 this.setState({
                     realms: response.data,
-                    realmId: selectedRealm, loading: false
+                    realmId: this.props.items.userRealmId, loading: false
                 });
-                if (selectedRealm !== "") {
+                if (this.props.items.userRealmId !== "") {
                     this.setState({
-                        realms: (response.data).filter(c => c.realmId == selectedRealm)
+                        realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                     })
 
                     let { technicalArea } = this.state;
-                    technicalArea.realmName = (response.data).filter(c => c.realmId == selectedRealm)[0].label.label_en;
+                    technicalArea.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         technicalArea
                     }, () => {
-                        this.getRealmCountryList(selectedRealm)
+                        this.getRealmCountryList(this.props.items.userRealmId)
                     })
                 }
             }).catch(
@@ -300,11 +298,17 @@ export default class TechnicalAreaTicketComponent extends Component {
             RealmCountryService.getRealmCountryForProgram(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.realmCountry.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.realmCountry.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var json = listArray;
                         console.log("json", json)
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountry.id, label: json[i].realmCountry.label.label_en }
+                            regList[i] = { value: json[i].realmCountry.id, label: getLabelText(json[i].realmCountry.label, this.state.lang) }
                         }
                         this.setState({
                             countryId: '',
@@ -372,13 +376,15 @@ export default class TechnicalAreaTicketComponent extends Component {
     resetClicked() {
         let { technicalArea } = this.state;
         // technicalArea.summary = '';
-        technicalArea.realmName = '';
+        technicalArea.realmName = this.props.items.userRealmId !== "" ? this.state.realms.filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en : "";
         technicalArea.countryName = '';
         technicalArea.technicalAreaName = '';
         technicalArea.technicalAreaCode = '';
         technicalArea.notes = '';
         this.setState({
-            technicalArea
+            technicalArea: technicalArea,                        
+            realmId: this.props.items.userRealmId,
+            countryId: ''
         },
             () => { });
     }
@@ -526,7 +532,15 @@ export default class TechnicalAreaTicketComponent extends Component {
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                        initialValues={initialValues}
+                        enableReinitialize={true}
+                        initialValues={{
+                            summary: summaryText_1,
+                            realmName: this.props.items.userRealmId,
+                            countryName: "",
+                            technicalAreaName: "",
+                            technicalAreaCode: "",
+                            notes: ""
+                        }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
@@ -670,12 +684,13 @@ export default class TechnicalAreaTicketComponent extends Component {
                                         </FormGroup>
                                         < FormGroup >
                                             <Label for="technicalAreaCode">{i18n.t('static.technicalArea.technicalAreaCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="technicalAreaCode" id="technicalAreaCode" readOnly={true}
+                                            <Input type="text" name="technicalAreaCode" id="technicalAreaCode"
                                                 bsSize="sm"
-                                                // valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode !== ""}
-                                                // invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
+                                                valid={!errors.technicalAreaCode && this.state.technicalArea.technicalAreaCode !== ""}
+                                                invalid={touched.technicalAreaCode && !!errors.technicalAreaCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={6}
                                                 value={this.state.technicalArea.technicalAreaCode}
                                                 required
                                             />
@@ -689,13 +704,14 @@ export default class TechnicalAreaTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.technicalArea.notes}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>
                                         </FormGroup>
                                         <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
