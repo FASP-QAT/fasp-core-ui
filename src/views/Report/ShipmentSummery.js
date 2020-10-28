@@ -1814,7 +1814,7 @@ class ShipmentSummery extends Component {
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder==true?i18n.t('static.report.erpOrder'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localprocurement==true?i18n.t('static.report.localprocurement'):'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localProcurement==true?i18n.t('static.report.localprocurement'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo!=null? this.state.shipmentDetailsList[idx].orderNo:'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>
