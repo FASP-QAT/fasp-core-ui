@@ -344,7 +344,7 @@
     "static.realm.monthInFutureForAmcText": "Enter # future months (including current month) used for calculating AMC",
     "static.realm.orderFrequencyText": "Enter Order Frequency (# orders/year)",
     "static.realm.realmCodeLength": "Enter realm display name (max 6 char)",
-    "static.procurementagent.procurmentAgentMaster": "Procurment Agent",
+    "static.procurementagent.procurmentAgentMaster": "Procurement Agent",
     "static.procurementagent.procurementagentdrafttosubmittime": "'Draft to Submitted' Lead Time (months)",
     "static.procurementagent.procurementagentsubmittoapprovetime": "Enter 'Submitted to Approved' lead time for this procurement agent (in months)",
     "static.procurementagent.procurementagentapprovetoshippedtime": "Enter 'Approved to Shipped' lead time for this procurement agent (in months)",
