@@ -948,6 +948,7 @@
     "static.supplyPlan.mtexpectedDeliveryDate": "Data de Recebimento",
     "static.shipment.delinkingsuccess": "Remessa desvinculada com sucesso",
     "static.ticket.filesuploadnote": "Se você tiver vários arquivos, compacte-os e envie-os.",
+    "static.program.seemoreprogram": "Ver mais...",
     "static.quantimed.importatleastonerow": "Selecione pelo menos um dado Qunatimed para importar",
     "static.quantimed.conversionFactor": "Fator de conversão de unidade",        
     "static.quantimed.importpercentage": "Porcentagem de importação"

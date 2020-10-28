@@ -277,6 +277,7 @@ export default class PipelineProgramInventory extends Component {
 
 
     saveInventory() {
+        this.setState({loading:true});
         var json = this.el.getJson();
         var list = this.state.inventoryList;
         var inventoryArray = []

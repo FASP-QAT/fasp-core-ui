@@ -24,6 +24,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+import ProgramService from "../../api/ProgramService"
 
 const initialValues = {
     programId: ''
@@ -74,6 +75,8 @@ export default class ImportProgram extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.getPrograms = this.getPrograms.bind(this);
+        this.checkNewerVersions = this.checkNewerVersions.bind(this);
     }
 
     hideSecondComponent() {
@@ -81,8 +84,84 @@ export default class ImportProgram extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
+    getPrograms() {
+        // console.log("T***get programs called");
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            // if (this.props.updateState != undefined) {
+            //     this.props.updateState(false);
+            // }
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red',
+                    loading: false
+                })
+                // if (this.props.updateState != undefined) {
+                //     this.props.updateState(false);
+                // }
+            }.bind(this);
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
+                        // console.log("programData---", programData);
+                        var programJson = {
+                            programId: programJson1.programId,
+                            versionId: myResult[i].version
+                        }
+                        proList.push(programJson)
+                    }
+                }
+                console.log("T***proList import program---",proList)
+                // this.setState({
+                //     programs: proList
+                // })
+                this.checkNewerVersions(proList);
+                // if (this.props.updateState != undefined) {
+                //     this.props.updateState(false);
+                //     this.props.fetchData();
+                // }
+            }.bind(this);
+        }.bind(this)
+
+    }
+    checkNewerVersions(programs) {
+        console.log("T***going to call check newer versions import program---",programs)
+        if (navigator.onLine) {
+            // AuthenticationService.setupAxiosInterceptors()
+            ProgramService.checkNewerVersions(programs)
+                .then(response => {
+                    console.log("T***import program response.data---",response.data);
+                    localStorage.removeItem("sesLatestProgram");
+                    localStorage.setItem("sesLatestProgram", response.data);
+                })
+        }
+    }
 
     componentDidMount() {
+        this.getPrograms();
         bsCustomFileInput.init()
         document.getElementById("programIdDiv").style.display = "none";
         document.getElementById("formSubmitButton").style.display = "none";
@@ -154,6 +233,9 @@ export default class ImportProgram extends Component {
                                                 addProgramDataRequest.onerror = function (event) {
                                                 };
 
+                                                addProgramDataRequest.onsuccess = function (event) {
+                                                };
+
                                                 // Adding data in downloaded program data
 
                                                 var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -177,7 +259,8 @@ export default class ImportProgram extends Component {
                                 loading: false
                             })
                             let id = AuthenticationService.displayDashboardBasedOnRole();
-                            this.refs.programListChild.checkNewerVersions();
+                            // this.refs.programListChild.checkNewerVersions();
+                            
                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
@@ -226,7 +309,8 @@ export default class ImportProgram extends Component {
                                                 loading: false
                                             })
                                             let id = AuthenticationService.displayDashboardBasedOnRole();
-                                            this.refs.programListChild.checkNewerVersions();
+                                            // this.refs.programListChild.checkNewerVersions();
+                                            this.getPrograms();
                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },

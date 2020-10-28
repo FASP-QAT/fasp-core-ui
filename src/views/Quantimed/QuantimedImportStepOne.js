@@ -255,9 +255,7 @@ class QuantimedImportStepOne extends Component {
                                         },
                                             () => {
                                                 this.props.items.importData = response.data;
-
-
-                                                console.log("superstate", this.props.items)
+                                                
                                                 this.props.triggerChildAlert();
                                                 this.props.finishedStepOne && this.props.finishedStepOne();
                                             })
