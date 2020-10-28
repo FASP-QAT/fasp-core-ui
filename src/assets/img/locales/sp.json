@@ -1222,6 +1222,7 @@
     "static.supplyPlan.mtexpectedDeliveryDate": "Recibir fecha",
     "static.shipment.delinkingsuccess": "Envío desvinculado correctamente",
     "static.ticket.filesuploadnote": "Si tiene varios archivos, comprímalos y cárguelos.",
+    "static.program.seemoreprogram": "Ver más...",
     "static.quantimed.importatleastonerow": "Seleccione al menos un dato Qunatimed para importar",
     "static.quantimed.conversionFactor": "Factor de conversión",    
     "static.quantimed.regionConversionFactor": "Factor de conversión de región"
