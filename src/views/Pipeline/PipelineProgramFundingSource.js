@@ -37,7 +37,7 @@ export default class PipelineProgramFundingSource extends Component {
 
     loaded() {
         var list = this.state.fundingSourceList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
 
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -60,7 +60,7 @@ export default class PipelineProgramFundingSource extends Component {
 
         //Planning Unit
         if (x == 1) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null,false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -85,10 +85,10 @@ export default class PipelineProgramFundingSource extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(1, y);
+            var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
 
             var currentFundingSource = this.el.getRowData(y)[1];
 
@@ -108,7 +108,7 @@ export default class PipelineProgramFundingSource extends Component {
 
     saveFundingSource() {
         var list = this.state.fundingSourceList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         var fundingSourceArray = []
         console.log(json.length)
         console.log(json)

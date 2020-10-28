@@ -46,6 +46,31 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this);
         this.calculateEmergencyOrder = this.calculateEmergencyOrder.bind(this);
+        this.onPaste = this.onPaste.bind(this);
+    }
+
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+
+                (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
+                (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
+                (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
+                (instance.jexcel).setValueFromCoords(23, data[i].y, -1, true);
+                (instance.jexcel).setValueFromCoords(24, data[i].y, "", true);
+                (instance.jexcel).setValueFromCoords(25, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(26, data[i].y, "", true);
+                (instance.jexcel).setValueFromCoords(27, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(28, data[i].y, 1, true);
+                (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
+                (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
+                (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
+                (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
+                z = data[i].y;
+            }
+        }
     }
 
 
@@ -417,14 +442,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80 },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100 },
-                                                { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.' },
+                                                { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.' },
                                                 { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
-                                                { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.' },
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 120, mask: '#,##.00', decimal: '.' },
-                                                { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.' },
+                                                { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                 { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
@@ -440,6 +465,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden' },
                                                 { type: 'hidden' }
                                             ],
+                                            oncreateeditor: function (a, b, c, d, e) {
+                                                console.log("In create editor")
+                                                e.type = 'text';
+                                                if (e.value) {
+                                                    e.selectionStart = e.value.length;
+                                                    e.selectionEnd = e.value.length;
+                                                }
+                                            },
+                                            onpaste: this.onPaste,
                                             pagination: paginationOption,
                                             paginationOptions: paginationArray,
                                             search: searchOption,
@@ -465,592 +499,660 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             },
                                             onload: this.loadedShipments,
                                             updateTable: function (el, cell, x, y, source, value, id) {
-                                                var elInstance = el.jexcel;
-                                                // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                                //     'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                                                //     'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-                                                var rowData = elInstance.getRowData(y);
-                                                // var erpFlag = rowData[21];
-                                                // if (erpFlag.toString() == true) {
-                                                //     for (var i = 0; i < colArr.length; i++) {
-                                                //         var cell = elInstance.getCell(`${colArr[i]}${parseInt(y) + 1}`)
-                                                //         cell.classList.add('readonly');
-                                                //     }
-                                                // } else {
-                                                // }
-                                                if (x == 6 || x == 2) {
-                                                    var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[6] && p.planningUnit.id == rowData[2]);
-                                                    if (rowData[6] == "" || (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
-                                                        console.log("In if")
-                                                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                                                        cell.classList.add('readonly');
-                                                    } else {
-                                                        console.log("In else")
-                                                        var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                                                        cell.classList.remove('readonly');
+                                                if (y != null) {
+                                                    var elInstance = el.jexcel;
+                                                    // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                                                    //     'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                                                    //     'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
+                                                    var rowData = elInstance.getRowData(y);
+                                                    // var erpFlag = rowData[21];
+                                                    // if (erpFlag.toString() == true) {
+                                                    //     for (var i = 0; i < colArr.length; i++) {
+                                                    //         var cell = elInstance.getCell(`${colArr[i]}${parseInt(y) + 1}`)
+                                                    //         cell.classList.add('readonly');
+                                                    //     }
+                                                    // } else {
+                                                    // }
+
+                                                    if (x == 6 || x == 2) {
+                                                        var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[6] && p.planningUnit.id == rowData[2]);
+                                                        if (rowData[6] == "" || (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
+                                                            console.log("In if")
+                                                            var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                            cell.classList.add('readonly');
+                                                        } else {
+                                                            console.log("In else")
+                                                            var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                        }
                                                     }
+                                                    // var lastY = -1;
+                                                    // if (rowData[23] != -1 && lastY != y) {
+                                                    //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
+                                                    //     for (var j = 0; j < colArr.length; j++) {
+                                                    //         var col = (colArr[j]).concat(parseInt(y) + 1);
+                                                    //         if (rowData[0].toString() == "false") {
+                                                    //             elInstance.setStyle(col, "background-color", "transparent");
+                                                    //             elInstance.setStyle(col, "background-color", "#D3D3D3");
+                                                    //             var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                                                    //             cell.classList.add('shipmentEntryDoNotInclude');
+                                                    //             var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                    //             cell.classList.add('shipmentEntryDoNotInclude');
+                                                    //             var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                    //             cell.classList.add('shipmentEntryDoNotInclude');
+                                                    //             var element = document.getElementById("shipmentsDetailsTable");
+                                                    //             element.classList.remove("jexcelremoveReadonlybackground");
+                                                    //         } else {
+                                                    //             elInstance.setStyle(col, "background-color", "transparent");
+                                                    //             var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                                                    //             cell.classList.remove('shipmentEntryDoNotInclude');
+                                                    //             // cell.classList.add('readonly');
+                                                    //             var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                    //             cell.classList.remove('shipmentEntryDoNotInclude');
+                                                    //             var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                    //             cell.classList.remove('shipmentEntryDoNotInclude');
+                                                    //             // cell.classList.add('readonly');
+                                                    //             var element = document.getElementById("shipmentsDetailsTable");
+                                                    //             element.classList.remove("jexcelremoveReadonlybackground");
+                                                    //         }
+
+                                                    //         if (rowData[11].toString() == "true") {
+                                                    //             console.log("In if");
+                                                    //             elInstance.setStyle(col, "color", "#000");
+                                                    //             elInstance.setStyle(col, "color", "red");
+                                                    //             var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                                                    //             cell.classList.add('shipmentEntryEmergency');
+                                                    //             var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                    //             cell.classList.add('shipmentEntryEmergency');
+                                                    //             var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                    //             cell.classList.add('shipmentEntryEmergency');
+                                                    //         } else {
+                                                    //             console.log("In else")
+                                                    //             elInstance.setStyle(col, "color", "#000");
+                                                    //             var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
+                                                    //             cell.classList.remove('shipmentEntryEmergency');
+                                                    //             var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                    //             cell.classList.remove('shipmentEntryEmergency');
+                                                    //             var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                    //             cell.classList.remove('shipmentEntryEmergency');
+                                                    //         }
+                                                    //     }
+                                                    //     lastY = y;
+                                                    // }
                                                 }
                                             }.bind(this),
                                             contextMenu: function (obj, x, y, e) {
                                                 var items = [];
-                                                if (shipmentEditable) {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.addNewShipment'),
-                                                        onclick: function () {
-                                                            this.addRowInJexcel();
-                                                        }.bind(this)
-                                                    });
-                                                }
+                                                if (y != null) {
+                                                    if (shipmentEditable) {
+                                                        items.push({
+                                                            title: i18n.t('static.supplyPlan.addNewShipment'),
+                                                            onclick: function () {
+                                                                this.addRowInJexcel();
+                                                            }.bind(this)
+                                                        });
+                                                    }
 
-                                                // Add shipment batch info
-                                                var rowData = obj.getRowData(y);
-                                                var expectedDeliveryDate = moment(rowData[4]).format("YYYY-MM-DD");
-                                                var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                                if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
-                                                        onclick: function () {
-                                                            this.props.updateState("loading", true);
-                                                            if (this.props.shipmentPage == "shipmentDataEntry") {
-                                                                this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
-                                                                this.props.toggleLarge();
-                                                            }
-                                                            var rowData = obj.getRowData(y)
-                                                            var batchInfoListAll = this.props.items.programJson.batchInfoList;
-                                                            this.setState({
-                                                                batchInfoListAll: batchInfoListAll
-                                                            })
-                                                            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
-                                                            this.el = jexcel(document.getElementById("shipmentBatchInfoTable"), '');
-                                                            this.el.destroy();
-                                                            var json = [];
-                                                            // var elInstance=this.state.plannedPsmShipmentsEl;
-
-                                                            var batchInfo = rowData[24];
-                                                            var tableEditable = shipmentEditable;
-                                                            if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
-                                                                tableEditable = false;
-                                                            }
-                                                            if (this.props.shipmentPage != "shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
-                                                                console.log("in if");
-                                                                if (rowData[21].toString() == "false" && tableEditable == true) {
-                                                                    document.getElementById("addRowBatchId").style.display = "block";
-                                                                } else {
-                                                                    console.log("In else")
-                                                                    document.getElementById("addRowBatchId").style.display = "none";
+                                                    // Add shipment batch info
+                                                    var rowData = obj.getRowData(y);
+                                                    var expectedDeliveryDate = moment(rowData[4]).format("YYYY-MM-DD");
+                                                    var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                                    if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
+                                                        items.push({
+                                                            title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
+                                                            onclick: function () {
+                                                                this.props.updateState("loading", true);
+                                                                if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                                    this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
+                                                                    this.props.toggleLarge();
                                                                 }
-                                                            }
+                                                                var rowData = obj.getRowData(y)
+                                                                var batchInfoListAll = this.props.items.programJson.batchInfoList;
+                                                                this.setState({
+                                                                    batchInfoListAll: batchInfoListAll
+                                                                })
+                                                                document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
+                                                                this.el = jexcel(document.getElementById("shipmentBatchInfoTable"), '');
+                                                                this.el.destroy();
+                                                                var json = [];
+                                                                // var elInstance=this.state.plannedPsmShipmentsEl;
 
-                                                            if (this.props.shipmentPage == "shipmentDataEntry") {
-                                                                if (tableEditable == false) {
-                                                                    console.log("In false")
-                                                                    document.getElementById("addShipmentBatchRowId").style.display = "none";
-                                                                } else {
-                                                                    document.getElementById("addShipmentBatchRowId").style.display = "block";
+                                                                var batchInfo = rowData[24];
+                                                                var tableEditable = shipmentEditable;
+                                                                if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
+                                                                    tableEditable = false;
                                                                 }
-                                                            }
-                                                            for (var sb = 0; sb < batchInfo.length; sb++) {
-                                                                var data = [];
-                                                                data[0] = batchInfo[sb].batch.batchNo;
-                                                                data[1] = batchInfo[sb].batch.expiryDate;
-                                                                data[2] = batchInfo[sb].shipmentQty;
-                                                                data[3] = batchInfo[sb].shipmentTransBatchInfoId;
-                                                                data[4] = y;
-                                                                data[5] = batchInfoListAll.findIndex(c => c.batchNo == batchInfo[sb].batch.batchNo && moment(c.expiryDate).format("YYYY-MM-DD") == moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"))
-                                                                data[6] = batchInfo[sb].batch.autoGenerated;
-                                                                data[7] = batchInfo[sb].batch.batchNo;
-                                                                data[8] = batchInfo[sb].batch.expiryDate;
-                                                                data[9] = batchInfo[sb].batch.autoGenerated;
-                                                                json.push(data);
-                                                            }
-                                                            if (batchInfo.length == 0) {
-                                                                var data = [];
-                                                                data[0] = "";
-                                                                data[1] = expiryDate;
-                                                                data[2] = ""
-                                                                data[3] = 0;
-                                                                data[4] = y;
-                                                                data[5] = -1;
-                                                                data[6] = false;
-                                                                data[7] = "";
-                                                                data[8] = "";
-                                                                data[9] = "";
-                                                                json.push(data)
-                                                            }
-                                                            var options = {
-                                                                data: json,
-                                                                columnDrag: true,
-                                                                colWidths: [100, 150, 100],
-                                                                columns: [
-                                                                    {
-                                                                        title: i18n.t('static.supplyPlan.batchId'),
-                                                                        type: 'text',
-                                                                    },
-                                                                    {
-                                                                        title: i18n.t('static.supplyPlan.expiryDate'),
-                                                                        type: 'calendar',
-                                                                        options: {
-                                                                            format: JEXCEL_DATE_FORMAT,
-                                                                            validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        title: i18n.t('static.supplyPlan.shipmentQty'),
-                                                                        type: 'numeric',
-                                                                        mask: '#,##.00', decimal: '.'
-                                                                    },
-                                                                    {
-                                                                        title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
-                                                                        type: 'hidden',
-                                                                    },
-                                                                    {
-                                                                        title: i18n.t('static.supplyPlan.rowNumber'),
-                                                                        type: 'hidden',
-                                                                    },
-                                                                    {
-                                                                        title: i18n.t('static.supplyPlan.index'),
-                                                                        type: 'hidden',
-                                                                    },
-                                                                    { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
-                                                                    { type: 'hidden' },
-                                                                    { type: 'hidden' },
-                                                                    { type: 'hidden' }
-                                                                ],
-                                                                pagination: false,
-                                                                search: false,
-                                                                columnSorting: true,
-                                                                tableOverflow: true,
-                                                                wordWrap: true,
-                                                                allowInsertColumn: false,
-                                                                allowManualInsertColumn: false,
-                                                                allowDeleteRow: true,
-                                                                oneditionend: this.onedit,
-                                                                copyCompatibility: true,
-                                                                allowInsertRow: true,
-                                                                allowManualInsertRow: false,
-                                                                editable: tableEditable,
-                                                                onchange: this.batchInfoChangedShipment,
-                                                                allowExport: false,
-                                                                text: {
-                                                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                                                    show: '',
-                                                                    entries: '',
-                                                                },
-                                                                license: JEXCEL_PRO_KEY,
-                                                                onload: this.loadedBatchInfoShipment,
-                                                                updateTable: function (el, cell, x, y, source, value, id) {
-                                                                }.bind(this),
-                                                                contextMenu: function (obj, x, y, e) {
-                                                                    var items = [];
-                                                                    if (y == null) {
+                                                                if (this.props.shipmentPage != "shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
+                                                                    console.log("in if");
+                                                                    if (rowData[21].toString() == "false" && tableEditable == true) {
+                                                                        document.getElementById("addRowBatchId").style.display = "block";
                                                                     } else {
-                                                                        // Insert new row
-                                                                        if (shipmentEditable && obj.options.allowInsertRow == true) {
-                                                                            items.push({
-                                                                                title: i18n.t('static.supplyPlan.addNewBatchInfo'),
-                                                                                onclick: function () {
-                                                                                    this.addBatchRowInJexcel()
-                                                                                }.bind(this)
-                                                                            });
+                                                                        console.log("In else")
+                                                                        document.getElementById("addRowBatchId").style.display = "none";
+                                                                    }
+                                                                }
+
+                                                                if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                                    if (tableEditable == false) {
+                                                                        console.log("In false")
+                                                                        document.getElementById("addShipmentBatchRowId").style.display = "none";
+                                                                    } else {
+                                                                        document.getElementById("addShipmentBatchRowId").style.display = "block";
+                                                                    }
+                                                                }
+                                                                for (var sb = 0; sb < batchInfo.length; sb++) {
+                                                                    var data = [];
+                                                                    data[0] = batchInfo[sb].batch.batchNo;
+                                                                    data[1] = batchInfo[sb].batch.expiryDate;
+                                                                    data[2] = batchInfo[sb].shipmentQty;
+                                                                    data[3] = batchInfo[sb].shipmentTransBatchInfoId;
+                                                                    data[4] = y;
+                                                                    data[5] = batchInfoListAll.findIndex(c => c.batchNo == batchInfo[sb].batch.batchNo && moment(c.expiryDate).format("YYYY-MM-DD") == moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"))
+                                                                    data[6] = batchInfo[sb].batch.autoGenerated;
+                                                                    data[7] = batchInfo[sb].batch.batchNo;
+                                                                    data[8] = batchInfo[sb].batch.expiryDate;
+                                                                    data[9] = batchInfo[sb].batch.autoGenerated;
+                                                                    json.push(data);
+                                                                }
+                                                                if (batchInfo.length == 0) {
+                                                                    var data = [];
+                                                                    data[0] = "";
+                                                                    data[1] = expiryDate;
+                                                                    data[2] = ""
+                                                                    data[3] = 0;
+                                                                    data[4] = y;
+                                                                    data[5] = -1;
+                                                                    data[6] = false;
+                                                                    data[7] = "";
+                                                                    data[8] = "";
+                                                                    data[9] = "";
+                                                                    json.push(data)
+                                                                }
+                                                                var options = {
+                                                                    data: json,
+                                                                    columnDrag: true,
+                                                                    colWidths: [100, 150, 100],
+                                                                    columns: [
+                                                                        {
+                                                                            title: i18n.t('static.supplyPlan.batchId'),
+                                                                            type: 'text',
+                                                                        },
+                                                                        {
+                                                                            title: i18n.t('static.supplyPlan.expiryDate'),
+                                                                            type: 'calendar',
+                                                                            options: {
+                                                                                format: JEXCEL_DATE_FORMAT,
+                                                                                validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            title: i18n.t('static.supplyPlan.shipmentQty'),
+                                                                            type: 'numeric',
+                                                                            mask: '#,##.00', decimal: '.',
+                                                                            disabledMaskOnEdition: true
+                                                                        },
+                                                                        {
+                                                                            title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
+                                                                            type: 'hidden',
+                                                                        },
+                                                                        {
+                                                                            title: i18n.t('static.supplyPlan.rowNumber'),
+                                                                            type: 'hidden',
+                                                                        },
+                                                                        {
+                                                                            title: i18n.t('static.supplyPlan.index'),
+                                                                            type: 'hidden',
+                                                                        },
+                                                                        { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
+                                                                        { type: 'hidden' },
+                                                                        { type: 'hidden' },
+                                                                        { type: 'hidden' }
+                                                                    ],
+                                                                    oncreateeditor: function (a, b, c, d, e) {
+                                                                        console.log("In create editor")
+                                                                        e.type = 'text';
+                                                                        if (e.value) {
+                                                                            e.selectionStart = e.value.length;
+                                                                            e.selectionEnd = e.value.length;
                                                                         }
-                                                                        if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
-                                                                            // region id
-                                                                            if (obj.getRowData(y)[5] == -1) {
+                                                                    },
+                                                                    pagination: false,
+                                                                    search: false,
+                                                                    columnSorting: true,
+                                                                    tableOverflow: true,
+                                                                    wordWrap: true,
+                                                                    allowInsertColumn: false,
+                                                                    allowManualInsertColumn: false,
+                                                                    allowDeleteRow: true,
+                                                                    oneditionend: this.onedit,
+                                                                    copyCompatibility: true,
+                                                                    allowInsertRow: true,
+                                                                    allowManualInsertRow: false,
+                                                                    editable: tableEditable,
+                                                                    onchange: this.batchInfoChangedShipment,
+                                                                    allowExport: false,
+                                                                    text: {
+                                                                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                                                                        show: '',
+                                                                        entries: '',
+                                                                    },
+                                                                    license: JEXCEL_PRO_KEY,
+                                                                    onload: this.loadedBatchInfoShipment,
+                                                                    updateTable: function (el, cell, x, y, source, value, id) {
+                                                                    }.bind(this),
+                                                                    contextMenu: function (obj, x, y, e) {
+                                                                        var items = [];
+                                                                        if (y == null) {
+                                                                        } else {
+                                                                            // Insert new row
+                                                                            if (shipmentEditable && obj.options.allowInsertRow == true) {
                                                                                 items.push({
-                                                                                    title: i18n.t("static.common.deleterow"),
+                                                                                    title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                                                                     onclick: function () {
-                                                                                        obj.deleteRow(parseInt(y));
-                                                                                    }
+                                                                                        this.addBatchRowInJexcel()
+                                                                                    }.bind(this)
                                                                                 });
                                                                             }
+                                                                            if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                                                // region id
+                                                                                if (obj.getRowData(y)[5] == -1) {
+                                                                                    items.push({
+                                                                                        title: i18n.t("static.common.deleterow"),
+                                                                                        onclick: function () {
+                                                                                            obj.deleteRow(parseInt(y));
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
                                                                         }
-                                                                    }
-                                                                    return items;
-                                                                }.bind(this)
-                                                            };
-                                                            var elVar = jexcel(document.getElementById("shipmentBatchInfoTable"), options);
-                                                            this.el = elVar;
-                                                            this.setState({ shipmentBatchInfoTableEl: elVar });
-                                                            this.props.updateState("loading", false);
-                                                        }.bind(this)
-                                                    });
-                                                }
+                                                                        return items;
+                                                                    }.bind(this)
+                                                                };
+                                                                var elVar = jexcel(document.getElementById("shipmentBatchInfoTable"), options);
+                                                                this.el = elVar;
+                                                                this.setState({ shipmentBatchInfoTableEl: elVar });
+                                                                this.props.updateState("loading", false);
+                                                            }.bind(this)
+                                                        });
+                                                    }
 
-                                                if (rowData[6] != "" && rowData[5] != "" && rowData[2] != "") {
-                                                    items.push({
-                                                        title: i18n.t('static.supplyPlan.showShipmentDates'),
-                                                        onclick: function () {
-                                                            var procurementAgent = rowData[6];
-                                                            var db1;
-                                                            var storeOS;
-                                                            getDatabase();
-                                                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                                                            openRequest.onerror = function (event) {
-                                                                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                                                this.props.updateState("color", "red");
-                                                                this.props.hideFirstComponent();
-                                                            }.bind(this);
-                                                            openRequest.onsuccess = function (e) {
-                                                                db1 = e.target.result;
-                                                                var programJson = this.props.items.programJson;
-                                                                var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                                                                var papuOs = papuTransaction.objectStore('procurementAgent');
-                                                                var papuRequest = papuOs.get(parseInt(procurementAgent));
-                                                                papuRequest.onerror = function (event) {
+                                                    if (rowData[6] != "" && rowData[5] != "" && rowData[2] != "") {
+                                                        items.push({
+                                                            title: i18n.t('static.supplyPlan.showShipmentDates'),
+                                                            onclick: function () {
+                                                                var procurementAgent = rowData[6];
+                                                                var db1;
+                                                                var storeOS;
+                                                                getDatabase();
+                                                                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                                                                openRequest.onerror = function (event) {
                                                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                                                                     this.props.updateState("color", "red");
                                                                     this.props.hideFirstComponent();
                                                                 }.bind(this);
-                                                                papuRequest.onsuccess = function (event) {
-                                                                    var papuResult = [];
-                                                                    papuResult = papuRequest.result;
+                                                                openRequest.onsuccess = function (e) {
+                                                                    db1 = e.target.result;
+                                                                    var programJson = this.props.items.programJson;
+                                                                    var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                                                                    var papuOs = papuTransaction.objectStore('procurementAgent');
+                                                                    var papuRequest = papuOs.get(parseInt(procurementAgent));
+                                                                    papuRequest.onerror = function (event) {
+                                                                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                                                        this.props.updateState("color", "red");
+                                                                        this.props.hideFirstComponent();
+                                                                    }.bind(this);
+                                                                    papuRequest.onsuccess = function (event) {
+                                                                        var papuResult = [];
+                                                                        papuResult = papuRequest.result;
 
-                                                                    this.props.updateState("loading", true);
-                                                                    if (this.props.shipmentPage == "shipmentDataEntry") {
-                                                                        this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentDates"));
-                                                                        this.props.toggleLarge();
-                                                                    }
-                                                                    document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'block';
-                                                                    this.el = jexcel(document.getElementById("shipmentDatesTable"), '');
-                                                                    this.el.destroy();
-                                                                    var json = [];
-                                                                    var shipmentDates = rowData[26];
-                                                                    var shipmentStatus = rowData[3];
-                                                                    var emergencyOrder = rowData[11];
-                                                                    var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
-                                                                    var expectedPlannedDate = "";
-                                                                    var expectedSubmittedDate = "";
-                                                                    var expectedApprovedDate = "";
-                                                                    var expectedShippedDate = "";
-                                                                    var expectedArrivedDate = "";
-                                                                    var plannedDate = shipmentDates.plannedDate;
-                                                                    var submittedDate = shipmentDates.submittedDate;
-                                                                    var approvedDate = shipmentDates.approvedDate;
-                                                                    var shippedDate = shipmentDates.shippedDate;
-                                                                    var arrivedDate = shipmentDates.arrivedDate;
-                                                                    var receivedDate = shipmentDates.receivedDate;
-                                                                    if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                        receivedDate = null;
-                                                                    }
-                                                                    if (shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                        arrivedDate = null;
-                                                                    }
-                                                                    if (shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                        shippedDate = null;
-                                                                    }
-                                                                    if (shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                        approvedDate = null;
-                                                                    }
-                                                                    if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS || shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                        submittedDate = null;
-                                                                    }
-                                                                    console.log("Shipment Dates", shipmentDates);
-                                                                    console.log("Received Date", receivedDate)
-                                                                    var addLeadTimes = 0;
-                                                                    if (rowData[7].toString() == "true") {
-                                                                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
-                                                                        var leadTimesPerStatus = addLeadTimes / 5;
-                                                                        expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                    } else {
-                                                                        var shipmentMode = rowData[5];
-                                                                        var ppUnit = papuResult;
-                                                                        var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
-                                                                        if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                                                            submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                                                        this.props.updateState("loading", true);
+                                                                        if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                                            this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentDates"));
+                                                                            this.props.toggleLarge();
                                                                         }
-                                                                        var approvedToShippedLeadTime = "";
-                                                                        approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
-                                                                        if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                                                            approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                                                        document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'block';
+                                                                        this.el = jexcel(document.getElementById("shipmentDatesTable"), '');
+                                                                        this.el.destroy();
+                                                                        var json = [];
+                                                                        var shipmentDates = rowData[26];
+                                                                        var shipmentStatus = rowData[3];
+                                                                        var emergencyOrder = rowData[11];
+                                                                        var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
+                                                                        var expectedPlannedDate = "";
+                                                                        var expectedSubmittedDate = "";
+                                                                        var expectedApprovedDate = "";
+                                                                        var expectedShippedDate = "";
+                                                                        var expectedArrivedDate = "";
+                                                                        var plannedDate = shipmentDates.plannedDate;
+                                                                        var submittedDate = shipmentDates.submittedDate;
+                                                                        var approvedDate = shipmentDates.approvedDate;
+                                                                        var shippedDate = shipmentDates.shippedDate;
+                                                                        var arrivedDate = shipmentDates.arrivedDate;
+                                                                        var receivedDate = shipmentDates.receivedDate;
+                                                                        if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                            receivedDate = null;
                                                                         }
-
-                                                                        var shippedToArrivedLeadTime = ""
-                                                                        if (shipmentMode == 2) {
-                                                                            shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                                                        if (shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                            arrivedDate = null;
+                                                                        }
+                                                                        if (shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                            shippedDate = null;
+                                                                        }
+                                                                        if (shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                            approvedDate = null;
+                                                                        }
+                                                                        if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS || shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                            submittedDate = null;
+                                                                        }
+                                                                        console.log("Shipment Dates", shipmentDates);
+                                                                        console.log("Received Date", receivedDate)
+                                                                        var addLeadTimes = 0;
+                                                                        if (rowData[7].toString() == "true") {
+                                                                            addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
+                                                                            var leadTimesPerStatus = addLeadTimes / 5;
+                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                         } else {
-                                                                            shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
-                                                                        }
-                                                                        expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                        expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                    }
-
-                                                                    var tableEditable = shipmentEditable;
-                                                                    if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare" || shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
-                                                                        tableEditable = false;
-                                                                    }
-
-                                                                    data = [];
-                                                                    data[0] = i18n.t("static.supplyPlan.estimated")
-                                                                    data[1] = expectedPlannedDate;
-                                                                    data[2] = expectedSubmittedDate;
-                                                                    data[3] = expectedApprovedDate;
-                                                                    data[4] = expectedShippedDate;
-                                                                    data[5] = expectedArrivedDate;
-                                                                    data[6] = expectedDeliveryDate;
-                                                                    data[7] = y;
-                                                                    data[8] = i18n.t("static.supplyPlan.estimated")
-                                                                    json.push(data);
-                                                                    var data = [];
-                                                                    data[0] = i18n.t("static.consumption.actual")
-                                                                    data[1] = plannedDate;
-                                                                    data[2] = submittedDate;
-                                                                    data[3] = approvedDate;
-                                                                    data[4] = shippedDate;
-                                                                    data[5] = arrivedDate;
-                                                                    data[6] = receivedDate;
-                                                                    data[7] = y;
-                                                                    data[8] = i18n.t("static.consumption.actual")
-                                                                    json.push(data);
-                                                                    var options = {
-                                                                        data: json,
-                                                                        columnDrag: true,
-                                                                        colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
-                                                                        columns: [
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.type'),
-                                                                                type: 'text',
-                                                                                readOnly: true
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.plannedDate'),
-                                                                                type: 'calendar',
-                                                                                options: {
-                                                                                    format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.submittedDate'),
-                                                                                type: 'calendar',
-                                                                                options: {
-                                                                                    format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.approvedDate'),
-                                                                                type: 'calendar',
-                                                                                options: {
-                                                                                    format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.shippedDate'),
-                                                                                type: 'calendar',
-                                                                                options: {
-                                                                                    format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.arrivedDate'),
-                                                                                type: 'calendar',
-                                                                                options: {
-                                                                                    format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.shipment.receiveddate'),
-                                                                                type: 'calendar',
-                                                                                options: {
-                                                                                    format: JEXCEL_DATE_FORMAT,
-                                                                                    validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [null, null]
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.rowNumber'),
-                                                                                type: 'hidden',
-                                                                            },
-                                                                            {
-                                                                                title: i18n.t('static.supplyPlan.type'),
-                                                                                type: 'text',
-                                                                                readOnly: true
-                                                                            },
-                                                                        ],
-                                                                        pagination: false,
-                                                                        search: false,
-                                                                        columnSorting: true,
-                                                                        tableOverflow: true,
-                                                                        wordWrap: true,
-                                                                        allowInsertColumn: false,
-                                                                        allowManualInsertColumn: false,
-                                                                        allowDeleteRow: false,
-                                                                        copyCompatibility: true,
-                                                                        allowInsertRow: false,
-                                                                        allowManualInsertRow: false,
-                                                                        allowExport: false,
-                                                                        onchange: this.shipmentDatesChanged,
-                                                                        editable: tableEditable,
-                                                                        contextMenu: function (obj, x, y, e) {
-                                                                            return [];
-                                                                        }.bind(this),
-                                                                        license: JEXCEL_PRO_KEY,
-                                                                        text: {
-                                                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} `,
-                                                                            show: '',
-                                                                            entries: '',
-                                                                        },
-                                                                        onload: this.loadedShipmentDates,
-                                                                        updateTable: function (el, cell, x, y, source, value, id) {
-                                                                            var elInstance = el.jexcel;
-                                                                            var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
-                                                                            cell.classList.add('readonly');
-                                                                            if (shipmentStatus == PLANNED_SHIPMENT_STATUS) {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                            } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                            } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                            } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                            } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                            } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.remove('readonly');
-                                                                            } else {
-                                                                                var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
-                                                                                cell.classList.add('readonly');
-                                                                                var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
-                                                                                cell.classList.add('readonly');
+                                                                            var shipmentMode = rowData[5];
+                                                                            var ppUnit = papuResult;
+                                                                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                                                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                                                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                                                            }
+                                                                            var approvedToShippedLeadTime = "";
+                                                                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                                                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                                                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
                                                                             }
 
-                                                                        }.bind(this)
-                                                                    };
-                                                                    var elVar = jexcel(document.getElementById("shipmentDatesTable"), options);
-                                                                    this.el = elVar;
-                                                                    this.setState({ shipmentDatesTableEl: elVar });
-                                                                    this.props.updateState("loading", false);
+                                                                            var shippedToArrivedLeadTime = ""
+                                                                            if (shipmentMode == 2) {
+                                                                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                                                            } else {
+                                                                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                                                            }
+                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                        }
+
+                                                                        var tableEditable = shipmentEditable;
+                                                                        if (rowData[21].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare" || shipmentStatus == ON_HOLD_SHIPMENT_STATUS || shipmentStatus == CANCELLED_SHIPMENT_STATUS) {
+                                                                            tableEditable = false;
+                                                                        }
+
+                                                                        data = [];
+                                                                        data[0] = i18n.t("static.supplyPlan.estimated")
+                                                                        data[1] = expectedPlannedDate;
+                                                                        data[2] = expectedSubmittedDate;
+                                                                        data[3] = expectedApprovedDate;
+                                                                        data[4] = expectedShippedDate;
+                                                                        data[5] = expectedArrivedDate;
+                                                                        data[6] = expectedDeliveryDate;
+                                                                        data[7] = y;
+                                                                        data[8] = i18n.t("static.supplyPlan.estimated")
+                                                                        json.push(data);
+                                                                        var data = [];
+                                                                        data[0] = i18n.t("static.consumption.actual")
+                                                                        data[1] = plannedDate;
+                                                                        data[2] = submittedDate;
+                                                                        data[3] = approvedDate;
+                                                                        data[4] = shippedDate;
+                                                                        data[5] = arrivedDate;
+                                                                        data[6] = receivedDate;
+                                                                        data[7] = y;
+                                                                        data[8] = i18n.t("static.consumption.actual")
+                                                                        json.push(data);
+                                                                        var options = {
+                                                                            data: json,
+                                                                            columnDrag: true,
+                                                                            colWidths: [80, 100, 100, 100, 100, 100, 100, 0, 80],
+                                                                            columns: [
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.type'),
+                                                                                    type: 'text',
+                                                                                    readOnly: true
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.plannedDate'),
+                                                                                    type: 'calendar',
+                                                                                    options: {
+                                                                                        format: JEXCEL_DATE_FORMAT,
+                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.submittedDate'),
+                                                                                    type: 'calendar',
+                                                                                    options: {
+                                                                                        format: JEXCEL_DATE_FORMAT,
+                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.approvedDate'),
+                                                                                    type: 'calendar',
+                                                                                    options: {
+                                                                                        format: JEXCEL_DATE_FORMAT,
+                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.shippedDate'),
+                                                                                    type: 'calendar',
+                                                                                    options: {
+                                                                                        format: JEXCEL_DATE_FORMAT,
+                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.arrivedDate'),
+                                                                                    type: 'calendar',
+                                                                                    options: {
+                                                                                        format: JEXCEL_DATE_FORMAT,
+                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.shipment.receiveddate'),
+                                                                                    type: 'calendar',
+                                                                                    options: {
+                                                                                        format: JEXCEL_DATE_FORMAT,
+                                                                                        validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [null, null]
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.rowNumber'),
+                                                                                    type: 'hidden',
+                                                                                },
+                                                                                {
+                                                                                    title: i18n.t('static.supplyPlan.type'),
+                                                                                    type: 'text',
+                                                                                    readOnly: true
+                                                                                },
+                                                                            ],
+                                                                            pagination: false,
+                                                                            search: false,
+                                                                            columnSorting: true,
+                                                                            tableOverflow: true,
+                                                                            wordWrap: true,
+                                                                            allowInsertColumn: false,
+                                                                            allowManualInsertColumn: false,
+                                                                            allowDeleteRow: false,
+                                                                            copyCompatibility: true,
+                                                                            allowInsertRow: false,
+                                                                            allowManualInsertRow: false,
+                                                                            allowExport: false,
+                                                                            onchange: this.shipmentDatesChanged,
+                                                                            editable: tableEditable,
+                                                                            contextMenu: function (obj, x, y, e) {
+                                                                                return [];
+                                                                            }.bind(this),
+                                                                            license: JEXCEL_PRO_KEY,
+                                                                            text: {
+                                                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} `,
+                                                                                show: '',
+                                                                                entries: '',
+                                                                            },
+                                                                            onload: this.loadedShipmentDates,
+                                                                            updateTable: function (el, cell, x, y, source, value, id) {
+                                                                                var elInstance = el.jexcel;
+                                                                                var cell = elInstance.getCell(`B${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`C${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`D${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`E${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                var cell = elInstance.getCell(`F${parseInt(0) + 1}`)
+                                                                                cell.classList.add('readonly');
+                                                                                if (shipmentStatus == PLANNED_SHIPMENT_STATUS) {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                } else if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.remove('readonly');
+                                                                                } else {
+                                                                                    var cell = elInstance.getCell(`B${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`C${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`D${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`E${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`F${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(0) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                    var cell = elInstance.getCell(`G${parseInt(1) + 1}`)
+                                                                                    cell.classList.add('readonly');
+                                                                                }
+
+                                                                            }.bind(this)
+                                                                        };
+                                                                        var elVar = jexcel(document.getElementById("shipmentDatesTable"), options);
+                                                                        this.el = elVar;
+                                                                        this.setState({ shipmentDatesTableEl: elVar });
+                                                                        this.props.updateState("loading", false);
+                                                                    }.bind(this)
                                                                 }.bind(this)
                                                             }.bind(this)
-                                                        }.bind(this)
-                                                    })
-                                                }
-                                                if (shipmentEditable && rowData[3].toString() == PLANNED_SHIPMENT_STATUS && rowData[23] != -1) {
-                                                    items.push({
-                                                        title: i18n.t('static.common.deleterow'),
-                                                        onclick: function () {
-                                                            obj.setValueFromCoords(29, y, false, true);
-                                                        }.bind(this)
-                                                    });
-                                                }
-                                                if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
-                                                    // region id
-                                                    if (obj.getRowData(y)[23] == -1) {
+                                                        })
+                                                    }
+                                                    if (shipmentEditable && rowData[3].toString() == PLANNED_SHIPMENT_STATUS && rowData[23] != -1) {
                                                         items.push({
-                                                            title: i18n.t("static.common.deleterow"),
+                                                            title: i18n.t('static.common.deleterow'),
                                                             onclick: function () {
-                                                                obj.deleteRow(parseInt(y));
-                                                            }
+                                                                obj.setValueFromCoords(29, y, false, true);
+                                                            }.bind(this)
                                                         });
+                                                    }
+                                                    if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson().length > 1) {
+                                                        // region id
+                                                        if (obj.getRowData(y)[23] == -1) {
+                                                            items.push({
+                                                                title: i18n.t("static.common.deleterow"),
+                                                                onclick: function () {
+                                                                    obj.deleteRow(parseInt(y));
+                                                                }
+                                                            });
+                                                        }
                                                     }
                                                 }
                                                 return items;
+
                                             }.bind(this)
                                         }
 

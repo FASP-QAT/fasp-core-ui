@@ -10,7 +10,7 @@ import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, JEXCEL_PRO_KEY } from '../../Constants';
+import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 export default class PipelineProgramInventory extends Component {
 
@@ -39,7 +39,7 @@ export default class PipelineProgramInventory extends Component {
     dropdownFilter = function (instance, cell, c, r, source) {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 7];
+        var value = (instance.jexcel.getJson(null,false)[r])[c - 7];
         console.log("==========>planningUnitValue", value);
         console.log("========>", this.state.realmCountryPlanningUnitList);
         var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value && c.realmCountry.id == realmCountryId);
@@ -58,10 +58,10 @@ export default class PipelineProgramInventory extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(1, y);
+            var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -73,7 +73,7 @@ export default class PipelineProgramInventory extends Component {
             }
 
             var col = ("C").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(2, y);
+            var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -85,7 +85,7 @@ export default class PipelineProgramInventory extends Component {
             }
 
             var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
+            var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -108,7 +108,7 @@ export default class PipelineProgramInventory extends Component {
                  this.el.setComments(col, "");
              }*/
 
-            var value = this.el.getValueFromCoords(6, y);
+            var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var validation = checkValidtion("number", "G", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
             if (validation == false) {
                 valid = false;
@@ -117,8 +117,8 @@ export default class PipelineProgramInventory extends Component {
 
             var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX;
             var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(7, y);
-            value = value.toString().replaceAll("\,", "");
+            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            // value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -198,6 +198,7 @@ export default class PipelineProgramInventory extends Component {
         }
 
         if (x == 6) {
+            value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var valid = checkValidtion("number", "G", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
         }
 
@@ -205,7 +206,7 @@ export default class PipelineProgramInventory extends Component {
 
             var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX;
             var col = ("H").concat(parseInt(y) + 1);
-            value = value.toString().replaceAll("\,", "");
+            value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -227,7 +228,7 @@ export default class PipelineProgramInventory extends Component {
 
     loaded() {
         var list = this.state.inventoryList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
 
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
@@ -279,7 +280,7 @@ export default class PipelineProgramInventory extends Component {
 
 
     saveInventory() {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         var list = this.state.inventoryList;
         var inventoryArray = []
         for (var i = 0; i < json.length; i++) {
@@ -297,8 +298,8 @@ export default class PipelineProgramInventory extends Component {
                 dataSourceId: dataSourceId,
                 regionId: map.get("2"),
                 inventoryDate: map.get("5"),
-                inventory: map.get("6"),
-                manualAdjustment: map.get("7"),
+                inventory: (this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                manualAdjustment: (this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                 notes: map.get("8"),
                 // active: map.get("6"),
                 realmCountryPlanningUnitId: map.get("3"),
@@ -440,18 +441,25 @@ export default class PipelineProgramInventory extends Component {
                                         {
                                             title: i18n.t('static.inventory.inventoryDate'),
                                             type: 'calendar',
-                                            options: { format: JEXCEL_DATE_FORMAT_WITHOUT_DATE }
+                                            format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
 
                                         },
                                         {
                                             title: i18n.t('static.inventory.inventory'),
-                                            type: 'text'
+                                            type: 'numeric',
+                                                mask: '#,##.00',
+                                                disabledMaskOnEdition: true,
+                                                decimal: '.'
 
                                         },
 
                                         {
                                             title: i18n.t('static.inventory.manualAdjustment'),
-                                            type: 'text'
+                                            type: 'text',
+                                            type: 'numeric',
+                                                mask: '[-]#,##.00',
+                                                disabledMaskOnEdition: true,
+                                                decimal: '.'
                                         },
                                         {
                                             title: 'Note',
@@ -463,6 +471,14 @@ export default class PipelineProgramInventory extends Component {
                                     contextMenu: function (obj, x, y, e) {
                                         return [];
                                     }.bind(this),
+                                    oncreateeditor: function (a, b, c, d, e) {
+                                        console.log("In create editor")
+                                        e.type = 'text';
+                                        if (e.value) {
+                                            e.selectionStart = e.value.length;
+                                            e.selectionEnd = e.value.length;
+                                        }
+                                    },
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,

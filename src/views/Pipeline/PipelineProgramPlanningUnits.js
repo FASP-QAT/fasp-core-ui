@@ -24,20 +24,20 @@ export default class PipelineProgramPlanningUnits extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.savePlanningUnits = this.savePlanningUnits.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 1];
+        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
 
         var puList = []
         if (value != -1) {
@@ -69,7 +69,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
     loaded() {
         var list = this.state.planningUnitList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
@@ -84,7 +84,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setComments(col, (list[y].pipelineProductName).concat(i18n.t('static.message.notExist')));
             }
             var col = ("K").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[10]).toString();
+            var value = (this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
 
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -95,7 +95,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
             var col = ("M").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[12]).toString();
+            var value = this.el.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
 
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -127,7 +127,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
         //Planning Unit
         if (x == 3) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -155,6 +155,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             //var reg = /^[0-9\b]+$/;
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -174,6 +175,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 5) {
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -193,6 +195,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 6) {
             var reg = /^[0-9\b]+$/;
             var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -212,6 +215,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 7) {
             var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
+            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -231,6 +235,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 8) {
             var reg = /^[0-9\b]+$/;
             var col = ("I").concat(parseInt(y) + 1);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -250,6 +255,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 10) {
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("K").concat(parseInt(y) + 1);
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             console.log('value=>', value)
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -270,6 +276,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         if (x == 11) {
             var reg = /^[0-9\b]+$/;
             var col = ("L").concat(parseInt(y) + 1);
+            value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -290,6 +297,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             // var reg = /^[0-9]+.[0-9]+$/;
             var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var col = ("M").concat(parseInt(y) + 1);
+            value = this.el.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -314,14 +322,14 @@ export default class PipelineProgramPlanningUnits extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
+        console.log("D------------>",json)
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
-
+            var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
             var currentPlanningUnit = this.el.getRowData(y)[1];
-
-            if (value == "") {
+            console.log("D------------>1", value);
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -348,7 +356,8 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
 
             var col = ("E").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(4, y);
+            // var value = this.el.getValueFromCoords(4, y);
+            var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -368,7 +377,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
             var reg = /^[0-9\b]+$/;
             var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
+            var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -389,7 +398,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             var reg = /^[0-9\b]+$/;
             var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
+            var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -409,7 +418,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(7, y);
+            var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -429,7 +438,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             var reg = /^[0-9\b]+$/;
             var col = ("I").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(8, y);
+            var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -449,7 +458,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
             //Local procurement lead time
             var col = ("K").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(10, y);
+            var value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -469,7 +478,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
 
             var col = ("L").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(11, y);
+            var value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -489,7 +498,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
 
             var col = ("M").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(12, y);
+            var value = this.el.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -517,7 +526,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
     savePlanningUnits() {
         var list = this.state.planningUnitList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var planningUnitArray = []
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
@@ -537,15 +546,15 @@ export default class PipelineProgramPlanningUnits extends Component {
                     id: 0
                 },
                 planningUnitId: planningUnitId,
-                multiplier: map.get("4"),
-                reorderFrequencyInMonths: map.get("5"),
-                minMonthsOfStock: map.get("6"),
-                monthsInFutureForAmc: map.get("7"),
-                monthsInPastForAmc: map.get("8"),
+                multiplier: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                reorderFrequencyInMonths: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                minMonthsOfStock: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInFutureForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInPastForAmc: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 programPlanningUnitId: map.get("9"),
-                localProcurmentLeadTime: map.get("10") == '' ? null : map.get("10"),
-                shelfLife: map.get("11"),
-                catalogPrice: map.get("12") == '' ? null : map.get("12")
+                localProcurmentLeadTime: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", "") == '' ? null : this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                shelfLife: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                catalogPrice: this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", "") == '' ? null : this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
 
 
             }
@@ -709,25 +718,25 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.unit.multiplier'),
-                                                        type: 'number',
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
 
                                                     },
                                                     {
                                                         title: i18n.t('static.program.reorderFrequencyInMonths'),
-                                                        type: 'number',
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
 
                                                     },
                                                     {
                                                         title: i18n.t('static.supplyPlan.minStockMos'),
-                                                        type: 'number'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.mosfuture'),
-                                                        type: 'number'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.mospast'),
-                                                        type: 'number'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.id'),
@@ -735,15 +744,15 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.pipeline.localprocurementleadtime'),
-                                                        type: 'number',
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.shelfLife'),
-                                                        type: 'number'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                        type: 'number'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.common.status'),
@@ -752,6 +761,14 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     }
                                                 ],
                                                 pagination: localStorage.getItem("sesRecordCount"),
+                                                oncreateeditor: function (a, b, c, d, e) {
+                                                    console.log("In create editor")
+                                                    e.type = 'text';
+                                                    if (e.value) {
+                                                        e.selectionStart = e.value.length;
+                                                        e.selectionEnd = e.value.length;
+                                                    }
+                                                },
                                                 filters: true,
                                                 contextMenu: function (obj, x, y, e) {
                                                     return [];

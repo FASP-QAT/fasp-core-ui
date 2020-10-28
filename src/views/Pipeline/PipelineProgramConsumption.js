@@ -9,7 +9,7 @@ import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions';
-import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PRO_KEY } from '../../Constants';
+import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
@@ -24,24 +24,24 @@ export default class PipelineProgramConsumption extends Component {
         this.state = {
             loading: true
         }
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
             var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(1, y);
+            var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -53,7 +53,7 @@ export default class PipelineProgramConsumption extends Component {
             }
 
             var col = ("C").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(2, y);
+            var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -65,7 +65,7 @@ export default class PipelineProgramConsumption extends Component {
             }
 
             var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
+            var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -79,8 +79,8 @@ export default class PipelineProgramConsumption extends Component {
 
             var reg = JEXCEL_INTEGER_REGEX;
             var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
-            value = value.toString().replaceAll("\,", "");
+            var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            // value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 // alert("in if");
                 this.el.setStyle(col, "background-color", "transparent");
@@ -102,8 +102,8 @@ export default class PipelineProgramConsumption extends Component {
                 }
             }
 
-            var value = this.el.getValueFromCoords(7, y);
-            value = value.toString().replaceAll("\,", "");
+            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));;
+            // value = value.toString().replaceAll("\,", "");
             var validation = checkValidtion("numberNotRequired", "H", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
             if (validation == true) {
                 if (parseInt(value) > 31) {
@@ -123,7 +123,7 @@ export default class PipelineProgramConsumption extends Component {
 
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -184,7 +184,7 @@ export default class PipelineProgramConsumption extends Component {
         if (x == 6) {
             var reg = JEXCEL_INTEGER_REGEX;
             var col = ("G").concat(parseInt(y) + 1);
-            value = value.toString().replaceAll("\,", "");
+            value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -202,6 +202,7 @@ export default class PipelineProgramConsumption extends Component {
         }
 
         if (x == 7) {
+            value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var valid = checkValidtion("numberNotRequired", "H", y, value, this.el, JEXCEL_INTEGER_REGEX, 1, 1);
             if (valid == true) {
                 if (parseInt(value) > 31) {
@@ -217,7 +218,7 @@ export default class PipelineProgramConsumption extends Component {
 
     loaded() {
         var list = this.state.consumptionList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
             var value = (this.el.getRowData(y)[1]).toString();
@@ -274,7 +275,7 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setComments(col, (list[y].realmCountryPlanningUnitId).concat(i18n.t('static.message.notExist')));
             }
 
-            var value = (this.el.getRowData(y)[6]).toString();
+            var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var col = ("G").concat(parseInt(y) + 1);
             var reg = JEXCEL_INTEGER_REGEX;
 
@@ -299,7 +300,7 @@ export default class PipelineProgramConsumption extends Component {
 
     }
     saveConsumption() {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var list = this.state.consumptionList;
         console.log("consumption json------->", json);
         var consumptionArray = []
@@ -320,8 +321,8 @@ export default class PipelineProgramConsumption extends Component {
                 consumptionDate: map.get("5"),
                 actualFlag: map.get("9"),
                 // consumptionQty: map.get("6"),
-                consumptionQty: (map.get("6")).toString().replaceAll("\,", ""),
-                dayOfStockOut: map.get("7"),
+                consumptionQty: (this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                dayOfStockOut: (this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                 dataSourceId: dataSourceId,
                 notes: map.get("8"),
                 realmCountryPlanningUnitId: map.get("3"),
@@ -473,7 +474,7 @@ export default class PipelineProgramConsumption extends Component {
                                                 title: i18n.t('static.pipeline.consumptionDate'),
                                                 type: 'calendar',
                                                 options: {
-                                                    format: JEXCEL_DATE_FORMAT_WITHOUT_DATE
+                                                    format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
                                                 }
                                             },
                                             {
@@ -485,7 +486,10 @@ export default class PipelineProgramConsumption extends Component {
                                             },
                                             {
                                                 title: i18n.t('static.consumption.daysofstockout'),
-                                                type: 'numeric'
+                                                type: 'numeric',
+                                                disabledMaskOnEdition: true,
+                                                mask: '#,##.00',
+                                                decimal: '.'
                                             },
                                             {
                                                 title: i18n.t('static.program.notes'),
@@ -505,6 +509,14 @@ export default class PipelineProgramConsumption extends Component {
                                         contextMenu: function (obj, x, y, e) {
                                             return [];
                                         }.bind(this),
+                                        oncreateeditor: function (a, b, c, d, e) {
+                                            console.log("In create editor")
+                                            e.type = 'text';
+                                            if (e.value) {
+                                                e.selectionStart = e.value.length;
+                                                e.selectionEnd = e.value.length;
+                                            }
+                                        },
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,

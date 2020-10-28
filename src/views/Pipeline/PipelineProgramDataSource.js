@@ -25,21 +25,21 @@ export default class PipelineProgramDataSource extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.saveDataSource = this.saveDataSource.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
         console.log('activeDataSourceList', this.state.activeDataSourceList)
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 1];
+        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         var puList = (this.state.activeDataSourceList).filter(c => c.dataSourceType.id == value);
 
         for (var k = 0; k < puList.length; k++) {
@@ -53,7 +53,7 @@ export default class PipelineProgramDataSource extends Component {
     }
     loaded() {
         var list = this.state.dataSourceList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
@@ -90,7 +90,7 @@ export default class PipelineProgramDataSource extends Component {
 
         //Data source
         if (x == 3) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -114,14 +114,14 @@ export default class PipelineProgramDataSource extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
+            var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
 
             var currentDataSource = this.el.getRowData(y)[1];
 
-            if (value == "") {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -152,7 +152,7 @@ export default class PipelineProgramDataSource extends Component {
 
     saveDataSource() {
         var list = this.state.dataSourceList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var dataSourceArray = []
         console.log(json.length)
         console.log(json)
