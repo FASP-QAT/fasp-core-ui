@@ -1042,7 +1042,7 @@ class ProcurementAgentExport extends Component {
 
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
 
         if (viewby == 1) {
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0) {
@@ -1229,8 +1229,8 @@ class ProcurementAgentExport extends Component {
                         procurementAgentIds: procurementAgentIds,
                         programId: programId,
                         versionId: versionId,
-                        startDate: new moment(startDate),
-                        stopDate: new moment(endDate),
+                        startDate: startDate,
+                        stopDate:endDate,
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
@@ -1532,8 +1532,8 @@ class ProcurementAgentExport extends Component {
                         fundingSourceIds: fundingSourceIds,
                         programId: programId,
                         versionId: versionId,
-                        startDate: new moment(startDate),
-                        stopDate: new moment(endDate),
+                        startDate: startDate,
+                        stopDate:endDate,
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
@@ -1826,8 +1826,8 @@ class ProcurementAgentExport extends Component {
                     var inputjson = {
                         programId: programId,
                         versionId: versionId,
-                        startDate: new moment(startDate),
-                        stopDate: new moment(endDate),
+                        startDate: startDate,
+                        stopDate: endDate,
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
