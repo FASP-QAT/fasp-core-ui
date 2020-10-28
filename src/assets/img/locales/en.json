@@ -175,7 +175,7 @@
     "static.program.dataimportsuccess": "Data imported successfully",
     "static.program.validdelivertoreceivetext": "Enter 'Delivered to Received' lead time (in months)",
     "static.country.currency": "Currency",
-    "static.program.monthfutureamc": "Months in future for AMC",
+    "static.program.monthfutureamc": "Months in future for AMC (including current month)",
     "static.subfundingsource.subfundingsourceaddttext": "Add Sub-Funding Source",
     "static.program.validmanagertext": "Select Program Manager",
     "static.program.airfreightperctext": "Air Freight Percentage",

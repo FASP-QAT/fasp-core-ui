@@ -374,8 +374,8 @@ export default class PipelineProgramDataStepSix extends Component {
                                             <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="company">{i18n.t('static.report.plannedToSubmitLeadTime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
+                                            <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input 
                                                 onBlur={handleBlur}
                                                 valid={!errors.plannedToSubmittedLeadTime && this.props.items.program.plannedToSubmittedLeadTime != ''}
                                                 invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime}
@@ -402,7 +402,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 onBlur={handleBlur}
                                                 valid={!errors.approvedToShippedLeadTime && this.props.items.program.approvedToShippedLeadTime != ''}
