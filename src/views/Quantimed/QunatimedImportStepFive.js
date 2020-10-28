@@ -93,17 +93,21 @@ export default class QunatimedImportStepFive extends Component {
     }
 
     componentDidMount() {
-
+        // this.showFinalData();
     }
 
     loaded_four = function (instance, cell, x, y, value) {
 
         jExcelLoadedFunctionQuantimed(instance);
 
+        var asterisk = document.getElementsByClassName("resizable")[1];
+        var tr = asterisk.firstChild;        
+        tr.children[7].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
+        tr.children[8].title = `${i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * ${i18n.t('static.quantimed.importpercentage')} * ${i18n.t('static.quantimed.conversionFactor')} = ${i18n.t('static.quantimed.newconsupmtionqty')}`
     }
 
     updateState(parameterName, value) {
-        
+
         this.setState({
             [parameterName]: value
         })
@@ -140,7 +144,7 @@ export default class QunatimedImportStepFive extends Component {
                         onClick: () => {
                             this.setState({
                                 loading: true
-                            })                            
+                            })
 
                             var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                             var curUser = AuthenticationService.getLoggedInUserId();
@@ -162,7 +166,7 @@ export default class QunatimedImportStepFive extends Component {
                             this.setState({
                                 finalImportData: activeFilter
                             })
-                            
+
                             let moments = dates.map(d => moment(d));
                             var minDate = moment.min(moments).format("YYYY-MM-DD");
 
@@ -176,7 +180,7 @@ export default class QunatimedImportStepFive extends Component {
                                 this.props.hideFirstComponent();
                             }.bind(this);
                             openRequest.onsuccess = function (e) {
-                                
+
                                 db1 = e.target.result;
                                 var transaction;
                                 var programTransaction;
@@ -218,16 +222,16 @@ export default class QunatimedImportStepFive extends Component {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
                                                 && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
                                                 && c.actualFlag == false && c.multiplier == 1);
-                                            
+
                                             if (index != -1) {
                                                 consumptionDataList[index].consumptionQty = qunatimedData[i].updateConsumptionQuantity;
                                                 consumptionDataList[index].consumptionRcpuQty = qunatimedData[i].updateConsumptionQuantity;
                                                 consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
-                                                
+
                                                 consumptionDataList[index].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[index].lastModifiedDate = curDate;
                                             } else {
-                                                
+
                                                 var consumptionJson = {
                                                     consumptionId: 0,
                                                     dataSource: {
@@ -265,7 +269,7 @@ export default class QunatimedImportStepFive extends Component {
                                         }
 
                                         programJson.consumptionList = consumptionDataList;
-                                        
+
 
                                         programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
 
@@ -293,7 +297,7 @@ export default class QunatimedImportStepFive extends Component {
                                                     finalQATPlanningList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
                                                 }
                                             }
-                                            
+
                                             calculateSupplyPlan(this.props.items.program.programId, 0, 'programData', 'quantimedImport', this, finalQATPlanningList, minDate);
 
                                         }.bind(this);
@@ -320,13 +324,13 @@ export default class QunatimedImportStepFive extends Component {
         this.el.destroy();
         var myVar = "";
         var json = this.props.items.importData.records;
-        
 
-        // let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
-        // let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
+
+        let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
+        let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
 
         var planningUnitFilter = json.filter(c => c.product.programPlanningUnitId != "-1");
-        // const dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))        
+        var dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))
 
 
         var db1;
@@ -339,7 +343,7 @@ export default class QunatimedImportStepFive extends Component {
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
-            
+
             db1 = e.target.result;
             var transaction;
             var programTransaction;
@@ -363,15 +367,15 @@ export default class QunatimedImportStepFive extends Component {
 
 
                 var consumptionDataList = (programJson.consumptionList);
-                
-                var qunatimedData = planningUnitFilter;
+
+                var qunatimedData = dateFilter;
                 var finalList = [];
                 for (var i = 0; i < qunatimedData.length; i++) {
                     var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
                         && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
                         && c.actualFlag == false && c.multiplier == 1);
 
-                    if (index != -1) {                        
+                    if (index != -1) {
                         qunatimedData[i].existingConsumptionQty = consumptionDataList[index].consumptionQty;
                     } else {
                         qunatimedData[i].existingConsumptionQty = "";
@@ -385,13 +389,13 @@ export default class QunatimedImportStepFive extends Component {
                 })
 
                 var qatPlanningList = this.props.items.qatPlanningList;
-                
+
                 var data_1 = [];
                 var records = [];
 
                 for (var i = 0; i < finalList.length; i++) {
 
-                    
+
                     data_1 = [];
                     data_1[0] = finalList[i].productId;// A
                     data_1[1] = finalList[i].product.productName;// B
@@ -400,8 +404,8 @@ export default class QunatimedImportStepFive extends Component {
                     data_1[4] = finalList[i].ingConsumption;// E 
                     data_1[5] = this.props.items.program.regionConversionFactor;// F 
                     data_1[6] = finalList[i].product.multiplier;// G 
-                    data_1[7] = finalList[i].existingConsumptionQty;// H 
-                    data_1[8] = finalList[i].updateConsumptionQuantity;// I                     
+                    data_1[7] = finalList[i].updateConsumptionQuantity;// H 
+                    data_1[8] = finalList[i].existingConsumptionQty;// I                     
                     data_1[9] = true;// J                                              
                     records.push(data_1);
                 }
@@ -415,13 +419,13 @@ export default class QunatimedImportStepFive extends Component {
                         i18n.t('static.supplyPlan.qatProduct'),
                         i18n.t('static.quantimed.consumptionDate'),
                         i18n.t('static.quantimed.quantimedForecastConsumptionQty'),
-                        i18n.t('static.quantimed.regionConversionFactor'),
+                        i18n.t('static.quantimed.importpercentage'),
                         i18n.t('static.quantimed.conversionFactor'),
-                        i18n.t('static.quantimed.existingconsupmtionqty'),
                         i18n.t('static.quantimed.newconsupmtionqty'),
+                        i18n.t('static.quantimed.existingconsupmtionqty'),
                         i18n.t('static.quantimed.importData')
                     ],
-                    colWidths: [35, 80, 80, 30, 30, 28, 28, 30, 30, 15],
+                    colWidths: [35, 80, 80, 30, 30, 28, 28, 30, 30, 20],
                     columns: [
                         { type: 'text', readOnly: true },
                         { type: 'text', readOnly: true },
@@ -483,7 +487,14 @@ export default class QunatimedImportStepFive extends Component {
                 <br></br>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
+                    
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
+
+                    <Col xs="12" sm="12">
+                        <h6>
+                            {i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * {i18n.t('static.quantimed.importpercentage')} * {i18n.t('static.quantimed.conversionFactor')} = {i18n.t('static.quantimed.newconsupmtionqty')}
+                        </h6>
+                    </Col>
 
                         <Col xs="12" sm="12">
 

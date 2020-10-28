@@ -40,11 +40,9 @@ const validationSchema = function (values) {
         organisationName: Yup.string()
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
-        // organisationCode: Yup.string()
-        // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-        // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-        // .required(i18n.t('static.common.displayName'))
-        // .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+        organisationCode: Yup.string()
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -695,10 +693,10 @@ export default class OrganisationTicketComponent extends Component {
                                         </FormGroup>
                                         < FormGroup >
                                             <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="organisationCode" id="organisationCode" readOnly={true}
+                                            <Input type="text" name="organisationCode" id="organisationCode"
                                                 bsSize="sm"
-                                                // valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
-                                                // invalid={touched.organisationCode && !!errors.organisationCode}
+                                                valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
+                                                invalid={touched.organisationCode && !!errors.organisationCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.organisation.organisationCode}

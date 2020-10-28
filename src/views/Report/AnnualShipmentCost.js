@@ -93,6 +93,7 @@ class AnnualShipmentCost extends Component {
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let shipmentStatusIds = this.state.statusValues.length == this.state.shipmentStatuses.length ? [] : this.state.statusValues.map(ele => (ele.value).toString());
+        let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
 
         this.setState({
             outPutList: []
@@ -101,7 +102,7 @@ class AnnualShipmentCost extends Component {
                 "programId": document.getElementById("programId").value,
                 "versionId": document.getElementById("versionId").value,
                 "procurementAgentIds": procurementAgentIds,
-                "planningUnitId": document.getElementById("planningUnitId").value,
+                "planningUnitIds": planningUnitIds,//document.getElementById("planningUnitId").value,
                 "fundingSourceIds": fundingSourceIds,
                 "shipmentStatusIds": shipmentStatusIds,
                 "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
@@ -112,12 +113,12 @@ class AnnualShipmentCost extends Component {
 
             let versionId = document.getElementById("versionId").value;
             let programId = document.getElementById("programId").value;
-            let planningUnitId = document.getElementById("planningUnitId").value;
+            //let planningUnitId = document.getElementById("planningUnitId").value;
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-            let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+            let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate();
             let reportbaseValue = document.getElementById("view").value;
-
-            if (programId > 0 && versionId != 0 && planningUnitId > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
+console.log('****',startDate,endDate)
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
                     var storeOS;
@@ -186,6 +187,8 @@ class AnnualShipmentCost extends Component {
                                     var outPutList = [];
                                     var shipmentList = [];
                                     shipmentList = programJson.shipmentList;
+                                    this.state.planningUnitValues.map(p=>{
+var planningUnitId =p.value
                                     var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
 
                                     if (reportbaseValue == 1) {
@@ -237,14 +240,15 @@ class AnnualShipmentCost extends Component {
                                                     'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
                                                     'fundingsource': fundingSource.fundingSourceCode,
                                                     'procurementAgent': procurementAgent.procurementAgentCode,
-                                                    'PLANNING_UNIT_ID': document.getElementById('planningUnitId').value,
+                                                    'PLANNING_UNIT_ID': planningUnitId,
                                                     'planningUnit': list[0].planningUnit.label.label_en
 
                                                 };
                                                 var monthstartfrom = this.state.rangeValue.from.month
                                                 for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                                                     var dtstr = from + "-" + String(monthstartfrom).padStart(2, '0') + "-01"
-                                                    var enddtStr = from + "-" + String(from == to ? this.state.rangeValue.to.month : 12).padStart(2, '0') + '-' + new Date(from, 12, 0).getDate()
+                                                    var m=from == to ? this.state.rangeValue.to.month : 12
+                                                    var enddtStr = from + "-" + String(m).padStart(2, '0') + '-' + new Date(from, m, 0).getDate()
                                                     console.log(dtstr, ' ', enddtStr)
                                                     var list2 = []
                                                     if (reportbaseValue == 1) {
@@ -265,6 +269,10 @@ class AnnualShipmentCost extends Component {
                                                 outPutList.push(json);
                                             }
                                         })
+                                    })})
+
+                                    outPutList = outPutList.sort(function (a, b) {
+                                        return parseInt(a.PROCUREMENT_AGENT_ID) - parseInt(b.PROCUREMENT_AGENT_ID);
                                     })
                                     this.setState({ outPutList: outPutList, message: '', loading: false });
 
@@ -335,7 +343,7 @@ class AnnualShipmentCost extends Component {
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [], outPutList: [] });
 
-            } else if (planningUnitId == 0) {
+            } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], outPutList: [] });
 
             } else if (this.state.procurementAgentValues.length == 0) {
@@ -540,11 +548,14 @@ class AnnualShipmentCost extends Component {
                     var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10), procurementAgentText)
 
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), {
-                        align: 'left'
-                    })
+                    // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), {
+                    //     align: 'left'
+                    // })
+                    var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 130 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), planningText)
+
                     var statustext = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.statusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), statustext)
+                    doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10) + (planningText.length * 10), statustext)
 
 
                 }
@@ -556,26 +567,30 @@ class AnnualShipmentCost extends Component {
 
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-
+var ystart= 160+doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length*10
         doc.setFontSize(9);
         doc.setTextColor("#002f6c");
         doc.setFont('helvetica', 'bold')
-        doc.text(i18n.t('static.procurementagent.procurementagent'), 50, 180, {
+        doc.text(i18n.t('static.procurementagent.procurementagent'), 50, ystart, {
             align: 'left'
         })
-        doc.text(i18n.t(i18n.t('static.fundingsource.fundingsource')), 60, 190, {
+        ystart=ystart+10
+        doc.text(i18n.t(i18n.t('static.fundingsource.fundingsource')), 60, ystart, {
             align: 'left'
         })
+        ystart=ystart+10
         doc.setFont('helvetica', 'normal')
-        doc.text(i18n.t('static.planningunit.planningunit'), 70, 200, {
+        doc.text(i18n.t('static.planningunit.planningunit'), 70, ystart, {
             align: 'left'
         })
         doc.setFont('helvetica', 'bold')
-        doc.line(50, 210, doc.internal.pageSize.width - 50, 210);
+        ystart=ystart+10
+        doc.line(50, ystart, doc.internal.pageSize.width - 50, ystart);
         var year = [];
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
             year.push(from);
         }
+       // ystart=ystart+10
         // var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
         var data = this.state.outPutList;
         // var data = [{ 2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
@@ -586,16 +601,16 @@ class AnnualShipmentCost extends Component {
         var initalvalue = index + 10
         for (var i = 0; i < year.length; i++) {
             initalvalue = initalvalue + index
-            doc.text(year[i].toString(), initalvalue, 180, {
+            doc.text(year[i].toString(), initalvalue, ystart-20, {
                 align: 'left',
             })
         }
         initalvalue += index
-        doc.text('Total', initalvalue, 180, {
+        doc.text('Total', initalvalue, ystart-20, {
             align: 'left'
         })
         initalvalue = 10
-        var yindex = 250
+        var yindex = ystart+20
         var totalAmount = []
         var GrandTotalAmount = []
         console.log('data', data)
@@ -615,7 +630,7 @@ class AnnualShipmentCost extends Component {
 
                 doc.setFont('helvetica', 'bold')
 
-                if (yindex > doc.internal.pageSize.height - 100) {
+                if (yindex > doc.internal.pageSize.height - 110) {
                     doc.addPage();
                     yindex = 80;
 
@@ -629,7 +644,7 @@ class AnnualShipmentCost extends Component {
 
                 doc.setFont('helvetica', 'bold')
 
-                if (yindex > doc.internal.pageSize.height - 100) {
+                if (yindex > doc.internal.pageSize.height - 110) {
                     doc.addPage();
                     yindex = 80;
 
@@ -646,7 +661,7 @@ class AnnualShipmentCost extends Component {
 
                 doc.setFont('helvetica', 'normal')
 
-                if (yindex > doc.internal.pageSize.height - 100) {
+                if (yindex > doc.internal.pageSize.height - 110) {
                     doc.addPage();
                     yindex = 80;
 
@@ -665,18 +680,39 @@ class AnnualShipmentCost extends Component {
                         totalAmount[x] = totalAmount[x] == null ? parseFloat(values[n]) : parseFloat(totalAmount[x]) + parseFloat(values[n])
                         GrandTotalAmount[x] = GrandTotalAmount[x] == null ? parseFloat(values[n]) : parseFloat(GrandTotalAmount[x]) + parseFloat(values[n])
                         doc.setFont('helvetica', 'normal')
-                        doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 30, {
-                            align: 'left'
-                        })
+                        if (yindex-40 > doc.internal.pageSize.height - 110) {
+                            doc.addPage();
+                           // yindex = 80;
+                            doc.text(this.formatter(values[n]).toString(), initalvalue, 80, {
+                                align: 'left'
+                            })
+        
+                        }else{
+                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 20, {
+                                align: 'left'
+                            })
+                        }
+                      
                     }
                 }
             }
             console.log(total)
             doc.setFont('helvetica', 'bold')
-            doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 30, {
+            if (yindex-40 > doc.internal.pageSize.height - 110) {
+                doc.addPage();
+                yindex = 80;
+               doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index,  80, {
                 align: 'left',
 
             });
+
+            }else{
+                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 20, {
+                    align: 'left',
+    
+                });
+            }
+            
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
             GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
             if (j < data.length - 1) {
@@ -1268,13 +1304,10 @@ class AnnualShipmentCost extends Component {
             }, this)
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.planningUnit.id}>
-                        {getLabelText(item.planningUnit.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        && planningUnits.map((item, i) => {
+          return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+  
+        }, this);
 
         // const { planningUnits } = this.state
         // let planningUnitList = planningUnits.length > 0
@@ -1453,8 +1486,20 @@ class AnnualShipmentCost extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-
                                             <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                  <div className="controls">
+
+                    <MultiSelect
+                      name="planningUnitId"
+                      id="planningUnitId"
+                      bsSize="md"
+                      value={this.state.planningUnitValues}
+                      onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                      options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                    />     </div></FormGroup>
+                                            {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
@@ -1470,10 +1515,10 @@ class AnnualShipmentCost extends Component {
                                                         </Input>
                                                         {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon> */}
+                                  </InputGroupAddon> 
                                                     </InputGroup>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
 
 
                                             <FormGroup className="col-md-3" >

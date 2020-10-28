@@ -102,7 +102,7 @@ export default class SyncMasterData extends Component {
         return (
             <div className="animated fadeIn">
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
-                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
+                {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
@@ -292,7 +292,7 @@ export default class SyncMasterData extends Component {
             }
         }
 
-        this.refs.programListChild.checkNewerVersions();
+        // this.refs.programListChild.checkNewerVersions();
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
 
         if (valid) {
