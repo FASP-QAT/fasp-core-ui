@@ -640,7 +640,7 @@ class StockAdjustmentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 80,80,80,80,120],
+            colWidths: [100, 100, 80, 80, 80, 80, 120],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -660,7 +660,8 @@ class StockAdjustmentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.report.stockAdjustment'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {

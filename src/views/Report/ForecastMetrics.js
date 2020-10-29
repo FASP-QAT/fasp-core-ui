@@ -510,7 +510,8 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.noofmonth'),
-          type: 'text',
+          type: 'numeric',
+          mask: '#,##.00',
         },
         {
           title: i18n.t('static.report.error'),

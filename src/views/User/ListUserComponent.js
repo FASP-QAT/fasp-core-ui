@@ -421,7 +421,7 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY} from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -578,7 +578,8 @@ class ListUserComponent extends Component {
                 },
                 {
                     title: i18n.t('static.user.phoneNumber'),
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
                     readOnly: true
                 },
                 {
@@ -588,7 +589,8 @@ class ListUserComponent extends Component {
                 },
                 {
                     title: i18n.t('static.user.failedAttempts'),
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
                     readOnly: true
                 },
                 {
@@ -624,7 +626,7 @@ class ListUserComponent extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,

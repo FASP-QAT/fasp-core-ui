@@ -534,10 +534,10 @@ export default class InventoryTurns extends Component {
         for (var j = 0; j < costOfInventory.length; j++) {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang);
-            data[1] = this.formatter(costOfInventory[j].totalConsumption);
-            data[2] = this.formatter(costOfInventory[j].avergeStock);
-            data[3] = this.formatter(costOfInventory[j].noOfMonths);
-            data[4] = this.formatterDouble(costOfInventory[j].inventoryTurns);
+            data[1] = costOfInventory[j].totalConsumption;
+            data[2] = costOfInventory[j].avergeStock;
+            data[3] = costOfInventory[j].noOfMonths;
+            data[4] = costOfInventory[j].inventoryTurns;
 
             costOfInventoryArray[count] = data;
             count++;
@@ -566,22 +566,26 @@ export default class InventoryTurns extends Component {
                 },
                 {
                     title: i18n.t('static.report.totconsumption'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.avergeStock'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.noofmonth'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.inventoryTurns'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
             ],

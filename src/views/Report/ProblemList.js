@@ -853,7 +853,8 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                 },
                 {
                     title: i18n.t('static.region.region'),
@@ -926,7 +927,7 @@ export default class ConsumptionDetails extends React.Component {
 
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1710,10 +1711,10 @@ export default class ConsumptionDetails extends React.Component {
                             </ul>
                         </FormGroup>
                         <div className="qat-problemListSearch">
-                        {/* <div className="ProgramListSearch"> */}
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground ">
-                        </div>
-                        {/* </div> */}
+                            {/* <div className="ProgramListSearch"> */}
+                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground ">
+                            </div>
+                            {/* </div> */}
                         </div>
                     </CardBody>
 

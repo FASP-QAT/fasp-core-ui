@@ -581,11 +581,11 @@ class StockStatusAcrossPlanningUnits extends Component {
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = data1;
-            data[2] = this.formatterDouble(dataStockStatus[j].mos);
-            data[3] = this.formatterDouble(dataStockStatus[j].minMos);
-            data[4] = this.formatterDouble(dataStockStatus[j].maxMos);
-            data[5] = this.formatter(dataStockStatus[j].stock);
-            data[6] = this.formatter(dataStockStatus[j].amc);
+            data[2] = dataStockStatus[j].mos;
+            data[3] = dataStockStatus[j].minMos;
+            data[4] = dataStockStatus[j].maxMos;
+            data[5] = dataStockStatus[j].stock;
+            data[6] = dataStockStatus[j].amc;
             data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('MMM-yy') : null);
 
             dataArray[count] = data;
@@ -617,23 +617,28 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.mos'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                 },
                 {
                     title: i18n.t('static.supplyPlan.minStockMos'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                 },
                 {
                     title: i18n.t('static.supplyPlan.maxStockMos'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                 },
                 {
                     title: i18n.t('static.report.amc'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
@@ -859,8 +864,8 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     }
 
-    filterDataAsPertracerCategory=()=>{
-        
+    filterDataAsPertracerCategory = () => {
+
     }
 
 
@@ -1148,7 +1153,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 )
             }, this);
 
-            const { tracerCategories } = this.state;
+        const { tracerCategories } = this.state;
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1396,7 +1401,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                         {/*   <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                            {/*   <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">
                                         <InputGroup>
@@ -1422,7 +1427,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         </InputGroup>
                                     </div>
                                                 </FormGroup>*/}
-                            
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
                                                 <div className="controls ">

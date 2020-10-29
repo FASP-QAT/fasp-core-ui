@@ -747,12 +747,14 @@ class ListProcurementAgentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     type: 'hidden',
                 },
                 {
@@ -784,7 +786,7 @@ class ListProcurementAgentComponent extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,

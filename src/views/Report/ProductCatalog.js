@@ -495,10 +495,10 @@ class ProductCatalog extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [ 80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
+            colWidths: [80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                
+
                 {
                     title: i18n.t('static.dashboard.productcategory'),
                     type: 'text',
@@ -524,7 +524,8 @@ class ProductCatalog extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.forecastingtoPlanningUnitMultiplier'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.planningUnit'),
@@ -536,21 +537,25 @@ class ProductCatalog extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.min'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.reorderFrequencyInMonths'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.shelfLife'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 }, {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {

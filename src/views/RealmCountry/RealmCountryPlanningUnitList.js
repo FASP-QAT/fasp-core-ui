@@ -405,7 +405,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                 {
                     // title: i18n.t('static.planningUnit.multiplierLabel'),
                     title: i18n.t('static.unit.multiplier'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {

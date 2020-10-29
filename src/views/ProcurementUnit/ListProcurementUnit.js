@@ -449,7 +449,8 @@ export default class ListProcurementUnit extends Component {
         },
         {
           title: i18n.t('static.procurementUnit.multiplier'),
-          type: 'text',
+          type: 'numeric',
+          mask: '#,##.00',
           readOnly: true
         },
         {
