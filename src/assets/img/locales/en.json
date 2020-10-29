@@ -1456,6 +1456,7 @@
     "static.notsufficientaccess":"You tried to access a page that is protected and you do not have sufficient rights.",
     "static.ticket.realmcountry": "Realm Country",
     "static.commitVersion.problemReportId":"Problem Report Id",
-    "static.button.commit":"Commit"
+    "static.button.commit":"Commit",
+    "static.problemActionReport.problemCategory":"Problem Category"
 
 }

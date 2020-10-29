@@ -334,6 +334,10 @@ export default class QatProblemActions extends Component {
 
                                                                     problemActionIndex: problemActionIndex,
 
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -544,7 +548,11 @@ export default class QatProblemActions extends Component {
                                                                     newAdded: false,
 
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -715,6 +723,10 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex: problemActionIndex,
 
                                                                     index: index,
+                                                                    problemCategory: {
+                                                                        id: 2,
+                                                                        label: { label_en: 'Procurement Schedule' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -980,6 +992,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -1188,6 +1204,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -1456,6 +1476,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -1724,6 +1748,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -1989,6 +2017,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -2308,6 +2340,10 @@ export default class QatProblemActions extends Component {
                                                                             data5: '',
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
+                                                                            problemCategory: {
+                                                                                id: 3,
+                                                                                label: { label_en: 'Supply Planning' }
+                                                                            },
                                                                             problemStatus: {
                                                                                 id: 1,
                                                                                 label: { label_en: 'Open' }
@@ -2595,6 +2631,10 @@ export default class QatProblemActions extends Component {
                                                                             data5: '',
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
+                                                                            problemCategory: {
+                                                                                id: 3,
+                                                                                label: { label_en: 'Supply Planning' }
+                                                                            },
                                                                             problemStatus: {
                                                                                 id: 1,
                                                                                 label: { label_en: 'Open' }
@@ -2868,6 +2908,10 @@ export default class QatProblemActions extends Component {
                                                                             data5: '',
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
+                                                                            problemCategory: {
+                                                                                id: 3,
+                                                                                label: { label_en: 'Supply Planning' }
+                                                                            },
                                                                             problemStatus: {
                                                                                 id: 1,
                                                                                 label: { label_en: 'Open' }
@@ -3192,6 +3236,10 @@ export default class QatProblemActions extends Component {
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
 
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -3507,7 +3555,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -3820,7 +3871,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4131,7 +4185,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4444,7 +4501,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4767,7 +4827,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4995,7 +5058,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -5230,7 +5296,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
