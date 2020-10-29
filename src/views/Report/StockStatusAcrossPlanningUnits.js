@@ -1398,7 +1398,7 @@ this.state.tracerCategoryValues.map(tc=>{
                         </div>
                     </div>
                     <CardBody className="pb-lg-5 pt-lg-0 ">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
 
                                 <Form >
