@@ -151,13 +151,18 @@ class MasterSyncService {
         });
     }
 
+    getProblemCategoryForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/problemCategory/${lastSyncDate}`, {
+        });
+    }
+
     syncProgram(programId, versionId, lastSyncDate) {
         console.log("In service")
         return axios.get(`${API_URL}/api/programData/shipmentSync/programId/${programId}/versionId/${versionId}/lastSyncDate/${lastSyncDate}`, {
         });
     }
 
-    getSyncAllMasters(lastSyncDate){
+    getSyncAllMasters(lastSyncDate) {
         return axios.get(`${API_URL}/api/sync/allMasters/${lastSyncDate}`, {
         });
     }

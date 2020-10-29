@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.program.realmcountrydashboard"))
+let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Edit Realm Country"
 const initialValues = {
     summary: summaryText_1,
@@ -28,7 +28,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         realmCountryName: Yup.string()
-            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.program.realmcountrydashboard')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.program.realmcountrydashboard'))))),
+            .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.ticket.realmcountry')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.ticket.realmcountry'))))),
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
@@ -233,7 +233,7 @@ export default class EditRealmCountryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.program.realmcountrydashboard')}</h4>
+                <h4>{i18n.t('static.ticket.realmcountry')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -334,7 +334,7 @@ export default class EditRealmCountryTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="realmCountryName">{i18n.t('static.program.realmcountrydashboard')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="realmCountryName">{i18n.t('static.ticket.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="realmCountryName" id="realmCountryName"
                                                 bsSize="sm"
                                                 valid={!errors.realmCountryName && this.state.realmCountry.realmCountryName != ''}

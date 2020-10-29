@@ -139,6 +139,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('problemCriticality')) {
             storeOS = db1.createObjectStore('problemCriticality', { keyPath: 'id', autoIncrement: true });
         }
+        if(!db1.objectStoreNames.contains('problemCategory')){
+            storeOS = db1.createObjectStore('problemCategory', { keyPath: 'id', autoIncrement: true });
+        }
         console.log("indexed db completed----------------------")
     };
 }

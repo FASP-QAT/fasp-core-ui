@@ -496,7 +496,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -1457,6 +1457,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tbody>
 
                                 </Table>
+                                <Table>
+                                    <tbody>
                                 <div className="" >
                                     {
                                         this.state.jsonArrForGraph.length > 0
@@ -1468,11 +1470,13 @@ export default class SupplyPlanComponent extends React.Component {
                                                     <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                 </div>
                                             </div>
-                                            <div className="offset-6 col-md-6"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="offset-6 col-md-12"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
 
                                 </div>
+                                </tbody>
+                                </Table>
                             </div>
 
                         </div>
@@ -3573,12 +3577,13 @@ export default class SupplyPlanComponent extends React.Component {
                                                             ))
                                                         }
                                                         
-<li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
                                                         <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-
-                                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                                         <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                                         <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                                                         <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
+                                                        <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">Local Procurment </span></li>
+                                                        <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">Emergency Comment </span></li>
                                                     </ul>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>

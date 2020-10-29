@@ -628,77 +628,78 @@ export default class ShipmentDelinking extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.dlink'),
-                            onclick: function () {
-                                this.setState({ loading: true })
-                                ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
-                                    .then(response => {
-                                        console.log("link response===", response);
-                                        this.setState({
-                                            message: i18n.t('static.shipment.delinkingsuccess'),
-                                            color: 'green',
-                                            haslink: true,
-                                            loading: false
+            contextMenu : false,
+            // contextMenu: function (obj, x, y, e) {
+            //     var items = [];
+            //     if (y != null) {
+            //         if (obj.options.allowInsertRow == true) {
+            //             items.push({
+            //                 title: i18n.t('static.common.dlink'),
+            //                 onclick: function () {
+            //                     this.setState({ loading: true })
+            //                     ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
+            //                         .then(response => {
+            //                             console.log("link response===", response);
+            //                             this.setState({
+            //                                 message: i18n.t('static.shipment.delinkingsuccess'),
+            //                                 color: 'green',
+            //                                 haslink: true,
+            //                                 loading: false
 
-                                        }, () => {
-                                            this.hideSecondComponent();
-                                            document.getElementById('div2').style.display = 'block';
-                                            this.filterData();
-                                        });
+            //                             }, () => {
+            //                                 this.hideSecondComponent();
+            //                                 document.getElementById('div2').style.display = 'block';
+            //                                 this.filterData();
+            //                             });
 
-                                    }).catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
+            //                         }).catch(
+            //                             error => {
+            //                                 if (error.message === "Network Error") {
+            //                                     this.setState({
+            //                                         message: 'static.unkownError',
+            //                                         loading: false
+            //                                     });
+            //                                 } else {
+            //                                     switch (error.response ? error.response.status : "") {
 
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    );
+            //                                         case 401:
+            //                                             this.props.history.push(`/login/static.message.sessionExpired`)
+            //                                             break;
+            //                                         case 403:
+            //                                             this.props.history.push(`/accessDenied`)
+            //                                             break;
+            //                                         case 500:
+            //                                         case 404:
+            //                                         case 406:
+            //                                             this.setState({
+            //                                                 message: error.response.data.messageCode,
+            //                                                 loading: false
+            //                                             });
+            //                                             break;
+            //                                         case 412:
+            //                                             this.setState({
+            //                                                 message: error.response.data.messageCode,
+            //                                                 loading: false
+            //                                             });
+            //                                             break;
+            //                                         default:
+            //                                             this.setState({
+            //                                                 message: 'static.unkownError',
+            //                                                 loading: false
+            //                                             });
+            //                                             break;
+            //                                     }
+            //                                 }
+            //                             }
+            //                         );
 
-                            }.bind(this)
-                        });
-                    }
-                }
+            //                 }.bind(this)
+            //             });
+            //         }
+            //     }
 
-                return items;
-            }.bind(this)
+            //     return items;
+            // }.bind(this)
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -1200,11 +1201,12 @@ export default class ShipmentDelinking extends Component {
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
-                                                        type="text"
+                                                        type="textarea"
                                                         name="notesTxt"
                                                         id="notesTxt"
                                                         bsSize="sm"
                                                         autocomplete="off"
+                                                        maxLength={600}
                                                     >
                                                     </Input>
                                                 </InputGroup>
