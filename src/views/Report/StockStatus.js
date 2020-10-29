@@ -95,7 +95,10 @@ const options = {
 
         }
 
-      },
+      }, gridLines: {
+        color: 'rgba(171,171,171,1)',
+        lineWidth: 0
+      }
 
     }, {
       id: 'B',
@@ -126,7 +129,7 @@ const options = {
       },
       gridLines: {
         color: 'rgba(171,171,171,1)',
-        lineWidth: 0.5
+        lineWidth: 0
       }
     }],
     xAxes: [{
@@ -142,6 +145,10 @@ const options = {
         fontColor: 'black',
         fontStyle: "normal",
         fontSize: "12"
+      },
+      gridLines: {
+        color: 'rgba(171,171,171,1)',
+        lineWidth: 0
       }
     }]
   },
@@ -302,7 +309,9 @@ class StockStatus extends Component {
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.amc').replaceAll(' ', '%20'),
-    i18n.t('static.report.mos').replaceAll(' ', '%20')])];
+    i18n.t('static.report.mos').replaceAll(' ', '%20'),
+    i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
+    i18n.t('static.report.maxmonth').replaceAll(' ', '%20')])];
 
     var A = headers
     var re;
@@ -312,7 +321,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos)])));
+      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos),this.roundN(ele.minMos),this.roundN(ele.maxMos)])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -345,7 +354,7 @@ class StockStatus extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
       }
@@ -411,7 +420,9 @@ class StockStatus extends Component {
     i18n.t('static.report.adjustmentQty'),
     i18n.t('static.supplyPlan.endingBalance'),
     i18n.t('static.report.amc'),
-    i18n.t('static.report.mos')]];
+    i18n.t('static.report.mos'),
+    i18n.t('static.report.minmonth'),
+    i18n.t('static.report.maxmonth')]];
 
     let data =
       this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption ? '' : this.formatter(ele.consumptionQty), ele.actualConsumption ? this.formatter(ele.consumptionQty) : '', this.formatter(ele.shipmentQty),
@@ -419,16 +430,16 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang))
       }).join(' \n')
-        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos))]);
+        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)),this.formatter(this.roundN(ele.minMos)),this.formatter(this.roundN(ele.maxMos))]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: height,
       head: header,
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, cellWidth: 67, halign: 'center' },
+      styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
       columnStyles: {
-        5: { cellWidth: 158.89 },
+        5: { cellWidth: 156.89 },
       }
     };
     doc.autoTable(content);
@@ -1436,7 +1447,7 @@ class StockStatus extends Component {
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
-                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="4"> {i18n.t('static.report.stock')} </th> </tr><tr>
+                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th> </tr><tr>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
@@ -1446,6 +1457,8 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.minmonth')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1489,6 +1502,12 @@ class StockStatus extends Component {
                             </td>
                             <td>
                               {this.roundN(this.state.stockStatusList[idx].mos)}
+                            </td>
+                            <td>
+                              {this.roundN(this.state.stockStatusList[idx].minMos)}
+                            </td>
+                            <td>
+                              {this.roundN(this.state.stockStatusList[idx].maxMos)}
                             </td>
 
                           </tr>)
