@@ -298,7 +298,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     this.state.countryLabels.map(ele =>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     this.state.tracerCategoryLabels.map(ele =>
-      csvRow.push((i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      csvRow.push('"'+(i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20')+'"'))
     csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
 
     csvRow.push('')
@@ -371,7 +371,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -985,11 +985,11 @@ filteredData.push({
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
                           options=
-                          {tracerCategories.length > 0
-                            && tracerCategories.map((item, i) => {
+                          {tracerCategories.length > 0?
+                             tracerCategories.map((item, i) => {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
 
-                            }, this)} />
+                            }, this):[]} />
 
                       </div>
                     </FormGroup>

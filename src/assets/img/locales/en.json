@@ -150,7 +150,7 @@
     "static.currency.currencycodetext": "Enter Currency Display Name",
     "static.dashboard.region": "Regions",
     "static.language.languagecodetext": "Enter Language Display Name",
-    "static.program.validseafreighttext": "Enter sea/land freight percentage",
+    "static.program.validseafreighttext": "Enter Sea/Land Freight Percentage",
     "static.common.startdate": "Start Date",
     "static.common.cancel": "Cancel",
     "static.common.accept": "Accept",
@@ -344,7 +344,7 @@
     "static.realm.monthInFutureForAmcText": "Enter # future months (including current month) used for calculating AMC",
     "static.realm.orderFrequencyText": "Enter Order Frequency (# orders/year)",
     "static.realm.realmCodeLength": "Enter realm display name (max 6 char)",
-    "static.procurementagent.procurmentAgentMaster": "Procurment Agent",
+    "static.procurementagent.procurmentAgentMaster": "Procurement Agent",
     "static.procurementagent.procurementagentdrafttosubmittime": "'Draft to Submitted' Lead Time (months)",
     "static.procurementagent.procurementagentsubmittoapprovetime": "Enter 'Submitted to Approved' lead time for this procurement agent (in months)",
     "static.procurementagent.procurementagentapprovetoshippedtime": "Enter 'Approved to Shipped' lead time for this procurement agent (in months)",
@@ -1446,5 +1446,6 @@
     "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecasted Consumption",
     "static.ticket.addressedIssues": "Addressed Tickets",
     "static.quantimed.regionPercentagevalidation": "Please enter number between 1 to 100",
+    "static.notsufficientaccess":"You tried to access a page that is protected and you do not have sufficient rights.",    
     "static.ticket.realmcountry": "Realm Country"
 }

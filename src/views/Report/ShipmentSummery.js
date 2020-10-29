@@ -346,7 +346,7 @@ class ShipmentSummery extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -1814,7 +1814,7 @@ class ShipmentSummery extends Component {
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder==true?i18n.t('static.report.erpOrder'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localprocurement==true?i18n.t('static.report.localprocurement'):'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localProcurement==true?i18n.t('static.report.localprocurement'):'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo!=null? this.state.shipmentDetailsList[idx].orderNo:'')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>

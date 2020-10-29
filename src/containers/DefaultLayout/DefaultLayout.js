@@ -412,7 +412,7 @@ const routes = [
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
   { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
-  { path: '/program/syncPage', name: "Commit Version", component: syncPage },
+  { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
   { path: '/program/importProgram', name: 'static.dashboard.importprogram', component: ImportProgram },
@@ -505,7 +505,7 @@ const routes = [
   { path: '/report/stockStatusOverTime', name: 'static.dashboard.stockstatusovertime', component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: 'static.dashboard.forecastmetrics', component: ForecastMetrics },
 
-  { path: '/report/qatProblemPlusActionReport', name: 'Qat Problem Plus Action Report', component: QatProblemPlusActionReport },
+  { path: '/report/qatProblemPlusActionReport', name: 'static.report.qatProblemActionReport', component: QatProblemPlusActionReport },
   { path: '/report/problemList', name: 'static.dashboard.qatProblemList', component: ProblemList },
 
   { path: '/report/funderExport', name: 'static.dashboard.funderExport', component: FunderExport },
@@ -770,19 +770,10 @@ class DefaultLayout extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson1 = JSON.parse(programData);
-            console.log("1---programJson1 program id---", programJson1.programId);
-            console.log("1---programData---", programData);
-            console.log("1---programJson1.consumptionList---", programJson1.consumptionList);
-            console.log("1---programJson1.inventoryList---", programJson1.inventoryList);
-            console.log("1---programJson1.shipmentList---", programJson1.shipmentList);
-            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---cmax---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
             let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---imax---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
             let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---smax---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
             let pmax = moment.max(cmax, imax, smax)
-            console.log("1---pmax---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
             var programJson = {
               lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
             }
@@ -790,7 +781,6 @@ class DefaultLayout extends Component {
           }
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        console.log("P***proList program data---",proList)
         this.setState({
           programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
         }, () => {
@@ -2540,11 +2530,11 @@ class DefaultLayout extends Component {
                         key={idx}
                         path={route.path}
                         exact={route.exact}
-                        name={i18n.t(route.name, { entityname: i18n.t(route.entityname) })}
+                        name={route.name!=undefined?(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name):''}
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(i18n.t(route.name, { entityname: i18n.t(route.entityname) }))} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )
