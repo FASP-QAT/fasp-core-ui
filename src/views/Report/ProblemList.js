@@ -835,7 +835,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 180, 180, 50, 100],
+            colWidths: [10, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -848,7 +848,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.program.programCode'),
-                    type: 'text',
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.program.versionId'),
@@ -860,7 +860,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
-                    type: 'hidden',
+                    type: 'text',
                 },
                 {
                     title: i18n.t('static.report.month'),
@@ -868,7 +868,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.report.createdDate'),
-                    type: 'text',
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
@@ -1001,8 +1001,9 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
         const headers = [];
-        headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemDescription').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
@@ -1013,8 +1014,9 @@ export default class ConsumptionDetails extends React.Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.data.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-                (ele.program.code).replaceAll(' ', '%20'),
+                // (ele.program.code).replaceAll(' ', '%20'),
                 ele.versionId,
+                getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
@@ -1097,8 +1099,9 @@ export default class ConsumptionDetails extends React.Component {
         var h1 = 50;
 
         const headers = [];
-        headers.push(i18n.t('static.program.programCode'));
+        // headers.push(i18n.t('static.program.programCode'));
         headers.push(i18n.t('static.program.versionId'));
+        headers.push(i18n.t('static.planningunit.planningunit'));
         headers.push(i18n.t('static.report.createdDate'));
         headers.push(i18n.t('static.report.problemDescription'));
         headers.push(i18n.t('static.report.suggession'));
@@ -1107,8 +1110,9 @@ export default class ConsumptionDetails extends React.Component {
         headers.push(i18n.t('static.problemAction.criticality'));
         // columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [
-            (ele.program.code),
+            // (ele.program.code),
             ele.versionId,
+            getLabelText(ele.planningUnit.label, this.state.lang),
             moment(ele.createdDate).format('MMM-YY'),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
@@ -1124,6 +1128,8 @@ export default class ConsumptionDetails extends React.Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
+                0:{cellWidth: 50},
+                1:{cellWidth: 100},
                 3: { cellWidth: 170 },
                 4: { cellWidth: 180 },
                 6: { cellWidth: 150 },
@@ -1672,7 +1678,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 onChange={this.fetchData}
                                             // value={1}
                                             >
-                                                <option value="-1">Open / Addressed</option>
+                                                <option value="-1">{i18n.t("static.problemList.problemStatus")}</option>
                                                 {problemStatus}
                                             </Input>
                                         </InputGroup>

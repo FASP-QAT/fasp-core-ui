@@ -8,7 +8,7 @@ export default function getSuggestion(row, lang) {
         // Please provide Actual consumption for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
         var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
-        for (var m = 1; m <= numberOfMonths; m++) {
+        for (var m = numberOfMonths; m >= 0; m--) {
             var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
             monthString = monthString.concat(curMonth + ",");
         }
@@ -39,7 +39,7 @@ export default function getSuggestion(row, lang) {
         // Please provide Stock count for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
         var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
-        for (var m = 1; m <= numberOfMonths; m++) {
+        for (var m = numberOfMonths; m >= 0; m--) {
             var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
             monthString = monthString.concat(curMonth + ",");
         }
