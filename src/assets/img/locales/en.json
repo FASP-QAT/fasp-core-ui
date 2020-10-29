@@ -1443,5 +1443,10 @@
     "static.quantimed.conversionFactor": "Conversion Factor",
     "static.quantimed.regionConversionFactor": "Region Conversion Factor",
     "static.quantimed.regionPercentage": "Region Conversion Factor (%)",
-    "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecast Consumption Quantity"
+    "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecast Consumption Quantity",
+    "static.mt.orderNoAlreadyTagged": "Order no. and prime line no. already tagged.",
+    "static.mt.planningUnitNotMatch": "Planning unit does not match",
+    "static.mt.shipentDelivered": "Shipment already delivered",
+    "static.mt.programNotMatch": "Program does not match",
+    "static.mt.noDetailsFound": "No details found"
 }

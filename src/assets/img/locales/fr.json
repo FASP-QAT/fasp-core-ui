@@ -1225,5 +1225,10 @@
     "static.program.seemoreprogram": "En savoir plus ...",
     "static.quantimed.importatleastonerow": "Veuillez sélectionner au moins une donnée Qunatimed pour l'importation",
     "static.quantimed.conversionFactor": "Facteur de conversion",
-    "static.quantimed.regionConversionFactor": "Facteur de conversion de région"
+    "static.quantimed.regionConversionFactor": "Facteur de conversion de région",
+    "static.mt.orderNoAlreadyTagged": "N ° de commande. et la ligne principale no. déjà étiqueté.",
+    "static.mt.planningUnitNotMatch": "L'unité de planification ne correspond pas",
+    "static.mt.shipentDelivered": "Envoi déjà livré",
+    "static.mt.programNotMatch": "Le programme ne correspond pas",
+    "static.mt.noDetailsFound": "Aucun détail trouvé"
 }

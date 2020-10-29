@@ -776,7 +776,8 @@ export default class ManualTagging extends Component {
                     this.setState({
                         reason: response.data.reason,
                         artmisList,
-                        result: ''
+                        result: '',
+                        alreadyLinkedmessage: ''
                     })
                 }).catch(
                     error => {
@@ -799,7 +800,8 @@ export default class ManualTagging extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
+                                        loading: false,
+                                        result: error.response.data.messageCode
                                     });
                                     break;
                                 case 412:
@@ -821,19 +823,22 @@ export default class ManualTagging extends Component {
         } else if (orderNo == "" && primeLineNo == "") {
             this.setState({
                 artmisList: [],
-                result: i18n.t('static.manualtagging.result')
+                result: i18n.t('static.manualtagging.result'),
+                alreadyLinkedmessage: ''
             })
         }
         else if (orderNo == "") {
             this.setState({
                 artmisList: [],
-                result: i18n.t('static.manualtagging.resultOrderNoBlank')
+                result: i18n.t('static.manualtagging.resultOrderNoBlank'),
+                alreadyLinkedmessage: ''
             })
         }
         else if (primeLineNo == "") {
             this.setState({
                 artmisList: [],
-                result: i18n.t('static.manualtagging.resultPrimeLineNoBlank')
+                result: i18n.t('static.manualtagging.resultPrimeLineNoBlank'),
+                alreadyLinkedmessage: ''
             })
         }
     }
@@ -1718,9 +1723,9 @@ export default class ManualTagging extends Component {
                                         }
                                     </ToolkitProvider>
                                 </div>
-                                <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {this.state.reason}</div>}</h5>
+                                <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5>
                                 <h5><div style={{ color: 'red' }} >
-                                    {this.state.result}</div></h5>
+                                    {i18n.t(this.state.result)}</div></h5>
                                 <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
                             </ModalBody>
                             <ModalFooter>
