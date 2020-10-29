@@ -181,7 +181,8 @@ class AddprogramPlanningUnit extends Component {
         var programObj;
         var programId = document.getElementById("programId").value;
         this.setState({
-            programId: programId
+            programId: programId,
+            loading: true
         });
         // AuthenticationService.setupAxiosInterceptors();
 
@@ -763,6 +764,9 @@ class AddprogramPlanningUnit extends Component {
                 }
             );
         } else {
+            this.setState({
+                loading: false
+            });
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             this.el.destroy();
         }
@@ -1333,6 +1337,7 @@ class AddprogramPlanningUnit extends Component {
                         },
                             () => {
                                 this.hideSecondComponent();
+                                this.buildJexcel();
                             })
                         // this.props.history.push(`/programProduct/addProgramProduct/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {

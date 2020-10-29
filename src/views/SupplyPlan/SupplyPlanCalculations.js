@@ -4,8 +4,9 @@ import moment from "moment";
 import i18n from '../../i18n';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
-export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate) {
+export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate,problemListChild) {
     console.log("In calculate", minimumDate);
+    console.log("D------------> in calculate")
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -278,7 +279,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 console.log("Index----------->>>>>>>>>>>>", index);
 
                                 if (index == -1) {
-                                    console.log("batchDetailsFromProgramJson----------->>>>>>>>>>>>",batchDetailsFromProgramJson)
+                                    console.log("batchDetailsFromProgramJson----------->>>>>>>>>>>>", batchDetailsFromProgramJson)
                                     var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"))[0];
                                     console.log("Bd----------->>>>>>>>>>>>", bd);
                                     var shipmentQtyWps = 0;
@@ -903,6 +904,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     } else if (page == 'quantimedImport') {
                         props.updateState("loading", false);
                         props.redirectToDashbaord();
+                    } else if (page == 'masterDataSync') {
+                        console.log("D------------> in master data sync")
+                        console.log("D------------> props", problemListChild);
+                        problemListChild.qatProblemActions(programId);
                     }
                 }
             }

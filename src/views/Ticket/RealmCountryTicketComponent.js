@@ -12,8 +12,11 @@ import RealmService from '../../api/RealmService';
 import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { SPACE_REGEX } from '../../Constants';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.realmcountrydashboard"))
+let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Add Realm Country"
 const initialValues = {
     summary: "",
@@ -81,11 +84,13 @@ export default class RealmCountryTicketComponent extends Component {
             realm: '',
             country: '',
             currency: '',
+            countriesList: [],
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.changeCountry = this.changeCountry.bind(this);
     }
 
     dataChange(event) {
@@ -118,6 +123,29 @@ export default class RealmCountryTicketComponent extends Component {
             realmCountry
         }, () => { })
     };
+
+    changeCountry(event) {
+        if (event === null) {
+            let { realmCountry } = this.state;
+            realmCountry.countryId = ''
+            this.setState({
+                realmCountry: realmCountry,
+                country: ''
+            });
+        } else {
+            let { realmCountry } = this.state;
+            var outText = "";
+            if (event.value !== "") {
+                var countryT = this.state.countries.filter(c => c.countryId == event.value)[0];
+                outText = countryT.label.label_en;
+            }
+            realmCountry.countryId = outText;
+            this.setState({
+                realmCountry: realmCountry,
+                country: event.value
+            });
+        }
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -229,8 +257,14 @@ export default class RealmCountryTicketComponent extends Component {
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
+                    var countryList = [];
+                    for (var i = 0; i < listArray.length; i++) {
+                        countryList[i] = { value: listArray[i].countryId, label: getLabelText(listArray[i].label, this.state.lang) }
+                    }
                     this.setState({
-                        countries: listArray, loading: false
+                        countries: listArray, 
+                        countriesList: countryList,
+                        loading: false
                     })
                 } else {
                     this.setState({
@@ -400,7 +434,7 @@ export default class RealmCountryTicketComponent extends Component {
         return (
             <div className="col-md-12">
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
-                <h4>{i18n.t('static.program.realmcountrydashboard')}</h4>
+                <h4>{i18n.t('static.ticket.realmcountry')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -492,7 +526,9 @@ export default class RealmCountryTicketComponent extends Component {
                                 isSubmitting,
                                 isValid,
                                 setTouched,
-                                handleReset
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
                             }) => (
                                     <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                         < FormGroup >
@@ -523,8 +559,8 @@ export default class RealmCountryTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                         </FormGroup>
                                         < FormGroup >
-                                            <Label for="countryId">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="countryId" id="countryId"
+                                            <Label for="countryId">{i18n.t('static.dashboard.country')}<span class="red Reqasterisk">*</span></Label>
+                                            {/* <Input type="select" name="countryId" id="countryId"
                                                 bsSize="sm"
                                                 valid={!errors.countryId && this.state.realmCountry.countryId != ''}
                                                 invalid={touched.countryId && !!errors.countryId}
@@ -534,7 +570,28 @@ export default class RealmCountryTicketComponent extends Component {
                                                 required>
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {countryList}
-                                            </Input>
+                                            </Input> */}
+
+                                            <Select
+                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                    { 'is-valid': !errors.countryId && this.state.realmCountry.countryId != '' },
+                                                    { 'is-invalid': (touched.countryId && !!errors.countryId) }
+                                                )}
+                                                bsSize="sm"
+                                                name="countryId"
+                                                id="countryId"
+                                                isClearable={false}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFieldValue("countryId", e);
+                                                    this.changeCountry(e)
+                                                }}
+                                                onBlur={() => setFieldTouched("countryId", true)}
+                                                required
+                                                min={1}
+                                                options={this.state.countriesList}
+                                                value={this.state.country}
+                                            />
                                             <FormFeedback className="red">{errors.countryId}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>

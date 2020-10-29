@@ -302,7 +302,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -2378,7 +2378,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                             </div>
                                         </div>
-                                        <div className="offset-6 col-md-6"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                        <div className="offset-6 col-md-12"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                     </div>}
                             </div>
                         </div>
