@@ -1224,6 +1224,12 @@
     "static.ticket.filesuploadnote": "Si vous avez plusieurs fichiers, veuillez les compresser et les télécharger.",
     "static.program.seemoreprogram": "En savoir plus ...",
     "static.quantimed.importatleastonerow": "Veuillez sélectionner au moins une donnée Qunatimed pour l'importation",
+    "static.quantimed.regionConversionFactor": "Facteur de conversion de région",
+    "static.mt.orderNoAlreadyTagged": "N ° de commande. et la ligne principale no. déjà étiqueté.",
+    "static.mt.planningUnitNotMatch": "L'unité de planification ne correspond pas",
+    "static.mt.shipentDelivered": "Envoi déjà livré",
+    "static.mt.programNotMatch": "Le programme ne correspond pas",
+    "static.mt.noDetailsFound": "Aucun détail trouvé",
     "static.quantimed.conversionFactor": "Facteur de conversion d'unité",
     "static.quantimed.importpercentage": "Pourcentage d'importation"
 }

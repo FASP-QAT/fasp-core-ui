@@ -536,10 +536,10 @@ export default class ProcurementAgentTicketComponent extends Component {
                                                 id="procurementAgentName"
                                                 valid={!errors.procurementAgentName && this.state.procurementAgent.procurementAgentName != ''}
                                                 invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDisplayName() }}
                                                 onBlur={handleBlur}
                                                 required
-                                                value={this.state.procurementAgent.procurementAgentName}
+                                                value={this.Capitalize(this.state.procurementAgent.procurementAgentName)}
                                             />
                                             {/* </InputGroupAddon> */}
                                             <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>

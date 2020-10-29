@@ -802,12 +802,8 @@ class warehouseCapacity extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.region.capacitycbm'),
-<<<<<<< HEAD
-                    type: 'number',mask: '#,##.00', decimal: '.',
-=======
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 }
             ],

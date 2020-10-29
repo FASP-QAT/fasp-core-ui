@@ -861,19 +861,11 @@ class ProcurementAgentExport extends Component {
             data[0] = (viewby == 1) ? (getLabelText(shipmentCosttList[j].procurementAgent.label, this.state.lang)) : ((viewby == 2) ? (getLabelText(shipmentCosttList[j].fundingSource.label, this.state.lang)) : ({}))
             data[1] = (viewby == 1) ? shipmentCosttList[j].procurementAgent.code : ((viewby == 2) ? shipmentCosttList[j].fundingSource.code : {})
             data[2] = getLabelText(shipmentCosttList[j].planningUnit.label, this.state.lang)
-<<<<<<< HEAD
-            data[3] = (shipmentCosttList[j].qty)
-            data[4] = (shipmentCosttList[j].productCost)
-            data[5] = shipmentCosttList[j].freightPerc.toFixed(2)
-            data[6] = (shipmentCosttList[j].freightCost)
-            data[7] = (shipmentCosttList[j].totalCost)
-=======
             data[3] = shipmentCosttList[j].qty
             data[4] = shipmentCosttList[j].productCost
             data[5] = shipmentCosttList[j].freightPerc.toFixed(2)
             data[6] = shipmentCosttList[j].freightCost
             data[7] = shipmentCosttList[j].totalCost
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
 
             shipmentCostArray[count] = data;
             count++;
@@ -980,56 +972,32 @@ class ProcurementAgentExport extends Component {
                 },
                 {
                     title: i18n.t('static.report.qty'),
-<<<<<<< HEAD
-                    type: 'number',
-                    mask:"#,##",
-=======
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.productCost'),
-<<<<<<< HEAD
-                    type: 'number',
-                    mask: '#,##.00', decimal: '.',
-=======
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightPer'),
-<<<<<<< HEAD
-                    type: 'number',
-                    mask: '#,##.00', decimal: '.',
-=======
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.freightCost'),
-<<<<<<< HEAD
-                    type: 'number',
-                    mask: '#,##.00', decimal: '.',
-=======
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalCost'),
-<<<<<<< HEAD
-                    type: 'number',mask: '#,##.00', decimal: '.',
-=======
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
             ],

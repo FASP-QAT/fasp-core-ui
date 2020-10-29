@@ -670,19 +670,11 @@ this.setState({
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = data1;
-<<<<<<< HEAD
-            data[2] = (dataStockStatus[j].mos);
-            data[3] = (dataStockStatus[j].minMos);
-            data[4] = (dataStockStatus[j].maxMos);
-            data[5] = (dataStockStatus[j].stock);
-            data[6] = (dataStockStatus[j].amc);
-=======
             data[2] = dataStockStatus[j].mos;
             data[3] = dataStockStatus[j].minMos;
             data[4] = dataStockStatus[j].maxMos;
             data[5] = dataStockStatus[j].stock;
             data[6] = dataStockStatus[j].amc;
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
             data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('MMM-yy') : null);
 
             dataArray[count] = data;
@@ -714,28 +706,6 @@ this.setState({
                 },
                 {
                     title: i18n.t('static.report.mos'),
-<<<<<<< HEAD
-                    type: 'number',mask: '#,##.0', decimal: '.',
-                },
-                {
-                    title: i18n.t('static.supplyPlan.minStockMos'),
-                    type: 'number',mask: '#,##.0', decimal: '.',
-                },
-                {
-                    title: i18n.t('static.supplyPlan.maxStockMos'),
-                    type: 'text',
-                    type: 'number',mask: '#,##.0', decimal: '.',
-                },
-                {
-                    title: i18n.t('static.report.stock'),
-                    type: 'text',
-                    type: 'number',mask: '#,##'
-                },
-                {
-                    title: i18n.t('static.report.amc'),
-                    type: 'text',
-                    type: 'number',mask: '#,##'
-=======
                     type: 'numeric',
                     mask: '#,##.00',
                 },
@@ -758,7 +728,6 @@ this.setState({
                     title: i18n.t('static.report.amc'),
                     type: 'numeric',
                     mask: '#,##.00',
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
@@ -984,25 +953,9 @@ this.setState({
 
     }
 
-<<<<<<< HEAD
-    handleTracerCategoryChange = (tracerCategoryIds) => {
-        tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
-          return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-          tracerCategoryValues: tracerCategoryIds.map(ele => ele),
-          tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
-        }, () => {
-    
-          this.fetchData()
-        })
-      }
-    
-=======
     filterDataAsPertracerCategory = () => {
 
     }
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
 
 
     fetchData = () => {
@@ -1445,7 +1398,7 @@ this.state.tracerCategoryValues.map(tc=>{
                         </div>
                     </div>
                     <CardBody className="pb-lg-5 pt-lg-0 ">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
 
                                 <Form >
@@ -1524,29 +1477,6 @@ this.state.tracerCategoryValues.map(tc=>{
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-<<<<<<< HEAD
-                                            <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <div className="controls">
-
-                        <MultiSelect
-                          name="tracerCategoryId"
-                          id="tracerCategoryId"
-                          bsSize="sm"
-                          value={this.state.tracerCategoryValues}
-                          onChange={(e) => { this.handleTracerCategoryChange(e) }}
-                          options=
-                          {tracerCategories.length > 0?
-                             tracerCategories.map((item, i) => {
-                              return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
-
-                            }, this):[]} />
-
-                      </div>
-                    </FormGroup>
-                            
-=======
                                             {/*   <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">
@@ -1574,7 +1504,6 @@ this.state.tracerCategoryValues.map(tc=>{
                                     </div>
                                                 </FormGroup>*/}
 
->>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
                                                 <div className="controls ">

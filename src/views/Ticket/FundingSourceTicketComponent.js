@@ -111,7 +111,7 @@ export default class FundingSourceTicketComponent extends Component {
             fundingSource.fundingSourceName = event.target.value;
         }
         if (event.target.name == "fundingSourceCode") {
-            fundingSource.fundingSourceCode = this.Capitalize(event.target.value);
+            fundingSource.fundingSourceCode = event.target.value.toUpperCase();
         }
         if (event.target.name == "allowedInBudget") {
             fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
@@ -505,7 +505,7 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmName && this.state.fundingSource.realmName != ''}
                                                 invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value)}}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e);}}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >
@@ -520,9 +520,9 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.fundingSourceName && this.state.fundingSource.fundingSourceName != ''}
                                                 invalid={touched.fundingSourceName && !!errors.fundingSourceName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDisplayName() }}
                                                 onBlur={handleBlur}
-                                                value={this.state.fundingSource.fundingSourceName}
+                                                value={this.Capitalize(this.state.fundingSource.fundingSourceName)}
                                                 required />
                                             <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
                                         </FormGroup>
@@ -532,7 +532,7 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
                                                 invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.CapitalizeCode(e.target.value)}}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 maxLength={7}
                                                 value={this.state.fundingSource.fundingSourceCode}
