@@ -1428,7 +1428,7 @@
     "static.report.erpOrder": "ERP Order",
     "static.report.localprocurement": "Local Procurement",
     "static.report.orderNo": "Procurer Order ID",
-    "static.ticket.openIssues": "Open Issues",
+    "static.ticket.openIssues": "Open Tickets",
     "static.uploadfile.Browse": "Browse",
     "static.inventory.inventoryQunatity": "Inventory Qunatity (ARU)",
     "static.inventory.adjustmentQunatity": "Adjustment Qunatity (ARU)",
@@ -1444,6 +1444,7 @@
     "static.quantimed.importpercentage": "Import Percentage",
     "static.quantimed.regionPercentage": "Percentage of Quantimed Data to Import to Region (%)",
     "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecasted Consumption",
-    "static.ticket.addressedIssues": "Addressed Issues",
-    "static.quantimed.regionPercentagevalidation": "Please enter number between 1 to 100"
+    "static.ticket.addressedIssues": "Addressed Tickets",
+    "static.quantimed.regionPercentagevalidation": "Please enter number between 1 to 100",
+    "static.ticket.realmcountry": "Realm Country"
 }
