@@ -148,7 +148,7 @@ export default class syncPage extends Component {
       columns: [
         { title: i18n.t('static.commit.consumptionId'), type: 'hidden', },
         { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: this.state.planningUnitList, width: 200 },
-        { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 85 },
+        { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 90 },
         { title: i18n.t('static.region.region'), type: 'dropdown', source: this.state.regionList, width: 100 },
         { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: this.state.dataSourceList, width: 100 },
         { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: this.state.realmCountryPlanningUnitList, width: 150 },
@@ -160,7 +160,7 @@ export default class syncPage extends Component {
         { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
         { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
-        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 70 },
+        { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 80 },
         { type: 'hidden', title: 'Old data' },
         { type: 'hidden', title: 'latest data' },
         { type: 'hidden', title: 'downloaded data' },
@@ -2356,7 +2356,7 @@ export default class syncPage extends Component {
               <CardFooter>
                 <FormGroup>
                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                  {this.state.isChanged == 1 && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>}
+                  {this.state.isChanged == 1 && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                   &nbsp;
                 </FormGroup>
               </CardFooter>
@@ -2588,13 +2588,13 @@ export default class syncPage extends Component {
           var oldProgramDataProblem = this.state.oldProgramDataProblemList;
           var latestProgramDataProblem = this.state.latestProgramDataProblemList;
           for (var c = 0; c < problemJson.length; c++) {
-            if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0]!=0) {
+            if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
               problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
             } else if ((problemJson[c])[31] == 3 && (problemJson[c])[0] != 0) {
               problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
             }
           }
-          problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c=>c.problemReportId==0))).filter(c => c.newAdded != true);
+          problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
           console.log("Planning unit list", planningUnitList);
           console.log("Consumption data", consumptionData);
           console.log("InventoryData", inventoryData);
@@ -2879,7 +2879,7 @@ export default class syncPage extends Component {
           colHeaderClasses: ["Reqasterisk"],
           columns: [
             {
-              title: 'problemReportId',
+              title: i18n.t('static.commitVersion.problemReportId'),
               type: 'text',
             },
             {
@@ -2888,7 +2888,7 @@ export default class syncPage extends Component {
             },
             {
               title: i18n.t('static.program.programCode'),
-              type: 'text',
+              type: 'hidden',
             },
             {
               title: i18n.t('static.program.versionId'),

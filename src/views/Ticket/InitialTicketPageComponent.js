@@ -38,10 +38,10 @@ import EditProgramTicketComponent from './EditProgramTicketComponent';
 import EditRealmTicketComponent from './EditRealmTicketComponent';
 import EditRealmCountryTicketComponent from './EditRealmCountryTicketComponent';
 import EditRealmCountryRegionTicketComponent from './EditRealmCountryRegionTicketComponent';
-import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
 import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketComponent';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
+import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
 
 export default class InitialTicketPageComponent extends Component {
 

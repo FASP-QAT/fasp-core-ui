@@ -1286,7 +1286,7 @@
     "static.supplyplan.consumptionDataEntry": "Consumption data entry",
     "static.supplyplan.adjustmentDataEntry": "Adjustment and inventory details data entry",
     "static.supplyplan.shipmentDataEntry": "Shipment data entry",
-    "static.supplyPlan.noteBelowGraph": "Note: If you remove an element it doesn't actually adjust the numbers",
+    "static.supplyPlan.noteBelowGraph": "Click on a legend item to hide the data element. Note that hiding shipments/consumption only removes them from the graph and does not impact the stock .",
     "static.common.max26digittext": "Maximum 26 characters only",
     "static.message.alphaspeccharnumtext": "Only letters, numbers and special characters like /,- are allowed",
     "static.supplyPlanReview.review": "Reviewed",
@@ -1445,5 +1445,7 @@
     "static.quantimed.regionPercentage": "Percentage of Quantimed Data to Import to Region (%)",
     "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecasted Consumption",
     "static.ticket.addressedIssues": "Addressed Issues",
-    "static.quantimed.regionPercentagevalidation": "Please enter number between 1 to 100"
+    "static.quantimed.regionPercentagevalidation": "Please enter number between 1 to 100",
+    "static.commitVersion.problemReportId":"Problem Report Id",
+    "static.button.commit":"Commit"
 }

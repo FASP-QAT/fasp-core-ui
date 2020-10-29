@@ -2378,7 +2378,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                             </div>
                                         </div>
-                                        <div className="offset-6 col-md-6"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                        <div className="offset-6 col-md-12"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                     </div>}
                             </div>
                         </div>

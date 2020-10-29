@@ -2255,7 +2255,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
 
-                                                        <tr className="totalShipments1">
+                                                        <tr className="totalShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                                             {
@@ -2273,7 +2273,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
 
-                                                        <tr className="totalShipments1">
+                                                        <tr className="totalShipments">
                                                             <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
                                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
@@ -2285,7 +2285,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
 
-                                                        <tr className="manualShipments1">
+                                                        <tr className="manualShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
@@ -2301,7 +2301,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                         </tr>
 
-                                                        <tr className="manualShipments1">
+                                                        <tr className="manualShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
@@ -2315,7 +2315,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
 
-                                                        <tr className="manualShipments1">
+                                                        <tr className="manualShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                                             {
@@ -2328,7 +2328,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 })
                                                             }
                                                         </tr>
-                                                        <tr className="manualShipments1">
+                                                        <tr className="manualShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
@@ -2341,7 +2341,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 })
                                                             }
                                                         </tr>
-                                                        <tr className="totalShipments1">
+                                                        <tr className="totalShipments">
                                                             <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
                                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
@@ -2352,7 +2352,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 ))
                                                             }
                                                         </tr>
-                                                        <tr className="erpShipments1">
+                                                        <tr className="erpShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                                             {
@@ -2366,7 +2366,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
 
-                                                        <tr className="erpShipments1">
+                                                        <tr className="erpShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
@@ -2379,7 +2379,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 })
                                                             }
                                                         </tr>
-                                                        <tr className="erpShipments1">
+                                                        <tr className="erpShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
                                                             {
@@ -2392,7 +2392,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 })
                                                             }
                                                         </tr>
-                                                        <tr className="erpShipments1">
+                                                        <tr className="erpShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
@@ -2498,7 +2498,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 <Bar id="cool-canvas1" data={bar} options={chartOptions} />
                                                             </div>
                                                         </div>
-                                                        <div className="offset-6 col-md-6"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                        <div className="offset-6 col-md-12"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                     </div>}
                                             </div>
                                         </div>
