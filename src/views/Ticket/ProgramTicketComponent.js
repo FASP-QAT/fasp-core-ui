@@ -157,6 +157,7 @@ export default class ProgramTicketComponent extends Component {
             programManagerList: [],
             regionList: [],
             regionId: '',
+            countryList: [],
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
@@ -166,6 +167,7 @@ export default class ProgramTicketComponent extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
         this.getProgramDisplayCode = this.getProgramDisplayCode.bind(this);
+        this.changeRealmCountry = this.changeRealmCountry.bind(this);
     }
 
     dataChange(event) {
@@ -244,6 +246,29 @@ export default class ProgramTicketComponent extends Component {
         }, () => { })
     };
 
+    changeRealmCountry(event){
+        if (event === null) {
+            let { program } = this.state;
+            program.realmCountryId = ''
+            this.setState({
+                program: program,
+                realmCountryId: ''
+            });
+        } else {
+            let { program } = this.state;
+            var outText = "";
+            if (event.value !== "") {
+                var realmCountryT = this.state.realmCountryList.filter(c => c.realmCountryId == event.value)[0];
+                outText = realmCountryT.country.label.label_en;
+            }
+            program.realmCountryId = outText;
+            this.setState({
+                program: program,
+                realmCountryId: event.value
+            });
+        }
+    }
+
     getDependentLists(realmId) {
         // AuthenticationService.setupAxiosInterceptors();
         if (realmId != "") {
@@ -314,8 +339,14 @@ export default class ProgramTicketComponent extends Component {
                             var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
+                        var countryList = [];
+                        for (var i = 0; i < listArray.length; i++) {
+                            countryList[i] = { value: listArray[i].realmCountryId, label: getLabelText(listArray[i].country.label, this.state.lang) }
+                        }
                         this.setState({
-                            realmCountryList: listArray, loading: false
+                            realmCountryList: listArray, 
+                            countryList: countryList,
+                            loading: false
                         })
                     } else {
                         this.setState({
@@ -483,7 +514,7 @@ export default class ProgramTicketComponent extends Component {
 
     getRegionList(e) {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getRegionList(e.target.value)
+        ProgramService.getRegionList(e.value)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
@@ -936,7 +967,7 @@ export default class ProgramTicketComponent extends Component {
                                         </FormGroup>
                                         < FormGroup >
                                             <Label for="realmCountryId">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmCountryId" id="realmCountryId"
+                                            {/* <Input type="select" name="realmCountryId" id="realmCountryId"
                                                 bsSize="sm"
                                                 valid={!errors.realmCountryId && this.state.program.realmCountryId != ''}
                                                 invalid={touched.realmCountryId && !!errors.realmCountryId}
@@ -946,7 +977,29 @@ export default class ProgramTicketComponent extends Component {
                                                 required >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {realmCountries}
-                                            </Input>
+                                            </Input> */}
+
+                                            <Select
+                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                    { 'is-valid': !errors.realmCountryId && this.state.program.realmCountryId != '' },
+                                                    { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                                )}
+                                                bsSize="sm"
+                                                name="realmCountryId"
+                                                id="realmCountryId"
+                                                isClearable={false}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFieldValue("realmCountryId", e);
+                                                    this.changeRealmCountry(e); this.getRegionList(e); this.getProgramDisplayCode()
+                                                }}
+                                                onBlur={() => setFieldTouched("realmCountryId", true)}
+                                                required
+                                                min={1}
+                                                options={this.state.countryList}
+                                                value={this.state.realmCountryId}
+                                            />
+
                                             <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                                         </FormGroup>
                                         < FormGroup >

@@ -271,7 +271,7 @@ class AggregateShipmentByProduct extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -1524,7 +1524,7 @@ class AggregateShipmentByProduct extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Version</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1541,7 +1541,7 @@ class AggregateShipmentByProduct extends Component {
 
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                <Label htmlFor="appendedInputButton"> {i18n.t('static.planningunit.planningunit')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
                                                     <InputGroup className="box">
@@ -1558,7 +1558,7 @@ class AggregateShipmentByProduct extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Include Planned Shipments</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
                                                         <Input
@@ -1568,8 +1568,8 @@ class AggregateShipmentByProduct extends Component {
                                                             bsSize="sm"
                                                             onChange={this.fetchData}
                                                         >
-                                                            <option value="0">Yes</option>
-                                                            <option value="1">No</option>
+                                                            <option value="0">{i18n.t('sstatic.program.yes')}</option>
+                                                            <option value="1">{i18n.t('static.program.no')}</option>
                                                         </Input>
                                                     </InputGroup>
                                                 </div>

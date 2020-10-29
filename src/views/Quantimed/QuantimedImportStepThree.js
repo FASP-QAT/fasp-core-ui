@@ -25,7 +25,8 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 // }
 
 
-const initialValuesThree = {
+let initialValuesThree = {
+    regionId: '',
     regionConversionFactor: ''
 }
 
@@ -34,11 +35,14 @@ const validationSchemaThree = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
-        regionConversionFactor: Yup.string()
-            .required(i18n.t('static.program.validairfreighttext'))
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
-            .min(0, i18n.t("static.procurementUnit.validValueText"))
-            .max(100, "Maximum 100%")
+        regionConversionFactor: Yup.number()
+            .moreThan(0, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
+            .lessThan(101, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))            
+            // .min(0, i18n.t("static.procurementUnit.validValueText"))
+            // .max(100, "Maximum 100%")
+            .required(i18n.t('static.program.validairfreighttext'))                        
+            ,
         // .max(100, i18n.t('static.program.validvaluetext'))
     })
 }
@@ -77,7 +81,7 @@ class QuantimedImportStepThree extends Component {
             regionList: [],
             region: {
                 regionId: '',
-                regionConversionFactor: 100
+                regionConversionFactor: ''
             }
         }
         // this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -183,13 +187,11 @@ class QuantimedImportStepThree extends Component {
 
     componentDidMount() {
 
-        let { region } = this.state;
-
-        region.regionConversionFactor = 100;
-
-        this.setState({
-            region
-        }, () => { });
+        this.state.region.regionConversionFactor = '100'       
+        initialValuesThree = {
+            regionConversionFactor : '100'
+        } 
+        // this.loadRegionList();
 
     }
 
@@ -241,6 +243,7 @@ class QuantimedImportStepThree extends Component {
         return (
             <>
                 <Formik
+                    enableReinitialize={true}
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -316,7 +319,7 @@ class QuantimedImportStepThree extends Component {
                                                     <Label for="regionConversionFactor">{i18n.t('static.quantimed.regionPercentage')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="number"
-                                                        min={0} max={100}
+                                                        min="1" max="100"
                                                         name="regionConversionFactor"
                                                         id="regionConversionFactor"
                                                         bsSize="sm"

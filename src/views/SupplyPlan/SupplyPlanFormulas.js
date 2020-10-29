@@ -600,7 +600,7 @@ Ending balance = 22,000</p><br></br>
                     <ListGroupItemText className="formulastext">
                     
                      <img className="formula-img-mr img-fluid" src={shipmentcost}/>
-                    
+                     <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
                     </ListGroupItemText>
                   </ListGroupItem>
                       </ListGroup>

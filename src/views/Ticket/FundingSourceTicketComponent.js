@@ -32,9 +32,16 @@ const validationSchema = function (values) {
         fundingSourceName: Yup.string()
             .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
-        // fundingSourceCode: Yup.string()
+        fundingSourceCode: Yup.string()
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
         // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
-        // .required(i18n.t('static.fundingsource.fundingsourceCodeText')),        
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
+        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
+        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
+            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        // .required(i18n.t('static.fundingsource.fundingsourceCodeText'))
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
     })
@@ -85,6 +92,7 @@ export default class FundingSourceTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.CapitalizeCode = this.CapitalizeCode.bind(this);
         this.getDisplayName = this.getDisplayName.bind(this);
     }
 
@@ -103,7 +111,7 @@ export default class FundingSourceTicketComponent extends Component {
             fundingSource.fundingSourceName = event.target.value;
         }
         if (event.target.name == "fundingSourceCode") {
-            fundingSource.fundingSourceCode = event.target.value;
+            fundingSource.fundingSourceCode = event.target.value.toUpperCase();
         }
         if (event.target.name == "allowedInBudget") {
             fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
@@ -238,6 +246,14 @@ export default class FundingSourceTicketComponent extends Component {
     Capitalize(str) {
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
+
+    CapitalizeCode(str) {
+        if (str != null && str != "") {
+            return str.toUpperCase();
         } else {
             return "";
         }
@@ -489,7 +505,7 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmName && this.state.fundingSource.realmName != ''}
                                                 invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e);}}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >
@@ -504,22 +520,23 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.fundingSourceName && this.state.fundingSource.fundingSourceName != ''}
                                                 invalid={touched.fundingSourceName && !!errors.fundingSourceName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDisplayName() }}
                                                 onBlur={handleBlur}
-                                                value={this.state.fundingSource.fundingSourceName}
+                                                value={this.Capitalize(this.state.fundingSource.fundingSourceName)}
                                                 required />
                                             <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
                                             <Label for="fundingSourceCode">{i18n.t('static.fundingsource.fundingsourceCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode" readOnly={true}
+                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode"
                                                 bsSize="sm"
-                                                // valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                // invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
+                                                valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
+                                                invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={7}
                                                 value={this.state.fundingSource.fundingSourceCode}
-                                            // required 
+                                                required
                                             />
                                             <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
                                         </FormGroup>

@@ -15,7 +15,7 @@ import * as Yup from 'yup';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_LEAD_TIME, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 
@@ -64,14 +64,15 @@ class QuantimedImportStepFour extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            rangeValue: { from: { year: new Date().getFullYear() - 2, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 2, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            // rangeValue: { from: { year: new Date().getFullYear() - 2, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear() + 3, month: new Date().getMonth() - 1 } },
+            rangeValue: { from: { year: this.props.items.dtmStartYear, month: this.props.items.dtmStartMonth }, to: { year: this.props.items.dtmEndYear, month: this.props.items.dtmEndMonth } },
+            minDate: { year: this.props.items.dtmStartYear, month: this.props.items.dtmStartMonth },
+            maxDate: { year: this.props.items.dtmEndYear, month: this.props.items.dtmEndMonth },
             loading: false,
             regionList: [],
-            region: {
-                regionId: ''
-            }
+            // region: {
+            //     regionId: ''
+            // }
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -86,20 +87,20 @@ class QuantimedImportStepFour extends Component {
 
     dataChange(event) {
 
-        let { region } = this.state;
-        if (event.target.name == "regionId") {
-            region.regionId = event.target.value;
-            this.props.items.program.regionId = event.target.value;
-        }
-        this.setState({
-            region
-        }, () => { });
+        // let { region } = this.state;
+        // if (event.target.name == "regionId") {
+        //     region.regionId = event.target.value;
+        //     this.props.items.program.regionId = event.target.value;
+        // }
+        // this.setState({
+        //     region
+        // }, () => { });
     }
 
 
     touchAll(setTouched, errors) {
         setTouched({
-            regionId: true
+            // regionId: true
         }
         )
         this.validateForm(errors)
@@ -126,8 +127,8 @@ class QuantimedImportStepFour extends Component {
     }
 
     setMinMaxDate() {
-        var startDate = new Date(this.props.items.importData.dtmStart);
-        var endDate = new Date(this.props.items.importData.dtmEnd);
+        // var startDate = new Date(this.props.items.importData.dtmStart);
+        // var endDate = new Date(this.props.items.importData.dtmEnd);
         
         // this.setState({
         //     rangeValue: { from: { year: startDate.getFullYear(), month: startDate.getMonth()}, to: { year: endDate.getFullYear(), month: endDate.getMonth()} },
@@ -188,8 +189,8 @@ class QuantimedImportStepFour extends Component {
                         this.props.items.program.rangeValue = this.state.rangeValue;
 
 
-                        var dateFilter = this.props.items.importData.records.filter(c => moment(moment(c.dtmPeriod).format("YYYY-MM-DD")).isBetween(startDate, endDate, null, '[)'));
-                        this.props.items.importData.records = dateFilter;
+                        // var dateFilter = this.props.items.importData.records.filter(c => moment(moment(c.dtmPeriod).format("YYYY-MM-DD")).isBetween(startDate, endDate, null, '[)'));
+                        // this.props.items.importData.records = dateFilter;
                         
 
                         this.props.finishedStepFour && this.props.finishedStepFour();

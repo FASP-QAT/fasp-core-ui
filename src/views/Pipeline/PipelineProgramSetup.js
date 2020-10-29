@@ -451,15 +451,16 @@ export default class PipelineProgramSetup extends Component {
 
     
     finishedStepSix = () => {
-        this.refs.consumptionChild.startLoading();
+        // this.refs.consumptionChild.startLoading();
         var consumption = this.refs.consumptionChild.saveConsumption();
-        var checkValidation = this.refs.consumptionChild.checkValidation();
-        console.log("inventory-----data---", consumption);
+        
+        console.log("consumption-----data---", consumption);
         // AuthenticationService.setupAxiosInterceptors();
-        this.refs.consumptionChild.startLoading();
+        // this.refs.consumptionChild.startLoading();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
+                    var checkValidation = this.refs.consumptionChild.checkValidation();
                     this.refs.consumptionChild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({
@@ -497,14 +498,15 @@ export default class PipelineProgramSetup extends Component {
     }
     finishedStepSeven = () => {
         var inventory = this.refs.inventoryChild.saveInventory();
-        var checkValidation = this.refs.inventoryChild.checkValidation();
+        // var checkValidation = this.refs.inventoryChild.checkValidation();
         console.log("inventory-----data---", inventory);
         // AuthenticationService.setupAxiosInterceptors();
-        this.refs.inventoryChild.startLoading();
+        // this.refs.inventoryChild.startLoading();
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
                     console.log("save indentory date====>", response);
+                    var checkValidation = this.refs.inventoryChild.checkValidation();
                     this.refs.inventoryChild.stopLoading();
                     if (checkValidation == true) {
                         this.setState({

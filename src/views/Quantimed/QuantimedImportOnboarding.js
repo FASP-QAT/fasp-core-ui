@@ -27,6 +27,10 @@ export default class QuantimedImportOnboarding extends Component {
             programs: '',
             progressPer: 0,
             importData: '',
+            dtmStartYear: 2018,
+            dtmStartMonth: 1,
+            dtmEndYear: 2023,
+            dtmEndMonth: 12,
             program: {
                 programId: '',
                 rangeValue: '',
@@ -34,6 +38,11 @@ export default class QuantimedImportOnboarding extends Component {
                 regionId: '',
                 regionConversionFactor: ''
             },
+            enableStepOne: 0,
+            enableStepTwo: 0,
+            enableStepThree: 0,
+            enableStepFour: 0,
+            enableStepFive: 0,
             qatPlanningList: []
         }
         this.Capitalize = this.Capitalize.bind(this);
@@ -57,8 +66,8 @@ export default class QuantimedImportOnboarding extends Component {
 
     }
 
-    redirectToDashboard(){
-        let id = AuthenticationService.displayDashboardBasedOnRole();        
+    redirectToDashboard() {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.quantimed.quantimedImportSuccess'))
     }
 
@@ -69,6 +78,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 1,
+            enableStepTwo: 0,
+            enableStepThree: 0,
+            enableStepFour: 0,
+            enableStepFive: 0
+        })
 
     }
     finishedStepOne() {
@@ -78,6 +94,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 1,
+            enableStepThree: 0,
+            enableStepFour: 1,
+            enableStepFive: 0
+        })
 
     }
 
@@ -88,6 +111,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'block';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 0,
+            enableStepThree: 1,
+            enableStepFour: 1,
+            enableStepFive: 0
+        })
 
     }
 
@@ -98,6 +128,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'block';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 0,
+            enableStepThree: 0,
+            enableStepFour: 1,
+            enableStepFive: 0
+        })
 
     }
 
@@ -108,6 +145,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'block';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 0,
+            enableStepThree: 0,
+            enableStepFour: 1,
+            enableStepFive: 1
+        })
 
     }
 
@@ -122,6 +166,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 1,
+            enableStepTwo: 0,
+            enableStepThree: 0,
+            enableStepFour: 0,
+            enableStepFive: 0
+        })
     }
 
     previousToStepTwo() {
@@ -131,6 +182,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 1,
+            enableStepThree: 0,
+            enableStepFour: 1,
+            enableStepFive: 0
+        })
     }
 
     previousToStepThree() {
@@ -140,6 +198,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'block';
         document.getElementById('stepFour').style.display = 'none';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 0,
+            enableStepThree: 1,
+            enableStepFour: 1,
+            enableStepFive: 0
+        })
     }
 
     previousToStepFour() {
@@ -149,6 +214,13 @@ export default class QuantimedImportOnboarding extends Component {
         document.getElementById('stepThree').style.display = 'none';
         document.getElementById('stepFour').style.display = 'block';
         document.getElementById('stepFive').style.display = 'none';
+        this.setState({
+            enableStepOne: 0,
+            enableStepTwo: 0,
+            enableStepThree: 0,
+            enableStepFour: 1,
+            enableStepFive: 0
+        })
     }
 
     Capitalize(str) {
@@ -168,7 +240,7 @@ export default class QuantimedImportOnboarding extends Component {
     }
 
     triggerStepFour() {
-        this.refs.child_4.setMinMaxDate();
+        // this.refs.child_4.setMinMaxDate();
     }
 
     triggerStepFive() {
@@ -290,7 +362,7 @@ export default class QuantimedImportOnboarding extends Component {
                                     <QuantimedImportStepThree ref="child_3" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state} triggerStepFour={this.triggerStepFour}></QuantimedImportStepThree>
                                 </div>
                                 <div id="stepFour">
-                                    <QuantimedImportStepFour ref="child_4" finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} triggerStepFive={this.triggerStepFive}></QuantimedImportStepFour>
+                                    {this.state.enableStepFour == 1 && <QuantimedImportStepFour ref="child_4" finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} triggerStepFive={this.triggerStepFive}></QuantimedImportStepFour>}
                                 </div>
                                 <div id="stepFive">
                                     <QunatimedImportStepFive ref="child_5" previousToStepFour={this.previousToStepFour} dataChange={this.dataChange} items={this.state} redirectToDashboard={this.redirectToDashboard}></QunatimedImportStepFive>

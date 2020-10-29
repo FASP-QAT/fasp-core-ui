@@ -221,7 +221,8 @@ class ApplicationDashboard extends Component {
       dashboard: '',
       users: [],
       lang: localStorage.getItem('lang'),
-      openIssues: ''
+      openIssues: '',
+      addressedIssues: ''
     };
     // this.state = {
 
@@ -408,7 +409,8 @@ class ApplicationDashboard extends Component {
       .then(response => {
         console.log("Customer Open Issues===", response);
         this.setState({
-          openIssues: response.data
+          openIssues: response.data.openIssues,
+          addressedIssues: response.data.addressedIssues
         })
       })
     this.hideFirstComponent();
@@ -1273,8 +1275,9 @@ class ApplicationDashboard extends Component {
                     </div>
 
 
-                    <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}</div>
-                    <div className="text-count">{this.state.openIssues}</div>
+                  
+                    <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}: {this.state.openIssues}</div>
+                    <div className="TextTittle">{i18n.t("static.ticket.addressedIssues")}: {this.state.addressedIssues}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
                     </div>
                   </a>
