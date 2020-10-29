@@ -411,6 +411,8 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push('')
         csvRow.push((i18n.t('static.report.problemType')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
+        csvRow.push((i18n.t('static.problemActionReport.problemCategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
@@ -418,7 +420,7 @@ export default class ConsumptionDetails extends React.Component {
         headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
         // headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemDescription').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
@@ -431,7 +433,7 @@ export default class ConsumptionDetails extends React.Component {
                 // (ele.program.code).replaceAll(' ', '%20'),
                 ele.versionId,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
+                // moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
@@ -494,6 +496,9 @@ export default class ConsumptionDetails extends React.Component {
                     doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+                    doc.text(i18n.t('static.problemActionReport.problemCategory') + ' : ' + document.getElementById("problemCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
 
                 }
 
@@ -516,7 +521,7 @@ export default class ConsumptionDetails extends React.Component {
         // headers.push(i18n.t('static.program.programCode'));
         headers.push(i18n.t('static.program.versionId'));
         headers.push(i18n.t('static.planningunit.planningunit'));
-        headers.push(i18n.t('static.report.createdDate'));
+        // headers.push(i18n.t('static.report.createdDate'));
         headers.push(i18n.t('static.report.problemDescription'));
         headers.push(i18n.t('static.report.suggession'));
         headers.push(i18n.t('static.report.problemStatus'));
@@ -527,7 +532,7 @@ export default class ConsumptionDetails extends React.Component {
             // (ele.program.code),
             ele.versionId,
             getLabelText(ele.planningUnit.label, this.state.lang),
-            moment(ele.createdDate).format('MMM-YY'),
+            // moment(ele.createdDate).format('MMM-YY'),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
@@ -544,9 +549,9 @@ export default class ConsumptionDetails extends React.Component {
             columnStyles: {
                 0: { cellWidth: 50 },
                 1: { cellWidth: 100 },
-                3: { cellWidth: 170 },
-                4: { cellWidth: 180 },
-                6: { cellWidth: 150 },
+                2: { cellWidth: 170 },
+                3: { cellWidth: 180 },
+                5: { cellWidth: 150 },
 
             }
         };

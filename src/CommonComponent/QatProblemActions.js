@@ -4983,13 +4983,13 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (consumptionListFortMinusOneDate1.length == 0 && consumptionListFortMinusThreeDate1.length == 0 && consumptionListFortMinusTwoDate1.length > 0) {
+                                                            if (consumptionListFortMinusOneDate1.length > 0 && consumptionListFortMinusThreeDate1.length > 0 && consumptionListFortMinusTwoDate1.length == 0) {
                                                                 // auto open logic for index1
                                                                 if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
-                                                                if (index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
+                                                                if (consumptionListFortMinusTwoDate1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                                     var filterObj = problemActionList[index1];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -5221,13 +5221,16 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (consumptionListFortDate1.length == 0 && consumptionListFortMinusTwoDate1.length == 0 && consumptionListFortMinusOneDate1.length > 0) {
+                                                            if (consumptionListFortDate1.length > 0 && consumptionListFortMinusTwoDate1.length > 0 && consumptionListFortMinusOneDate1.length == 0) {
+                                                                console.log("1============>");
                                                                 // auto open logic for index1
                                                                 if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
-                                                                if (index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
+                                                                console.log("2============>");
+                                                                if (consumptionListFortMinusOneDate1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
+                                                                    console.log("3============>");
                                                                     var filterObj = problemActionList[index1];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -5271,6 +5274,7 @@ export default class QatProblemActions extends Component {
 
                                                         if (consumptionListFortDate.length > 0 && consumptionListFortMinusTwoDate.length > 0 && consumptionListFortMinusOneDate.length == 0) {
                                                             // //console.log("rais prob--------");
+                                                            console.log("4============>");
                                                             if (index == -1) {
                                                                 var json = {
                                                                     problemReportId: 0,
@@ -5347,6 +5351,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionList.push(json);
                                                                 problemActionIndex++;
                                                             } else {
+                                                                console.log("5============>");
                                                                 // problemActionList[index].isFound = 1 auot open logic for index;
                                                                 if (index != -1 && problemActionList[index].problemStatus.id == 2) {
                                                                     openProblem(index, username, userId, problemActionList);
@@ -5354,6 +5359,7 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
+                                                            console.log("6============>");
                                                             // //console.log("dont rais prob--------");
                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // //console.log("resolve the problem problem id 21");

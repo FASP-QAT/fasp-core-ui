@@ -17,7 +17,7 @@ export default function openProblem(index,username,userId,problemActionList) {
                 label_pr: null
             }
         },
-        notes: 'Open',
+        notes: '',
         createdBy: {
             userId: userId,
             username: username
