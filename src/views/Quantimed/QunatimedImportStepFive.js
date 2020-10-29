@@ -101,7 +101,7 @@ export default class QunatimedImportStepFive extends Component {
 
         jExcelLoadedFunctionQuantimed(instance);
 
-        var asterisk = document.getElementsByClassName("resizable")[1];
+        var asterisk = document.getElementsByClassName("resizable")[2];
         var tr = asterisk.firstChild;
         tr.children[7].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
         tr.children[8].title = `${i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * ${i18n.t('static.quantimed.importpercentage')} * ${i18n.t('static.quantimed.conversionFactor')} = ${i18n.t('static.quantimed.newconsupmtionqty')}`
