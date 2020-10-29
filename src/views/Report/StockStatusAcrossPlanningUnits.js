@@ -272,7 +272,7 @@ this.setState({
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -1398,7 +1398,7 @@ this.state.tracerCategoryValues.map(tc=>{
                         </div>
                     </div>
                     <CardBody className="pb-lg-5 pt-lg-0 ">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
 
                                 <Form >
