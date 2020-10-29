@@ -780,7 +780,8 @@ export default class PlanningUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.planningUnit.labelMultiplier'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
@@ -811,7 +812,7 @@ export default class PlanningUnitListComponent extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
-            filters:true,
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,

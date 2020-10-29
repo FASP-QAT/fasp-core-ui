@@ -562,7 +562,8 @@ class RegionListComponent extends Component {
                 ,
                 {
                     title: i18n.t('static.region.capacitycbm'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {

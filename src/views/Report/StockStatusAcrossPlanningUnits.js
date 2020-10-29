@@ -670,11 +670,19 @@ this.setState({
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = data1;
+<<<<<<< HEAD
             data[2] = (dataStockStatus[j].mos);
             data[3] = (dataStockStatus[j].minMos);
             data[4] = (dataStockStatus[j].maxMos);
             data[5] = (dataStockStatus[j].stock);
             data[6] = (dataStockStatus[j].amc);
+=======
+            data[2] = dataStockStatus[j].mos;
+            data[3] = dataStockStatus[j].minMos;
+            data[4] = dataStockStatus[j].maxMos;
+            data[5] = dataStockStatus[j].stock;
+            data[6] = dataStockStatus[j].amc;
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
             data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('MMM-yy') : null);
 
             dataArray[count] = data;
@@ -706,6 +714,7 @@ this.setState({
                 },
                 {
                     title: i18n.t('static.report.mos'),
+<<<<<<< HEAD
                     type: 'number',mask: '#,##.0', decimal: '.',
                 },
                 {
@@ -726,6 +735,30 @@ this.setState({
                     title: i18n.t('static.report.amc'),
                     type: 'text',
                     type: 'number',mask: '#,##'
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+                },
+                {
+                    title: i18n.t('static.supplyPlan.minStockMos'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                },
+                {
+                    title: i18n.t('static.supplyPlan.maxStockMos'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                },
+                {
+                    title: i18n.t('static.report.stock'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                },
+                {
+                    title: i18n.t('static.report.amc'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
@@ -951,6 +984,7 @@ this.setState({
 
     }
 
+<<<<<<< HEAD
     handleTracerCategoryChange = (tracerCategoryIds) => {
         tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
           return parseInt(a.value) - parseInt(b.value);
@@ -964,6 +998,11 @@ this.setState({
         })
       }
     
+=======
+    filterDataAsPertracerCategory = () => {
+
+    }
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
 
 
     fetchData = () => {
@@ -1237,7 +1276,7 @@ this.state.tracerCategoryValues.map(tc=>{
                 )
             }, this);
 
-            const { tracerCategories } = this.state;
+        const { tracerCategories } = this.state;
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1485,6 +1524,7 @@ this.state.tracerCategoryValues.map(tc=>{
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+<<<<<<< HEAD
                                             <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1506,6 +1546,35 @@ this.state.tracerCategoryValues.map(tc=>{
                       </div>
                     </FormGroup>
                             
+=======
+                                            {/*   <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.filterDataAsPertracerCategory}
+                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                {tracerCategories.length > 0
+                                                    && tracerCategories.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.tracerCategoryId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                                </FormGroup>*/}
+
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
                                                 <div className="controls ">

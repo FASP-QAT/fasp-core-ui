@@ -566,6 +566,7 @@ export default class InventoryTurns extends Component {
                 },
                 {
                     title: i18n.t('static.report.totconsumption'),
+<<<<<<< HEAD
                     type: 'number',
                     readOnly: true,
                     mask: '#,##',
@@ -587,6 +588,29 @@ export default class InventoryTurns extends Component {
                     type: 'number',
                     readOnly: true,
                     mask: '#,##.00', decimal: '.'
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.avergeStock'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.noofmonth'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.dashboard.inventoryTurns'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    readOnly: true
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                 },
             ],
             text: {

@@ -353,7 +353,8 @@ export default class PlanningUnitCapacityList extends Component {
                 },
                 {
                     title: i18n.t('static.planningunit.capacity'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {

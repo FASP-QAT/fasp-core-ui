@@ -800,7 +800,7 @@ class PlanningUnitCapacity extends Component {
                         startDate: moment(map1.get("2")).format("YYYY-MM-DD"),
 
                         stopDate: moment(map1.get("3")).format("YYYY-MM-DD"),
-                        capacity: this.el.getValueFromCoords(4, i),
+                        capacity: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("5"),
                     }
                     changedpapuList.push(json);
@@ -994,6 +994,14 @@ class PlanningUnitCapacity extends Component {
                 }
 
             ],
+            oncreateeditor: function (a, b, c, d, e) {
+                console.log("In create editor")
+                e.type = 'text';
+                if (e.value) {
+                    e.selectionStart = e.value.length;
+                    e.selectionEnd = e.value.length;
+                }
+            },
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1495,7 +1503,7 @@ class PlanningUnitCapacity extends Component {
         // }
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValueFromCoords(4, y);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1626,7 +1634,7 @@ class PlanningUnitCapacity extends Component {
                 // }
 
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

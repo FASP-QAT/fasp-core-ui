@@ -94,7 +94,7 @@ class SupplierLeadTimes extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-           // data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
+            // data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[0] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[1] = outPutList[j].procurementAgent.code
             data[2] = outPutList[j].plannedSubmittedLeadTime
@@ -127,7 +127,7 @@ class SupplierLeadTimes extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-               
+
                 {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
@@ -141,7 +141,8 @@ class SupplierLeadTimes extends Component {
                 },
                 {
                     title: i18n.t('static.report.plannedToSubmitLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 // {
@@ -151,42 +152,50 @@ class SupplierLeadTimes extends Component {
                 // },
                 {
                     title: i18n.t('static.procurementagent.procurementagentapprovetosubmittime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.shippedToArrivedAirLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalSeaLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.totalAirLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.localProcurementAgentLeadTime'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
             ],
@@ -283,7 +292,7 @@ class SupplierLeadTimes extends Component {
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-           //     (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                //     (getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -424,7 +433,7 @@ class SupplierLeadTimes extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.outPutList.map(ele => [
             //  getLabelText(ele.country.label, this.state.lang),
-         //   getLabelText(ele.program.label, this.state.lang),
+            //   getLabelText(ele.program.label, this.state.lang),
             ele.planningUnit.id,
             getLabelText(ele.planningUnit.label, this.state.lang),
             ele.procurementAgent.code,
@@ -1419,7 +1428,7 @@ class SupplierLeadTimes extends Component {
             }, this);
         const columns = [
 
-           {
+            {
                 dataField: 'planningUnit.id',
                 text: i18n.t('static.report.qatPID'),
                 sort: true,

@@ -495,10 +495,10 @@ class ProductCatalog extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [ 80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
+            colWidths: [80, 80, 90, 0, 80, 80, 80, 0, 0, 80, 80, 80, 70],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                
+
                 {
                     title: i18n.t('static.dashboard.productcategory'),
                     type: 'text',
@@ -524,8 +524,13 @@ class ProductCatalog extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.forecastingtoPlanningUnitMultiplier'),
+<<<<<<< HEAD
                     type: 'number',
                     mask: '#,##.00', decimal: '.',
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.planningUnit'),
@@ -537,6 +542,7 @@ class ProductCatalog extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.min'),
+<<<<<<< HEAD
                     type: 'number',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -544,16 +550,35 @@ class ProductCatalog extends Component {
                     title: i18n.t('static.report.reorderFrequencyInMonths'),
                     type: 'number',
                     mask: '#,##.00', decimal: '.',
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    readOnly: true
+                }, {
+                    title: i18n.t('static.report.reorderFrequencyInMonths'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.shelfLife'),
+<<<<<<< HEAD
                     type: 'number',mask: '#,##.00', decimal: '.',
                     readOnly: true
                 }, {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                     type: 'number',mask: '#,##.00', decimal: '.',
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    readOnly: true
+                }, {
+                    title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
                 {

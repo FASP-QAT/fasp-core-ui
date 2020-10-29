@@ -555,8 +555,8 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'number',
-                    mask: '#,###',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
@@ -566,12 +566,14 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'number',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.costUsd'),
-                    type: 'number',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
             ],

@@ -21,7 +21,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DECIMAL_NO_REGEX,JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -235,7 +235,9 @@ class PlanningUnitCountry extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.unit.multiplier'),
-                                                        type: 'number',
+                                                        type: 'numeric',
+                                                        mask: '#,##.00',
+                                                        disabledMaskOnEdition: true
 
                                                     },
 
@@ -257,6 +259,14 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 ],
+                                                oncreateeditor: function (a, b, c, d, e) {
+                                                    console.log("In create editor")
+                                                    e.type = 'text';
+                                                    if (e.value) {
+                                                        e.selectionStart = e.value.length;
+                                                        e.selectionEnd = e.value.length;
+                                                    }
+                                                },
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
@@ -271,7 +281,7 @@ class PlanningUnitCountry extends Component {
 
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
-                                                filters:true,
+                                                filters: true,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
@@ -696,7 +706,8 @@ class PlanningUnitCountry extends Component {
                         unit: {
                             unitId: parseInt(map1.get("4"))
                         },
-                        multiplier: map1.get("5"),
+                        // multiplier: map1.get("5"),
+                        multiplier: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
                         active: map1.get("6"),
                         realmCountry: {
                             id: parseInt(map1.get("7"))
@@ -903,8 +914,9 @@ class PlanningUnitCountry extends Component {
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             // var reg = /^[0-9\b]+$/;
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
             var reg = JEXCEL_DECIMAL_NO_REGEX;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value != "") {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1026,7 +1038,7 @@ class PlanningUnitCountry extends Component {
                 // }
 
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(5, y);
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

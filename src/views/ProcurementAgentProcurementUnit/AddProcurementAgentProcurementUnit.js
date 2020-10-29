@@ -174,8 +174,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             id: map.get("1"),
                         },
                         skuCode: map.get("2"),
-                        vendorPrice: this.el.getValueFromCoords(3, i),
-                        approvedToShippedLeadTime: this.el.getValueFromCoords(4, i),
+                        vendorPrice: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        approvedToShippedLeadTime: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         gtin: map.get("5")
                     }
                     procurementUnitArray.push(procurementUnitJson);
@@ -317,7 +317,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 // }
 
                 var col = ("D").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(3, y);
+                var value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -338,7 +338,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }
 
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_LEAD_TIME;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -467,10 +467,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-            value = this.el.getValueFromCoords(3, y);
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value != "") {
                 // if (isNaN(parseInt(value)) || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -489,10 +489,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValueFromCoords(4, y);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_LEAD_TIME;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value != "") {
                 // if (isNaN(parseInt(value)) || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -664,6 +664,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             },
 
                                         ],
+                                        oncreateeditor: function (a, b, c, d, e) {
+                                            console.log("In create editor")
+                                            e.type = 'text';
+                                            if (e.value) {
+                                                e.selectionStart = e.value.length;
+                                                e.selectionEnd = e.value.length;
+                                            }
+                                        },
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
                                         search: true,

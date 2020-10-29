@@ -188,6 +188,14 @@ class RealmCountryRegion extends Component {
                                 }
 
                             ],
+                            oncreateeditor: function (a, b, c, d, e) {
+                                console.log("In create editor")
+                                e.type = 'text';
+                                if (e.value) {
+                                    e.selectionStart = e.value.length;
+                                    e.selectionEnd = e.value.length;
+                                }
+                            },
                             pagination: localStorage.getItem("sesRecordCount"),
                             filters: true,
                             search: true,
@@ -523,7 +531,8 @@ class RealmCountryRegion extends Component {
                         },
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
-                        capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
+                        // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
+                        capacityCbm: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         gln: (map1.get("3") === '' ? null : map1.get("3")),
                         active: map1.get("4"),
                         realmCountry: {
@@ -676,7 +685,7 @@ class RealmCountryRegion extends Component {
         // }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            value = this.el.getValueFromCoords(2, y);
+            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             value = value.replace(/,/g, "");
@@ -786,7 +795,7 @@ class RealmCountryRegion extends Component {
                 // }
                 var col = ("C").concat(parseInt(y) + 1);
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                var value = this.el.getValueFromCoords(2, y);
+                var value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 value = value.replace(/,/g, "");
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

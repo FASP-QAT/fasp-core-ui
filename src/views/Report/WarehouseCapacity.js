@@ -201,14 +201,14 @@ class warehouseCapacity extends Component {
                     if (navigator.onLine) {
                         var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-                         doc.text(doc.internal.pageSize.width / 8, y, planningText)
+                        doc.text(doc.internal.pageSize.width / 8, y, planningText)
                         for (var i = 0; i < planningText.length; i++) {
                             if (y > doc.internal.pageSize.height - 100) {
                                 doc.addPage();
                                 y = 80;
 
-                            }else{
-                               y=y+10 
+                            } else {
+                                y = y + 10
                             }
                         }
                         // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -249,8 +249,8 @@ class warehouseCapacity extends Component {
         ]
         let data = this.state.data.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
         let content = {
-            margin: { top: 80, bottom:120,left:100 },
-            startY: 90+doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4).length*10+doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length*10+20,
+            margin: { top: 80, bottom: 120, left: 100 },
+            startY: 90 + doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4).length * 10 + doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10 + 20,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -802,7 +802,12 @@ class warehouseCapacity extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.region.capacitycbm'),
+<<<<<<< HEAD
                     type: 'number',mask: '#,##.00', decimal: '.',
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 }
             ],

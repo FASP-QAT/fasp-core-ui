@@ -822,8 +822,13 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.expiredQty'),
+<<<<<<< HEAD
                     type: 'number',
                     mask: '#,###',
+=======
+                    type: 'numeric',
+                    mask: '#,##.00',
+>>>>>>> 173e609fd118102a9971fac44cccf46714665d2b
                     readOnly: true
                 },
                 {
@@ -843,7 +848,8 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.shelfLife'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
