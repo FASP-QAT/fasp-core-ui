@@ -81,6 +81,7 @@ class AuthenticationService {
     }
 
     displayDashboardBasedOnRole() {
+        console.log("M sync role based dashboard 1");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -89,8 +90,10 @@ class AuthenticationService {
                 let role = decryptedUser.roleList[i];
                 if (role != null && role != "") {
                     roleList.push(role.roleId);
+                    console.log("M sync role based dashboard 2");
                 }
             }
+            console.log("M sync role based dashboard 3");
             if (roleList.includes("ROLE_APPLICATION_ADMIN"))
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))

@@ -35,6 +35,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import TracerCategoryService from '../../api/TracerCategoryService';
 
+import MultiSelect from 'react-multi-select-component';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -61,6 +62,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             selData: [],
             lang: localStorage.getItem('lang'),
             tracerCategories: [],
+            tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+      planningUnitList:[],
             loading: true,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
@@ -71,8 +75,87 @@ class StockStatusAcrossPlanningUnits extends Component {
     }
 
     getTracerCategoryList() {
-        var programId = document.getElementById('programId').value;
-        if (programId > 0) {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        
+        if (programId > 0 && versionId!=0) {
+            if (versionId.includes('Local')) {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+                       
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList.push(myResult[i].planningUnit)
+                            }
+                        }
+  console.log('proList',proList)                       
+                        var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
+                        var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
+                    var planningunitRequest1 = planningunitOs1.getAll();
+                  //  var pllist = []
+                    planningunitRequest1.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest1.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest1.result;
+                        var flList = []
+                         console.log(myResult)
+                        for (var i = 0; i < myResult.length; i++) {
+                              for (var j = 0; j < proList.length; j++) {
+                                 if (myResult[i].planningUnitId == proList[j].id) {
+                                    console.log(myResult[i].planningUnitId , proList[j].id)
+                         
+                                flList.push(myResult[i].forecastingUnit)
+                                planningList.push(myResult[i])
+                            }
+                        }}
+console.log('flList',flList)
+
+var tcList = [];
+flList.filter(function(item){
+  var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+  if(i <= -1){
+    tcList.push({tracerCategoryId:item.tracerCategory.id,label:item.tracerCategory.label});
+  }
+  return null;
+});
+                     
+                        console.log('tcList',tcList)
+this.setState({
+    tracerCategories:tcList,
+    planningUnitList:planningList
+},()=>{this.fetchData()})
+
+                   
+                  
+                    }.bind(this);
+
+                    }.bind(this);
+                }.bind(this)
+
+
+            }
+            else {
+   
 
             let realmId = AuthenticationService.getRealmId();
             TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
@@ -122,7 +205,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                         }
                     }
                 }
-            );
+            );}
 
         } else {
             this.setState({
@@ -150,6 +233,9 @@ class StockStatusAcrossPlanningUnits extends Component {
         csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
         csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
         csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
+        this.state.tracerCategoryLabels.map(ele =>
+            csvRow.push('"'+(i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20')+'"'))
+         
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -187,7 +273,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -222,6 +308,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+                    var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8,170 , planningText)
+          
                 }
 
             }
@@ -243,7 +332,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         let content = {
             margin: { top: 80, bottom: 50 },
-            startY: 170,
+            startY: 200,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
@@ -862,9 +951,19 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     }
 
-    filterDataAsPertracerCategory=()=>{
-        
-    }
+    handleTracerCategoryChange = (tracerCategoryIds) => {
+        tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
+          return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+          tracerCategoryValues: tracerCategoryIds.map(ele => ele),
+          tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
+        }, () => {
+    
+          this.fetchData()
+        })
+      }
+    
 
 
     fetchData = () => {
@@ -873,7 +972,9 @@ class StockStatusAcrossPlanningUnits extends Component {
         let startDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, 1));
         let endDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0).getDate()));
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
-        if (programId != 0 && versionId != 0) {
+        let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
+    
+        if (programId != 0 && versionId != 0 && this.state.tracerCategoryValues.length>0) {
             if (versionId.includes('Local')) {
 
                 this.setState({ loading: true })
@@ -908,41 +1009,20 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
-                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                        var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
-                        planningunitRequest.onerror = function (event) {
-                            // Handle errors!
-                            this.setState({
-                                loading: false
-                            })
-                        };
-                        planningunitRequest.onsuccess = function (e) {
-
-                            var myResult = [];
-                            myResult = planningunitRequest.result;
-                            var programId = (document.getElementById("programId").value).split("_")[0];
-                            var proList = []
-                            console.log(myResult)
-                            for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
-
-                                    proList[i] = myResult[i]
-                                }
-                            }
-
-                            proList.map(planningUnit => {
-
-                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnit.id);
+                      
+                            this.state.planningUnitList.map(planningUnit => {
+                                console.log(planningUnit)
+this.state.tracerCategoryValues.map(tc=>{
+    if(tc.value==planningUnit.forecastingUnit.tracerCategory.id){
+                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnitId);
                                 let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
                                 var maxDate = moments.length > 0 ? moment.max(moments) : ''
                                 var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
-                                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
+                                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
                                 console.log(planningUnit)
                                 if (list.length > 0) {
                                     var json = {
-                                        planningUnit: planningUnit.planningUnit,
+                                        planningUnit: {id:planningUnit.planningUnitId,label:planningUnit.label},
                                         lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
                                         mos: includePlanningShipments.toString() == 'true' ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
                                         minMos: list[0].minStockMoS,
@@ -954,7 +1034,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                                 } else {
                                     var json = {
-                                        planningUnit: planningUnit.planningUnit,
+                                        planningUnit: {id:planningUnit.planningUnitId,label:planningUnit.label},
                                         lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
                                         mos: null,
                                         minMos: planningUnit.minMonthsOfStock,
@@ -964,19 +1044,18 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     }
                                     data.push(json)
                                 }
-
-                            })
+                            }
+                            })})
                             console.log(data)
                             this.setState({
                                 selData: data,
                                 message: ''
                             }, () => {
-                                this.buildJExcel();
+                                this.filterDataAsperstatus();
                             });
                         }.bind(this)
 
                     }.bind(this)
-                }.bind(this)
 
 
 
@@ -998,7 +1077,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "dt": startDate.startOf('month').format('YYYY-MM-DD'),
-                    "includePlannedShipments": includePlanningShipments.toString() == "true" ? 1 : 0
+                    "includePlannedShipments": includePlanningShipments.toString() == "true" ? 1 : 0,
+                    "tracerCategoryIds": tracercategory
 
                 }
                 /*  this.setState({
@@ -1121,6 +1201,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                 // this.buildJExcel();
             });
 
+        }else {
+            this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [], selData: [] }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+                // this.buildJExcel();
+            });
         }
     }
 
@@ -1372,7 +1458,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.fetchData() }}
+                                                            onChange={(e) => {this.getTracerCategoryList();  }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -1399,32 +1485,26 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                         {/*   <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                    <div className="controls SelectField">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="tracerCategoryId"
-                                                id="tracerCategoryId"
-                                                bsSize="sm"
-                                                onChange={this.filterDataAsPertracerCategory}
-                                            // onChange={(e) => { this.getPlanningUnit(); }}
-                                            >
-                                                <option value="-1">{i18n.t('static.common.all')}</option>
-                                                {tracerCategories.length > 0
-                                                    && tracerCategories.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.tracerCategoryId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
+                                            <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <div className="controls">
 
-                                            </Input>
-                                        </InputGroup>
-                                    </div>
-                                                </FormGroup>*/}
+                        <MultiSelect
+                          name="tracerCategoryId"
+                          id="tracerCategoryId"
+                          bsSize="sm"
+                          value={this.state.tracerCategoryValues}
+                          onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          options=
+                          {tracerCategories.length > 0?
+                             tracerCategories.map((item, i) => {
+                              return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+
+                            }, this):[]} />
+
+                      </div>
+                    </FormGroup>
                             
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>

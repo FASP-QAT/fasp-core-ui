@@ -17,22 +17,23 @@ export default class PipelineProgramConsumption extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            loading: true,
+            abc:true
+        }
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
         this.loaded = this.loaded.bind(this);
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        this.state = {
-            loading: true
-        }
-        this.startLoading = this.startLoading.bind(this);
-        this.stopLoading = this.stopLoading.bind(this);
     }
 
     startLoading() {
-        this.setState({ loading: true });
+        this.setState({ abc:true,loading: true });
     }
     stopLoading() {
-        this.setState({ loading: false });
+        this.setState({ abc:false,loading: false });
     }
 
     checkValidation() {
@@ -42,7 +43,7 @@ export default class PipelineProgramConsumption extends Component {
 
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -54,7 +55,7 @@ export default class PipelineProgramConsumption extends Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -66,7 +67,7 @@ export default class PipelineProgramConsumption extends Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -301,6 +302,7 @@ export default class PipelineProgramConsumption extends Component {
     }
     saveConsumption() {
         var json = this.el.getJson(null, false);
+        this.setState({abc:true});
         var list = this.state.consumptionList;
         console.log("consumption json------->", json);
         var consumptionArray = []
@@ -543,7 +545,8 @@ export default class PipelineProgramConsumption extends Component {
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
                                     this.loaded();
                                     this.setState({
-                                        loading: false
+                                        loading: false,
+                                        abc:false
                                     })
 
                                 }
@@ -866,12 +869,12 @@ export default class PipelineProgramConsumption extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
+                <div className="table-responsive" style={{ display: this.state.abc ? "none" : "block" }}>
 
                     <div id="consumptiontableDiv">
                     </div>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div style={{ display: this.state.abc ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>

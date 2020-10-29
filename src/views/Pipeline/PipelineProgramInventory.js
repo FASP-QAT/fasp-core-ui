@@ -62,7 +62,7 @@ export default class PipelineProgramInventory extends Component {
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -74,7 +74,7 @@ export default class PipelineProgramInventory extends Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -86,7 +86,7 @@ export default class PipelineProgramInventory extends Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -281,6 +281,7 @@ export default class PipelineProgramInventory extends Component {
 
     saveInventory() {
         var json = this.el.getJson(null,false);
+        this.setState({loading:true});
         var list = this.state.inventoryList;
         var inventoryArray = []
         for (var i = 0; i < json.length; i++) {

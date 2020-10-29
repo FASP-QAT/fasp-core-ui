@@ -635,14 +635,21 @@ class RealmCountryRegion extends Component {
 
         //Region
         if (x == 1) {
+            var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
 
@@ -738,6 +745,7 @@ class RealmCountryRegion extends Component {
             var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
                 //Region
+                var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
                 console.log("value-----", value);
@@ -747,8 +755,15 @@ class RealmCountryRegion extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    if (!(budgetRegx.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.spacetext'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
                 }
 
                 //Capacity

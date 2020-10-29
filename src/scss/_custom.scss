@@ -3622,23 +3622,30 @@ margin-left: -45px;
 }
 .quantimedProgressbartext2 {
   // left: 16%;
-  left: 33.3333%;
-  transform: translateX(-43%) scale(1);
+  left: 25%;
+  transform: translateX(-37%) scale(1);
 }
 .quantimedProgressbartext3 {
   // left: 16%;
   // left: 64.5%;
   // transform: translateX(18%) scale(1);  
-  left: 66.6667%;
-    transform: translateX(-69%) scale(1);
+  left: 50%;
+    transform: translateX(-50%) scale(1);
 }
 
 
 .quantimedProgressbartext4 {
   // left: 16%;
-  left: 100%;
-  transform: translateX(-116%) scale(1);
+  left: 75%;
+  transform: translateX(-62%) scale(1);
 }
+
+.quantimedProgressbartext5 {
+  // left: 16%;
+  left: 100%;
+  transform: translateX(-120%) scale(1);
+}
+
 .en-btnlogin{
   color: #002f6c !important;
   background-color: transparent !important;

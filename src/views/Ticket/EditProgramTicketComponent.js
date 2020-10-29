@@ -133,8 +133,14 @@ export default class EditProgramTicketComponent extends Component {
         ProgramService.getProgramList().then(response => {
             if (response.status == 200) {
                 console.log("resp--------------------", response.data);
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    programList: response.data, loading: false
+                    programList: listArray, loading: false
                 })
             } else {
                 this.setState({
@@ -353,6 +359,7 @@ export default class EditProgramTicketComponent extends Component {
                                                 invalid={touched.notes && !!errors.notes}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
+                                                maxLength={600}
                                                 value={this.state.program.notes}
                                             // required 
                                             />

@@ -430,7 +430,7 @@ export default class ListProcurementUnit extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100],
+      colWidths: [150, 150, 100,50,50,150],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {

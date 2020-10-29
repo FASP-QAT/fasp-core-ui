@@ -92,7 +92,7 @@ export default class PipelineProgramProcurementAgent extends Component {
 
             var currentProcurementAgent = this.el.getRowData(y)[1];
 
-            if (value == "") {
+            if (value == "" || value==undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));

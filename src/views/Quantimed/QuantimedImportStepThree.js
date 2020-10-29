@@ -25,8 +25,9 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 // }
 
 
-const initialValuesThree = {
-
+let initialValuesThree = {
+    regionId: '',
+    regionConversionFactor: ''
 }
 
 
@@ -34,6 +35,15 @@ const validationSchemaThree = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
+        regionConversionFactor: Yup.number()
+            .moreThan(0, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
+            .lessThan(101, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))            
+            // .min(0, i18n.t("static.procurementUnit.validValueText"))
+            // .max(100, "Maximum 100%")
+            .required(i18n.t('static.program.validairfreighttext'))                        
+            ,
+        // .max(100, i18n.t('static.program.validvaluetext'))
     })
 }
 
@@ -70,7 +80,8 @@ class QuantimedImportStepThree extends Component {
             loading: false,
             regionList: [],
             region: {
-                regionId: ''
+                regionId: '',
+                regionConversionFactor: ''
             }
         }
         // this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -90,7 +101,11 @@ class QuantimedImportStepThree extends Component {
         if (event.target.name == "regionId") {
             region.regionId = event.target.value;
             this.props.items.program.regionId = event.target.value;
-        }        
+        }
+        if (event.target.name == "regionConversionFactor") {
+            region.regionConversionFactor = event.target.value;
+            this.props.items.program.regionConversionFactor = event.target.value;
+        }
         this.setState({
             region
         }, () => { });
@@ -103,7 +118,7 @@ class QuantimedImportStepThree extends Component {
         })
 
         var programId = this.props.items.program.programId;
-        
+
         var db1;
         var storeOS;
         getDatabase();
@@ -114,7 +129,7 @@ class QuantimedImportStepThree extends Component {
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
-            
+
             db1 = e.target.result;
             var transaction;
             var programTransaction;
@@ -132,25 +147,26 @@ class QuantimedImportStepThree extends Component {
                 var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                
+
                 var regList = programJson.regionList;
-                
-                
+
+
                 this.setState({
                     regionList: regList,
                     loading: false
-                }, ()=>{})
+                }, () => { })
             }.bind(this);
         }.bind(this);
-      
+
     }
 
     touchAll(setTouched, errors) {
         setTouched({
-            regionId: true
+            regionId: true,
+            regionConversionFactor: true
         }
         )
-        this.validateForm(errors)
+        this.validateFormThree(errors)
     }
     validateFormThree(errors) {
         this.findFirstErrorThree('healthAreaForm', (fieldName) => {
@@ -170,6 +186,12 @@ class QuantimedImportStepThree extends Component {
     // toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     componentDidMount() {
+
+        this.state.region.regionConversionFactor = '100'       
+        initialValuesThree = {
+            regionConversionFactor : '100'
+        } 
+        // this.loadRegionList();
 
     }
 
@@ -209,7 +231,7 @@ class QuantimedImportStepThree extends Component {
         // }
 
         const { regionList } = this.state;
-        
+
         let regions = regionList.length > 0 && regionList.map((item, i) => {
             return (
                 <option key={i} value={item.regionId}>
@@ -221,6 +243,7 @@ class QuantimedImportStepThree extends Component {
         return (
             <>
                 <Formik
+                    enableReinitialize={true}
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -230,6 +253,8 @@ class QuantimedImportStepThree extends Component {
                         // alert(startDate)
                         // alert(endDate)                        
                         // this.props.items.program.rangeValue = this.state.rangeValue;
+                        var percentage = this.state.region.regionConversionFactor / 100;
+                        this.props.items.program.regionConversionFactor = percentage;
                         this.props.finishedStepThree && this.props.finishedStepThree();
                         this.props.triggerStepFour();
 
@@ -251,8 +276,8 @@ class QuantimedImportStepThree extends Component {
                                         <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
                                             <CardBody className="pb-lg-2 pt-lg-2">
                                                 {/* <div className="pl-0"> */}
-                                                    {/* <div className="row"> */}
-                                                        {/* <FormGroup className="col-md-4">
+                                                {/* <div className="row"> */}
+                                                {/* <FormGroup className="col-md-4">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.quantimed.quantimedImportCosumptionPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                     <div className="controls edit">
 
@@ -270,26 +295,47 @@ class QuantimedImportStepThree extends Component {
                                                     </div>
                                                 </FormGroup> */}
 
-                                                        <FormGroup>
-                                                            <Label htmlFor="select">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                valid={!errors.regionId}
-                                                                invalid={touched.regionId && !!errors.regionId}
-                                                                bsSize="sm"
-                                                                className="col-md-4"
-                                                                onBlur={handleBlur}
-                                                                type="select" name="regionId" id="regionId"
-                                                                value={this.state.region.regionId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {regions}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                                            {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        valid={!errors.regionId}
+                                                        invalid={touched.regionId && !!errors.regionId}
+                                                        bsSize="sm"
+                                                        className="col-md-4"
+                                                        onBlur={handleBlur}
+                                                        type="select" name="regionId" id="regionId"
+                                                        value={this.state.region.regionId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {regions}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
 
-                                                        </FormGroup>
-                                                    {/* </div> */}
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="regionConversionFactor">{i18n.t('static.quantimed.regionPercentage')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="number"
+                                                        min="1" max="100"
+                                                        name="regionConversionFactor"
+                                                        id="regionConversionFactor"
+                                                        bsSize="sm"
+                                                        className="col-md-4"
+                                                        valid={!errors.regionConversionFactor && this.state.region.regionConversionFactor != ''}
+                                                        invalid={touched.regionConversionFactor && !!errors.regionConversionFactor}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.region.regionConversionFactor}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.regionConversionFactor}</FormFeedback>
+                                                </FormGroup>
+
+
+
+                                                {/* </div> */}
                                                 {/* </div> */}
                                                 {/* </CardBody>
                                     <CardFooter className="pb-0 pr-0"> */}
