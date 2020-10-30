@@ -2135,7 +2135,7 @@ export default class syncPage extends Component {
         var oldData = (jsonData[c])[17];
         var latestData = (jsonData[c])[18];
         var downloadedData = (jsonData[c])[19];
-        for (var j = 0; j < 17; j++) {
+        for (var j = 0; j < 11; j++) {
           if ((oldData[j] == latestData[j]) || (oldData[j] == "" && latestData[j] == null) || (oldData[j] == null && latestData[j] == "")) {
             var col = (colArr[j]).concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");

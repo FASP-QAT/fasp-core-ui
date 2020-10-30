@@ -18,6 +18,7 @@ export default function openProblem(index,username,userId,problemActionList) {
             }
         },
         notes: '',
+        reviewed: false,
         createdBy: {
             userId: userId,
             username: username
