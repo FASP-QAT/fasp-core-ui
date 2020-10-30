@@ -2305,6 +2305,11 @@ export default class syncPage extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
+                        <FormGroup className="tab-ml-1 mt-4">
+                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                          {this.state.isChanged == 1 && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                          &nbsp;
+                </FormGroup>
                       </div>
                     </Col>
                     <Row>
@@ -2353,13 +2358,13 @@ export default class syncPage extends Component {
                   </div>
                 </div>
               </CardBody>
-              <CardFooter>
-                <FormGroup>
+              {/* <CardFooter> */}
+                {/* <FormGroup>
                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                   {this.state.isChanged == 1 && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                   &nbsp;
-                </FormGroup>
-              </CardFooter>
+                </FormGroup> */}
+              {/* </CardFooter> */}
             </Card>
           </Col>
         </Row>
