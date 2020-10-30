@@ -249,7 +249,8 @@ class SupplyPlanVersionAndReview extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-
+            if (AuthenticationService.getLoggedInUserRole.includes('ROLE_SUPPLY_PLAN_REVIEWER')) {
+            
             let programId = document.getElementById("programId").value;
             // let countryId = document.getElementById("countryId").value;
             // let versionStatusId = this.el.getValueFromCoords(5, x);
@@ -262,14 +263,14 @@ class SupplyPlanVersionAndReview extends Component {
             let versionStatusId = rowData[10];
             let versionTypeId = rowData[9];
             console.log("====>", versionStatusId, "====>", versionTypeId);
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLYPLAN_STATUS')) {
+            
                 // if (versionStatusId == 1 && versionTypeId == 2) {
                     this.props.history.push({
                         pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
 
                     });
                 // }
-            // }
+            }
 
         }
     }.bind(this);
