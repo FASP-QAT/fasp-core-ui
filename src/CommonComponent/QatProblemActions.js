@@ -269,6 +269,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -277,7 +278,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -374,6 +375,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -410,6 +412,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -418,7 +421,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -492,6 +495,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -500,7 +504,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -589,6 +593,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -627,6 +632,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -635,7 +641,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -763,6 +769,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -812,6 +819,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -820,7 +828,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -858,6 +866,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -866,7 +875,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -938,6 +947,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -946,7 +956,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -1032,6 +1042,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -1070,6 +1081,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1078,7 +1090,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -1244,6 +1256,7 @@ export default class QatProblemActions extends Component {
                                                                                     }
                                                                                 },
                                                                                 notes: "",
+                                                                                reviewed: false,
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -1294,6 +1307,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1302,7 +1316,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -1338,6 +1352,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1346,7 +1361,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -1516,6 +1531,7 @@ export default class QatProblemActions extends Component {
                                                                                     }
                                                                                 },
                                                                                 notes: "",
+                                                                                reviewed: false,
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -1565,6 +1581,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1573,7 +1590,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -1609,6 +1626,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1617,7 +1635,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -1788,6 +1806,7 @@ export default class QatProblemActions extends Component {
                                                                                     }
                                                                                 },
                                                                                 notes: "",
+                                                                                reviewed: false,
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -1837,6 +1856,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1845,7 +1865,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -1881,6 +1901,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1889,7 +1910,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -2057,6 +2078,7 @@ export default class QatProblemActions extends Component {
                                                                                     }
                                                                                 },
                                                                                 notes: "",
+                                                                                reviewed: false,
                                                                                 createdBy: {
                                                                                     userId: userId,
                                                                                     username: username
@@ -2106,6 +2128,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -2114,7 +2137,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -2150,6 +2173,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -2158,7 +2182,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -2257,6 +2281,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: '',
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2265,7 +2290,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-
+                                                                        filterObj.reviewed = false; 
                                                                         var problemStatusObject = {
                                                                             id: 2,
                                                                             label: {
@@ -2380,6 +2405,7 @@ export default class QatProblemActions extends Component {
                                                                                         }
                                                                                     },
                                                                                     notes: "",
+                                                                                    reviewed: false,
                                                                                     createdBy: {
                                                                                         userId: userId,
                                                                                         username: username
@@ -2417,6 +2443,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: '',
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2425,7 +2452,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-
+                                                                        filterObj.reviewed = false; 
                                                                         var problemStatusObject = {
                                                                             id: 2,
                                                                             label: {
@@ -2550,6 +2577,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: '',
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2558,7 +2586,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-
+                                                                        filterObj.reviewed = false; 
                                                                         var problemStatusObject = {
                                                                             id: 2,
                                                                             label: {
@@ -2671,6 +2699,7 @@ export default class QatProblemActions extends Component {
                                                                                         }
                                                                                     },
                                                                                     notes: "",
+                                                                                    reviewed: false,
                                                                                     createdBy: {
                                                                                         userId: userId,
                                                                                         username: username
@@ -2708,6 +2737,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: '',
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2716,7 +2746,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-
+                                                                        filterObj.reviewed = false; 
                                                                         var problemStatusObject = {
                                                                             id: 2,
                                                                             label: {
@@ -2825,6 +2855,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: '',
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2833,7 +2864,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-
+                                                                        filterObj.reviewed = false; 
                                                                         var problemStatusObject = {
                                                                             id: 2,
                                                                             label: {
@@ -2948,6 +2979,7 @@ export default class QatProblemActions extends Component {
                                                                                         }
                                                                                     },
                                                                                     notes: "",
+                                                                                    reviewed: false,
                                                                                     createdBy: {
                                                                                         userId: userId,
                                                                                         username: username
@@ -2985,6 +3017,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: '',
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2993,7 +3026,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-
+                                                                        filterObj.reviewed = false; 
                                                                         var problemStatusObject = {
                                                                             id: 2,
                                                                             label: {
@@ -3168,6 +3201,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3176,7 +3210,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -3276,6 +3310,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3318,6 +3353,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3326,7 +3362,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -3492,6 +3528,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3500,7 +3537,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -3595,6 +3632,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3634,6 +3672,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3642,7 +3681,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -3806,6 +3845,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3814,7 +3854,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -3911,6 +3951,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -3950,6 +3991,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -3958,7 +4000,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -4121,6 +4163,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4129,7 +4172,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -4225,6 +4268,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -4264,6 +4308,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4272,7 +4317,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -4436,6 +4481,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4444,7 +4490,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -4541,6 +4587,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -4580,6 +4627,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4588,7 +4636,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -4761,6 +4809,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4769,7 +4818,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -4867,6 +4916,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -4906,6 +4956,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 },
                                                                 notes: '',
+                                                                reviewed: false,
                                                                 createdBy: {
                                                                     userId: userId,
                                                                     username: username
@@ -4914,7 +4965,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-
+                                                            filterObj.reviewed = false; 
                                                             var problemStatusObject = {
                                                                 id: 2,
                                                                 label: {
@@ -5006,6 +5057,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -5014,7 +5066,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -5098,6 +5150,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -5136,6 +5189,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -5144,7 +5198,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {
@@ -5247,6 +5301,7 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         notes: '',
+                                                                        reviewed: false,
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -5255,7 +5310,7 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-
+                                                                    filterObj.reviewed = false; 
                                                                     var problemStatusObject = {
                                                                         id: 2,
                                                                         label: {
@@ -5340,6 +5395,7 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             notes: "",
+                                                                            reviewed: false,
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -5380,6 +5436,7 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     notes: '',
+                                                                    reviewed: false,
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -5388,7 +5445,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-
+                                                                filterObj.reviewed = false; 
                                                                 var problemStatusObject = {
                                                                     id: 2,
                                                                     label: {

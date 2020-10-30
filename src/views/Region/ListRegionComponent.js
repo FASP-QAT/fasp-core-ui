@@ -475,7 +475,7 @@ class RegionListComponent extends Component {
 
         var csvRow = [];
 
-        csvRow.push(i18n.t('static.region.country') + ' , ' + (document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
 

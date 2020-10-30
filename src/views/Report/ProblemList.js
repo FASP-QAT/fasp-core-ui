@@ -405,16 +405,16 @@ export default class ConsumptionDetails extends React.Component {
     }
     exportCSV(columns) {
         var csvRow = [];
-        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'));
+        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"');
         csvRow.push('')
-        csvRow.push((i18n.t('static.report.problemStatus')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
-        csvRow.push((i18n.t('static.report.problemType')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
-        csvRow.push((i18n.t('static.problemActionReport.problemCategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.problemActionReport.problemCategory') + ' , ' + document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         const headers = [];
         headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
@@ -704,6 +704,8 @@ export default class ConsumptionDetails extends React.Component {
 
                     var problemReportList = (programJson.problemReportList);
                     var problemReportFilterList = problemReportList;
+
+                    console.log("problemList===========>",problemReportList);
 
                     if(problemStatusId==-1){
                         problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);

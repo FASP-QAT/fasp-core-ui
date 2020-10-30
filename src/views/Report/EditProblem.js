@@ -700,6 +700,7 @@ export default class EditLanguageComponent extends Component {
                                                 "problemReportTransId": '',
                                                 "problemStatus": this.state.problemStatusObject,
                                                 "notes": this.state.notes,
+                                                reviewed: false,
                                                 "createdBy": {
                                                     "userId": userId,
                                                     "username": username

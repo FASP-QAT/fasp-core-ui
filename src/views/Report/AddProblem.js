@@ -454,6 +454,7 @@ class AddRoleComponent extends Component {
                         }
                       },
                       notes: document.getElementById('notes').value,
+                      reviewed: false,
                       createdBy: {
                         userId: userId,
                         username: username
