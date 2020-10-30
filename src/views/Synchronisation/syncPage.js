@@ -539,7 +539,7 @@ export default class syncPage extends Component {
     data.push(latestData);
     var options = {
       data: data,
-      colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
+      colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -552,7 +552,7 @@ export default class syncPage extends Component {
         },
         {
           title: i18n.t('static.program.programCode'),
-          type: 'text',
+          type: 'hidden',
         },
         {
           title: i18n.t('static.program.versionId'),
@@ -564,7 +564,7 @@ export default class syncPage extends Component {
         },
         {
           title: i18n.t('static.planningunit.planningunit'),
-          type: 'hidden',
+          type: 'text',
         },
         {
           title: i18n.t('static.report.month'),
@@ -572,7 +572,7 @@ export default class syncPage extends Component {
         },
         {
           title: i18n.t('static.report.createdDate'),
-          type: 'text',
+          type: 'hide',
         },
         {
           title: i18n.t('static.report.problemDescription'),
@@ -2392,7 +2392,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2416,7 +2416,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesInventory}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesInventory}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChangesInventory}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2439,7 +2439,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesShipment}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesShipment}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChangesShipment}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2462,7 +2462,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2876,7 +2876,7 @@ export default class syncPage extends Component {
         var options = {
           data: mergedProblemListJexcel,
           columnDrag: true,
-          colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
+          colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
           colHeaderClasses: ["Reqasterisk"],
           columns: [
             {
@@ -2901,7 +2901,7 @@ export default class syncPage extends Component {
             },
             {
               title: i18n.t('static.planningunit.planningunit'),
-              type: 'hidden',
+              type: 'text',
             },
             {
               title: i18n.t('static.report.month'),
@@ -2909,7 +2909,7 @@ export default class syncPage extends Component {
             },
             {
               title: i18n.t('static.report.createdDate'),
-              type: 'text',
+              type: 'hidden',
             },
             {
               title: i18n.t('static.report.problemDescription'),

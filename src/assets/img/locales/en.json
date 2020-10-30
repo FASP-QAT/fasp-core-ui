@@ -1457,6 +1457,7 @@
     "static.ticket.realmcountry": "Realm Country",
     "static.commitVersion.problemReportId":"Problem Report Id",
     "static.button.commit":"Commit",
+    "static.inventory.notAllowedForFutureMonths":"Inventory is not allowed for future months",
     "static.problemActionReport.problemCategory":"Problem Category"
 
     

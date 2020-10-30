@@ -353,7 +353,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: 'Active',
-                                                                    type: 'hidden'
+                                                                    type: 'checkbox'
                                                                 },
                                                                 {
                                                                     title: 'Changed Flag',
@@ -1278,6 +1278,10 @@ class AddprogramPlanningUnit extends Component {
                     valid = true;
                 }
             }
+        }
+
+        if(x==10){
+            this.el.setValueFromCoords(11, y, 1, true);
         }
         this.setState({ isValidData: valid });
     }
