@@ -746,14 +746,14 @@ class SupplyPlanVersionAndReview extends Component {
     exportCSV(columns) {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
 
-        csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((document.getElementById("countryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.common.status')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("versionStatusId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.common.status') + ' : ' + document.getElementById("versionStatusId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
 
         const headers = [];

@@ -353,13 +353,13 @@ export default class InventoryTurns extends Component {
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         var re;
 
