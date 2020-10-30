@@ -565,8 +565,9 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'number',
-                    readOnly: true
+                    type: 'numeric',
+                    readOnly: true,
+                    mask:'#,##.00'
                 },
                 {
                     title: i18n.t('static.report.costUsd'),

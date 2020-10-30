@@ -229,13 +229,15 @@ export default class QatProblemActions extends Component {
                                                         var numberOfMonths = parseInt(problemList[prob].data1);
                                                         // for (var m = 1; m <= numberOfMonths; m++) {
                                                         var myStartDate = moment(Date.now()).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
-                                                        var myEndDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        // var myEndDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        var myEndDate = moment(Date.now()).endOf('month').format("YYYY-MM-DD");
                                                         // var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true");
                                                         var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true" && c.active == true);
 
                                                         if (problemActionList[prob] != undefined) {
                                                             var myStartDate1 = moment(problemActionList[prob].dt).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
-                                                            var myEndDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            // var myEndDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            var myEndDate1 = moment(problemActionList[prob].dt).endOf('month').format("YYYY-MM-DD");
                                                             // //console.log("myStartDate1====>", myStartDate1);
                                                             // //console.log("myEndDate1====>", myEndDate1);
                                                             var filteredConsumptionList1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate1 && c.actualFlag.toString() == "true" && c.active == true);
@@ -332,6 +334,10 @@ export default class QatProblemActions extends Component {
 
                                                                     problemActionIndex: problemActionIndex,
 
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -442,7 +448,8 @@ export default class QatProblemActions extends Component {
                                                         var numberOfMonthsInventory = parseInt(problemList[prob].data1);
                                                         // for (var mi = 1; mi <= numberOfMonthsInventory; mi++) {
                                                         var myStartDateInventory = moment(Date.now()).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
-                                                        var myEndDateInventory = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        // var myEndDateInventory = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        var myEndDateInventory = moment(Date.now()).endOf('month').format("YYYY-MM-DD");
                                                         var filterInventoryList = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory && c.active == true);
                                                         var index = problemActionList.findIndex(
                                                             c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
@@ -455,7 +462,8 @@ export default class QatProblemActions extends Component {
                                                         // //console.log("prob====>", prob)
                                                         if (problemActionList[prob] != undefined) {
                                                             var myStartDateInventory1 = moment(problemActionList[prob].dt).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
-                                                            var myEndDateInventory1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            // var myEndDateInventory1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            var myEndDateInventory1 = moment(problemActionList[prob].dt).endOf('month').format("YYYY-MM-DD");
                                                             var filterInventoryList1 = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory1 && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory1 && c.active == true);
                                                             var index1 = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
@@ -540,7 +548,11 @@ export default class QatProblemActions extends Component {
                                                                     newAdded: false,
 
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -711,6 +723,10 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex: problemActionIndex,
 
                                                                     index: index,
+                                                                    problemCategory: {
+                                                                        id: 2,
+                                                                        label: { label_en: 'Procurement Schedule' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -976,6 +992,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -1184,6 +1204,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -1452,6 +1476,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -1720,6 +1748,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -1985,6 +2017,10 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex: problemActionIndex,
 
                                                                         index: index,
+                                                                        problemCategory: {
+                                                                            id: 2,
+                                                                            label: { label_en: 'Procurement Schedule' }
+                                                                        },
                                                                         problemStatus: {
                                                                             id: 1,
                                                                             label: { label_en: 'Open' }
@@ -2304,6 +2340,10 @@ export default class QatProblemActions extends Component {
                                                                             data5: '',
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
+                                                                            problemCategory: {
+                                                                                id: 3,
+                                                                                label: { label_en: 'Supply Planning' }
+                                                                            },
                                                                             problemStatus: {
                                                                                 id: 1,
                                                                                 label: { label_en: 'Open' }
@@ -2591,6 +2631,10 @@ export default class QatProblemActions extends Component {
                                                                             data5: '',
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
+                                                                            problemCategory: {
+                                                                                id: 3,
+                                                                                label: { label_en: 'Supply Planning' }
+                                                                            },
                                                                             problemStatus: {
                                                                                 id: 1,
                                                                                 label: { label_en: 'Open' }
@@ -2864,6 +2908,10 @@ export default class QatProblemActions extends Component {
                                                                             data5: '',
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
+                                                                            problemCategory: {
+                                                                                id: 3,
+                                                                                label: { label_en: 'Supply Planning' }
+                                                                            },
                                                                             problemStatus: {
                                                                                 id: 1,
                                                                                 label: { label_en: 'Open' }
@@ -3188,6 +3236,10 @@ export default class QatProblemActions extends Component {
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
 
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -3503,7 +3555,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -3816,7 +3871,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4127,7 +4185,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4440,7 +4501,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4763,7 +4827,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 3,
+                                                                        label: { label_en: 'Supply Planning' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -4916,13 +4983,13 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (consumptionListFortMinusOneDate1.length == 0 && consumptionListFortMinusThreeDate1.length == 0 && consumptionListFortMinusTwoDate1.length > 0) {
+                                                            if (consumptionListFortMinusOneDate1.length > 0 && consumptionListFortMinusThreeDate1.length > 0 && consumptionListFortMinusTwoDate1.length == 0) {
                                                                 // auto open logic for index1
                                                                 if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
-                                                                if (index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
+                                                                if (consumptionListFortMinusTwoDate1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
                                                                     var filterObj = problemActionList[index1];
                                                                     var transList = filterObj.problemTransList;
                                                                     let tempProblemTransObj = {
@@ -4991,7 +5058,10 @@ export default class QatProblemActions extends Component {
                                                                     data5: '',
                                                                     newAdded: false,
                                                                     problemActionIndex: problemActionIndex,
-
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
                                                                     problemStatus: {
                                                                         id: 1,
                                                                         label: { label_en: 'Open' }
@@ -5046,6 +5116,250 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         } else {
+                                                            // //console.log("dont rais prob--------");
+                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
+                                                                // //console.log("resolve the problem problem id 21");
+                                                                // problemActionList[index].isFound = 0;
+                                                                var filterObj = problemActionList[index];
+                                                                var transList = filterObj.problemTransList;
+                                                                let tempProblemTransObj = {
+                                                                    problemReportTransId: '',
+                                                                    problemStatus: {
+                                                                        id: 2,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 462,
+                                                                            label_en: "Resolved",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    },
+                                                                    notes: '',
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                }
+                                                                transList.push(tempProblemTransObj);
+                                                                filterObj.problemTransList = transList;
+
+                                                                var problemStatusObject = {
+                                                                    id: 2,
+                                                                    label: {
+                                                                        active: true,
+                                                                        labelId: 462,
+                                                                        label_en: "Resolved",
+                                                                        label_sp: null,
+                                                                        label_fr: null,
+                                                                        label_pr: null
+                                                                    }
+                                                                }
+                                                                filterObj.problemStatus = problemStatusObject;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                // new problem for missing gaps============================
+                                                if (problemList[prob].problem.problemId == 22) {
+                                                    for (var r = 0; r < regionList.length; r++) {
+                                                        var consumptionList = programList[pp].consumptionList;
+                                                        consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                        var tDate = moment(Date.now()).endOf('month').format("YYYY-MM-DD");
+                                                        var tMinusOneDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        var tMinusTwoDate = moment(Date.now()).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        // var tMinusThreeDate = moment(Date.now()).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
+                                                        // //console.log("tMinusOneDate--->",tMinusOneDate);
+                                                        // //console.log("tMinusOneDate--->",tMinusTwoDate);
+                                                        // //console.log("tMinusOneDate--->",tMinusThreeDate);
+
+                                                        var consumptionListFortDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                        var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                        var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                        
+                                                        // var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                        // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
+                                                        // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
+                                                        // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+                                                        var index = problemActionList.findIndex(
+                                                            c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
+                                                                && c.region.id == regionList[r].regionId
+                                                                && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                && c.program.id == programList[pp].programId
+                                                                && c.realmProblem.problem.problemId == 22
+                                                            // && c.versionId == versionID
+                                                        );
+
+                                                        if (problemActionList[prob] != undefined) {
+
+                                                            var consumptionList1 = programList[pp].consumptionList;
+                                                            consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+
+                                                            var tDate1 = moment(problemActionList[prob].dt).endOf('month').format("YYYY-MM-DD");
+                                                            var tMinusOneDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            var tMinusTwoDate1 = moment(problemActionList[prob].dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            // var tMinusThreeDate1 = moment(problemActionList[prob].dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
+                                                            // //console.log("tMinusOneDate--->",tMinusOneDate);
+                                                            // //console.log("tMinusOneDate--->",tMinusTwoDate);
+                                                            // //console.log("tMinusOneDate--->",tMinusThreeDate);
+                                                           
+                                                            var consumptionListFortDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                            var consumptionListFortMinusOneDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                            var consumptionListFortMinusTwoDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                            // var consumptionListFortMinusThreeDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
+                                                            // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
+                                                            // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
+                                                            // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+                                                            var index1 = problemActionList.findIndex(
+                                                                c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    && c.region.id == regionList[r].regionId
+                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                    && c.program.id == programList[pp].programId
+                                                                    && c.realmProblem.problem.problemId == 22
+                                                                // && c.versionId == versionID
+                                                            );
+
+                                                            if (consumptionListFortDate1.length > 0 && consumptionListFortMinusTwoDate1.length > 0 && consumptionListFortMinusOneDate1.length == 0) {
+                                                                console.log("1============>");
+                                                                // auto open logic for index1
+                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                    openProblem(index1, username, userId, problemActionList);
+                                                                }
+                                                            } else {
+                                                                console.log("2============>");
+                                                                if (consumptionListFortMinusOneDate1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
+                                                                    console.log("3============>");
+                                                                    var filterObj = problemActionList[index1];
+                                                                    var transList = filterObj.problemTransList;
+                                                                    let tempProblemTransObj = {
+                                                                        problemReportTransId: '',
+                                                                        problemStatus: {
+                                                                            id: 2,
+                                                                            label: {
+                                                                                active: true,
+                                                                                labelId: 462,
+                                                                                label_en: "Resolved",
+                                                                                label_sp: null,
+                                                                                label_fr: null,
+                                                                                label_pr: null
+                                                                            }
+                                                                        },
+                                                                        notes: '',
+                                                                        createdBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                    }
+                                                                    transList.push(tempProblemTransObj);
+                                                                    filterObj.problemTransList = transList;
+
+                                                                    var problemStatusObject = {
+                                                                        id: 2,
+                                                                        label: {
+                                                                            active: true,
+                                                                            labelId: 462,
+                                                                            label_en: "Resolved",
+                                                                            label_sp: null,
+                                                                            label_fr: null,
+                                                                            label_pr: null
+                                                                        }
+                                                                    }
+                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (consumptionListFortDate.length > 0 && consumptionListFortMinusTwoDate.length > 0 && consumptionListFortMinusOneDate.length == 0) {
+                                                            // //console.log("rais prob--------");
+                                                            console.log("4============>");
+                                                            if (index == -1) {
+                                                                var json = {
+                                                                    problemReportId: 0,
+                                                                    program: {
+                                                                        id: programList[pp].programId,
+                                                                        label: programList[pp].label,
+                                                                        code: programList[pp].programCode
+                                                                    },
+                                                                    versionId: versionID,
+                                                                    realmProblem: problemList[prob],
+
+                                                                    dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                    region: {
+                                                                        id: regionList[r].regionId,
+                                                                        label: regionList[r].label
+                                                                    },
+                                                                    planningUnit: {
+                                                                        id: planningUnitList[p].planningUnit.id,
+                                                                        label: planningUnitList[p].planningUnit.label,
+
+                                                                    },
+                                                                    shipmentId: '',
+                                                                    data5: '',
+                                                                    newAdded: false,
+                                                                    problemActionIndex: problemActionIndex,
+                                                                    problemCategory: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Data Quality' }
+                                                                    },
+                                                                    problemStatus: {
+                                                                        id: 1,
+                                                                        label: { label_en: 'Open' }
+                                                                    },
+                                                                    problemType: {
+                                                                        id: 1,
+                                                                        label: {
+                                                                            label_en: 'Automatic'
+                                                                        }
+                                                                    },
+                                                                    reviewed: false,
+                                                                    createdBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                    lastModifiedBy: {
+                                                                        userId: userId,
+                                                                        username: username
+                                                                    },
+                                                                    lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                    problemTransList: [
+                                                                        {
+                                                                            problemReportTransId: '',
+                                                                            problemStatus: {
+                                                                                id: 1,
+                                                                                label: {
+                                                                                    active: true,
+                                                                                    labelId: 461,
+                                                                                    label_en: "Open",
+                                                                                    label_sp: null,
+                                                                                    label_fr: null,
+                                                                                    label_pr: null
+                                                                                }
+                                                                            },
+                                                                            notes: "",
+                                                                            createdBy: {
+                                                                                userId: userId,
+                                                                                username: username
+                                                                            },
+                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        }
+                                                                    ]
+                                                                }
+                                                                problemActionList.push(json);
+                                                                problemActionIndex++;
+                                                            } else {
+                                                                console.log("5============>");
+                                                                // problemActionList[index].isFound = 1 auot open logic for index;
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                    openProblem(index, username, userId, problemActionList);
+                                                                }
+                                                            }
+
+                                                        } else {
+                                                            console.log("6============>");
                                                             // //console.log("dont rais prob--------");
                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                 // //console.log("resolve the problem problem id 21");

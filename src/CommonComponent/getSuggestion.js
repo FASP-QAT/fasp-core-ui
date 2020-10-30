@@ -8,7 +8,7 @@ export default function getSuggestion(row, lang) {
         // Please provide Actual consumption for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
         var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
-        for (var m = 1; m <= numberOfMonths; m++) {
+        for (var m = numberOfMonths; m >= 0; m--) {
             var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
             monthString = monthString.concat(curMonth + ",");
         }
@@ -39,7 +39,7 @@ export default function getSuggestion(row, lang) {
         // Please provide Stock count for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
         var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
-        for (var m = 1; m <= numberOfMonths; m++) {
+        for (var m = numberOfMonths; m >= 0; m--) {
             var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
             monthString = monthString.concat(curMonth + ",");
         }
@@ -465,6 +465,33 @@ export default function getSuggestion(row, lang) {
     }
     if (row.realmProblem.problem.problemId == 21) {
         var gapMonth = moment(row.dt).subtract(2, 'months').startOf('month').format("MMM-YY");
+
+        var desc_en = row.realmProblem.problem.actionLabel.label_en;
+        var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
+        var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
+        var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
+
+        // console.log("desc_sp====",desc_sp);
+        var label = row.realmProblem.problem.actionLabel;
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(gapMonth);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(gapMonth);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(gapMonth);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(gapMonth);
+            label.label_pr = result_pr;
+        }
+
+        return getLabelText(label, lang);
+    }
+
+    if (row.realmProblem.problem.problemId == 22) {
+        var gapMonth = moment(row.dt).subtract(1, 'months').startOf('month').format("MMM-YY");
 
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
