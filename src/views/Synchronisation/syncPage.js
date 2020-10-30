@@ -2783,6 +2783,7 @@ export default class syncPage extends Component {
         var oldProgramDataProblemList = oldProgramData.problemReportList;
         var downloadedProgramDataProblemList = this.state.downloadedProgramData.problemReportList;
         console.log("oldProgramDataProblemList--------------------------->", oldProgramDataProblemList);
+        console.log("latestProgramDataProblemList--------------------------->", latestProgramDataProblemList);
         var mergedProblemListData = [];
         var existingProblemReportId = [];
         for (var c = 0; c < oldProgramDataProblemList.length; c++) {
@@ -2792,7 +2793,7 @@ export default class syncPage extends Component {
           } else {
             // If 0 check whether that exists in latest version or not
             var index = 0;
-            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21) {
+            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 22) {
               index = latestProgramDataProblemList.findIndex(
                 f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
                   && f.region.id == oldProgramDataProblemList[c].region.id

@@ -211,8 +211,39 @@ export default class SyncMasterData extends Component {
                                 }
                             }
                             console.log("Batch Info updated", batchInfoList);
+
+                            var problemReportArray = response.data.problemReportList;
+                            console.log("Problem report array", problemReportArray);
+                            for (var pr = 0; pr < problemReportArray.length; pr++) {
+                                console.log("problemReportArray[pr].problemReportId---------->", problemReportArray[pr].problemReportId);
+                                var index = problemReportList.findIndex(c => c.problemReportId == problemReportArray[pr].problemReportId)
+                                console.log("Index----------->", index);
+                                if (index == -1) {
+                                    problemReportList.push(problemReportArray[pr]);
+                                } else {
+                                    console.log("In else");
+                                    problemReportList[index].reviewed = problemReportArray[pr].reviewed;
+                                    console.log("problemReportList[index]", problemReportList[index]);
+                                    var problemReportTransList = problemReportList[index].problemTransList;
+                                    console.log("Problem report trans list", problemReportTransList)
+                                    var curProblemReportTransList = problemReportArray[pr].problemTransList;
+                                    console.log("Cur problem report trans list", curProblemReportTransList)
+                                    for (var cpr = 0;cpr < curProblemReportTransList.length; cpr++) {
+                                        var index1 = problemReportTransList.findIndex(c => c.problemReportTransId == curProblemReportTransList[cpr].problemReportTransId);
+                                        console.log("index1", index1)
+                                        if (index1 == -1) {
+                                            problemReportTransList.push(curProblemReportTransList[cpr]);
+                                        } else {
+                                            problemReportTransList[index1] = curProblemReportTransList[cpr];
+                                        }
+                                    }
+                                    problemReportList[index].problemReportTransList = problemReportTransList;
+                                }
+                            }
+
                             programJson.shipmentList = shipmentDataList;
                             programJson.batchInfoList = batchInfoList;
+                            programJson.problemReportList = problemReportList;
                             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var db1;
                             var storeOS;

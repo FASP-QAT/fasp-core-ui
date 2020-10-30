@@ -2539,7 +2539,7 @@ class DefaultLayout extends Component {
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name!=undefined?((route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)):'')} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )

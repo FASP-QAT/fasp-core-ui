@@ -414,6 +414,10 @@ class AddRoleComponent extends Component {
                   problemActionIndex: problemActionIndex,
 
                   index: '',
+                  problemCategory: {
+                    id: 1,
+                    label: { label_en: 'Data Quality' }
+                  },
                   problemStatus: {
                     id: 1,
                     label: { label_en: 'Open' }

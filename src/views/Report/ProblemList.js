@@ -52,7 +52,8 @@ export default class ConsumptionDetails extends React.Component {
             message: '',
             planningUnitId: '',
             lang: localStorage.getItem('lang'),
-            loading: false
+            loading: false,
+            problemCategoryList: []
         }
 
         this.fetchData = this.fetchData.bind(this);
@@ -157,6 +158,32 @@ export default class ConsumptionDetails extends React.Component {
                         this.getProblemListAfterCalculation();
                     }
 
+                    var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
+                    var problemCategoryOs = problemCategoryTransaction.objectStore('problemCategory');
+                    var problemCategoryRequest = problemCategoryOs.getAll();
+
+                    problemCategoryRequest.onerror = function (event) {
+                        // Handle errors!
+                        // this.hideSecondComponent();
+                    };
+                    problemCategoryRequest.onsuccess = function (e) {
+
+                        var myResultC = [];
+                        myResultC = problemCategoryRequest.result;
+                        var procList = []
+                        for (var i = 0; i < myResultC.length; i++) {
+                            var Json = {
+                                name: getLabelText(myResultC[i].label, lan),
+                                id: myResultC[i].id
+                            }
+                            procList[i] = Json
+                        }
+                        this.setState({
+                            problemCategoryList: procList
+                        })
+
+                    }.bind(this)
+
                 }.bind(this);
             }.bind(this);
         }.bind(this);
@@ -222,7 +249,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 50, 50, 10, 10, 10, 50, 180, 180, 50, 100],
+            colWidths: [10, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -235,7 +262,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.program.programCode'),
-                    type: 'text',
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.program.versionId'),
@@ -247,7 +274,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
-                    type: 'hidden',
+                    type: 'text',
                 },
                 {
                     title: i18n.t('static.report.month'),
@@ -255,7 +282,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.report.createdDate'),
-                    type: 'text',
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
@@ -384,13 +411,16 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push('')
         csvRow.push((i18n.t('static.report.problemType')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
+        csvRow.push((i18n.t('static.problemActionReport.problemCategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
         const headers = [];
-        headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemDescription').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
@@ -400,9 +430,10 @@ export default class ConsumptionDetails extends React.Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.data.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-                (ele.program.code).replaceAll(' ', '%20'),
+                // (ele.program.code).replaceAll(' ', '%20'),
                 ele.versionId,
-                moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
+                getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
+                // moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
@@ -434,7 +465,7 @@ export default class ConsumptionDetails extends React.Component {
                     align: 'center'
                 })
 
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
             }
@@ -465,6 +496,9 @@ export default class ConsumptionDetails extends React.Component {
                     doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+                    doc.text(i18n.t('static.problemActionReport.problemCategory') + ' : ' + document.getElementById("problemCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
 
                 }
 
@@ -484,9 +518,10 @@ export default class ConsumptionDetails extends React.Component {
         var h1 = 50;
 
         const headers = [];
-        headers.push(i18n.t('static.program.programCode'));
+        // headers.push(i18n.t('static.program.programCode'));
         headers.push(i18n.t('static.program.versionId'));
-        headers.push(i18n.t('static.report.createdDate'));
+        headers.push(i18n.t('static.planningunit.planningunit'));
+        // headers.push(i18n.t('static.report.createdDate'));
         headers.push(i18n.t('static.report.problemDescription'));
         headers.push(i18n.t('static.report.suggession'));
         headers.push(i18n.t('static.report.problemStatus'));
@@ -494,9 +529,10 @@ export default class ConsumptionDetails extends React.Component {
         headers.push(i18n.t('static.problemAction.criticality'));
         // columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [
-            (ele.program.code),
+            // (ele.program.code),
             ele.versionId,
-            moment(ele.createdDate).format('MMM-YY'),
+            getLabelText(ele.planningUnit.label, this.state.lang),
+            // moment(ele.createdDate).format('MMM-YY'),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
@@ -511,9 +547,11 @@ export default class ConsumptionDetails extends React.Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
-                3: { cellWidth: 170 },
-                4: { cellWidth: 180 },
-                6: { cellWidth: 150 },
+                0: { cellWidth: 50 },
+                1: { cellWidth: 100 },
+                2: { cellWidth: 170 },
+                3: { cellWidth: 180 },
+                5: { cellWidth: 150 },
 
             }
         };
@@ -632,9 +670,10 @@ export default class ConsumptionDetails extends React.Component {
         let programId = document.getElementById('programId').value;
         let problemStatusId = document.getElementById('problemStatusId').value;
         let problemTypeId = document.getElementById('problemTypeId').value;
+        let problemCategoryId = document.getElementById('problemCategoryId').value;
 
         this.setState({ programId: programId });
-        if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0) {
+        if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0 && problemCategoryId != 0) {
 
             var db1;
             getDatabase();
@@ -664,74 +703,32 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
-                    var problemReportFilterList = this.state.data;
+                    var problemReportFilterList = problemReportList;
 
-                    if (problemStatusId == -1 && problemTypeId == -1) {
-
-                        problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
-                        this.setState({
-                            data: problemReportFilterList,
-                            message: ''
-                        },
-                            () => {
-                                this.buildJExcel();
-                            });
-                    }
-                    if (problemStatusId != -1 && problemTypeId == -1) {
-                        // var problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
+                    if(problemStatusId==-1){
+                        problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
+                    }else{
                         if (problemStatusId == 2) {
                             var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                            // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-                            problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
+                            problemReportFilterList = problemReportFilterList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
                         } else {
-                            problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId);
+                            problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == problemStatusId);
                         }
-                        this.setState({
-                            data: problemReportFilterList,
-                            message: ''
-                        },
-                            () => {
-                                this.buildJExcel();
-                            });
-                    } if (problemStatusId == -1 && problemTypeId != -1) {
-                        problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.problemType.id == problemTypeId);
-                        this.setState({
-                            data: problemReportFilterList,
-                            message: ''
-                        },
-                            () => {
-                                this.buildJExcel();
-                            });
                     }
-                    if (problemStatusId != -1 && problemTypeId != -1) {
-                        if (problemStatusId == 2) {
-                            var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                            // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-                            problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
-                        } else {
-                            problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.problemType.id == problemTypeId);
-                        }
-                        this.setState({
-                            data: problemReportFilterList,
-                            message: ''
-                        },
-                            () => {
-                                this.buildJExcel();
-                            });
-                    } else {
-
-                        this.setState({
-                            data: problemReportFilterList,
-                            message: ''
-                        },
-                            () => {
-                                this.buildJExcel();
-                            });
-
+                    if(problemTypeId !=-1){
+                        problemReportFilterList=problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
                     }
-                    // console.log("problemReportFilterList---->", problemReportFilterList);
+                    if(problemCategoryId !=-1){
+                        problemReportFilterList=problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
+                    }
 
-
+                    this.setState({
+                        data: problemReportFilterList,
+                        message: ''
+                    },
+                        () => {
+                            this.buildJExcel();
+                        });
 
                 }.bind(this)
             }.bind(this)
@@ -835,6 +832,14 @@ export default class ConsumptionDetails extends React.Component {
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
             && problemStatusList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
+        const { problemCategoryList } = this.state;
+        let problemCategories = problemCategoryList.length > 0
+            && problemCategoryList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>{item.name}</option>
                 )
@@ -1059,7 +1064,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 onChange={this.fetchData}
                                             // value={1}
                                             >
-                                                <option value="-1">Open / Addressed</option>
+                                                <option value="-1">{i18n.t("static.problemList.problemStatus")}</option>
                                                 {problemStatus}
                                             </Input>
                                         </InputGroup>
@@ -1083,6 +1088,23 @@ export default class ConsumptionDetails extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.problemActionReport.problemCategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                name="problemCategoryId" id="problemCategoryId"
+                                                onChange={this.fetchData}
+                                            // value={1}
+                                            >
+                                                <option value="-1">{i18n.t("static.common.all")}</option>
+                                                {problemCategories}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
                             </div>
                         </Col>
                         {/* {this.state.data.length > 0 &&  */}
@@ -1094,10 +1116,10 @@ export default class ConsumptionDetails extends React.Component {
                             </ul>
                         </FormGroup>
                         <div className="qat-problemListSearch">
-                        {/* <div className="ProgramListSearch"> */}
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground ">
-                        </div>
-                        {/* </div> */}
+                            {/* <div className="ProgramListSearch"> */}
+                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground ">
+                            </div>
+                            {/* </div> */}
                         </div>
                     </CardBody>
 
