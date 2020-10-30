@@ -179,6 +179,7 @@ export default class SyncMasterData extends Component {
                             var programJson = JSON.parse(programData);
                             var shipmentDataList = (programJson.shipmentList);
                             var batchInfoList = (programJson.batchInfoList);
+                            var problemReportList = programJson.problemReportList;
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
@@ -238,7 +239,7 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, date);
                                 }.bind(this)
                             }.bind(this)
                         } else {

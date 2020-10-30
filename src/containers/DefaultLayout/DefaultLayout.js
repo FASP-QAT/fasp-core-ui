@@ -952,6 +952,11 @@ class DefaultLayout extends Component {
                       // },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
+                        name: i18n.t('static.dashboard.datasync'),
+                        icon: 'fa fa-refresh',
+                        url: '/masterDataSync',
+                      },
+                      {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
                         attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_TRANSLATIONS') ? false : true) },

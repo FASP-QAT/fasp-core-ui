@@ -5,7 +5,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -585,7 +585,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.supplyPlan.expiryDate'),
                                                                         type: 'calendar',
                                                                         options: {
-                                                                            format: JEXCEL_DATE_FORMAT,
+                                                                            format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
                                                                             validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
                                                                         }
                                                                     },
@@ -1355,7 +1355,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
-                        if (moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                        var expectedDate = expectedPlannedDate;
+                        if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                            expectedDate = expectedSubmittedDate;
+                        } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                            expectedDate = expectedApprovedDate;
+                        } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                            expectedDate = expectedShippedDate;
+                        } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                            expectedDate = expectedArrivedDate
+                        } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
+                            expectedDate = expectedDeliveryDate;
+                        }
+                        if (moment(expectedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                             shipmentInstance.setValueFromCoords(11, y, true, true);
                         } else {
                             shipmentInstance.setValueFromCoords(11, y, false, true);
@@ -1372,7 +1384,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                if (moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                var expectedDate = expectedPlannedDate;
+                if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                    expectedDate = expectedSubmittedDate;
+                } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    expectedDate = expectedApprovedDate;
+                } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                    expectedDate = expectedShippedDate;
+                } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                    expectedDate = expectedArrivedDate
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
+                    expectedDate = expectedDeliveryDate;
+                }
+                if (moment(expectedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                     shipmentInstance.setValueFromCoords(11, y, true, true);
                 } else {
                     shipmentInstance.setValueFromCoords(11, y, false, true);
@@ -1599,6 +1623,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "M", y, rowData[12], elInstance);
             elInstance.setValueFromCoords(13, y, "", true);
             if (valid == true) {
+                var budgetList = this.state.budgetListAll;
+                var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget);
+                console.log("MyList---------->", mylist);
+                if (mylist.length == 1) {
+                    elInstance.setValueFromCoords(13, y, mylist[0].id, true);
+                }
                 var shipmentStatus = rowData[3];
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
                     if (rowData[12] == TBD_FUNDING_SOURCE) {
@@ -2332,8 +2362,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
+                            var expectedDate = expectedPlannedDate;
+                            if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
+                                expectedDate = expectedSubmittedDate;
+                            } else if (shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                                expectedDate = expectedApprovedDate;
+                            } else if (shipmentStatus == SHIPPED_SHIPMENT_STATUS) {
+                                expectedDate = expectedShippedDate;
+                            } else if (shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                                expectedDate = expectedArrivedDate
+                            } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS) {
+                                expectedDate = expectedDeliveryDate;
+                            }
                             if (lastShipmentStatus == "") {
-                                if (lastShipmentStatus == "" && moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                if (lastShipmentStatus == "" && moment(expectedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                     shipmentInstance.setValueFromCoords(11, rowDataForDates[7], true, true);
                                 } else {
                                     shipmentInstance.setValueFromCoords(11, rowDataForDates[7], false, true);

@@ -4,7 +4,7 @@ import moment from "moment";
 import i18n from '../../i18n';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
-export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate,problemListChild) {
+export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild,lastSyncDate) {
     console.log("In calculate", minimumDate);
     console.log("D------------> in calculate")
     var db1;
@@ -907,7 +907,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     } else if (page == 'masterDataSync') {
                         console.log("D------------> in master data sync")
                         console.log("D------------> props", problemListChild);
-                        problemListChild.qatProblemActions(programId);
+                        if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
+                            console.log("D------------> in last login date")
+                            problemListChild.qatProblemActions(programId);
+                        }
                     }
                 }
             }
