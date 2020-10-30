@@ -539,7 +539,7 @@ export default class syncPage extends Component {
     data.push(latestData);
     var options = {
       data: data,
-      colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
+      colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -552,7 +552,7 @@ export default class syncPage extends Component {
         },
         {
           title: i18n.t('static.program.programCode'),
-          type: 'text',
+          type: 'hidden',
         },
         {
           title: i18n.t('static.program.versionId'),
@@ -564,7 +564,7 @@ export default class syncPage extends Component {
         },
         {
           title: i18n.t('static.planningunit.planningunit'),
-          type: 'hidden',
+          type: 'text',
         },
         {
           title: i18n.t('static.report.month'),
@@ -572,7 +572,7 @@ export default class syncPage extends Component {
         },
         {
           title: i18n.t('static.report.createdDate'),
-          type: 'text',
+          type: 'hide',
         },
         {
           title: i18n.t('static.report.problemDescription'),
@@ -1005,6 +1005,7 @@ export default class syncPage extends Component {
                   var dProgramDataBytes = CryptoJS.AES.decrypt(dProgramRequest.result.programData, SECRET_KEY);
                   var dProgramData = dProgramDataBytes.toString(CryptoJS.enc.Utf8);
                   var dProgramJson = JSON.parse(dProgramData);
+                  console.log("dProgramJson----------->",dProgramJson);
                   var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                   var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                   var rcpuRequest = rcpuOs.getAll();
@@ -2109,6 +2110,7 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var c = 0; c < jsonData.length; c++) {
+      console.log("jsonData[c])[18]=====>",(jsonData[c])[18]);
       if ((jsonData[c])[18] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2144,6 +2146,7 @@ export default class syncPage extends Component {
             console.log("OldData[j", oldData[j]);
             console.log("DownloadedDara[j", downloadedData[j]);
             console.log("Latest data[j]", latestData[j]);
+            console.log("jsonData[c])[19]=====>",(jsonData[c])[19]);
             if ((jsonData[c])[19] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2392,7 +2395,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChanges}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2416,7 +2419,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesInventory}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesInventory}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChangesInventory}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2439,7 +2442,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesShipment}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesShipment}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChangesShipment}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2462,7 +2465,7 @@ export default class syncPage extends Component {
           </ModalBody>
           <ModalFooter>
             <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.acceptCurrentChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptCurrentVersion')}</Button>{' '}
-            <Button type="submit" size="md" color="info" className="submitBtn float-right mr-1" onClick={this.acceptIncomingChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
+            <Button type="submit" size="md" className="acceptLocalChnagesButton submitBtn float-right mr-1" onClick={this.acceptIncomingChangesProblem}> <i className="fa fa-check"></i>{i18n.t('static.commitVersion.acceptLatestVersion')}</Button>{' '}
           </ModalFooter>
         </Modal>
         {/* Resolve conflicts modal */}
@@ -2782,7 +2785,9 @@ export default class syncPage extends Component {
         var latestProgramDataProblemList = this.state.latestProgramData.problemReportList;
         var oldProgramDataProblemList = oldProgramData.problemReportList;
         var downloadedProgramDataProblemList = this.state.downloadedProgramData.problemReportList;
+        console.log("downloadedProgramDataProblemList------>",downloadedProgramDataProblemList);
         console.log("oldProgramDataProblemList--------------------------->", oldProgramDataProblemList);
+        console.log("latestProgramDataProblemList--------------------------->", latestProgramDataProblemList);
         var mergedProblemListData = [];
         var existingProblemReportId = [];
         for (var c = 0; c < oldProgramDataProblemList.length; c++) {
@@ -2792,7 +2797,7 @@ export default class syncPage extends Component {
           } else {
             // If 0 check whether that exists in latest version or not
             var index = 0;
-            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21) {
+            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 22) {
               index = latestProgramDataProblemList.findIndex(
                 f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
                   && f.region.id == oldProgramDataProblemList[c].region.id
@@ -2862,7 +2867,7 @@ export default class syncPage extends Component {
             latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[18] = latestData;//Latest data
-          var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemListId != 0 && c.problemListId == mergedProblemListData[cd].problemListId);
+          var downloadedDataList = downloadedProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
           var downloadedData = "";
           if (downloadedDataList.length > 0) {
             downloadedData = [downloadedDataList[0].problemReportId, 1, downloadedDataList[0].program.code, 1, (downloadedDataList[0].region.label != null) ? (getLabelText(downloadedDataList[0].region.label, this.state.lang)) : '', getLabelText(downloadedDataList[0].planningUnit.label, this.state.lang), (downloadedDataList[0].dt != null) ? (moment(downloadedDataList[0].dt).format('MMM-YY')) : '', moment(downloadedDataList[0].createdDate).format('MMM-YY'), getProblemDesc(downloadedDataList[0], this.state.lang), getSuggestion(downloadedDataList[0], this.state.lang), getLabelText(downloadedDataList[0].problemStatus.label, this.state.lang), this.getNote(downloadedDataList[0], this.state.lang), downloadedDataList[0].problemStatus.id, downloadedDataList[0].planningUnit.id, downloadedDataList[0].realmProblem.problem.problemId, downloadedDataList[0].realmProblem.problem.actionUrl, downloadedDataList[0].realmProblem.criticality.id, "", "", "", 4];
@@ -2875,7 +2880,7 @@ export default class syncPage extends Component {
         var options = {
           data: mergedProblemListJexcel,
           columnDrag: true,
-          colWidths: [100, 10, 50, 50, 10, 10, 10, 50, 200, 200, 70, 70],
+          colWidths: [50, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
           colHeaderClasses: ["Reqasterisk"],
           columns: [
             {
@@ -2900,7 +2905,7 @@ export default class syncPage extends Component {
             },
             {
               title: i18n.t('static.planningunit.planningunit'),
-              type: 'hidden',
+              type: 'text',
             },
             {
               title: i18n.t('static.report.month'),
@@ -2908,7 +2913,7 @@ export default class syncPage extends Component {
             },
             {
               title: i18n.t('static.report.createdDate'),
-              type: 'text',
+              type: 'hidden',
             },
             {
               title: i18n.t('static.report.problemDescription'),

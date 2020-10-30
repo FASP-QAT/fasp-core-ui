@@ -357,13 +357,13 @@ export default class CostOfInventory extends Component {
 
         var csvRow = [];
 
-        csvRow.push((i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')))
-        csvRow.push((i18n.t('static.report.version') + ' , ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.program.isincludeplannedshipment') + ' , ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))+'"')
+        csvRow.push('"'+(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         var re;
 
@@ -565,8 +565,9 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'number',
-                    readOnly: true
+                    type: 'numeric',
+                    readOnly: true,
+                    mask:'#,##.00'
                 },
                 {
                     title: i18n.t('static.report.costUsd'),

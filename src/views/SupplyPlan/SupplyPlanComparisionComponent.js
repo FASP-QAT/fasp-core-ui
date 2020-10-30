@@ -186,12 +186,12 @@ export default class SupplyPlanComponent extends React.Component {
 
     exportCSV = () => {
         var csvRow = [];
-        csvRow.push(i18n.t('static.program.program') + ' , ' + ((this.props.items.programSelect.label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label)).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
 
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((this.props.items.planningUnitName).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push( "\""+(i18n.t('static.planningunit.planningunit') + ' : ' + this.props.items.planningUnitName).replaceAll(' ', '%20')+ "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minMonthsOfStock").replaceAll(' ', '%20') + ' : ' + this.state.minMonthsOfStock + "\"")
         csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.report.mospast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
@@ -302,7 +302,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -524,7 +524,7 @@ export default class SupplyPlanComponent extends React.Component {
             }
         }
         )
-        
+
         addHeaders(doc)
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
@@ -886,408 +886,383 @@ export default class SupplyPlanComponent extends React.Component {
                             supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                         }
                         // if (supplyPlanData.length > 0) {
-                            var lastClosingBalance = 0;
-                            for (var n = 0; n < m.length; n++) {
-                                var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
-                                if (jsonList.length > 0) {
-                                    openingBalanceArray.push(jsonList[0].openingBalance);
-                                    consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
-                                    shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
-                                    manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
+                        var lastClosingBalance = 0;
+                        for (var n = 0; n < m.length; n++) {
+                            var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
+                            if (jsonList.length > 0) {
+                                openingBalanceArray.push(jsonList[0].openingBalance);
+                                consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
+                                shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
+                                manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
 
-                                    // Tomorrow begin from here
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
+                                // Tomorrow begin from here
+                                var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
 
-                                    var sd1 = [];
-                                    var sd2 = [];
-                                    var sd3 = [];
-                                    var sd4 = [];
-                                    var isEmergencyOrder = 0;
-                                    var isLocalProcurementAgent = 0;
-                                    var paColor = "";
-                                    if (shipmentDetails != "" && shipmentDetails != undefined) {
-                                        for (var i = 0; i < shipmentDetails.length; i++) {
-                                            if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
+                                var sd1 = [];
+                                var sd2 = [];
+                                var sd3 = [];
+                                var sd4 = [];
+                                var isEmergencyOrder = 0;
+                                var isLocalProcurementAgent = 0;
+                                var paColor = "";
+                                if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                    for (var i = 0; i < shipmentDetails.length; i++) {
+                                        if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
                                                 }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd1.push(shipmentDetail);
-                                            } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd2.push(shipmentDetail);
-                                            } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd3.push(shipmentDetail);
-                                            } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd4.push(shipmentDetail);
-                                            }
-                                        }
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd1.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        deliveredShipmentsTotalData.push("")
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd2.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        shippedShipmentsTotalData.push("")
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd3.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        orderedShipmentsTotalData.push("")
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd4.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        plannedShipmentsTotalData.push("")
-                                    }
-
-                                    erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
-
-
-                                    var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
-                                    var sd1 = [];
-                                    var sd2 = [];
-                                    var sd3 = [];
-                                    var sd4 = [];
-                                    var isEmergencyOrder = 0;
-                                    var isLocalProcurementAgent = 0;
-                                    if (shipmentDetails != "" && shipmentDetails != undefined) {
-                                        for (var i = 0; i < shipmentDetails.length; i++) {
-                                            if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd1.push(shipmentDetail);
-                                            } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd2.push(shipmentDetail);
-                                            } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd3.push(shipmentDetail);
-                                            } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                                if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor = procurementAgent.colorHtmlCode;
-                                                    var index = paColors.findIndex(c => c.color == paColor);
-                                                    if (index == -1) {
-                                                        paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
-                                                    }
-                                                } else {
-                                                    if (shipmentDetails[i].procurementAgent.id != "") {
-                                                        var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    } else {
-                                                        var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                        var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                        paColor = "#efefef"
-                                                    }
-                                                }
-                                                if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                    isEmergencyOrder = true
-                                                }
-                                                if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                    isLocalProcurementAgent = true;
-                                                }
-                                                sd4.push(shipmentDetail);
-                                            }
-                                        }
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd1.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        deliveredErpShipmentsTotalData.push("")
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd2.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        shippedErpShipmentsTotalData.push("")
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd3.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        orderedErpShipmentsTotalData.push("")
-                                    }
-
-                                    if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
-                                        var colour = paColor;
-                                        if (sd4.length > 1) {
-                                            colour = "#d9ead3";
-                                        }
-                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
-                                    } else {
-                                        plannedErpShipmentsTotalData.push("")
-                                    }
-                                    console.log("deliveredShipmentsTotalData", deliveredShipmentsTotalData);
-
-                                    inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
-                                    totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
-                                    monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
-                                    amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
-                                    minStockMoS.push(jsonList[0].minStockMoS)
-                                    maxStockMoS.push(jsonList[0].maxStockMoS)
-                                    unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
-                                    closingBalanceArray.push(jsonList[0].closingBalance)
-
-
-                                    lastClosingBalance = jsonList[0].closingBalance
-
-                                    // suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
-                                    // consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
-                                    // inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
-                                    var sstd = {}
-                                    var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                                    var compare = (m[n].startDate >= currentMonth);
-                                    var stockInHand = jsonList[0].closingBalance;
-                                    var amc = Math.round(parseFloat(jsonList[0].amc));
-                                    if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(jsonList[0].minStockMoS))) {
-                                        var suggestedOrd = parseInt((amc * parseInt(jsonList[0].maxStockMoS)) - jsonList[0].closingBalance);
-                                        if (suggestedOrd == 0) {
-                                            var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                                parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                                parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                            var isEmergencyOrder = 0;
-                                            if (expectedDeliveryDate >= currentMonth) {
-                                                isEmergencyOrder = 0;
                                             } else {
-                                                isEmergencyOrder = 1;
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
                                             }
-                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
-                                        } else {
-                                            var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                                parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                                parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                            var isEmergencyOrder = 0;
-                                            if (expectedDeliveryDate >= currentMonth) {
-                                                isEmergencyOrder = 0;
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd1.push(shipmentDetail);
+                                        } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
                                             } else {
-                                                isEmergencyOrder = 1;
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
                                             }
-                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd2.push(shipmentDetail);
+                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd3.push(shipmentDetail);
+                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd4.push(shipmentDetail);
                                         }
-                                    } else {
+                                    }
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd1.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    deliveredShipmentsTotalData.push("")
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd2.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    shippedShipmentsTotalData.push("")
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd3.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    orderedShipmentsTotalData.push("")
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd4.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    plannedShipmentsTotalData.push("")
+                                }
+
+                                erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
+
+
+                                var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
+                                var sd1 = [];
+                                var sd2 = [];
+                                var sd3 = [];
+                                var sd4 = [];
+                                var isEmergencyOrder = 0;
+                                var isLocalProcurementAgent = 0;
+                                if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                    for (var i = 0; i < shipmentDetails.length; i++) {
+                                        if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd1.push(shipmentDetail);
+                                        } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd2.push(shipmentDetail);
+                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd3.push(shipmentDetail);
+                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                paColor = procurementAgent.colorHtmlCode;
+                                                var index = paColors.findIndex(c => c.color == paColor);
+                                                if (index == -1) {
+                                                    paColors.push({ color: paColor, text: procurementAgent.procurementAgentCode })
+                                                }
+                                            } else {
+                                                if (shipmentDetails[i].procurementAgent.id != "") {
+                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                } else {
+                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    paColor = "#efefef"
+                                                }
+                                            }
+                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                                isEmergencyOrder = true
+                                            }
+                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                                isLocalProcurementAgent = true;
+                                            }
+                                            sd4.push(shipmentDetail);
+                                        }
+                                    }
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd1.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    deliveredErpShipmentsTotalData.push("")
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd2.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    shippedErpShipmentsTotalData.push("")
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd3.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    orderedErpShipmentsTotalData.push("")
+                                }
+
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                                    var colour = paColor;
+                                    if (sd4.length > 1) {
+                                        colour = "#d9ead3";
+                                    }
+                                    plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                } else {
+                                    plannedErpShipmentsTotalData.push("")
+                                }
+                                console.log("deliveredShipmentsTotalData", deliveredShipmentsTotalData);
+
+                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
+                                totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
+                                monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
+                                amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                minStockMoS.push(jsonList[0].minStockMoS)
+                                maxStockMoS.push(jsonList[0].maxStockMoS)
+                                unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
+                                closingBalanceArray.push(jsonList[0].closingBalance)
+
+
+                                lastClosingBalance = jsonList[0].closingBalance
+
+                                // suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
+                                // consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
+                                // inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
+                                var sstd = {}
+                                var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                var compare = (m[n].startDate >= currentMonth);
+                                var stockInHand = jsonList[0].closingBalance;
+                                var amc = Math.round(parseFloat(jsonList[0].amc));
+                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(jsonList[0].minStockMoS))) {
+                                    var suggestedOrd = parseInt((amc * parseInt(jsonList[0].maxStockMoS)) - jsonList[0].closingBalance);
+                                    if (suggestedOrd == 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                             parseFloat(programJson.arrivedToDeliveredLeadTime);
@@ -1299,177 +1274,202 @@ export default class SupplyPlanComponent extends React.Component {
                                             isEmergencyOrder = 1;
                                         }
                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
+                                    } else {
+                                        var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                            parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                            parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                        var isEmergencyOrder = 0;
+                                        if (expectedDeliveryDate >= currentMonth) {
+                                            isEmergencyOrder = 0;
+                                        } else {
+                                            isEmergencyOrder = 1;
+                                        }
+                                        sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
                                     }
-                                    suggestedShipmentsTotalData.push(sstd);
+                                } else {
+                                    var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                        parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                        parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                    var isEmergencyOrder = 0;
+                                    if (expectedDeliveryDate >= currentMonth) {
+                                        isEmergencyOrder = 0;
+                                    } else {
+                                        isEmergencyOrder = 1;
+                                    }
+                                    sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
+                                }
+                                suggestedShipmentsTotalData.push(sstd);
 
-                                    var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
-                                    var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
-                                    var consumptionTotalForRegion = 0;
-                                    var totalAdjustmentsQtyForRegion = 0;
-                                    var totalActualQtyForRegion = 0;
-                                    var projectedInventoryForRegion = 0;
-                                    var regionsReportingActualInventory = [];
-                                    var totalNoOfRegions = (this.state.regionListFiltered).length;
-                                    for (var r = 0; r < totalNoOfRegions; r++) {
-                                        var consumptionQtyForRegion = 0;
-                                        var actualFlagForRegion = "";
-                                        var consumptionListForRegionalDetails = consumptionListForRegion.filter(c => c.region.id == regionListFiltered[r].id);
-                                        var noOfActualEntries = (consumptionListForRegionalDetails.filter(c => c.actualFlag.toString() == "true")).length;
-                                        for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
-                                            if (noOfActualEntries > 0) {
-                                                if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                    consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                    consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                }
-                                                actualFlagForRegion = true;
-                                            } else {
+                                var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
+                                var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
+                                var consumptionTotalForRegion = 0;
+                                var totalAdjustmentsQtyForRegion = 0;
+                                var totalActualQtyForRegion = 0;
+                                var projectedInventoryForRegion = 0;
+                                var regionsReportingActualInventory = [];
+                                var totalNoOfRegions = (this.state.regionListFiltered).length;
+                                for (var r = 0; r < totalNoOfRegions; r++) {
+                                    var consumptionQtyForRegion = 0;
+                                    var actualFlagForRegion = "";
+                                    var consumptionListForRegionalDetails = consumptionListForRegion.filter(c => c.region.id == regionListFiltered[r].id);
+                                    var noOfActualEntries = (consumptionListForRegionalDetails.filter(c => c.actualFlag.toString() == "true")).length;
+                                    for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
+                                        if (noOfActualEntries > 0) {
+                                            if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
                                                 consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
                                                 consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                actualFlagForRegion = false;
+                                            }
+                                            actualFlagForRegion = true;
+                                        } else {
+                                            consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
+                                            consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
+                                            actualFlagForRegion = false;
+                                        }
+                                    }
+                                    if (consumptionListForRegionalDetails.length == 0) {
+                                        consumptionQtyForRegion = "";
+                                    }
+                                    consumptionArrayForRegion.push({ "regionId": regionListFiltered[r].id, "qty": consumptionQtyForRegion, "actualFlag": actualFlagForRegion, "month": m[n] })
+
+                                    var adjustmentsQtyForRegion = 0;
+                                    var actualQtyForRegion = 0;
+                                    var inventoryListForRegionalDetails = inventoryListForRegion.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionListFiltered[r].id);
+                                    var actualCount = 0;
+                                    var adjustmentsCount = 0;
+                                    for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
+                                        if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
+                                            actualCount += 1;
+                                            actualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                            totalActualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                            var index = regionsReportingActualInventory.findIndex(c => c == regionListFiltered[r].id);
+                                            if (index == -1) {
+                                                regionsReportingActualInventory.push(regionListFiltered[r].id)
                                             }
                                         }
-                                        if (consumptionListForRegionalDetails.length == 0) {
-                                            consumptionQtyForRegion = "";
+                                        if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
+                                            adjustmentsCount += 1;
+                                            adjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                            totalAdjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
                                         }
-                                        consumptionArrayForRegion.push({ "regionId": regionListFiltered[r].id, "qty": consumptionQtyForRegion, "actualFlag": actualFlagForRegion, "month": m[n] })
-
-                                        var adjustmentsQtyForRegion = 0;
-                                        var actualQtyForRegion = 0;
-                                        var inventoryListForRegionalDetails = inventoryListForRegion.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionListFiltered[r].id);
-                                        var actualCount = 0;
-                                        var adjustmentsCount = 0;
-                                        for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
-                                            if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
-                                                actualCount += 1;
-                                                actualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                totalActualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                var index = regionsReportingActualInventory.findIndex(c => c == regionListFiltered[r].id);
-                                                if (index == -1) {
-                                                    regionsReportingActualInventory.push(regionListFiltered[r].id)
-                                                }
-                                            }
-                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
-                                                adjustmentsCount += 1;
-                                                adjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                totalAdjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                            }
-                                        }
-                                        if (actualCount == 0) {
-                                            actualQtyForRegion = "";
-                                        }
-                                        if (adjustmentsCount == 0) {
-                                            adjustmentsQtyForRegion = "";
-                                        }
-                                        inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                     }
-                                    consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-
-                                    var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
-                                    console.log("project Inventory", projectedInventoryForRegion);
-                                    if (regionsReportingActualInventory.length != totalNoOfRegions) {
-                                        totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
+                                    if (actualCount == 0) {
+                                        actualQtyForRegion = "";
                                     }
-                                    inventoryArrayForRegion.push({ "regionId": -1, "adjustmentsQty": totalAdjustmentsQtyForRegion, "actualQty": totalActualQtyForRegion, "finalInventory": jsonList[0].closingBalance, "autoAdjustments": jsonList[0].nationalAdjustment, "projectedInventory": projectedInventoryForRegion, "month": m[n] })
-                                    for (var r = 0; r < totalNoOfRegions; r++) {
-                                        var consumptionListForRegion = (programJson.consumptionList).filter(c => c.planningUnit.id == this.state.planningUnitId && c.active == true && c.actualFlag.toString() == "true");
-                                        let conmax = moment.max(consumptionListForRegion.map(d => moment(d.consumptionDate)))
-                                        lastActualConsumptionDate.push({ lastActualConsumptionDate: conmax, region: regionListFiltered[r].id });
+                                    if (adjustmentsCount == 0) {
+                                        adjustmentsQtyForRegion = "";
                                     }
-                                    var json = {
-                                        month: m[n].month,
-                                        consumption: jsonList[0].consumptionQty,
-                                        stock: jsonList[0].closingBalance,
-                                        planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
-                                        delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
-                                        shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
-                                        ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
-                                        mos: parseFloat(jsonList[0].mos).toFixed(2),
-                                        minMos: jsonList[0].minStockMoS,
-                                        maxMos: jsonList[0].maxStockMoS
-                                    }
-                                    jsonArrForGraph.push(json);
-                                } else {
-                                    openingBalanceArray.push(lastClosingBalance);
-                                    consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
-                                    shipmentsTotalData.push(0);
-                                    suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
-                                    manualShipmentsTotalData.push(0);
-                                    deliveredShipmentsTotalData.push("");
-                                    shippedShipmentsTotalData.push("");
-                                    orderedShipmentsTotalData.push("");
-                                    plannedShipmentsTotalData.push("");
-                                    erpShipmentsTotalData.push(0);
-                                    deliveredErpShipmentsTotalData.push("");
-                                    shippedErpShipmentsTotalData.push("");
-                                    orderedErpShipmentsTotalData.push("");
-                                    plannedErpShipmentsTotalData.push("");
-                                    inventoryTotalData.push("");
-                                    totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
-                                    monthsOfStockArray.push("")
-                                    amcTotalData.push("");
-                                    minStockMoS.push("");
-                                    maxStockMoS.push("")
-                                    unmetDemand.push("");
-                                    closingBalanceArray.push(lastClosingBalance);
-                                    for (var i = 0; i < this.state.regionListFiltered.length; i++) {
-                                        consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
-                                        inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
-                                    }
-                                    consumptionArrayForRegion.push({ "regionId": -1, "qty": "", "actualFlag": "", "month": m[n] })
-                                    inventoryArrayForRegion.push({ "regionId": -1, "adjustmentsQty": "", "actualQty": i18n.t('static.supplyPlan.notAllRegionsHaveActualStock'), "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
-                                    lastActualConsumptionDate.push("");
-
-                                    var json = {
-                                        month: m[n].month,
-                                        consumption: null,
-                                        stock: lastClosingBalance,
-                                        planned: 0,
-                                        delivered: 0,
-                                        shipped: 0,
-                                        ordered: 0,
-                                        mos: "",
-                                        minMos: "",
-                                        maxMos: ""
-                                    }
-                                    jsonArrForGraph.push(json);
+                                    inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                 }
+                                consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
+
+                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
+                                console.log("project Inventory", projectedInventoryForRegion);
+                                if (regionsReportingActualInventory.length != totalNoOfRegions) {
+                                    totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
+                                }
+                                inventoryArrayForRegion.push({ "regionId": -1, "adjustmentsQty": totalAdjustmentsQtyForRegion, "actualQty": totalActualQtyForRegion, "finalInventory": jsonList[0].closingBalance, "autoAdjustments": jsonList[0].nationalAdjustment, "projectedInventory": projectedInventoryForRegion, "month": m[n] })
+                                for (var r = 0; r < totalNoOfRegions; r++) {
+                                    var consumptionListForRegion = (programJson.consumptionList).filter(c => c.planningUnit.id == this.state.planningUnitId && c.active == true && c.actualFlag.toString() == "true");
+                                    let conmax = moment.max(consumptionListForRegion.map(d => moment(d.consumptionDate)))
+                                    lastActualConsumptionDate.push({ lastActualConsumptionDate: conmax, region: regionListFiltered[r].id });
+                                }
+                                var json = {
+                                    month: m[n].month,
+                                    consumption: jsonList[0].consumptionQty,
+                                    stock: jsonList[0].closingBalance,
+                                    planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
+                                    delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
+                                    shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
+                                    ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
+                                    mos: parseFloat(jsonList[0].mos).toFixed(2),
+                                    minMos: jsonList[0].minStockMoS,
+                                    maxMos: jsonList[0].maxStockMoS
+                                }
+                                jsonArrForGraph.push(json);
+                            } else {
+                                openingBalanceArray.push(lastClosingBalance);
+                                consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
+                                shipmentsTotalData.push(0);
+                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
+                                manualShipmentsTotalData.push(0);
+                                deliveredShipmentsTotalData.push("");
+                                shippedShipmentsTotalData.push("");
+                                orderedShipmentsTotalData.push("");
+                                plannedShipmentsTotalData.push("");
+                                erpShipmentsTotalData.push(0);
+                                deliveredErpShipmentsTotalData.push("");
+                                shippedErpShipmentsTotalData.push("");
+                                orderedErpShipmentsTotalData.push("");
+                                plannedErpShipmentsTotalData.push("");
+                                inventoryTotalData.push("");
+                                totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
+                                monthsOfStockArray.push("")
+                                amcTotalData.push("");
+                                minStockMoS.push("");
+                                maxStockMoS.push("")
+                                unmetDemand.push("");
+                                closingBalanceArray.push(lastClosingBalance);
+                                for (var i = 0; i < this.state.regionListFiltered.length; i++) {
+                                    consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
+                                    inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
+                                }
+                                consumptionArrayForRegion.push({ "regionId": -1, "qty": "", "actualFlag": "", "month": m[n] })
+                                inventoryArrayForRegion.push({ "regionId": -1, "adjustmentsQty": "", "actualQty": i18n.t('static.supplyPlan.notAllRegionsHaveActualStock'), "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
+                                lastActualConsumptionDate.push("");
+
+                                var json = {
+                                    month: m[n].month,
+                                    consumption: null,
+                                    stock: lastClosingBalance,
+                                    planned: 0,
+                                    delivered: 0,
+                                    shipped: 0,
+                                    ordered: 0,
+                                    mos: "",
+                                    minMos: "",
+                                    maxMos: ""
+                                }
+                                jsonArrForGraph.push(json);
                             }
-                            // console.log("supplyPlan", supplyPlan);
-                            console.log("consumptionTotalData", consumptionTotalData);
-                            this.setState({
-                                openingBalanceArray: openingBalanceArray,
-                                consumptionTotalData: consumptionTotalData,
-                                expiredStockArr: totalExpiredStockArr,
-                                shipmentsTotalData: shipmentsTotalData,
-                                suggestedShipmentsTotalData: suggestedShipmentsTotalData,
-                                manualShipmentsTotalData: manualShipmentsTotalData,
-                                deliveredShipmentsTotalData: deliveredShipmentsTotalData,
-                                shippedShipmentsTotalData: shippedShipmentsTotalData,
-                                orderedShipmentsTotalData: orderedShipmentsTotalData,
-                                plannedShipmentsTotalData: plannedShipmentsTotalData,
-                                erpShipmentsTotalData: erpShipmentsTotalData,
-                                deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
-                                shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
-                                orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
-                                plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
-                                inventoryTotalData: inventoryTotalData,
-                                monthsOfStockArray: monthsOfStockArray,
-                                amcTotalData: amcTotalData,
-                                minStockMoS: minStockMoS,
-                                maxStockMoS: maxStockMoS,
-                                unmetDemand: unmetDemand,
-                                inventoryFilteredArray: inventoryArrayForRegion,
-                                regionListFiltered: regionListFiltered,
-                                consumptionFilteredArray: consumptionArrayForRegion,
-                                planningUnitName: planningUnitName,
-                                lastActualConsumptionDate: moment(Date.now()).format("YYYY-MM-DD"),
-                                // lastActualConsumptionDateArr: supplyPlanData[0].lastActualConsumptionDate,
-                                lastActualConsumptionDateArr: lastActualConsumptionDate,
-                                paColors: paColors,
-                                jsonArrForGraph: jsonArrForGraph,
-                                closingBalanceArray: closingBalanceArray,
-                                loading: false
-                            })
+                        }
+                        // console.log("supplyPlan", supplyPlan);
+                        console.log("consumptionTotalData", consumptionTotalData);
+                        this.setState({
+                            openingBalanceArray: openingBalanceArray,
+                            consumptionTotalData: consumptionTotalData,
+                            expiredStockArr: totalExpiredStockArr,
+                            shipmentsTotalData: shipmentsTotalData,
+                            suggestedShipmentsTotalData: suggestedShipmentsTotalData,
+                            manualShipmentsTotalData: manualShipmentsTotalData,
+                            deliveredShipmentsTotalData: deliveredShipmentsTotalData,
+                            shippedShipmentsTotalData: shippedShipmentsTotalData,
+                            orderedShipmentsTotalData: orderedShipmentsTotalData,
+                            plannedShipmentsTotalData: plannedShipmentsTotalData,
+                            erpShipmentsTotalData: erpShipmentsTotalData,
+                            deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
+                            shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
+                            orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
+                            plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
+                            inventoryTotalData: inventoryTotalData,
+                            monthsOfStockArray: monthsOfStockArray,
+                            amcTotalData: amcTotalData,
+                            minStockMoS: minStockMoS,
+                            maxStockMoS: maxStockMoS,
+                            unmetDemand: unmetDemand,
+                            inventoryFilteredArray: inventoryArrayForRegion,
+                            regionListFiltered: regionListFiltered,
+                            consumptionFilteredArray: consumptionArrayForRegion,
+                            planningUnitName: planningUnitName,
+                            lastActualConsumptionDate: moment(Date.now()).format("YYYY-MM-DD"),
+                            // lastActualConsumptionDateArr: supplyPlanData[0].lastActualConsumptionDate,
+                            lastActualConsumptionDateArr: lastActualConsumptionDate,
+                            paColors: paColors,
+                            jsonArrForGraph: jsonArrForGraph,
+                            closingBalanceArray: closingBalanceArray,
+                            loading: false
+                        })
                         // } else {
                         //     this.setState({ loading: false })
                         //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
@@ -2173,7 +2173,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.deliveredShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2188,7 +2192,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.shippedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2202,7 +2210,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.orderedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2215,7 +2227,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2239,7 +2255,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2253,7 +2273,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2266,7 +2290,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2279,7 +2307,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurementEmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedErpShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
                                                     }
@@ -2415,7 +2447,7 @@ export default class SupplyPlanComponent extends React.Component {
                     <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
                         <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
-                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                            <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                             <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                         </ul>
                         <div className=" card-header-actions" style={{ marginTop: '-5px' }}>
@@ -2876,8 +2908,8 @@ export default class SupplyPlanComponent extends React.Component {
                     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'plannedErpShipments') {
                     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                }else{
-                    shipmentList=[];
+                } else {
+                    shipmentList = [];
                 }
                 this.setState({
                     showShipments: 1,

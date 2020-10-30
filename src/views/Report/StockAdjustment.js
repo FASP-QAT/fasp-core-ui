@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -484,19 +484,19 @@ class StockAdjustmentComponent extends Component {
     exportCSV(columns) {
 
         var csvRow = [];
-        csvRow.push((i18n.t('static.report.dateRange') + ' , ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20'))
-        csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-        csvRow.push(i18n.t('static.report.version').replaceAll(' ', '%20') + '  ,  ' + (document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' +  document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"'+(i18n.t('static.report.version').replaceAll(' ', '%20') + '  :  ' +  document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+            csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' +  ele.toString()).replaceAll(' ', '%20')+'"'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
 
         const headers = [];
-        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')+'"') });
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -617,7 +617,7 @@ class StockAdjustmentComponent extends Component {
             data = [];
             data[0] = getLabelText(stockAdjustmentList[j].dataSource.label, this.state.lang)
             data[1] = getLabelText(stockAdjustmentList[j].planningUnit.label, this.state.lang)
-            data[2] = new moment(stockAdjustmentList[j].inventoryDate).format('MMM YYYY')
+            data[2] = stockAdjustmentList[j].inventoryDate
             data[3] = (stockAdjustmentList[j].stockAdjustemntQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[4] = stockAdjustmentList[j].lastModifiedBy.username;
             data[5] = new moment(stockAdjustmentList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`);
@@ -654,7 +654,7 @@ class StockAdjustmentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.report.month'),
-                    type: 'text',
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
                     readOnly: true
                 },
                 {

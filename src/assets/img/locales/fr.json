@@ -1173,7 +1173,7 @@
     "static.dashboard.supplyPlanWaiting": "Plans d'approvisionnement en attente d'approbation",
     "static.list.listCountry": "Liste des pays",
     "static.add.addCountry": "Ajouter un pays",
-    "static.list.listTechnicalArea": "Liste technique",
+    "static.list.listTechnicalArea": "Lister le domaine technique",
     "static.add.addTechnicalArea": "Ajouter une zone technique",
     "static.list.listRegion": "Région de liste",
     "static.add.addRegion": "Ajouter une région",
@@ -1231,5 +1231,7 @@
     "static.mt.programNotMatch": "Le programme ne correspond pas",
     "static.mt.noDetailsFound": "Aucun détail trouvé",
     "static.quantimed.conversionFactor": "Facteur de conversion d'unité",
-    "static.quantimed.importpercentage": "Pourcentage d'importation"
+    "static.quantimed.importpercentage": "Pourcentage d'importation",
+    "static.program.realmcountrydashboard": "Pays",
+    "static.dashboard.setupprogram": "Programme d'installation"
 }

@@ -1708,6 +1708,12 @@ h5,
   border-color: 1px solid #e5edf5;
 }
 
+.acceptLocalChnagesButton{
+  background-color: rgb(229, 237, 245)!important;
+  border-color: rgb(229, 237, 245)!important;
+  color: #000!important;
+}
+
 .card {
   // margin-top: -2%;
   margin: 0px -2% 1.5em -2%;
@@ -3531,6 +3537,30 @@ margin-left: -45px;
     background-image:url('/src/assets/img/localProcurement.png');
     background-repeat: no-repeat;
     background-position: top left;
+}
+
+.localProcurement1EmergencyComment{
+  background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurementWhite.png');
+  background-repeat: no-repeat,no-repeat;
+  background-position: top right,top left;
+}
+
+.localProcurementAgent1{
+  background-image:url('/src/assets/img/localProcurementWhite.png');
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+.localProcurement2EmergencyComment{
+  background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurementBlack.png');
+  background-repeat: no-repeat,no-repeat;
+  background-position: top right,top left;
+}
+
+.localProcurementAgent2{
+  background-image:url('/src/assets/img/localProcurementBlack.png');
+  background-repeat: no-repeat;
+  background-position: top left;
 }
 
 .emergencyComment{

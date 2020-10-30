@@ -17,7 +17,7 @@ export default function openProblem(index,username,userId,problemActionList) {
                 label_pr: null
             }
         },
-        notes: 'Open',
+        notes: '',
         createdBy: {
             userId: userId,
             username: username
@@ -25,7 +25,9 @@ export default function openProblem(index,username,userId,problemActionList) {
         createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
     }
     transList.push(tempProblemTransObj);
-    filterObj.problemTransList = transList;
+    filterObj.problemTransList = transList; 
+    // reviewed: false,
+    filterObj.reviewed = false; 
 
     var problemStatusObject = {
         id: 1,
