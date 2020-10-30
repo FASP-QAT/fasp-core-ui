@@ -293,17 +293,17 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.month') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.program.realm')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("realmId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"'+(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
     this.state.countryLabels.map(ele =>
-      csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
     this.state.tracerCategoryLabels.map(ele =>
       csvRow.push('"'+(i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20')+'"'))
     csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
 
     csvRow.push('')
     csvRow.push('')
-    csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+    csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
     csvRow.push('')
     var re;
 
