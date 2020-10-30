@@ -411,7 +411,7 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push('')
         csvRow.push('"'+(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
-        csvRow.push((i18n.t('static.problemActionReport.problemCategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.problemActionReport.problemCategory') + ' , ' + document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
