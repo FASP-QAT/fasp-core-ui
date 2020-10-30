@@ -100,17 +100,17 @@ class warehouseCapacity extends Component {
 
         if (navigator.onLine) {
             this.state.countryLabels.map(ele =>
-                csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+                csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
             csvRow.push('')
             this.state.programLabels.map(ele =>
-                csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+                csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
         } else {
-            csvRow.push(i18n.t('static.program.program') + ' , ' + (document.getElementById("programIdOffline").selectedOptions[0].text).replaceAll(' ', '%20'))
+            csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programIdOffline").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
         }
 
         csvRow.push('')
         csvRow.push('')
-        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
         csvRow.push('')
 
         var re;

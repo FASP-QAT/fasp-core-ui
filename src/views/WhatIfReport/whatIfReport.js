@@ -1037,13 +1037,13 @@ export default class WhatIfReportComponent extends React.Component {
     exportCSV = () => {
 
         var csvRow = [];
-        csvRow.push(i18n.t('static.program.program') + ' , ' + (((this.state.programSelect).label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push("\"" +(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label).replaceAll(' ', '%20')+ "\"")
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
 
-        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + (((this.state.planningUnit).label).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push( "\""+(i18n.t('static.planningunit.planningunit') + ' : ' + ((this.state.planningUnit).label)).replaceAll(' ', '%20')+ "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minMonthsOfStock").replaceAll(' ', '%20') + ' : ' + this.state.minMonthsOfStock + "\"")
         csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.report.mospast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
