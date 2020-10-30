@@ -2717,7 +2717,7 @@ class EditSupplyPlanStatus extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 60, 60, 10, 10, 10, 60, 180, 180, 60, 100, 10, 10, 10, 10, 10, 70, 70, 100],
+            colWidths: [10, 10, 30, 50, 10, 100, 10, 60, 180, 180, 60, 100, 10, 10, 10, 10, 10, 70, 70, 100],
             // colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -2745,7 +2745,8 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
-                    type: 'hidden',
+                    type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.month'),
@@ -2753,7 +2754,7 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.report.createdDate'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true
                 },
                 {

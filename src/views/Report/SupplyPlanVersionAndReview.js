@@ -262,12 +262,14 @@ class SupplyPlanVersionAndReview extends Component {
             let versionStatusId = rowData[10];
             let versionTypeId = rowData[9];
             console.log("====>", versionStatusId, "====>", versionTypeId);
-            if (versionStatusId == 1 && versionTypeId == 2) {
-                this.props.history.push({
-                    pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLYPLAN_STATUS')) {
+                // if (versionStatusId == 1 && versionTypeId == 2) {
+                    this.props.history.push({
+                        pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
 
-                });
-            }
+                    });
+                // }
+            // }
 
         }
     }.bind(this);
@@ -785,7 +787,7 @@ class SupplyPlanVersionAndReview extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
