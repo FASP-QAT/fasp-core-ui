@@ -249,7 +249,14 @@ class SupplyPlanVersionAndReview extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRole.includes('ROLE_SUPPLY_PLAN_REVIEWER')) {
+            var hasRole=false;
+            console.log("AuthenticationService.getLoggedInUserRole()====>",AuthenticationService.getLoggedInUserRole());
+            AuthenticationService.getLoggedInUserRole().map(c=>{if(c.roleId=='ROLE_SUPPLY_PLAN_REVIEWER'){
+                hasRole=true;
+
+            }});
+
+            if(hasRole) {
             
             let programId = document.getElementById("programId").value;
             // let countryId = document.getElementById("countryId").value;
