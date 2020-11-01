@@ -183,8 +183,13 @@ export default class SyncMasterData extends Component {
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
+                            var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
                             console.log("Min Date shiparray", shipArray);
-                            var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)))
+                            var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
+                            var minDate1 = moment.min(shipArray1.map(d => moment(d.receivedDate)));
+                            if (moment(minDate1).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = minDate1;
+                            }
                             console.log("Min Date in sync", minDate);
                             var batchArray = response.data.batchInfoList;
                             var planningUnitList = [];
@@ -197,6 +202,12 @@ export default class SyncMasterData extends Component {
                                 if (index == -1) {
                                     shipmentDataList.push(shipArray[j]);
                                 } else {
+                                    if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                        minDate = shipmentDataList[index].expectedDeliveryDate;
+                                    }
+                                    if (shipmentDataList[index].receivedDate!=null && shipmentDataList[index].receivedDate!="" && shipmentDataList[index].receivedDate!="" && shipmentDataList[index].receivedDate!=undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                        minDate = shipmentDataList[index].receivedDate;
+                                    }
                                     shipmentDataList[index] = shipArray[j];
                                 }
                             }
