@@ -105,7 +105,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     // Adding months in past for all the calculations
                     var lastDataEntryDate = moment(maxDate).add(programPlanningUnitList[ppL].monthsInPastForAmc, 'months').format("YYYY-MM-DD");
                     // Filtering supply plan data for excluding the selected planning units
-                    supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM-DD") < moment(minDate).format("YYYY-MM-DD")));
+                    supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")));
                     // Looping till the max data entry date
                     for (var i = 0; createdDate < lastDataEntryDate; i++) {
                         // Adding months to created date and getting start date and end date
@@ -197,7 +197,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         console.log("Shipment list----------------->", shipmentList);
                         // Getting shipment list for a month
                         var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
-                        console.log("Shipment Arr----------------->", shipmentArr);
+                        console.log("D Shipment Arr----------------->", shipmentArr);
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
                         var manualTotalQty = 0;
@@ -225,13 +225,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         for (var j = 0; j < shipmentArr.length; j++) {
                             // Adding total shipment qty
                             shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
-                            console.log("(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
+                            console.log("D Shipment Arr----------------->(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
                             // Adding total shipment qty wps
                             if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
                                 shipmentTotalQtyWps += parseInt((shipmentArr[j].shipmentQty));
                             }
                             // Adding manual shipments
+                            console.log("D Shipment Arr----------------->shipmentArr[j].erpFlag.toString()", shipmentArr[j].erpFlag.toString());
+                            console.log("D Shipment Arr----------------->Consition", shipmentArr[j].erpFlag.toString() == "false");
+                            console.log("D Shipment Arr----------------->manualTotalQty------------>", manualTotalQty);
                             if (shipmentArr[j].erpFlag.toString() == "false") {
+                                console.log("D Shipment Arr----------------->In if", shipmentArr[j].shipmentQty);
                                 manualTotalQty += parseInt((shipmentArr[j].shipmentQty));
                                 // Adding shipments based on status
                                 if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -249,7 +253,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Adding erp shipments
+                                console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty);
                                 erpTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                console.log("D Shipment Arr----------------->ErpTotalQty", erpTotalQty);
                                 // Adding shipments based on status
                                 if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
                                     receivedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
@@ -781,8 +787,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             expectedStockWps: expectedStockWps,
                             regionCountForStock: regionsReportingActualInventory
                         }
+                        console.log("D Shipment Arr----------------->JSON", json);
                         console.log("Json", json);
+                        console.log("D Shipment Arr----------------->supplyPlanData---------------->", supplyPlanData);
                         supplyPlanData.push(json);
+                        console.log("D Shipment Arr----------------->supplyPlanData1--------->", supplyPlanData);
                     }
                 }
                 console.log("Supply plan data", supplyPlanData);

@@ -2421,6 +2421,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                             for (var n = 0; n < m.length; n++) {
                                 var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
+                                console.log("D Shipment Arr----------------->JsonList--------------->",jsonList);
                                 if (jsonList.length > 0) {
                                     console.log("jsonList[0].consumptionQty", jsonList[0].consumptionQty, "Month", m[n].startDate);
                                     openingBalanceArray.push(jsonList[0].openingBalance);
