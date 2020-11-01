@@ -705,6 +705,8 @@ export default class ConsumptionDetails extends React.Component {
                     var problemReportList = (programJson.problemReportList);
                     var problemReportFilterList = problemReportList;
 
+                    console.log("problemList===========>",problemReportList);
+
                     if(problemStatusId==-1){
                         problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
                     }else{
