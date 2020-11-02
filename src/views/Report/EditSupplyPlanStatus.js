@@ -195,7 +195,8 @@ class EditSupplyPlanStatus extends Component {
                 regionList: []
             },
             statuses: [],
-            regionList: []
+            regionList: [],
+            editable:false
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -1680,7 +1681,7 @@ class EditSupplyPlanStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
-                console.log(response.data)
+                console.log("===========>",response.data)
                 let { program } = this.state
                 program = response.data
                 var regionList = []
@@ -1695,7 +1696,9 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     program,
                     regionList: regionList,
-                    data: response.data.problemReportList
+                    data: response.data.problemReportList,
+                    editable:program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 ? true : false
+
                 }, () => {
                     this.getPlanningUnit()
                     this.getDatasource()
@@ -2853,7 +2856,7 @@ class EditSupplyPlanStatus extends Component {
 
 
             ],
-            editable: false,
+            editable: this.state.editable,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                 show: '',
@@ -2876,7 +2879,7 @@ class EditSupplyPlanStatus extends Component {
             // onselection: this.selected,
             // oneditionend: this.onedit,
             copyCompatibility: true,
-            editable: true,
+            // editable: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -3672,6 +3675,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
+                                                                readOnly={!this.state.editable}
                                                                 required
                                                             />
                                                             <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
@@ -3690,6 +3694,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
                                                                 value={this.state.program.currentVersion.versionStatus.id}
+                                                                disabled={!this.state.editable}
                                                                 required
                                                             >
                                                                 <option value="">{i18n.t('static.common.select')}</option>
@@ -3708,8 +3713,8 @@ class EditSupplyPlanStatus extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                    <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
+                                                   {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                     <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                     &nbsp;
