@@ -236,20 +236,24 @@ class GlobalConsumption extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
     this.state.countryLabels.map(ele =>
-      csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
+      csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
     this.state.programLabels.map(ele =>
-      csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20')))
+      csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
     // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     console.log(this.state.planningUnitValues)
+    csvRow.push('')
     this.state.planningUnitValues.map(ele =>
-      csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20')+'"'))
+      csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
     csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
 
     csvRow.push('')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
 
@@ -306,7 +310,7 @@ class GlobalConsumption extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -525,7 +529,7 @@ class GlobalConsumption extends Component {
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
     let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let viewById = document.getElementById("viewById").value;
-    let realmId = document.getElementById('realmId').value;
+    let realmId = AuthenticationService.getRealmId()
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
 
     console.log("realmId--------->", realmId);
@@ -634,8 +638,8 @@ class GlobalConsumption extends Component {
   getCountrys() {
     if (navigator.onLine) {
 
-      // let realmId = AuthenticationService.getRealmId();
-      let realmId = document.getElementById('realmId').value
+       let realmId = AuthenticationService.getRealmId();
+     // let realmId = document.getElementById('realmId').value
       RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
           this.setState({
@@ -889,7 +893,7 @@ class GlobalConsumption extends Component {
   componentDidMount() {
 
     this.getPrograms()
-    // this.getCountrys();
+     this.getCountrys();
     this.getRelamList();
     // this.getProductCategories()
   }
@@ -1148,7 +1152,7 @@ class GlobalConsumption extends Component {
 
                     </FormGroup>
 
-                    <FormGroup className="col-md-3">
+                    {/* <FormGroup className="col-md-3">
                       <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
                       <div className="controls ">
                         <InputGroup>
@@ -1164,7 +1168,7 @@ class GlobalConsumption extends Component {
 
                         </InputGroup>
                       </div>
-                    </FormGroup>
+                    </FormGroup> */}
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
