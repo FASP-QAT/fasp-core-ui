@@ -27,6 +27,7 @@ import getSuggestion from '../../CommonComponent/getSuggestion';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import actualIcon from '../../assets/img/actual.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
@@ -232,6 +233,8 @@ export default class ConsumptionDetails extends React.Component {
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
             data[17] = problemList[j].problemType.id
+            data[18] = problemList[j].reviewed
+          
             // data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
             problemArray[count] = data;
             count++;
@@ -324,6 +327,12 @@ export default class ConsumptionDetails extends React.Component {
                     title: 'Problem Type',
                     type: 'hidden',
                 },
+                {
+                    title: i18n.t('static.supplyPlanReview.review'),
+                    type: 'checkbox',
+                    
+                },
+               
 
 
             ],
@@ -606,7 +615,7 @@ export default class ConsumptionDetails extends React.Component {
         var elInstance = instance.jexcel;
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P','S']
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
             var problemStatusId = rowData[12];
@@ -704,6 +713,8 @@ export default class ConsumptionDetails extends React.Component {
 
                     var problemReportList = (programJson.problemReportList);
                     var problemReportFilterList = problemReportList;
+
+                    console.log("problemList===========>",problemReportList);
 
                     if(problemStatusId==-1){
                         problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
