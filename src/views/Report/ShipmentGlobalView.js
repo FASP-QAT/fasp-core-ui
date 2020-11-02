@@ -401,7 +401,6 @@ class ShipmentGlobalView extends Component {
 
         };
         this.getCountrys = this.getCountrys.bind(this);
-        this.filterData = this.filterData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -424,12 +423,21 @@ class ShipmentGlobalView extends Component {
 
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
         this.state.countryLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            this.state.programLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.dashboard.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         var viewby = document.getElementById("viewById").value;
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
 
         if (viewby == 1) {
             this.state.fundingSourceLabels.map(ele =>
@@ -438,8 +446,10 @@ class ShipmentGlobalView extends Component {
             this.state.procurementAgentLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
+        csvRow.push('')
         csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
-        csvRow.push('"' +((i18n.t   ('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+ '"'))
+        csvRow.push('')
+        csvRow.push('"' + ((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
 
         csvRow.push('')
         csvRow.push('')
@@ -526,7 +536,7 @@ class ShipmentGlobalView extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -558,34 +568,41 @@ class ShipmentGlobalView extends Component {
 
                     var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
+                    var len = 120 + countryLabelsText.length * 10
 
-                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, len, planningText)
+                    len = len + 10 + planningText.length * 10
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
                         align: 'left'
                     })
-
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                    len = len + 20
+                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
                         align: 'left'
                     })
-
-                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+                    len = len + 20
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
+                    len = len + 20
+                    doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 225, {
+                    len = len + 20
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
                         align: 'left'
                     })
+                    len = len + 20
                     var viewby = document.getElementById("viewById").value;
                     if (viewby == 1) {
 
                         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 240, fundingSourceText)
+                        doc.text(doc.internal.pageSize.width / 8, len, fundingSourceText)
 
                     } else {
 
                         var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 240, procurementAgentText)
+                        doc.text(doc.internal.pageSize.width / 8, len, procurementAgentText)
                     }
 
                 }
@@ -698,17 +715,19 @@ class ShipmentGlobalView extends Component {
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
 
-            this.fetchData(this.state.rangeValue)
+            this.fetchData()
         })
     }
     handleChangeProgram(programIds) {
-
+        programIds = programIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            programValues: programIds.map(ele => ele.value),
+            programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
 
-            this.filterData(this.state.rangeValue)
+            this.fetchData()
         })
 
     }
@@ -720,132 +739,21 @@ class ShipmentGlobalView extends Component {
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
 
-            this.filterData(this.state.rangeValue)
+            this.fetchData()
         })
     }
 
 
-    filterData(rangeValue) {
-        /*this.setState({
-          consumptions: {date:["04-2019","05-2019","06-2019","07-2019"],countryData:[{label:"c1",value:[10,4,5,7]},
-          {label:"c2",value:[13,2,8,7]},
-          {label:"c3",value:[9,1,0,7]},
-          {label:"c4",value:[5,4,3,7]}]}
-        })
-        */
-        setTimeout('', 10000);
-        let productCategoryId = document.getElementById("productCategoryId").value;
-        let CountryIds = this.state.countryValues;
-        let planningUnitIds = this.state.planningUnitValues;
-        let programIds = this.state.programValues
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
-
-            var inputjson = {
-                "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "stopDate": stopDate
-            }
-            // console.log('***' + inputjson)
-            // AuthenticationService.setupAxiosInterceptors();
-
-            ReportService.getGlobalConsumptiondata(inputjson)
-                .then(response => {
-                    // console.log(JSON.stringify(response.data));
-                    this.setState({
-                        consumptions: response.data,
-                        message: ''
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            consumptions: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             consumptions: []
-            //         })
-
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-        } else if (CountryIds.length == 0) {
-            this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
-
-        } else if (programIds.length == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
-
-        } else if (productCategoryId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
-
-        } else {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
-
-        }
-    }
 
     getCountrys() {
 
         // AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
+        let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
                 this.setState({
                     countrys: response.data.map(ele => ele.realmCountry)
-                })
+                }, () => { this.fetchData(); })
             }).catch(
                 error => {
                     this.setState({
@@ -889,30 +797,8 @@ class ShipmentGlobalView extends Component {
                     }
                 }
             );
-        // .catch(
-        //     error => {
-        //         this.setState({
-        //             countrys: []
-        //         })
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                 default:
-        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-        //                     break;
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
-        this.fetchData();
+
+
     }
     getPlanningUnit() {
 
@@ -1025,14 +911,70 @@ class ShipmentGlobalView extends Component {
 
     componentDidMount() {
 
-        // this.getCountrys();
-        this.getRelamList();
+        this.getCountrys();
+        this.getPrograms();
         this.getProductCategories();
         this.getProcurementAgent();
         this.getFundingSource();
         document.getElementById("procurementAgentDiv").style.display = "none";
 
     }
+
+    getPrograms = () => {
+
+        ProgramService.getProgramList()
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    programs: response.data, loading: false
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                        programs: [], loading: false
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
+
+
 
     getRelamList = () => {
         // AuthenticationService.setupAxiosInterceptors();
@@ -1340,13 +1282,14 @@ class ShipmentGlobalView extends Component {
     fetchData = () => {
 
         let viewby = document.getElementById("viewById").value;
-        let realmId = document.getElementById('realmId').value;
+        let realmId = AuthenticationService.getRealmId()
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let productCategoryId = document.getElementById("productCategoryId").value;
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
         let useApprovedVersion = document.getElementById("includeApprovedVersions").value
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
+        let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1365,7 +1308,7 @@ class ShipmentGlobalView extends Component {
         // console.log("startDate-----", startDate);
         // console.log("endDate-----", endDate);
 
-        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
+        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
 
             this.setState({
                 message: '',
@@ -1377,6 +1320,7 @@ class ShipmentGlobalView extends Component {
                 startDate: startDate,
                 stopDate: endDate,
                 realmCountryIds: CountryIds,
+                programIds: programIds,
                 planningUnitId: planningUnitId,
                 reportView: viewby,
                 fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
@@ -1388,58 +1332,59 @@ class ShipmentGlobalView extends Component {
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
                     console.log("RESP------", response.data);
-if( response.data.shipmentList.length!=0){
-                    var table1Headers = [];
-                    var lab = [];
-                    var val = [];
-                    var table1Body = [];
+                    if (response.data.shipmentList.length != 0) {
+                        var table1Headers = [];
+                        var lab = [];
+                        var val = [];
+                        var table1Body = [];
 
-                    table1Headers = Object.keys(response.data.countrySplitList[0].amount);
-                    // lab = Object.keys(response.data.dateSplitList[0].amount);
-                    table1Headers.unshift("Country");
-
-
-                    // for (var i = 0; i < response.data.dateSplitList.length; i++) {
-                    //     let temp = Object.values(response.data.dateSplitList[i].amount)
-                    //     val.push(temp);
-                    // }
+                        table1Headers = Object.keys(response.data.countrySplitList[0].amount);
+                        // lab = Object.keys(response.data.dateSplitList[0].amount);
+                        table1Headers.unshift("Country");
 
 
-                    for (var item = 0; item < response.data.countrySplitList.length; item++) {
-                        let obj = {
-                            country: response.data.countrySplitList[item].country,
-                            amount: Object.values(response.data.countrySplitList[item].amount),
+                        // for (var i = 0; i < response.data.dateSplitList.length; i++) {
+                        //     let temp = Object.values(response.data.dateSplitList[i].amount)
+                        //     val.push(temp);
+                        // }
+
+
+                        for (var item = 0; item < response.data.countrySplitList.length; item++) {
+                            let obj = {
+                                country: response.data.countrySplitList[item].country,
+                                amount: Object.values(response.data.countrySplitList[item].amount),
+                            }
+                            table1Body.push(obj);
                         }
-                        table1Body.push(obj);
+
+
+
+
+
+                        this.setState({
+                            data: response.data,
+                            shipmentList: response.data.shipmentList,
+                            dateSplitList: response.data.dateSplitList,
+                            countrySplitList: response.data.countrySplitList,
+                            countryShipmentSplitList: response.data.countryShipmentSplitList,
+                            table1Headers: table1Headers,
+                            table1Body: table1Body,
+                            lab: lab,
+                            val: val,
+                            loading: false
+                        }, () => {
+                            console.log("shipmentList-----", this.state.shipmentList);
+                            console.log("dateSplitList-----", this.state.dateSplitList);
+                            console.log("countrySplitList-----", this.state.countrySplitList);
+                            console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
+
+                            // console.log("labels---", this.state.labels);
+                            // console.log("values---", this.state.values);
+                            // console.log("DATA--1---", this.state.table1Headers);
+                            // console.log("DATA---2--", this.state.table1Body);
+                        })
                     }
-
-
-
-
-
-                    this.setState({
-                        data: response.data,
-                        shipmentList: response.data.shipmentList,
-                        dateSplitList: response.data.dateSplitList,
-                        countrySplitList: response.data.countrySplitList,
-                        countryShipmentSplitList: response.data.countryShipmentSplitList,
-                        table1Headers: table1Headers,
-                        table1Body: table1Body,
-                        lab: lab,
-                        val: val,
-                        loading: false
-                    }, () => {
-                        console.log("shipmentList-----", this.state.shipmentList);
-                        console.log("dateSplitList-----", this.state.dateSplitList);
-                        console.log("countrySplitList-----", this.state.countrySplitList);
-                        console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
-
-                        // console.log("labels---", this.state.labels);
-                        // console.log("values---", this.state.values);
-                        // console.log("DATA--1---", this.state.table1Headers);
-                        // console.log("DATA---2--", this.state.table1Body);
-                    })}
-                    else{
+                    else {
                         this.setState({
                             data: response.data,
                             shipmentList: response.data.shipmentList,
@@ -1451,8 +1396,8 @@ if( response.data.shipmentList.length!=0){
                             lab: [],
                             val: [],
                             loading: false
-                        }, () => {}
-                    )
+                        }, () => { }
+                        )
                     }
                 }).catch(
                     error => {
@@ -1544,6 +1489,20 @@ if( response.data.shipmentList.length!=0){
         } else if (this.state.countryValues.length == 0) {
             this.setState({
                 message: i18n.t('static.program.validcountrytext'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
+
+        } else if (this.state.programValues.length == 0) {
+            this.setState({
+                message: i18n.t('static.common.selectProgram'),
                 data: [],
                 shipmentList: [],
                 dateSplitList: [],
@@ -1664,7 +1623,7 @@ if( response.data.shipmentList.length!=0){
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
 
-            this.fetchData(this.state.rangeValue)
+            this.fetchData()
         })
     }
 
@@ -1710,18 +1669,27 @@ if( response.data.shipmentList.length!=0){
 
         const { productCategories } = this.state;
 
-        const { realmList } = this.state;
-        let realms = realmList.length > 0
-            && realmList.map((item, i) => {
+        // const { realmList } = this.state;
+        // let realms = realmList.length > 0
+        //     && realmList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.realmId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
+
+
+        const { programs } = this.state;
+        let programList = [];
+        programList = programs.length > 0
+            && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
+
+                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+
                 )
             }, this);
-
-
-
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -1858,7 +1826,7 @@ if( response.data.shipmentList.length!=0){
 
                                         </FormGroup>
 
-                                        <FormGroup className="col-md-3">
+                                        {/* <FormGroup className="col-md-3">
                                             <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -1874,7 +1842,7 @@ if( response.data.shipmentList.length!=0){
 
                                                 </InputGroup>
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup> */}
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
@@ -1888,6 +1856,25 @@ if( response.data.shipmentList.length!=0){
                                                 value={this.state.countryValues}
                                                 onChange={(e) => { this.handleChange(e) }}
                                                 options={countryList && countryList.length > 0 ? countryList : []}
+                                            />
+                                            {!!this.props.error &&
+                                                this.props.touched && (
+                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                )}
+
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+
+                                            <MultiSelect
+
+                                                bsSize="sm"
+                                                name="programIds"
+                                                id="programIds"
+                                                value={this.state.programValues}
+                                                onChange={(e) => { this.handleChangeProgram(e) }}
+                                                options={programList && programList.length > 0 ? programList : []}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
