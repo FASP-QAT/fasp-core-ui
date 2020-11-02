@@ -4,7 +4,7 @@ import moment from "moment";
 import i18n from '../../i18n';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
-export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild,lastSyncDate) {
+export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, lastSyncDate) {
     console.log("In calculate", minimumDate);
     console.log("D------------> in calculate")
     var db1;
@@ -105,7 +105,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     // Adding months in past for all the calculations
                     var lastDataEntryDate = moment(maxDate).add(programPlanningUnitList[ppL].monthsInPastForAmc, 'months').format("YYYY-MM-DD");
                     // Filtering supply plan data for excluding the selected planning units
-                    supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM-DD") < moment(minDate).format("YYYY-MM-DD")));
+                    supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")));
                     // Looping till the max data entry date
                     for (var i = 0; createdDate < lastDataEntryDate; i++) {
                         // Adding months to created date and getting start date and end date
@@ -197,7 +197,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         console.log("Shipment list----------------->", shipmentList);
                         // Getting shipment list for a month
                         var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
-                        console.log("Shipment Arr----------------->", shipmentArr);
+                        console.log("D Shipment Arr----------------->", shipmentArr);
                         var shipmentTotalQty = 0;
                         var shipmentTotalQtyWps = 0;
                         var manualTotalQty = 0;
@@ -225,13 +225,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         for (var j = 0; j < shipmentArr.length; j++) {
                             // Adding total shipment qty
                             shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
-                            console.log("(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
+                            console.log("D Shipment Arr----------------->(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
                             // Adding total shipment qty wps
                             if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
                                 shipmentTotalQtyWps += parseInt((shipmentArr[j].shipmentQty));
                             }
                             // Adding manual shipments
+                            console.log("D Shipment Arr----------------->shipmentArr[j].erpFlag.toString()", shipmentArr[j].erpFlag.toString());
+                            console.log("D Shipment Arr----------------->Consition", shipmentArr[j].erpFlag.toString() == "false");
+                            console.log("D Shipment Arr----------------->manualTotalQty------------>", manualTotalQty);
                             if (shipmentArr[j].erpFlag.toString() == "false") {
+                                console.log("D Shipment Arr----------------->In if", shipmentArr[j].shipmentQty);
                                 manualTotalQty += parseInt((shipmentArr[j].shipmentQty));
                                 // Adding shipments based on status
                                 if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -249,7 +253,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Adding erp shipments
+                                console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty);
                                 erpTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                console.log("D Shipment Arr----------------->ErpTotalQty", erpTotalQty);
                                 // Adding shipments based on status
                                 if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
                                     receivedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
@@ -280,28 +286,32 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                 if (index == -1) {
                                     console.log("batchDetailsFromProgramJson----------->>>>>>>>>>>>", batchDetailsFromProgramJson)
-                                    var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"))[0];
-                                    console.log("Bd----------->>>>>>>>>>>>", bd);
-                                    var shipmentQtyWps = 0;
-                                    if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
-                                        shipmentQtyWps = batchListForShipments[b].shipmentQty;
+                                    var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                    if (bd.length > 0) {
+                                        bd = bd[0];
+                                        console.log("Bd----------->>>>>>>>>>>>", bd);
+                                        var shipmentQtyWps = 0;
+                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                            shipmentQtyWps = batchListForShipments[b].shipmentQty;
+                                        }
+                                        var json = {
+                                            batchId: bd.batchId,
+                                            batchNo: bd.batchNo,
+                                            expiryDate: bd.expiryDate,
+                                            autoGenerated: bd.autoGenerated,
+                                            openingBalance: 0,
+                                            openingBalanceWps: 0,
+                                            consumption: 0,
+                                            adjustment: 0,
+                                            stock: 0,
+                                            shipment: batchListForShipments[b].shipmentQty,
+                                            shipmentWps: shipmentQtyWps,
+                                            expiredQty: 0,
+                                            expiredQtyWps: 0
+                                        }
+                                        myArray.push(json);
                                     }
-                                    var json = {
-                                        batchId: bd.batchId,
-                                        batchNo: bd.batchNo,
-                                        expiryDate: bd.expiryDate,
-                                        autoGenerated: bd.autoGenerated,
-                                        openingBalance: 0,
-                                        openingBalanceWps: 0,
-                                        consumption: 0,
-                                        adjustment: 0,
-                                        stock: 0,
-                                        shipment: batchListForShipments[b].shipmentQty,
-                                        shipmentWps: shipmentQtyWps,
-                                        expiredQty: 0,
-                                        expiredQtyWps: 0
-                                    }
-                                    myArray.push(json);
+
                                 } else {
                                     myArray[index].shipment = parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
                                     if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
@@ -347,23 +357,26 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
 
                                         if (index == -1) {
-                                            var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"))[0];
-                                            var json = {
-                                                batchId: bd.batchId,
-                                                batchNo: bd.batchNo,
-                                                expiryDate: bd.expiryDate,
-                                                autoGenerated: bd.autoGenerated,
-                                                openingBalance: 0,
-                                                openingBalanceWps: 0,
-                                                consumption: 0,
-                                                adjustment: 0,
-                                                stock: parseInt(parseInt(batchListForInventory[b].actualQty) * parseInt(inventoryListForRegion[inv].multiplier)),
-                                                shipment: 0,
-                                                shipmentWps: shipmentQtyWps,
-                                                expiredQty: 0,
-                                                expiredQtyWps: 0
+                                            var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                            if (bd.length > 0) {
+                                                bd = bd[0]
+                                                var json = {
+                                                    batchId: bd.batchId,
+                                                    batchNo: bd.batchNo,
+                                                    expiryDate: bd.expiryDate,
+                                                    autoGenerated: bd.autoGenerated,
+                                                    openingBalance: 0,
+                                                    openingBalanceWps: 0,
+                                                    consumption: 0,
+                                                    adjustment: 0,
+                                                    stock: parseInt(parseInt(batchListForInventory[b].actualQty) * parseInt(inventoryListForRegion[inv].multiplier)),
+                                                    shipment: 0,
+                                                    shipmentWps: shipmentQtyWps,
+                                                    expiredQty: 0,
+                                                    expiredQtyWps: 0
+                                                }
+                                                myArray.push(json);
                                             }
-                                            myArray.push(json);
                                         } else {
                                             myArray[index].stock = parseInt(myArray[index].stock) + parseInt(parseInt(batchListForInventory[b].actualQty) * parseInt(inventoryListForRegion[inv].multiplier));
                                         }
@@ -382,24 +395,27 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         var expiryDate = batchListForInventory[b].batch.expiryDate;
                                         var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
                                         if (index == -1) {
-                                            var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"))[0];
-                                            var json = {
-                                                batchId: bd.batchId,
-                                                batchNo: bd.batchNo,
-                                                expiryDate: bd.expiryDate,
-                                                autoGenerated: bd.autoGenerated,
-                                                openingBalance: 0,
-                                                openingBalanceWps: 0,
-                                                consumption: 0,
-                                                adjustment: parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier)),
-                                                stock: 0,
-                                                shipment: 0,
-                                                shipmentWps: shipmentQtyWps,
-                                                expiredQty: 0,
-                                                expiredQtyWps: 0
+                                            var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                            if (bd.length > 0) {
+                                                bd = bd[0];
+                                                var json = {
+                                                    batchId: bd.batchId,
+                                                    batchNo: bd.batchNo,
+                                                    expiryDate: bd.expiryDate,
+                                                    autoGenerated: bd.autoGenerated,
+                                                    openingBalance: 0,
+                                                    openingBalanceWps: 0,
+                                                    consumption: 0,
+                                                    adjustment: parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier)),
+                                                    stock: 0,
+                                                    shipment: 0,
+                                                    shipmentWps: shipmentQtyWps,
+                                                    expiredQty: 0,
+                                                    expiredQtyWps: 0
+                                                }
+                                                myArray.push(json);
+                                                adjustmentBatchQtyTotal += parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
                                             }
-                                            myArray.push(json);
-                                            adjustmentBatchQtyTotal += parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
                                         } else {
                                             myArray[index].adjustment = parseInt(myArray[index].adjustment) + parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
                                             if (myArray[index].stock == 0) {
@@ -463,23 +479,26 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
 
                                     if (index == -1) {
-                                        var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"))[0];
-                                        var json = {
-                                            batchId: bd.batchId,
-                                            batchNo: bd.batchNo,
-                                            expiryDate: bd.expiryDate,
-                                            autoGenerated: bd.autoGenerated,
-                                            openingBalance: 0,
-                                            openingBalanceWps: 0,
-                                            consumption: parseInt(parseInt(batchListForConsumption[b].consumptionQty) * parseInt(consumptionListForActualConsumption[ac].multiplier)),
-                                            adjustment: 0,
-                                            stock: 0,
-                                            shipment: 0,
-                                            shipmentWps: shipmentQtyWps,
-                                            expiredQty: 0,
-                                            expiredQtyWps: 0
+                                        var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                        if (bd.length > 0) {
+                                            bd = bd[0]
+                                            var json = {
+                                                batchId: bd.batchId,
+                                                batchNo: bd.batchNo,
+                                                expiryDate: bd.expiryDate,
+                                                autoGenerated: bd.autoGenerated,
+                                                openingBalance: 0,
+                                                openingBalanceWps: 0,
+                                                consumption: parseInt(parseInt(batchListForConsumption[b].consumptionQty) * parseInt(consumptionListForActualConsumption[ac].multiplier)),
+                                                adjustment: 0,
+                                                stock: 0,
+                                                shipment: 0,
+                                                shipmentWps: shipmentQtyWps,
+                                                expiredQty: 0,
+                                                expiredQtyWps: 0
+                                            }
+                                            myArray.push(json);
                                         }
-                                        myArray.push(json);
                                     } else {
                                         myArray[index].consumption = parseInt(myArray[index].consumption) + parseInt(parseInt(batchListForConsumption[b].consumptionQty) * parseInt(consumptionListForActualConsumption[ac].multiplier));
                                     }
@@ -768,8 +787,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             expectedStockWps: expectedStockWps,
                             regionCountForStock: regionsReportingActualInventory
                         }
+                        console.log("D Shipment Arr----------------->JSON", json);
                         console.log("Json", json);
+                        console.log("D Shipment Arr----------------->supplyPlanData---------------->", supplyPlanData);
                         supplyPlanData.push(json);
+                        console.log("D Shipment Arr----------------->supplyPlanData1--------->", supplyPlanData);
                     }
                 }
                 console.log("Supply plan data", supplyPlanData);

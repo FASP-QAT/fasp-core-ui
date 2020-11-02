@@ -1135,7 +1135,7 @@ export default class WhatIfReportComponent extends React.Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -1219,7 +1219,7 @@ export default class WhatIfReportComponent extends React.Component {
         var h1 = 100;
         var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png',50, 160, 750, 340, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 160, 750, 340, 'CANVAS');
         // doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             item.monthName.concat(" ").concat(item.monthYear)
@@ -1714,62 +1714,64 @@ export default class WhatIfReportComponent extends React.Component {
                 var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
                 var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
                 var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
-                var maxForMonths = 0;
-                var realm = programJson.realmCountry.realm;
-                var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-                if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnit.minMonthsOfStock) {
-                    maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                } else if (programPlanningUnit.minMonthsOfStock < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                    maxForMonths = programPlanningUnit.minMonthsOfStock
-                } else {
-                    maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
-                }
-                var minStockMoSQty = parseInt(maxForMonths);
-
-                // Calculations for Max Stock
-                var minForMonths = 0;
-                var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-                if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + programPlanningUnit.reorderFrequencyInMonths)) {
-                    minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                } else {
-                    minForMonths = (maxForMonths + programPlanningUnit.reorderFrequencyInMonths);
-                }
-                var maxStockMoSQty = parseInt(minForMonths);
-                console.log("Min Stock MoS", minStockMoSQty);
-                console.log("Min Stock MoS", maxStockMoSQty);
-                this.setState({
-                    shelfLife: programPlanningUnit.shelfLife,
-                    versionId: programJson.currentVersion.versionId,
-                    monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
-                    monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
-                    reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
-                    minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
-                    minStockMoSQty: minStockMoSQty,
-                    maxStockMoSQty: maxStockMoSQty,
-                    inList: invList,
-                    coList: conList,
-                    shList: shiList,
-                })
-
-                var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-                var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
-                var shipmentStatusRequest = shipmentStatusOs.getAll();
-                shipmentStatusRequest.onerror = function (event) {
+                var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                var realmOs = realmTransaction.objectStore('realm');
+                var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+                realmRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "red"
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                shipmentStatusRequest.onsuccess = function (event) {
-                    var shipmentStatusResult = [];
-                    shipmentStatusResult = shipmentStatusRequest.result;
-                    var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                    var papuOs = papuTransaction.objectStore('procurementAgent');
-                    var papuRequest = papuOs.getAll();
-                    papuRequest.onerror = function (event) {
+                realmRequest.onsuccess = function (event) {
+                    var maxForMonths = 0;
+                    var realm = realmRequest.result;
+                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                    console.log("realm.minMosMaxGaurdrail", realm.minMosMaxGaurdrail);
+                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                    if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnit.minMonthsOfStock) {
+                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                    } else {
+                        maxForMonths = programPlanningUnit.minMonthsOfStock
+                    }
+                    var minStockMoSQty = parseInt(maxForMonths);
+
+                    // Calculations for Max Stock
+                    var minForMonths = 0;
+                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + programPlanningUnit.reorderFrequencyInMonths)) {
+                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                    } else {
+                        minForMonths = (maxForMonths + programPlanningUnit.reorderFrequencyInMonths);
+                    }
+                    var maxStockMoSQty = parseInt(minForMonths);
+                    console.log("maxStockMoSQty-------->", maxStockMoSQty);
+                    console.log("DEFAULT_MIN_MAX_MONTHS_OF_STOCK------------->", DEFAULT_MIN_MAX_MONTHS_OF_STOCK)
+                    if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                        maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                    }
+                    console.log("Min Stock MoS", minStockMoSQty);
+                    console.log("Min Stock MoS", maxStockMoSQty);
+                    this.setState({
+                        shelfLife: programPlanningUnit.shelfLife,
+                        versionId: programJson.currentVersion.versionId,
+                        monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
+                        monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
+                        reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
+                        minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
+                        minStockMoSQty: minStockMoSQty,
+                        maxStockMoSQty: maxStockMoSQty,
+                        inList: invList,
+                        coList: conList,
+                        shList: shiList,
+                    })
+
+                    var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                    var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
+                    var shipmentStatusRequest = shipmentStatusOs.getAll();
+                    shipmentStatusRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
@@ -1777,18 +1779,32 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    papuRequest.onsuccess = function (event) {
-                        var papuResult = [];
-                        papuResult = papuRequest.result;
-                        this.setState({
-                            procurementAgentListForWhatIf: papuResult
-                        })
-                        console.log("ProgramJson", programJson);
-                        var supplyPlanData = [];
-                        if (programJson.supplyPlan != undefined) {
-                            supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
-                        }
-                        // if (supplyPlanData.length > 0) {
+                    shipmentStatusRequest.onsuccess = function (event) {
+                        var shipmentStatusResult = [];
+                        shipmentStatusResult = shipmentStatusRequest.result;
+                        var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                        var papuOs = papuTransaction.objectStore('procurementAgent');
+                        var papuRequest = papuOs.getAll();
+                        papuRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "red",
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        papuRequest.onsuccess = function (event) {
+                            var papuResult = [];
+                            papuResult = papuRequest.result;
+                            this.setState({
+                                procurementAgentListForWhatIf: papuResult
+                            })
+                            console.log("ProgramJson", programJson);
+                            var supplyPlanData = [];
+                            if (programJson.supplyPlan != undefined) {
+                                supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
+                            }
+                            // if (supplyPlanData.length > 0) {
                             var lastClosingBalance = 0;
                             for (var n = 0; n < m.length; n++) {
                                 var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
@@ -2162,8 +2178,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var compare = (m[n].startDate >= currentMonth);
                                     var stockInHand = jsonList[0].closingBalance;
                                     var amc = Math.round(parseFloat(jsonList[0].amc));
-                                    if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(jsonList[0].minStockMoS))) {
-                                        var suggestedOrd = parseInt((amc * parseInt(jsonList[0].maxStockMoS)) - jsonList[0].closingBalance);
+                                    if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
+                                        var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
@@ -2285,8 +2301,8 @@ export default class WhatIfReportComponent extends React.Component {
                                         shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
                                         ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
                                         mos: parseFloat(jsonList[0].mos).toFixed(2),
-                                        minMos: jsonList[0].minStockMoS,
-                                        maxMos: jsonList[0].maxStockMoS
+                                        minMos: minStockMoSQty,
+                                        maxMos: maxStockMoSQty
                                     }
                                     jsonArrForGraph.push(json);
                                 } else {
@@ -2371,10 +2387,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 closingBalanceArray: closingBalanceArray,
                                 loading: false
                             })
-                        // } else {
-                        //     this.setState({ loading: false })
-                        //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
-                        // }
+                            // } else {
+                            //     this.setState({ loading: false })
+                            //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                            // }
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -2721,7 +2738,7 @@ export default class WhatIfReportComponent extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            this.setState({ loading: true , inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD")});
+            this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") });
             var elInstance = this.state.inventoryBatchInfoTableEl;
             if (elInstance != undefined && elInstance != "") {
                 elInstance.destroy();
@@ -3407,9 +3424,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     // var currentMonthDate = moment(Date.now()).format("YYYY-MM");
                                                     // var manualEntryDate = moment(this.state.monthsArray[count].startDate).format("YYYY-MM");
                                                     // if (manualEntryDate >= currentMonthDate) {
-                                                        return (<td align="right" className=" hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', this.state.monthsArray[count].startDate, 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    return (<td align="right" className=" hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', this.state.monthsArray[count].startDate, 0, '', '', "0")}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
                                                     // } else {
-                                                        // return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    // return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
                                                     // }
                                                 })
                                             }
@@ -3660,7 +3677,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                 </div>
                                             </div>
-                                            <div className="offset-6 col-md-12"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
 
@@ -3691,7 +3708,7 @@ export default class WhatIfReportComponent extends React.Component {
                     <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
                         <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
-                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                            <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                             <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                         </ul>
                         <div className=" card-header-actions" style={{ marginTop: '-5px' }}>
@@ -4178,11 +4195,11 @@ export default class WhatIfReportComponent extends React.Component {
                                         ))
                                     }
                                     <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                    <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
 
-                                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
-                                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
-                                                        <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
+                                    <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                    <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
                                 </ul>
                             </FormGroup>
                             <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
@@ -4193,7 +4210,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
                                     <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
                                     <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
                                 </ul>
                             </FormGroup>
                         </div>

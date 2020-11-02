@@ -35,13 +35,13 @@ const validationSchemaThree = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
-        regionConversionFactor: Yup.number()
-            .moreThan(0, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
-            .lessThan(101, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
-            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))            
+        regionConversionFactor: Yup.string()
+            // .moreThan(0, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
+            // .lessThan(101, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
+            .matches(/^((\d?[1-9]|[1-9]0)|(\d?[1-9]|[1-9]0)\.(\d?[0-9])|100)$/m, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))            
             // .min(0, i18n.t("static.procurementUnit.validValueText"))
             // .max(100, "Maximum 100%")
-            .required(i18n.t('static.program.validairfreighttext'))                        
+            .required(i18n.t('static.currency.conversionrateMin'))                        
             ,
         // .max(100, i18n.t('static.program.validvaluetext'))
     })
@@ -329,6 +329,7 @@ class QuantimedImportStepThree extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.state.region.regionConversionFactor}
+                                                        placeholder="1-100"
                                                         required />
                                                     <FormFeedback className="red">{errors.regionConversionFactor}</FormFeedback>
                                                 </FormGroup>

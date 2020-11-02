@@ -476,7 +476,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
-        this.setState({  inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
+        this.setState({ inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             elInstance.destroy();
@@ -612,8 +612,8 @@ class EditSupplyPlanStatus extends Component {
                     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'plannedErpShipments') {
                     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                }else{
-                    shipmentList=[]
+                } else {
+                    shipmentList = []
                 }
                 this.setState({
                     showShipments: 1,
@@ -892,16 +892,27 @@ class EditSupplyPlanStatus extends Component {
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var programJson = this.state.program;
-            var maxForMonths = 0;
-                var realm = programJson.realmCountry.realm;
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+            var realmOs = realmTransaction.objectStore('realm');
+            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            realmRequest.onerror = function (event) {
+                this.setState({
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            realmRequest.onsuccess = function (event) {
+                var maxForMonths = 0;
+                var realm = realmRequest.result;
                 var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                console.log("realm.minMosMaxGaurdrail", realm.minMosMaxGaurdrail);
                 var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
                 if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnit.minMonthsOfStock) {
                     maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                } else if (programPlanningUnit.minMonthsOfStock < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                    maxForMonths = programPlanningUnit.minMonthsOfStock
                 } else {
-                    maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
+                    maxForMonths = programPlanningUnit.minMonthsOfStock
                 }
                 var minStockMoSQty = parseInt(maxForMonths);
 
@@ -914,51 +925,56 @@ class EditSupplyPlanStatus extends Component {
                     minForMonths = (maxForMonths + programPlanningUnit.reorderFrequencyInMonths);
                 }
                 var maxStockMoSQty = parseInt(minForMonths);
+                console.log("maxStockMoSQty-------->", maxStockMoSQty);
+                console.log("DEFAULT_MIN_MAX_MONTHS_OF_STOCK------------->", DEFAULT_MIN_MAX_MONTHS_OF_STOCK)
+                if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                    maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                }
                 console.log("Min Stock MoS", minStockMoSQty);
                 console.log("Min Stock MoS", maxStockMoSQty);
-            this.setState({
-                shelfLife: programPlanningUnit.shelfLife,
-                versionId: programJson.currentVersion.versionId,
-                monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
-                monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
-                reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
-                minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
-                minStockMoSQty: minStockMoSQty,
-                maxStockMoSQty: maxStockMoSQty
-            })
-
-            var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-            var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
-            var shipmentStatusRequest = shipmentStatusOs.getAll();
-            shipmentStatusRequest.onerror = function (event) {
                 this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false,
-                    color: "red"
+                    shelfLife: programPlanningUnit.shelfLife,
+                    versionId: programJson.currentVersion.versionId,
+                    monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
+                    monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
+                    reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
+                    minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
+                    minStockMoSQty: minStockMoSQty,
+                    maxStockMoSQty: maxStockMoSQty
                 })
-            }.bind(this);
-            shipmentStatusRequest.onsuccess = function (event) {
-                var shipmentStatusResult = [];
-                shipmentStatusResult = shipmentStatusRequest.result;
-                var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                var papuOs = papuTransaction.objectStore('procurementAgent');
-                var papuRequest = papuOs.getAll();
-                papuRequest.onerror = function (event) {
+
+                var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
+                var shipmentStatusRequest = shipmentStatusOs.getAll();
+                shipmentStatusRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
                         color: "red"
                     })
                 }.bind(this);
-                papuRequest.onsuccess = function (event) {
-                    var papuResult = [];
-                    papuResult = papuRequest.result;
-                    console.log("ProgramJson", programJson);
-                    var supplyPlanData = [];
-                    if (programJson.supplyPlan != undefined) {
-                        supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
-                    }
-                    // if (supplyPlanData.length > 0) {
+                shipmentStatusRequest.onsuccess = function (event) {
+                    var shipmentStatusResult = [];
+                    shipmentStatusResult = shipmentStatusRequest.result;
+                    var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                    var papuOs = papuTransaction.objectStore('procurementAgent');
+                    var papuRequest = papuOs.getAll();
+                    papuRequest.onerror = function (event) {
+                        this.setState({
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
+                        })
+                    }.bind(this);
+                    papuRequest.onsuccess = function (event) {
+                        var papuResult = [];
+                        papuResult = papuRequest.result;
+                        console.log("ProgramJson", programJson);
+                        var supplyPlanData = [];
+                        if (programJson.supplyPlan != undefined) {
+                            supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
+                        }
+                        // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
@@ -1333,8 +1349,8 @@ class EditSupplyPlanStatus extends Component {
                                 var compare = (m[n].startDate >= currentMonth);
                                 var stockInHand = jsonList[0].closingBalance;
                                 var amc = Math.round(parseFloat(jsonList[0].amc));
-                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(jsonList[0].minStockMoS))) {
-                                    var suggestedOrd = parseInt((amc * parseInt(jsonList[0].maxStockMoS)) - jsonList[0].closingBalance);
+                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
+                                    var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
                                     if (suggestedOrd == 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
@@ -1457,8 +1473,8 @@ class EditSupplyPlanStatus extends Component {
                                     shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
                                     ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
                                     mos: parseFloat(jsonList[0].mos).toFixed(2),
-                                    minMos: jsonList[0].minStockMoS,
-                                    maxMos: jsonList[0].maxStockMoS
+                                    minMos: minStockMoSQty,
+                                    maxMos: maxStockMoSQty
                                 }
                                 jsonArrForGraph.push(json);
                             } else {
@@ -1543,14 +1559,14 @@ class EditSupplyPlanStatus extends Component {
                             closingBalanceArray: closingBalanceArray,
                             loading: false
                         })
-                    // } else {
-                    //     this.setState({ loading: false })
-                    //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
-                    // }
+                        // } else {
+                        //     this.setState({ loading: false })
+                        //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                        // }
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
         }.bind(this)
-
     }
 
 
@@ -2169,11 +2185,11 @@ class EditSupplyPlanStatus extends Component {
                                                 ))
                                             }
                                             <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                            <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
 
-                                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
-                                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
-                                                        <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
+                                            <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                            <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                            <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
 
                                         </ul>
                                     </FormGroup>
@@ -2185,7 +2201,7 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
                                         </ul>
                                     </FormGroup>
 
@@ -2533,7 +2549,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 <Bar id="cool-canvas1" data={bar} options={chartOptions} />
                                                             </div>
                                                         </div>
-                                                        <div className="offset-6 col-md-12"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                        <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                     </div>}
                                             </div>
                                         </div>
@@ -3101,7 +3117,7 @@ class EditSupplyPlanStatus extends Component {
                             <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
                                 <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
-                                <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                    <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                                 </ul>
                                 <div className=" card-header-actions" style={{ marginTop: '-5px' }}>
