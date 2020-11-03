@@ -1237,7 +1237,7 @@
     "static.shipment.shipmentProcurementAgent": "Shipment/Orders Procurement Agent",
     "static.shipment.shipmentfundingSource": "Shipment/Orders Funding Source",
     "static.common.preview": "Preview",
-    "static.report.problemTransDetails": "Problem Trans Details",
+    "static.report.problemTransDetails": "Problem Transactions",
     "static.report.updateStatus": "Update Details",
     "static.ticket.requestTo": "Request to...",
     "static.ticket.drodownvaluenotfound": "Note: If you don't see the desired XYZ you want, submit a ticket for this item",

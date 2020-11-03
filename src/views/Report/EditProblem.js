@@ -571,6 +571,17 @@ export default class EditLanguageComponent extends Component {
                 style: { width: '170px' },
             },
             {
+                dataField: 'reviewed',
+                text: i18n.t('static.supplyPlanReview.review'),
+                sort: true,
+                align: 'center',
+                style: { width: '80px' },
+                headerAlign: 'center',
+                formatter: (cell, row) => { 
+                    return cell==true ? i18n.t('static.program.yes') : i18n.t('static.program.no');
+                }
+            },
+            {
                 dataField: 'createdBy.username',
                 text: i18n.t('static.report.lastmodifiedby'),
                 sort: true,

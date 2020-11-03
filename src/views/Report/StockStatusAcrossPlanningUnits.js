@@ -162,7 +162,7 @@ this.setState({
                 if (response.status == 200) {
                     this.setState({
                         tracerCategories: response.data
-                    })
+                    },()=>{this.fetchData()})
                 }
 
             }).catch(
@@ -965,7 +965,7 @@ this.setState({
         let endDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0).getDate()));
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
         let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
-    
+    console.log('this.state.tracerCategoryValues.length',this.state.tracerCategoryValues.length)
         if (programId != 0 && versionId != 0 && this.state.tracerCategoryValues.length>0) {
             if (versionId.includes('Local')) {
 

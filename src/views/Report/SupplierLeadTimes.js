@@ -272,15 +272,15 @@ class SupplierLeadTimes extends Component {
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                ele.plannedSubmittedLeadTime,
+                ele.plannedSubmittedLeadTime==undefined?'': ele.plannedSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime,
                 ele.approvedToShippedLeadTime,
                 ele.shippedToArrivedBySeaLeadTime,
                 ele.shippedToArrivedByAirLeadTime,
                 ele.arrivedToDeliveredLeadTime,
-                ele.totalSeaLeadTime,
-                ele.totalAirLeadTime,
+                ele.totalSeaLeadTime==undefined?'':ele.totalSeaLeadTime,
+                ele.totalAirLeadTime==undefined?'':ele.totalAirLeadTime,
                 ele.localProcurementAgentLeadTime==null?'':ele.localProcurementAgentLeadTime
 
                 // (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'),
@@ -1455,7 +1455,7 @@ class SupplierLeadTimes extends Component {
 
             {
                 dataField: 'submittedToApprovedLeadTime',
-                text: i18n.t('static.program.submittoapproveleadtime'),
+                text: i18n.t('static.procurementagent.procurementagentapprovetosubmittime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1492,7 +1492,7 @@ class SupplierLeadTimes extends Component {
             },
             {
                 dataField: 'arrivedToDeliveredLeadTime',
-                text: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
+                text: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
