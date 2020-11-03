@@ -2835,7 +2835,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
-                    var batchInfoList = (programJson.batchInfoList).filter(c => c.planningUnitId == document.getElementById("planningUnitId").value);
+                    var batchInfoList = (programJson.batchInfoList);
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
@@ -3018,7 +3018,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
                                 console.log("shipmentBatchInfoList[bi]", shipmentBatchInfoList[bi]);
                                 // Push shipment batch details in program json batch info list
-                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM"));
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
                                 console.log("Batch info list 1st", batchInfoList);
                                 console.log("Index1", index);
                                 if (index == -1) {
@@ -3179,7 +3179,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                             console.log("shipmentBatchInfoList.length", shipmentBatchInfoList.length);
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM"));
+                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
                                 console.log("BatchInfoList", batchInfoList);
                                 console.log("Index", index);
                                 if (index == -1) {

@@ -275,6 +275,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             // Adding shipments qty batch wise
                             var batchListForShipments = shipmentArr[j].batchInfoList;
                             console.log("Batch list for shipments", batchListForShipments);
+                            console.log("D--------------->shipmentArr[j]", shipmentArr[j].shipmentId);
                             for (var b = 0; b < batchListForShipments.length; b++) {
                                 var batchNo = batchListForShipments[b].batch.batchNo;
                                 var expiryDate = batchListForShipments[b].batch.expiryDate
@@ -318,10 +319,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         myArray[index].shipmentWps = parseInt(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
                                     }
                                 }
+                                console.log("D------------>MyArray", myArray);
                                 var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
-                                shipmentBatchQtyTotal += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
-                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
-                                    shipmentBatchQtyTotalWps += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                console.log("D------------------>Index--------->", index, "BatchNo----------->", batchNo, "Expiry date---------->", expiryDate);
+                                if (index != -1) {
+                                    shipmentBatchQtyTotal += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                    if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                        shipmentBatchQtyTotalWps += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                    }
                                 }
                             }
                         }
