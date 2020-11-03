@@ -169,11 +169,14 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       tracerCategoryValues: [],
       tracerCategoryLabels: [],
       realmList: [],
+      programValues: [],
+      programLabels: [],
       programs: [],
+
       planningUnits: [],
       message: '',
       data: [],
-      selData:[],
+      selData: [],
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
@@ -293,21 +296,28 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
-    csvRow.push('"'+(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+    //csvRow.push('"'+(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('')
     this.state.countryLabels.map(ele =>
-      csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
+      csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+    this.state.programLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+
     this.state.tracerCategoryLabels.map(ele =>
-      csvRow.push('"'+(i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20')+'"'))
+      csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
     csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
 
     csvRow.push('')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
 
-    var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance').replaceAll(',', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(',', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(',', '%20')])]
+    var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.qatPID').replaceAll(' ', '%20'), i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'), i18n.t('static.program.programMaster').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.amc').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.monthsOfStock').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.minStock').replaceAll(' ', '%20'), i18n.t('static.supplyPlan.maxStock').replaceAll(' ', '%20')])]
 
     re = this.state.data
 
@@ -348,13 +358,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     console.log(item)
     if (this.roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color }
-    }else if (this.roundN(item.mos) != 0&&this.roundN(item.mos) != null && this.roundN(item.mos) <item.minMos) {
+    } else if (this.roundN(item.mos) != 0 && this.roundN(item.mos) != null && this.roundN(item.mos) < item.minMos) {
       return { backgroundColor: legendcolor[1].color }
-    } else if (this.roundN(item.mos) >=item.minMos && this.roundN(item.mos) <=item.maxMos) {
+    } else if (this.roundN(item.mos) >= item.minMos && this.roundN(item.mos) <= item.maxMos) {
       return { backgroundColor: legendcolor[2].color }
-    } else if (this.roundN(item.mos)>item.maxMos) {
+    } else if (this.roundN(item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color }
-    } 
+    }
   }
 
   exportPDF = () => {
@@ -371,7 +381,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -400,18 +410,21 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-            align: 'left'
-          })
-          doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          // doc.text(i18n.t('static.program.realm') + ' : ' + document.getElementById("realmId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          //   align: 'left'
+          // })
+          doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
 
           var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join(' , '), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+          var len = 140 + (planningText.length * 10)
+          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-var len=160+(planningText.length*10)
+          var len = len+10 + (planningText.length * 10)
           var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8,len , planningText)
+          doc.text(doc.internal.pageSize.width / 8, len, planningText)
 
         }
 
@@ -432,7 +445,7 @@ var len=160+(planningText.length*10)
     var data = [];
     this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
-    var startY = 150 + (this.state.countryValues.length * 2) + this.state.tracerCategoryLabels.length*3
+    var startY = 150 + (this.state.countryValues.length * 2) + this.state.tracerCategoryLabels.length * 3
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,
@@ -471,7 +484,20 @@ var len=160+(planningText.length*10)
     })
   }
 
+  handleChangeProgram(programIds) {
+    programIds = programIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      programValues: programIds.map(ele => ele),
+      programLabels: programIds.map(ele => ele.label)
+    }, () => {
 
+      this.filterData()
+
+    })
+
+  }
 
 
   handleChange(countrysId) {
@@ -501,16 +527,18 @@ var len=160+(planningText.length*10)
   filterData = () => {
     let countrysId = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
-    let realmId = document.getElementById('realmId').value
+    let realmId = AuthenticationService.getRealmId()
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
+    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
     console.log(realmId)
-    if (realmId > 0 && this.state.countryValues.length > 0 && this.state.tracerCategoryValues.length > 0) {
+    if (realmId > 0 && this.state.countryValues.length > 0 && this.state.tracerCategoryValues.length > 0 && this.state.programValues.length > 0) {
       this.setState({ loading: true })
       var inputjson = {
         "realmCountryIds": countrysId,
         "tracerCategoryIds": tracercategory,
+        "programIds": programIds,
         "realmId": realmId,
         "dt": date, "useApprovedSupplyPlanOnly": useApprovedVersion
 
@@ -537,19 +565,19 @@ var len=160+(planningText.length*10)
           //console.log('data',data);
           this.setState({
             selData: response.data, message: '',
-          loading: false
-          },() => {
+            loading: false
+          }, () => {
             this.filterDataAsperstatus()
 
-        })
+          })
         }).catch(
           error => {
             this.setState({
               selData: [], loading: false
-            },() => {
+            }, () => {
               this.filterDataAsperstatus()
 
-          })
+            })
             if (error.message === "Network Error") {
               this.setState({
                 message: 'static.unkownError',
@@ -614,13 +642,16 @@ var len=160+(planningText.length*10)
       // );
     }
     else if (realmId <= 0) {
-      this.setState({ message: i18n.t('static.common.realmtext'), data: [],selData:[] });
+      this.setState({ message: i18n.t('static.common.realmtext'), data: [], selData: [] });
 
     } else if (this.state.countryValues.length == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext'), data: [],selData:[] });
+      this.setState({ message: i18n.t('static.program.validcountrytext'), data: [], selData: [] });
+
+    } else if (this.state.programValues.length == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram'), data:[],selData: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [],selData:[] });
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [], selData: [] });
     }
 
 
@@ -631,45 +662,46 @@ var len=160+(planningText.length*10)
     console.log(stockStatusId)
     var filteredData = []
     if (stockStatusId != -1) {
-  
-        this.state.selData.map(ele1 => {
-          var filterProgramData=[]
-          ele1.programData.map(ele=>{
-            console.log(ele)
-            var min = ele.minMos
-            var max = ele.maxMos
-            //  var reorderFrequency = ele.reorderFrequency
-            if (stockStatusId == 0) {
-                if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
-                    console.log('in 0')
-                    filterProgramData.push(ele)
-                }
-            } else if (stockStatusId == 1) {
-                if ((ele.mos != null &&this.roundN(ele.mos) != 0&& this.roundN(ele.mos) < min)) {
-                    console.log('in 1')
-                    filterProgramData.push(ele)
-                }
-            } else if (stockStatusId == 3) {
-                if (this.roundN(ele.mos) > max) {
-                    console.log('in 2')
-                    filterProgramData.push(ele)
-                }
-            } else if (stockStatusId == 2) {
-                if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
-                    console.log('in 3')
-                    filterProgramData.push(ele)
-                }
-            }})
-            if(filterProgramData.length>0){
-filteredData.push({
-  planningUnit:ele1.planningUnit,
-  programData:filterProgramData
-})
+
+      this.state.selData.map(ele1 => {
+        var filterProgramData = []
+        ele1.programData.map(ele => {
+          console.log(ele)
+          var min = ele.minMos
+          var max = ele.maxMos
+          //  var reorderFrequency = ele.reorderFrequency
+          if (stockStatusId == 0) {
+            if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
+              console.log('in 0')
+              filterProgramData.push(ele)
             }
-             
-        });
+          } else if (stockStatusId == 1) {
+            if ((ele.mos != null && this.roundN(ele.mos) != 0 && this.roundN(ele.mos) < min)) {
+              console.log('in 1')
+              filterProgramData.push(ele)
+            }
+          } else if (stockStatusId == 3) {
+            if (this.roundN(ele.mos) > max) {
+              console.log('in 2')
+              filterProgramData.push(ele)
+            }
+          } else if (stockStatusId == 2) {
+            if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
+              console.log('in 3')
+              filterProgramData.push(ele)
+            }
+          }
+        })
+        if (filterProgramData.length > 0) {
+          filteredData.push({
+            planningUnit: ele1.planningUnit,
+            programData: filterProgramData
+          })
+        }
+
+      });
     } else {
-        filteredData = this.state.selData
+      filteredData = this.state.selData
     }
     console.log(filteredData)
     let planningUnits = [...new Set(filteredData.map(ele => ele.planningUnit))]
@@ -677,19 +709,19 @@ filteredData.push({
     //let programs=[...new Set((response.data.map(ele=> ele.programData.program.code)).flat(1))]
     let programs = [...new Set((filteredData.map(ele => ele.programData.map(ele1 => ele1.program.code))).flat(1))]
     console.log('programs', JSON.stringify(programs));
-   
+
     this.setState({
-        data: filteredData,
-        programs: programs,
-        planningUnits: planningUnits
+      data: filteredData,
+      programLst: programs,
+      planningUnits: planningUnits
     })
 
-}
+  }
 
 
   getCountrys = () => {
     // AuthenticationService.setupAxiosInterceptors();
-    let realmId = document.getElementById('realmId').value
+    let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
     RealmCountryService.getRealmCountryForProgram(realmId)
       .then(response => {
         this.setState({
@@ -767,7 +799,7 @@ filteredData.push({
   getTracerCategoryList() {
 
     // AuthenticationService.setupAxiosInterceptors();
-    let realmId = document.getElementById('realmId').value
+    let realmId = AuthenticationService.getRealmId()//document.getElementById('realmId').value
     TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
       if (response.status == 200) {
@@ -839,10 +871,68 @@ filteredData.push({
   }
 
   componentDidMount() {
+    this.getPrograms()
+    this.getCountrys();
+    this.getTracerCategoryList();
     // AuthenticationService.setupAxiosInterceptors();
-    this.getRelamList();
+    //  this.getRelamList();
 
   }
+
+  getPrograms = () => {
+
+    ProgramService.getProgramList()
+      .then(response => {
+        console.log(JSON.stringify(response.data))
+        this.setState({
+          programs: response.data, loading: false
+        })
+      }).catch(
+        error => {
+          this.setState({
+            programs: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+
+  }
+
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
@@ -886,13 +976,24 @@ filteredData.push({
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { tracerCategories } = this.state;
-    const { realmList } = this.state;
-    let realms = realmList.length > 0
-      && realmList.map((item, i) => {
+    // const { realmList } = this.state;
+    // let realms = realmList.length > 0
+    //   && realmList.map((item, i) => {
+    //     return (
+    //       <option key={i} value={item.realmId}>
+    //         {getLabelText(item.label, this.state.lang)}
+    //       </option>
+    //     )
+    //   }, this);
+
+    const { programs } = this.state;
+    let programList = [];
+    programList = programs.length > 0
+      && programs.map((item, i) => {
         return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
+
+          { label: getLabelText(item.label, this.state.lang), value: item.programId }
+
         )
       }, this);
 
@@ -936,7 +1037,7 @@ filteredData.push({
                       </div>
 
                     </FormGroup>
-                    <FormGroup className="col-md-3">
+                    {/* <FormGroup className="col-md-3">
                       <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
                       <div className="controls ">
                         <InputGroup>
@@ -952,7 +1053,7 @@ filteredData.push({
 
                         </InputGroup>
                       </div>
-                    </FormGroup>
+                    </FormGroup> */}
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -974,6 +1075,27 @@ filteredData.push({
                     </FormGroup>
 
                     <FormGroup className="col-md-3">
+                      <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+
+                      <MultiSelect
+
+                        bsSize="sm"
+                        name="programIds"
+                        id="programIds"
+                        value={this.state.programValues}
+                        onChange={(e) => { this.handleChangeProgram(e) }}
+                        options={programList && programList.length > 0 ? programList : []}
+                      />
+                      {!!this.props.error &&
+                        this.props.touched && (
+                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                        )}
+
+                    </FormGroup>
+
+
+                    <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -985,11 +1107,11 @@ filteredData.push({
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
                           options=
-                          {tracerCategories.length > 0?
-                             tracerCategories.map((item, i) => {
+                          {tracerCategories.length > 0 ?
+                            tracerCategories.map((item, i) => {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
 
-                            }, this):[]} />
+                            }, this) : []} />
 
                       </div>
                     </FormGroup>
@@ -1012,32 +1134,32 @@ filteredData.push({
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="stockStatusId"
-                                                            id="stockStatusId"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.filterDataAsperstatus() }}
-                                                        >
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="stockStatusId"
+                            id="stockStatusId"
+                            bsSize="sm"
+                            onChange={(e) => { this.filterDataAsperstatus() }}
+                          >
 
-                                                            <option value="-1">{i18n.t('static.common.all')}</option>
-                                                            {legendcolor.length > 0
-                                                                && legendcolor.map((item, i) => {
-                                                                    return (
-                                                                        <option key={i} value={item.value}>
-                                                                            {item.text}
-                                                                        </option>
-                                                                    )
-                                                                }, this)
-                                                            }
-                                                        </Input>
+                            <option value="-1">{i18n.t('static.common.all')}</option>
+                            {legendcolor.length > 0
+                              && legendcolor.map((item, i) => {
+                                return (
+                                  <option key={i} value={item.value}>
+                                    {item.text}
+                                  </option>
+                                )
+                              }, this)
+                            }
+                          </Input>
 
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
                     <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                       <ul className="legendcommitversion list-group">
                         {
@@ -1066,7 +1188,7 @@ filteredData.push({
                             <tr>
                               <th className="text-center" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
                               {
-                                this.state.programs.map(ele => { return (<th className="text-center" style={{ width: ((100-27)/this.state.programs.length)+'%' }}>{ele}</th>) })}
+                                this.state.programLst.map(ele => { return (<th className="text-center" style={{ width: ((100 - 27) / this.state.programLst.length) + '%' }}>{ele}</th>) })}
                             </tr>
                           </thead>
 
@@ -1075,7 +1197,7 @@ filteredData.push({
                               this.state.planningUnits.map(
                                 ele => {
                                   return <tr><td>{getLabelText(ele.label, this.state.lang)}</td>{
-                                    this.state.programs.map(ele1 => {
+                                    this.state.programLst.map(ele1 => {
                                       return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
                                         item => {
                                           return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos)}</td>)
