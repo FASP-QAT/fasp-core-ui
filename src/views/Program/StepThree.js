@@ -51,6 +51,7 @@ export default class StepThree extends Component {
         this.state = {
             healthAreaList: []
         }
+        this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
 
     touchAllThree(setTouched, errors) {
@@ -75,9 +76,16 @@ export default class StepThree extends Component {
         }
     }
 
+    generateHealthAreaCode(event) {
+        let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
+        // alert(healthAreaCode);
+        this.props.generateHealthAreaCode(healthAreaCode);
+    }
+
     getHealthAreaList() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
+        // ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
+        ProgramService.getHealthAreaListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -181,7 +189,7 @@ export default class StepThree extends Component {
                                             name="healthAreaId"
                                             id="healthAreaId"
                                             className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateHealthAreaCode(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmHealthArea}

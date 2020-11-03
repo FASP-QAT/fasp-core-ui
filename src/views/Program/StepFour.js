@@ -52,6 +52,7 @@ export default class StepFour extends Component {
         this.state = {
             organisationList: []
         }
+        this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
     }
 
     touchAllFour(setTouched, errors) {
@@ -76,9 +77,16 @@ export default class StepFour extends Component {
         }
     }
 
+    generateOrganisationCode(event) {
+        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        // alert(organisationCode);
+        this.props.generateOrganisationCode(organisationCode);
+    }
+
     getOrganisationList() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
+        // ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
+        ProgramService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -182,7 +190,7 @@ export default class StepFour extends Component {
                                             name="organisationId"
                                             id="organisationId"
                                             className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateOrganisationCode(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmOrganisation}
