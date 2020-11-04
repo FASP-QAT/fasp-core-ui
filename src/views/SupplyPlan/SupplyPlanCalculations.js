@@ -80,8 +80,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     programPlanningUnitList = [];
                 }
                 console.log("Filtered planning unit list", programPlanningUnitList);
+                programPlanningUnitList = programPlanningUnitList.filter(c => c != undefined);
                 // Loop across filtered planning unit
                 for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
+                    console.log("D----------------------------->PlanningUnitId", programPlanningUnitList[ppL].planningUnit.id)
                     // Getting max data entry date
                     var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
                     var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
@@ -253,7 +255,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Adding erp shipments
-                                console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty);
+                                console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty, "Planning unit", shipmentArr[j].planningUnit.id, "Shipmentg sttays", shipmentArr[j].shipmentStatus.id, "Shipment Ud", shipmentArr[j].shipmentId);
                                 erpTotalQty += parseInt((shipmentArr[j].shipmentQty));
                                 console.log("D Shipment Arr----------------->ErpTotalQty", erpTotalQty);
                                 // Adding shipments based on status
