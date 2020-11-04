@@ -1037,19 +1037,19 @@ export default class WhatIfReportComponent extends React.Component {
     exportCSV = () => {
 
         var csvRow = [];
-        csvRow.push("\"" +(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label).replaceAll(' ', '%20')+ "\"")
+        csvRow.push("\"" + (i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label).replaceAll(' ', '%20') + "\"")
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
         csvRow.push('')
 
-        csvRow.push( "\""+(i18n.t('static.planningunit.planningunit') + ' : ' + ((this.state.planningUnit).label)).replaceAll(' ', '%20')+ "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.minMonthsOfStock").replaceAll(' ', '%20') + ' : ' + this.state.minMonthsOfStock + "\"")
-        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
-        csvRow.push("\"" + i18n.t("static.report.mospast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
-        csvRow.push("\"" + i18n.t("static.report.mosfuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
+        csvRow.push("\"" + (i18n.t('static.planningunit.planningunit') + ' : ' + ((this.state.planningUnit).label)).replaceAll(' ', '%20') + "\"")
+        csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
+        csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
+        csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
+        csvRow.push("\"" + i18n.t("static.supplyPlan.monthsOfStock").replaceAll(' ', '%20') + ' : ' + this.state.minMonthsOfStock + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
+        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
 
         csvRow.push('')
@@ -1176,22 +1176,22 @@ export default class WhatIfReportComponent extends React.Component {
                     doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 10, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.supplyPlan.minMonthsOfStock') + ' : ' + this.state.minMonthsOfStock, doc.internal.pageSize.width / 10, 100, {
+                    doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + this.state.monthsInPastForAMC, doc.internal.pageSize.width / 10, 100, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.reorderFrequencyInMonths') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 110, {
+                    doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + this.state.monthsInFutureForAMC, doc.internal.pageSize.width / 10, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mospast') + ' : ' + this.state.monthsInPastForAMC, doc.internal.pageSize.width / 10, 120, {
+                    doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 120, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.mosfuture') + ' : ' + this.state.monthsInFutureForAMC, doc.internal.pageSize.width / 10, 130, {
+                    doc.text(i18n.t('static.supplyPlan.monthsOfStock') + ' : ' + this.state.minMonthsOfStock, doc.internal.pageSize.width / 10, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.supplyPlan.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 140, {
+                    doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 140, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 150, {
+                    doc.text(i18n.t('static.report.reorderFrequencyInMonths') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 150, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 160, {
@@ -4200,16 +4200,18 @@ export default class WhatIfReportComponent extends React.Component {
                                     <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
+                                    <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
+                                    <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                                 </ul>
                             </FormGroup>
                             <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                                 <ul className="legendcommitversion list-group">
-                                    <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.minMonthsOfStock")} : {this.state.minMonthsOfStock}</span></li>
-                                    <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mospast")} : {this.state.monthsInPastForAMC}</span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.mosfuture")} : {this.state.monthsInFutureForAMC}</span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.shelfLife")} : {this.state.shelfLife}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPast")} : {this.state.monthsInPastForAMC}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcFuture")} : {this.state.monthsInFutureForAMC}</span></li>
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
+                                    <li><span className="lightgreylegend "></span> <span className="legendcommitversionText"> {i18n.t("static.supplyPlan.monthsOfStock")} : {this.state.minMonthsOfStock}</span></li>
                                     <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
+                                    <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.reorderFrequencyInMonths")} : {this.state.reorderFrequency}</span></li>
                                     <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
                                 </ul>
                             </FormGroup>
