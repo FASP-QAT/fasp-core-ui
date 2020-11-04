@@ -12,6 +12,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+    getProgramListAll() {
+        return axios.get(`${API_URL}/api/program/all`, {
+        });
+    }
     loadProgramList() {
         return axios.get(`${API_URL}/api/loadProgram/`, {
         });
