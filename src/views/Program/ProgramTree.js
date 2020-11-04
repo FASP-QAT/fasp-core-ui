@@ -52,7 +52,8 @@ class Program extends Component {
             color: '',
             lang: localStorage.getItem('lang'),
             realmId: AuthenticationService.getRealmId(),
-            loading: true
+            loading: true,
+            programList:[]
         };
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -151,6 +152,57 @@ class Program extends Component {
     }
 
     componentDidMount() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                this.setState({
+                    // supplyPlanError: i18n.t('static.program.errortext'),
+                    // loading: false,
+                    // color: "red"
+                })
+                // this.hideFirstComponent()
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
+                        var programJson = {
+                            programId: programJson1.programId,
+                            versionId:programJson1.currentVersion.versionId
+                        }
+                        proList.push(programJson);
+                    }
+                }
+                console.log("D--------------->ProList", proList);
+                this.setState({
+                    programList: proList,
+                    // loading: false
+                })
+            }.bind(this)
+        }.bind(this)
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
             // AuthenticationService.setupAxiosInterceptors();
@@ -534,13 +586,13 @@ class Program extends Component {
                                                 {
                                                     this.state.countryList.map(item => (
                                                         <li>
-                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.realmCountry.id)} />
+                                                            <input type="checkbox" id={"c1-".concat(item.realmCountry.id)} />
                                                             <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
                                                                     item.healthAreaList.map(item1 => (
                                                                         <li>
-                                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
+                                                                            <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
                                                                             <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
@@ -552,7 +604,8 @@ class Program extends Component {
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
                                                                                                         <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
-                                                                                                        <label htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                        {console.log("D------------>this.state.programList",this.state.programList,"Condition------->",this.state.programList.filter(c=>c.programId==item2.program.id && c.versionId==Math.max.apply(Math, item2.versionList.map(function(o) { return o.versionId; }))).length)}
+                                                                                                        <label className={this.state.programList.filter(c=>c.programId==item2.program.id && c.versionId==Math.max.apply(Math, item2.versionList.map(function(o) { return o.versionId; }))).length>0?"greenColor":this.state.programList.filter(c=>c.programId==item2.program.id).length>0?"redColor":""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>

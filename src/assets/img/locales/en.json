@@ -1458,7 +1458,9 @@
     "static.commitVersion.problemReportId":"Problem Report Id",
     "static.button.commit":"Commit",
     "static.inventory.notAllowedForFutureMonths":"Inventory is not allowed for future months",
-    "static.problemActionReport.problemCategory":"Problem Category"
+    "static.problemActionReport.problemCategory":"Problem Category",
+    "static.supplyPlan.amcPast":"AMC (months in past)",
+    "static.supplyPlan.amcFuture":"AMC (months in future)"
 
     
 }
