@@ -52,6 +52,7 @@ export default class Steptwo extends Component {
         this.state = {
             realmCountryList: []
         }
+        this.generateCountryCode = this.generateCountryCode.bind(this);
 
     }
 
@@ -75,6 +76,12 @@ export default class Steptwo extends Component {
                 break
             }
         }
+    }
+
+    generateCountryCode(event) {
+        let realmCountryCode = this.state.realmCountryList.filter(c => (c.realmCountryId == event.target.value))[0].country.countryCode;
+        // alert(realmCountryCode);
+        this.props.generateCountryCode(realmCountryCode);
     }
 
     getRealmCountryList() {
@@ -175,7 +182,7 @@ export default class Steptwo extends Component {
                                         <Input
                                             valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e); this.generateCountryCode(e) }}
                                             bsSize="sm"
                                             className="col-md-4"
                                             onBlur={handleBlur}

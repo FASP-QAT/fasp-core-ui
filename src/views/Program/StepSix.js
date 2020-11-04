@@ -152,6 +152,10 @@ export default class StepSix extends Component {
         }
     }
 
+    componentDidMount() {
+        // console.log("SIX------", this.props.items.realmCountryCode);
+    }
+
     getProgramManagerList() {
 
         // AuthenticationService.setupAxiosInterceptors();
@@ -205,6 +209,30 @@ export default class StepSix extends Component {
                     }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' autocomplete="off">
                                 <Row>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
+                                        <Input
+                                            type="text" name="programCode"
+                                            bsSize="sm"
+                                            disabled
+                                            value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode + "-"}
+                                            id="programCode" />
+                                        <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company"></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            // valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
+                                            // invalid={touched.airFreightPerc && !!errors.airFreightPerc}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="text"
+                                            maxLength={6}
+                                            name="programCode1" id="programCode1" />
+                                        <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                    </FormGroup>
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -362,10 +390,10 @@ export default class StepSix extends Component {
                                         &nbsp;
                                          <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
 
-                                        </FormGroup>
-                                    </Row>
-                                </Form>
-                            )} />
+                                    </FormGroup>
+                                </Row>
+                            </Form>
+                        )} />
 
             // </>
         );

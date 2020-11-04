@@ -140,6 +140,15 @@ class ProgramService {
         );
 
     }
+    getHealthAreaListByRealmCountryId(json) {
+        return axios.get(`${API_URL}/api/healthArea/realmCountryId/${json}`, {}
+        );
+    }
+
+    getOrganisationListByRealmCountryId(json) {
+        return axios.get(`${API_URL}/api/organisation/realmCountryId/${json}`, {}
+        );
+    }
 
 }
 export default new ProgramService()
