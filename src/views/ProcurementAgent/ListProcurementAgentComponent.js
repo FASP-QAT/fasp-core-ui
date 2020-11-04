@@ -712,7 +712,7 @@ class ListProcurementAgentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 200, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 100, 130, 100, 80, 100, 80, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
