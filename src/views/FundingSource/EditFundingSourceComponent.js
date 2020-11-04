@@ -381,7 +381,7 @@ class EditFundingSourceComponent extends Component {
 
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
-                                                        <FormGroup check inline>
+                                                        <FormGroup check inline className="ml-5">
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="radio"
