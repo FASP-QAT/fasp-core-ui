@@ -777,7 +777,7 @@ export default class ConsumptionDetails extends React.Component {
                     this.el.destroy();
                 });
         }
-        else if (problemStatusId == 0) {
+        else if (problemStatusIds != []) {
             this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
