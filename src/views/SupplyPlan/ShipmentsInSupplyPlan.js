@@ -298,6 +298,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             console.log("Total shipment qty", totalShipmentQty);
                                             console.log("shipmentList[i].receivedDate", shipmentList[i].receivedDate);
+                                            console.log("D--------------->", shipmentList[i].shippedDate);
                                             var shipmentDatesJson = {
                                                 plannedDate: shipmentList[i].plannedDate,
                                                 submittedDate: shipmentList[i].submittedDate,
@@ -727,16 +728,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                                                                         receivedDate = null;
                                                                     }
-                                                                    if (shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                    if (shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                                                                         arrivedDate = null;
                                                                     }
-                                                                    if (shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                    if (shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                                                                         shippedDate = null;
                                                                     }
-                                                                    if (shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                    if (shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                                                                         approvedDate = null;
                                                                     }
-                                                                    if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS || shipmentStatus != APPROVED_SHIPMENT_STATUS || shipmentStatus != SHIPPED_SHIPMENT_STATUS || shipmentStatus != ARRIVED_SHIPMENT_STATUS || shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                    if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                                                                         submittedDate = null;
                                                                     }
                                                                     console.log("Shipment Dates", shipmentDates);
@@ -2016,6 +2017,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 1) {
+            this.props.updateState("shipmentBatchInfoDuplicateError", "");
+            positiveValidation("A", y, elInstance);
             if (rowData[9].toString() == "true") {
                 if (rowData[0] != rowData[7] || rowData[1] != rowData[8]) {
                     elInstance.setValueFromCoords(6, y, 0, true);

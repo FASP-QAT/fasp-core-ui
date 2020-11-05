@@ -1298,7 +1298,7 @@
     "static.common.percentageregex": "Only numbers between 0 to 100 are allowed",
     "static.supplyPlan.daysOfStockMaxValue": "Enter value which is less than or equal to 31",
     "static.supplyPlan.noActualConsumptionForFuture": "Actual consumption is not allowed for future months",
-    "static.unit.multiplierFromARUTOPU": "Multiplier (From ARU to PU)",
+    "static.unit.multiplierFromARUTOPU": "Conversion Factor (From ARU to PU)",
     "static.supplyPlan.quantityPU": " Quantity (PU)",
     "static.common.max30digittext": "Maximum 30 characters only",
     "static.procurementUnit.volumeUnit": "Volume Unit",
@@ -1458,7 +1458,10 @@
     "static.commitVersion.problemReportId":"Problem Report Id",
     "static.button.commit":"Commit",
     "static.inventory.notAllowedForFutureMonths":"Inventory is not allowed for future months",
-    "static.problemActionReport.problemCategory":"Problem Category"
+    "static.problemActionReport.problemCategory":"Problem Category",
+    "static.supplyPlan.amcPast":"AMC (months in past)",
+    "static.supplyPlan.amcFuture":"AMC (months in future)",
+    "static.commitVersion.cannotCommitWithOpenProblems":"You cannot commit a version with open problems."
 
     
 }
