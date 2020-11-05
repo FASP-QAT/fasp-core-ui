@@ -234,6 +234,10 @@ export default class SyncMasterData extends Component {
                                 } else {
                                     console.log("In else");
                                     problemReportList[index].reviewed = problemReportArray[pr].reviewed;
+                                    problemReportList[index].problemStatus.id=problemReportArray[pr].problemStatus.id;
+                                    problemReportList[index].reviewNotes=problemReportArray[pr].reviewNotes;
+                                    problemReportList[index].reviewedDate=problemReportArray[pr].reviewedDate;
+
                                     console.log("problemReportList[index]", problemReportList[index]);
                                     var problemReportTransList = problemReportList[index].problemTransList;
                                     console.log("Problem report trans list", problemReportTransList)

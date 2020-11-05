@@ -196,7 +196,7 @@ class EditSupplyPlanStatus extends Component {
             },
             statuses: [],
             regionList: [],
-            editable:false
+            editable: false
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -1697,7 +1697,7 @@ class EditSupplyPlanStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
-                console.log("===========>",response.data)
+                console.log("===========>", response.data)
                 let { program } = this.state
                 program = response.data
                 var regionList = []
@@ -1713,7 +1713,7 @@ class EditSupplyPlanStatus extends Component {
                     program,
                     regionList: regionList,
                     data: response.data.problemReportList,
-                    editable:program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 ? true : false
+                    editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 ? true : false
 
                 }, () => {
                     this.getPlanningUnit()
@@ -2633,8 +2633,8 @@ class EditSupplyPlanStatus extends Component {
     }
 
     getNote(row, lang) {
-        var transList = row.problemTransList;
-        var listLength = row.problemTransList.length;
+        var transList = row.problemTransList.filter(c=>c.reviewed==false);
+        var listLength = transList.length;
         return transList[listLength - 1].notes;
     }
 
@@ -2656,58 +2656,82 @@ class EditSupplyPlanStatus extends Component {
         var problemReportFilterList = problemReportList;
         console.log("problemReportList====>", problemReportList);
         if (problemStatusId != 0) {
+            if (problemStatusId == -1) {
+                problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
+            } else {
+                if (problemStatusId == 2) {
+                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                    problemReportFilterList = problemReportFilterList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
+                } else {
+                    problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == problemStatusId);
+                }
+            }
+            if (reviewedStatusId != -1) {
+                if (reviewedStatusId == 0) {
+                    problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                } else {
+                    problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                }
+            }
+            this.setState({
+                problemList: problemReportFilterList,
+                message: ''
+            },
+                () => {
+                    this.buildJExcel();
+                });
 
-            if (problemStatusId == -1 && reviewedStatusId == 0) {
-                problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == false);
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            }
-            else if (problemStatusId != -1 && reviewedStatusId == 0) {
-                if (problemStatusId == 2) {
-                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                    // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-                    problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == false);
-                } else {
-                    problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == false);
-                }
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            } else if (problemStatusId == -1 && reviewedStatusId == 1) {
-                problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == true);
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            }
-            else if (problemStatusId != -1 && reviewedStatusId == 1) {
-                if (problemStatusId == 2) {
-                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                    // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-                    problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == true);
-                } else {
-                    problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == true);
-                }
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            }
+            // if (problemStatusId == -1 && reviewedStatusId == 0) {
+            //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == false);
+            //     this.setState({
+            //         problemList: problemReportFilterList,
+            //         message: ''
+            //     },
+            //         () => {
+            //             this.buildJExcel();
+            //         });
+            // }
+            // else if (problemStatusId != -1 && reviewedStatusId == 0) {
+            //     if (problemStatusId == 2) {
+            //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+            //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+            //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == false);
+            //     } else {
+            //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == false);
+            //     }
+            //     this.setState({
+            //         problemList: problemReportFilterList,
+            //         message: ''
+            //     },
+            //         () => {
+            //             this.buildJExcel();
+            //         });
+            // } else if (problemStatusId == -1 && reviewedStatusId == 1) {
+            //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == true);
+            //     this.setState({
+            //         problemList: problemReportFilterList,
+            //         message: ''
+            //     },
+            //         () => {
+            //             this.buildJExcel();
+            //         });
+            // }
+            // else if (problemStatusId != -1 && reviewedStatusId == 1) {
+            //     if (problemStatusId == 2) {
+            //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+            //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+            //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == true);
+            //     } else {
+            //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == true);
+            //     }
+            //     this.setState({
+            //         problemList: problemReportFilterList,
+            //         message: ''
+            //     },
+            //         () => {
+            //             this.buildJExcel();
+            //         });
+            // }
 
 
 
@@ -3590,6 +3614,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (map.get("20") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
+                                            problemStatusId:map.get("12"),
                                             reviewed: map.get("18"),
                                             notes: map.get("19")
                                         });
@@ -3729,8 +3754,8 @@ class EditSupplyPlanStatus extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                   {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                    {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                     <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                     &nbsp;

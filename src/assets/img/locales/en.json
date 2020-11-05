@@ -862,8 +862,8 @@
     "static.commit.negativeStock": "Batches have negative stock!",
     "static.commit.erpDidNotMatch": "ERP mapping error",
     "static.commit.duplicateErp": "Duplicate ERP",
-    "static.report.approver": "Approver",
-    "static.report.approveddate": "Date Approved",
+    "static.report.approver": "Reviewer",
+    "static.report.approveddate": "Date Approved / Rejected",
     "static.report.stock": "Stock",
     "static.report.consupmtionqty": "Consumption Quantity",
     "static.report.amc": "AMC",
@@ -1458,7 +1458,9 @@
     "static.commitVersion.problemReportId":"Problem Report Id",
     "static.button.commit":"Commit",
     "static.inventory.notAllowedForFutureMonths":"Inventory is not allowed for future months",
-    "static.problemActionReport.problemCategory":"Problem Category"
+    "static.problemActionReport.problemCategory":"Problem Category",
+    "static.report.reviewNotes":"Latest Review Notes",
+    "static.report.reviewedDate":"Latest Reviewed Date"
 
     
 }

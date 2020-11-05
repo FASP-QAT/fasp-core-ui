@@ -31,6 +31,7 @@ import actualIcon from '../../assets/img/actual.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import MultiSelect from 'react-multi-select-component';
 const entityname = i18n.t('static.report.problem');
 
 
@@ -54,7 +55,8 @@ export default class ConsumptionDetails extends React.Component {
             planningUnitId: '',
             lang: localStorage.getItem('lang'),
             loading: false,
-            problemCategoryList: []
+            problemCategoryList: [],
+            problemStatusValues: [{label: "Open", value: 1},{label: "Addressed", value: 3}]
         }
 
         this.fetchData = this.fetchData.bind(this);
@@ -67,6 +69,7 @@ export default class ConsumptionDetails extends React.Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.updateState = this.updateState.bind(this);
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
+        this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
@@ -90,8 +93,8 @@ export default class ConsumptionDetails extends React.Component {
     componentDidMount = function () {
         // qatProblemActions();
         this.hideFirstComponent();
-        let problemStatusId = document.getElementById('problemStatusId').value;
-        console.log("problemStatusId ---------> ", problemStatusId);
+        // let problemStatusId = document.getElementById('problemStatusId').value;
+        // console.log("problemStatusId ---------> ", problemStatusId);
         const lan = localStorage.getItem("lang");
         var db1;
         getDatabase();
@@ -208,8 +211,11 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     buildJExcel() {
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.data;
-        console.log("problemList---->", problemList);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
+        // console.log("problemListDate---->",problemListDate);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
 
@@ -232,10 +238,14 @@ export default class ConsumptionDetails extends React.Component {
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-            data[17] = problemList[j].problemType.id
-            data[18] = problemList[j].reviewed
-          
-            // data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+
+            data[17] = problemList[j].reviewed
+            data[20] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+            // data[20] = problemList[j].problemType.id
+            data[18] = problemList[j].reviewNotes
+            data[19] = problemList[j].reviewedDate
+
+
             problemArray[count] = data;
             count++;
         }
@@ -252,7 +262,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 10, 50, 10, 100, 10, 50, 180, 180, 50, 100],
+            colWidths: [10, 10, 10, 10, 10, 100, 10, 50, 180, 180, 50, 100, 10, 10, 10, 10, 10, 50, 100, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -269,7 +279,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'text',
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.region.region'),
@@ -319,10 +329,7 @@ export default class ConsumptionDetails extends React.Component {
                     title: 'actionUrl',
                     type: 'hidden',
                 },
-                {
-                    title: 'criticalitiId',
-                    type: 'hidden',
-                },
+
                 {
                     title: 'Problem Type',
                     type: 'hidden',
@@ -330,9 +337,23 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-                    
+
                 },
-               
+                {
+                    title: i18n.t('static.report.reviewNotes'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.reviewedDate'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.Criticality'),
+                    type: 'text',
+                },
+
 
 
             ],
@@ -367,11 +388,11 @@ export default class ConsumptionDetails extends React.Component {
                 var items = [];
                 if (y != null) {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
-                    if (obj.options.allowInsertRow == true && this.el.getValueFromCoords(12, y) != 2) {
+                    if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
                         items.push({
                             title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
-                                let problemStatusId = document.getElementById('problemStatusId').value;
+                                // let problemStatusId = document.getElementById('problemStatusId').value;
                                 let problemTypeId = document.getElementById('problemTypeId').value;
                                 var index = 0;
                                 if (this.el.getValueFromCoords(1, y) == "") {
@@ -414,16 +435,18 @@ export default class ConsumptionDetails extends React.Component {
     }
     exportCSV(columns) {
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"');
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        // csvRow.push('"' + (i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        this.state.problemStatusValues.map(ele =>
+            csvRow.push('"'+(i18n.t('static.report.problemStatus') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20')+'"'))
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.problemActionReport.problemCategory') + ' , ' + document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.problemActionReport.problemCategory') + ' , ' + document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
         headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
@@ -499,9 +522,12 @@ export default class ConsumptionDetails extends React.Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
+                    // doc.text(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    //     align: 'left'
+                    // })
+                    var statusText = doc.splitTextToSize((i18n.t('static.report.problemStatus') + ' : ' + (this.state.problemStatusValues.map(ele => ele.label)).join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 130, statusText)
+
                     doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
@@ -579,7 +605,7 @@ export default class ConsumptionDetails extends React.Component {
             if (this.state.data.length != 0) {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
-                    if (this.el.getValueFromCoords(12, x) != 2) {
+                    if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
                         console.log("onclick------>", this.el.getValueFromCoords(12, x));
                         var planningunitId = this.el.getValueFromCoords(13, x);
                         var programId = document.getElementById('programId').value;
@@ -615,25 +641,26 @@ export default class ConsumptionDetails extends React.Component {
         var elInstance = instance.jexcel;
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P','S']
+            // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
+            var colArr = ['U']
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
             var problemStatusId = rowData[12];
-            if (criticalityId == 3 && problemStatusId != 2) {
+            if (criticalityId == 3 && problemStatusId != 4 && problemStatusId != 2) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
                     let textColor = contrast('#f48282');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (criticalityId == 2 && problemStatusId != 2) {
+            } else if (criticalityId == 2 && problemStatusId != 4 && problemStatusId != 2) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
                     let textColor = contrast('orange');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (criticalityId == 1 && problemStatusId != 2) {
+            } else if (criticalityId == 1 && problemStatusId != 4 && problemStatusId != 2) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
@@ -677,12 +704,15 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.destroy();
             });
         let programId = document.getElementById('programId').value;
-        let problemStatusId = document.getElementById('problemStatusId').value;
+        // let problemStatusId = document.getElementById('problemStatusId').value;
+        let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
+        // let problemStatusId =-1;
         let problemTypeId = document.getElementById('problemTypeId').value;
         let problemCategoryId = document.getElementById('problemCategoryId').value;
+        let reviewedCheck = document.getElementById('reviewedStatusId').value;
 
         this.setState({ programId: programId });
-        if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0 && problemCategoryId != 0) {
+        if (parseInt(programId) != 0 && problemStatusIds != [] && problemTypeId != 0 && problemCategoryId != 0) {
 
             var db1;
             getDatabase();
@@ -714,23 +744,19 @@ export default class ConsumptionDetails extends React.Component {
                     var problemReportList = (programJson.problemReportList);
                     var problemReportFilterList = problemReportList;
 
-                    console.log("problemList===========>",problemReportList);
+                    console.log("problemList===========>", problemReportList);
 
-                    if(problemStatusId==-1){
-                        problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
-                    }else{
-                        if (problemStatusId == 2) {
-                            var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                            problemReportFilterList = problemReportFilterList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
-                        } else {
-                            problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == problemStatusId);
-                        }
+                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
+
+                    if (problemTypeId != -1) {
+                        problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
                     }
-                    if(problemTypeId !=-1){
-                        problemReportFilterList=problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
+                    if (problemCategoryId != -1) {
+                        problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
                     }
-                    if(problemCategoryId !=-1){
-                        problemReportFilterList=problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
+                    if (reviewedCheck != -1) {
+                        problemReportFilterList = problemReportFilterList.filter(c => (c.reviewed == reviewedCheck));
                     }
 
                     this.setState({
@@ -767,17 +793,17 @@ export default class ConsumptionDetails extends React.Component {
         }
     }
 
-    editProblem(problem, index) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-            let problemStatusId = document.getElementById('problemStatusId').value;
-            let problemTypeId = document.getElementById('problemTypeId').value;
-            this.props.history.push({
-                pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
-                // state: { language }
-            });
-        }
+    // editProblem(problem, index) {
+    //     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+    //         let problemStatusId = document.getElementById('problemStatusId').value;
+    //         let problemTypeId = document.getElementById('problemTypeId').value;
+    //         this.props.history.push({
+    //             pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
+    //             // state: { language }
+    //         });
+    //     }
 
-    }
+    // }
 
     addMannualProblem() {
         console.log("-------------------addNewProblem--------------------");
@@ -817,9 +843,24 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     getNote(row, lang) {
-        var transList = row.problemTransList;
-        var listLength = row.problemTransList.length;
+        var transList = row.problemTransList.filter(c => c.reviewed == false);
+        var listLength = transList.length;
         return transList[listLength - 1].notes;
+    }
+    handleProblemStatusChange = (event) => {
+        console.log('***', event)
+        var problemStatusIds = event
+        problemStatusIds = problemStatusIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            problemStatusValues: problemStatusIds.map(ele => ele),
+            problemStatusLabels: problemStatusIds.map(ele => ele.label)
+        }, () => {
+            console.log("problemStatusValues===>",this.state.problemStatusValues);
+            this.fetchData()
+        })
+
     }
 
     render() {
@@ -840,12 +881,19 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
 
+        // const { problemStatusList } = this.state;
+        // let problemStatus = problemStatusList.length > 0
+        //     && problemStatusList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
+
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
             && problemStatusList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
+                return ({ label: item.name, value: item.id })
+
             }, this);
 
         const { problemCategoryList } = this.state;
@@ -1031,6 +1079,8 @@ export default class ConsumptionDetails extends React.Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
+                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />} &nbsp;
+                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
                                 {this.state.programId != 0 && <a href="javascript:void();" title="Recalculate" onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
                                 &nbsp;&nbsp;
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
@@ -1038,18 +1088,18 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    {this.state.data.length > 0 && <div className="Card-header-reporticon">
+                    {/* {this.state.data.length > 0 && <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
                         </div>
-                    </div>}
+                    </div>} */}
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1065,9 +1115,9 @@ export default class ConsumptionDetails extends React.Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1080,10 +1130,25 @@ export default class ConsumptionDetails extends React.Component {
                                             </Input>
                                         </InputGroup>
                                     </div>
+                                </FormGroup> */}
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls problemListSelectField">
+
+                                        <MultiSelect
+                                            name="problemStatusId"
+                                            id="problemStatusId"
+                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
+                                            value={this.state.problemStatusValues}
+                                            onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                            labelledBy={i18n.t('static.common.select')}
+                                        />
+                                    </div>
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1102,7 +1167,7 @@ export default class ConsumptionDetails extends React.Component {
 
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.problemActionReport.problemCategory')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1112,6 +1177,24 @@ export default class ConsumptionDetails extends React.Component {
                                             >
                                                 <option value="-1">{i18n.t("static.common.all")}</option>
                                                 {problemCategories}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlanReview.review')}</Label>
+                                    <div className="controls problemListSelectField">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                name="reviewedStatusId" id="reviewedStatusId"
+                                                onChange={this.fetchData}
+                                            // value={1}
+                                            >
+                                                <option value="-1">{i18n.t("static.common.all")}</option>
+                                                <option value="1">{i18n.t("static.program.yes")}</option>
+                                                <option value="0">{i18n.t("static.program.no")}</option>
+
                                             </Input>
                                         </InputGroup>
                                     </div>
