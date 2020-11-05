@@ -2017,6 +2017,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 1) {
+            this.props.updateState("shipmentBatchInfoDuplicateError", "");
+            positiveValidation("A", y, elInstance);
             if (rowData[9].toString() == "true") {
                 if (rowData[0] != rowData[7] || rowData[1] != rowData[8]) {
                     elInstance.setValueFromCoords(6, y, 0, true);
