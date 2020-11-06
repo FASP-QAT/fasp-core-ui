@@ -2633,7 +2633,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     getNote(row, lang) {
-        var transList = row.problemTransList.filter(c=>c.reviewed==false);
+        var transList = row.problemTransList.filter(c => c.reviewed == false);
         var listLength = transList.length;
         return transList[listLength - 1].notes;
     }
@@ -3609,64 +3609,72 @@ class EditSupplyPlanStatus extends Component {
                                 // console.log("problemList===>", json);
                                 // console.log("program===>", this.state.program);
                                 var reviewedProblemList = [];
+                                var isAllCheckForReviewed = true;
                                 for (var i = 0; i < json.length; i++) {
                                     var map = new Map(Object.entries(json[i]));
                                     if (map.get("20") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
-                                            problemStatusId:map.get("12"),
+                                            problemStatusId: map.get("12"),
                                             reviewed: map.get("18"),
                                             notes: map.get("19")
                                         });
                                     }
+                                    if (map.get("18") == false) {
+                                        isAllCheckForReviewed = false
+                                    }
                                 }
-                                console.log("reviewedProblemList===>", reviewedProblemList);
-                                ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                    .then(response => {
-                                        console.log("messageCode", response)
-                                        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                    })
-                                    .catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
+                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
+                                    console.log("reviewedProblemList===>", reviewedProblemList);
+                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                        .then(response => {
+                                            console.log("messageCode", response)
+                                            this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                        })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
                                                 }
                                             }
-                                        }
-                                    );
-
+                                        );
+                                } else {
+                                    alert("YOUR MESSAGE");
+                                }
 
                             }}
                             render={
