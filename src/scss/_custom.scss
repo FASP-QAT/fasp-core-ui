@@ -2571,6 +2571,11 @@ input::placeholder {
     background-color: red;
     border-color: 1px solid red;
   }
+
+  .greenlegend {
+    background-color: #118b70;
+    border-color: 1px solid #118b70;
+  }
   .skipedShipmentsEmegencylegend{
     background-color: #FA8072;
     border-color: 1px solid #FA8072;
@@ -3727,7 +3732,7 @@ background-color: yellow;
 }
 
 .greenColor{
-  color: green;
+  color: #118b70;
 }
 
 .redColor{
