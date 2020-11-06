@@ -1977,7 +1977,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </div>
                     } */}
 
-                    <CardBody className="">
+                    <CardBody className="pb-lg-5">
                         <Col md="3 pl-0">
 
                             <FormGroup className="Selectdiv mt-md-2 mb-md-0">
