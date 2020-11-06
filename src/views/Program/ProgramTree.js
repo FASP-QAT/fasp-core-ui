@@ -555,6 +555,11 @@ class Program extends Component {
                                 <strong>{i18n.t('static.program.download')}</strong>
                             </CardHeader> */}
                             <CardBody className="pb-lg-2 pt-lg-2">
+                                <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
+                                    <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
+                                    <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
@@ -614,7 +619,7 @@ class Program extends Component {
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
-                                                                                            {console.log("Item1------------>",item1),console.log("Item1------------>",item.realmCountry.id,"---------","fpm".concat(item.realmCountry.id).concat(item1.id))}
+                                                                                            {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))}
                                                                                             <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)} />
                                                                                             <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)}></label>
                                                                                             <ul>

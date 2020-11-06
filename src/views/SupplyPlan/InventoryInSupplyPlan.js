@@ -165,9 +165,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         inventoryEditable = false;
                     }
 
-                    if (this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
+                    if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
                         document.getElementById("addInventoryRowSupplyPlan").style.display = "none";
-                    } else if (this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == true) {
+                    } else if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == true) {
                         document.getElementById("addInventoryRowSupplyPlan").style.display = "block";
                     }
                     var paginationOption = false;
@@ -370,12 +370,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
                                             inventoryBatchEditable = false;
                                         }
-                                        document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
-                                        if (this.props.inventoryPage != "supplyPlanCompare") {
-                                            if (inventoryBatchEditable == false) {
-                                                document.getElementById("inventoryBatchAddRow").style.display = "none";
-                                            } else {
-                                                document.getElementById("inventoryBatchAddRow").style.display = "block";
+                                        if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+                                            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
+                                        }
+                                        if (document.getElementById("inventoryBatchAddRow") != null) {
+                                            if (this.props.inventoryPage != "supplyPlanCompare") {
+                                                if (inventoryBatchEditable == false) {
+                                                    document.getElementById("inventoryBatchAddRow").style.display = "none";
+                                                } else {
+                                                    document.getElementById("inventoryBatchAddRow").style.display = "block";
+                                                }
                                             }
                                         }
                                         for (var sb = 0; sb < batchInfo.length; sb++) {
@@ -1126,7 +1130,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 this.setState({
                     inventoryBatchInfoTableEl: ""
                 })
-                document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+                if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+                    document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+                }
                 if (this.props.inventoryPage == "inventoryDataEntry") {
                     this.props.toggleLarge("submit");
                 }
@@ -1226,10 +1232,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(16, y, 1, true);
-                }else{
+                } else {
                     if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                         inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
-                        valid=false
+                        valid = false
                     } else {
                         positiveValidation("A", y, elInstance);
                     }
