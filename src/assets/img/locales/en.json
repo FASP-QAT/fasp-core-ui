@@ -1450,7 +1450,6 @@
     "static.quantimed.importpercentage": "Import Percentage",
     "static.quantimed.regionPercentage": "Percentage of Quantimed Data to Import to Region (%)",
     "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecasted Consumption",
-    "static.problemList.problemStatus":"Open / Addressed",
     "static.ticket.addressedIssues": "Addressed Tickets",
     "static.quantimed.regionPercentagevalidation": "Please enter number between 1 to 100",
     "static.notsufficientaccess":"You tried to access a page that is protected and you do not have sufficient rights.", 
@@ -1461,7 +1460,9 @@
     "static.problemActionReport.problemCategory":"Problem Category",
     "static.supplyPlan.amcPast":"AMC (months in past)",
     "static.supplyPlan.amcFuture":"AMC (months in future)",
-    "static.commitVersion.cannotCommitWithOpenProblems":"You cannot commit a version with open problems."
-
-    
+    "static.commitVersion.cannotCommitWithOpenProblems":"You cannot commit a version with open problems.",
+    "static.loadProgram.oldVersion":"Older version is downloaded",
+    "static.loadProgram.latestVersion":"Latest version is downloaded",
+    "static.loadProgram.notDownloaded":"Program is not downloaded",
+    "static.problemList.problemStatus":"Open / Addressed"
 }
