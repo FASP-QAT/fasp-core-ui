@@ -516,7 +516,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             this.setState({
                                                                 batchInfoListAll: batchInfoListAll
                                                             })
-                                                            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
+                                                            if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
+                                                                document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
+                                                            }
                                                             this.el = jexcel(document.getElementById("shipmentBatchInfoTable"), '');
                                                             this.el.destroy();
                                                             var json = [];
@@ -537,7 +539,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 }
                                                             }
 
-                                                            if (this.props.shipmentPage == "shipmentDataEntry") {
+                                                            if (this.props.shipmentPage == "shipmentDataEntry" && document.getElementById("addShipmentBatchRowId") != null) {
                                                                 if (tableEditable == false) {
                                                                     console.log("In false")
                                                                     document.getElementById("addShipmentBatchRowId").style.display = "none";
@@ -706,7 +708,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentDates"));
                                                                         this.props.toggleLarge();
                                                                     }
-                                                                    document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'block';
+                                                                    if (document.getElementById("showSaveShipmentsDatesButtonsDiv") != null) {
+                                                                        document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'block';
+                                                                    }
                                                                     this.el = jexcel(document.getElementById("shipmentDatesTable"), '');
                                                                     this.el.destroy();
                                                                     var json = [];
@@ -1944,7 +1948,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 qtyCalculatorTableEl: "",
                 qtyCalculatorTableEl1: ""
             })
-            document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+            if (document.getElementById("showSaveQtyButtonDiv") != null) {
+                document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+            }
             this.props.updateState("qtyCalculatorValidationError", "");
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge("submit");
@@ -2157,7 +2163,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.setState({
                 shipmentBatchInfoTableEl: ""
             })
-            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+            if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
+                document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+            }
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge("submit");
             }
@@ -2575,7 +2583,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.setState({
                 shipmentDatesTableEl: ""
             })
-            document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+            if (document.getElementById("showSaveShipmentsDatesButtonsDiv") != null) {
+                document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+            }
             this.props.updateState("shipmentDatesError", "");
             if (this.props.shipmentPage == "shipmentDataEntry") {
                 this.props.toggleLarge("submit");
@@ -3254,7 +3264,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 this.props.updateState("shipmentModalTitle", i18n.t("static.supplyPlan.qtyCalculator"));
                 this.props.toggleLarge();
             }
-            document.getElementById("showSaveQtyButtonDiv").style.display = 'block';
+            if (document.getElementById("showSaveQtyButtonDiv") != null) {
+                document.getElementById("showSaveQtyButtonDiv").style.display = 'block';
+            }
             this.el = jexcel(document.getElementById("qtyCalculatorTable"), '');
             this.el.destroy();
             var json = [];

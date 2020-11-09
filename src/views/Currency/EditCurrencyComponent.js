@@ -8,7 +8,7 @@ import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SPACE_REGEX, ALPHABETS_REGEX, DECIMAL_NO_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABETS_REGEX, DECIMAL_NO_REGEX } from '../../Constants.js';
 
 
 const entityname = i18n.t('static.currency.currencyMaster');
@@ -24,7 +24,8 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
             // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
-            .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+            // .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.currency.currencycodetext')),
         // .max(4, i18n.t('static.currency.currencycodemax4digittext')),
         // currencySymbol: Yup.string()
