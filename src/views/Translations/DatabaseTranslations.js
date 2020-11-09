@@ -1,8 +1,8 @@
 import React from "react";
-import jexcel from 'jexcel';
-
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody, CardHeader, FormGroup,
     CardFooter, Button, Col, Row
@@ -12,7 +12,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.label.databaseTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -88,6 +88,11 @@ export default class DatabaseTranslations extends React.Component {
                         entries: '',
                     },
                     onload: this.loaded,
+                    filters: true,
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return [];
+                    }.bind(this),
                     // tableHeight: '500px',
                 };
                 this.el = jexcel(document.getElementById("databaseTranslationTable"), options);
@@ -166,7 +171,7 @@ export default class DatabaseTranslations extends React.Component {
         this.setState({
             labelList: labelList
         })
-        if (JSON.stringify(this.el.getComments()).length == 2) {
+        if (JSON.stringify(this.el.getComments()).length == 2 || this.el.getComments() == null) {
             // AuthenticationService.setupAxiosInterceptors();
             var json = this.state.labelList;
             LabelsService.saveDatabaseLabels(json).then(response => {

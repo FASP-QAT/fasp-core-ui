@@ -296,11 +296,12 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
 
 const entityname = i18n.t('static.realm.realm');
 export default class ReactListComponent extends Component {
@@ -358,7 +359,7 @@ export default class ReactListComponent extends Component {
                             data[4] = realmList[j].minMosMaxGaurdrail;
                             data[5] = realmList[j].maxMosMaxGaurdrail;
                             data[6] = realmList[j].lastModifiedBy.username;
-                            data[7] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+                            data[7] = (realmList[j].lastModifiedDate ? (realmList[j].lastModifiedDate) : null)
                             data[8] = realmList[j].active;
 
                             realmArray[count] = data;
@@ -377,7 +378,7 @@ export default class ReactListComponent extends Component {
                         var options = {
                             data: data,
                             columnDrag: true,
-                            colWidths: [150, 150, 100],
+                            colWidths: [0, 100, 90, 90, 90, 90, 100, 120, 90],
                             colHeaderClasses: ["Reqasterisk"],
                             columns: [
                                 {
@@ -396,17 +397,17 @@ export default class ReactListComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.realm.minMosMinGaurdraillabel'),
-                                    type: 'text',
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
                                     readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.minMosMaxGaurdraillabel'),
-                                    type: 'text',
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
                                     readOnly: true
                                 },
                                 {
                                     title: i18n.t('static.realm.maxMosMaxGaurdraillabel'),
-                                    type: 'text',
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
                                     readOnly: true
                                 },
                                 {
@@ -416,7 +417,8 @@ export default class ReactListComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedDate'),
-                                    type: 'text',
+                                    type: 'calendar',
+                                    options: { format: JEXCEL_DATE_FORMAT_SM },
                                     readOnly: true
                                 },
                                 {
@@ -445,13 +447,13 @@ export default class ReactListComponent extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
                             onselection: this.selected,
-
-
                             oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowExport: false,
                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                             position: 'top',
+                            filters: true,
+                            license: JEXCEL_PRO_KEY,
                             contextMenu: function (obj, x, y, e) {
                                 var items = [];
                                 if (y != null) {
