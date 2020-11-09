@@ -154,6 +154,7 @@ class Program extends Component {
 
     componentDidMount() {
         this.getLocalPrograms();
+        this.getPrograms();
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
             // AuthenticationService.setupAxiosInterceptors();
