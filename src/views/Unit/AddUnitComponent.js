@@ -10,7 +10,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { UNIT_LABEL_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, UNIT_LABEL_REGEX } from '../../Constants.js';
 
 
 const initialValues = {
@@ -24,10 +24,12 @@ const validationSchema = function (values) {
         dimensionId: Yup.string()
             .required(i18n.t('static.unit.dimensiontext')),
         unitName: Yup.string()
-            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            // .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.unit.unittext')),
         unitCode: Yup.string()
-            .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            // .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.unit.unitcodetext'))
 
     })

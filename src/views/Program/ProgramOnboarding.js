@@ -1061,7 +1061,7 @@ export default class ProgramOnboarding extends Component {
                                     </Row> */}
                                 </div>
                                 <div id="stepSeven">
-                                    <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
+                                    <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
                                     <FormGroup className="mt-2">
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         &nbsp;

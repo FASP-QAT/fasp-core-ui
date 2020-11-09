@@ -8,7 +8,7 @@ import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     fundingSource: "",
@@ -22,7 +22,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
             // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
     })
 }
