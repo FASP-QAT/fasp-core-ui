@@ -710,7 +710,7 @@ export default class PlanningUnitListComponent extends Component {
 
     PlanningUnitCapacity(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT_CAPACITY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
             // console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
@@ -833,7 +833,7 @@ export default class PlanningUnitListComponent extends Component {
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT_CAPACITY')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
                                     })
