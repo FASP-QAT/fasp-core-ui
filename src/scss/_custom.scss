@@ -932,7 +932,7 @@ label.arrow_label:after {
   height: 100%;
   color: red; 
   top: 0px;
-  left: 6px;
+  left: 2px;
   cursor: col-resize;
   content: "*" !important; 
 font-size: 14px;
@@ -3536,6 +3536,10 @@ margin-left: -45px;
     background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurement.png');
     background-repeat: no-repeat,no-repeat;
     background-position: top right,top left;
+}
+
+.jexcel>thead>tr>td.jexcel_filters_icon_active{
+  background-image:url('/src/assets/img/filter.png')!important;
 }
 
 .localProcurementAgent{

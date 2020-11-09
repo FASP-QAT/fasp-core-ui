@@ -1461,8 +1461,8 @@
     "static.supplyPlan.amcPast":"AMC (months in past)",
     "static.supplyPlan.amcFuture":"AMC (months in future)",
     "static.commitVersion.cannotCommitWithOpenProblems":"You cannot commit a version with open problems.",
-    "static.loadProgram.oldVersion":"Older version is downloaded",
-    "static.loadProgram.latestVersion":"Latest version is downloaded",
-    "static.loadProgram.notDownloaded":"Program is not downloaded",
+    "static.loadProgram.oldVersion":"Older version is loaded",
+    "static.loadProgram.latestVersion":"Latest version is loaded",
+    "static.loadProgram.notDownloaded":"Program is not loaded",
     "static.problemList.problemStatus":"Open / Addressed"
 }

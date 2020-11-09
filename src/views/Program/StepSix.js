@@ -247,7 +247,7 @@ export default class StepSix extends Component {
                                             type="text" name="programCode"
                                             bsSize="sm"
                                             disabled
-                                            value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode + "-"}
+                                            value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode}
                                             id="programCode" />
                                         <FormFeedback className="red">{errors.programCode}</FormFeedback>
                                         </FormGroup>
