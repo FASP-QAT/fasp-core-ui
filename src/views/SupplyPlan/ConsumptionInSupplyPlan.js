@@ -678,9 +678,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                 }
             }
+            var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
         }
         if (x == 1) {
             var valid = checkValidtion("text", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
         }
         if (x == 3) {
             var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
@@ -744,6 +746,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 2) {
+            var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
             var dataSource = rowData[3];
             var dataSourceType = "";
             if (dataSource != undefined && dataSource != "") {

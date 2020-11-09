@@ -551,13 +551,19 @@ class RealmCountryRegion extends Component {
                                         // message: error.response.data.messageCode,
                                         message: i18n.t('static.region.duplicateGLN'),
                                         loading: false
-                                    });
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
-                                    });
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                                 default:
                                     this.setState({

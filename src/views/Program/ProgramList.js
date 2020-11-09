@@ -409,8 +409,21 @@ export default class ProgramList extends Component {
 
   filterData() {
     let countryId = document.getElementById("countryId").value;
-    console.log("countryId--------->", countryId)
-    if (countryId != 0) {
+    var selStatus = document.getElementById("active").value;
+    console.log("countryId--------->", countryId);
+    console.log("selStatus--------->", selStatus);
+    if (countryId != 0 && selStatus != "") {
+      console.log("1------------");
+      let tempSelStatus = (selStatus == "true" ? true : false)
+      // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+      const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId && c.active == tempSelStatus)
+      this.setState({
+        selProgram: selProgram
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (countryId != 0) {
+      console.log("2------------");
       // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
       const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId)
       this.setState({
@@ -418,7 +431,17 @@ export default class ProgramList extends Component {
       }, () => {
         this.buildJExcel();
       });
+    } else if (selStatus != "") {
+      console.log("3------------");
+      let tempSelStatus = (selStatus == "true" ? true : false)
+      const selProgram = this.state.programList.filter(c => c.active == tempSelStatus)
+      this.setState({
+        selProgram: selProgram
+      }, () => {
+        this.buildJExcel();
+      });
     } else {
+      console.log("4------------");
       this.setState({
         selProgram: this.state.programList
       }, () => {
@@ -598,7 +621,8 @@ export default class ProgramList extends Component {
     console.log("props--------------------", this.props);
     // AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
-    ProgramService.getProgramList().then(response => {
+    // ProgramService.getProgramList().then(response => {
+    ProgramService.getProgramListAll().then(response => {
       if (response.status == 200) {
         console.log("resp--------------------", response.data);
         this.setState({
@@ -607,7 +631,8 @@ export default class ProgramList extends Component {
           // loading: false
         },
           () => {
-            this.buildJExcel();
+            // this.buildJExcel();
+            this.filterData();
           })
       } else {
         this.setState({
@@ -787,7 +812,7 @@ export default class ProgramList extends Component {
             </div>
           </div>
           <CardBody className="pb-lg-0">
-            <Col md="3 pl-0" >
+            {/* <Col md="3 pl-0" >
               <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
 
@@ -803,12 +828,51 @@ export default class ProgramList extends Component {
                       <option value="0">{i18n.t('static.common.all')}</option>
                       {countries}
                     </Input>
-                    {/* <InputGroupAddon addonType="append">
-                      <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                    </InputGroupAddon> */}
                   </InputGroup>
                 </div>
               </FormGroup>
+            </Col> */}
+
+            <Col md="6 pl-0">
+              <div className="d-md-flex Selectdiv2">
+                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="countryId"
+                        id="countryId"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="0">{i18n.t('static.common.all')}</option>
+                        {countries}
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="active"
+                        id="active"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="">{i18n.t('static.common.all')}</option>
+                        <option value="true" selected>{i18n.t('static.common.active')}</option>
+                        <option value="false">{i18n.t('static.common.disabled')}</option>
+
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+              </div>
             </Col>
 
             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">

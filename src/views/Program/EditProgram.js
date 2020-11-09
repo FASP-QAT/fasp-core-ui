@@ -480,6 +480,9 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
+        if (event.target.name === "active") {
+            program.active = event.target.id === "active2" ? false : true
+        }
         if (event.target.name == 'uniqueCode') {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
@@ -975,6 +978,42 @@ export default class EditProgram extends Component {
                                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                                         <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
 
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="active"
+                                                                value={true}
+                                                                checked={this.state.program.active === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="active"
+                                                                value={false}
+                                                                checked={this.state.program.active === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
+                                                        </FormGroup>
                                                     </FormGroup>
 
                                                 </CardBody>
