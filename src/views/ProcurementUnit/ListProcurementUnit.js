@@ -322,11 +322,12 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
 import moment from 'moment';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
 export default class ListProcurementUnit extends Component {
@@ -409,7 +410,7 @@ export default class ListProcurementUnit extends Component {
       data[5] = getLabelText(procurementUnitList[j].supplier.label, this.state.lang)
       data[6] = procurementUnitList[j].labeling;
       data[7] = procurementUnitList[j].lastModifiedBy.username;
-      data[8] = (procurementUnitList[j].lastModifiedDate ? moment(procurementUnitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[8] = (procurementUnitList[j].lastModifiedDate ? moment(procurementUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
       data[9] = procurementUnitList[j].active;
 
 
@@ -429,7 +430,7 @@ export default class ListProcurementUnit extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100,50,50,150],
+      colWidths: [0,150, 150, 80, 60, 100, 100,100,100,100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -448,7 +449,7 @@ export default class ListProcurementUnit extends Component {
         },
         {
           title: i18n.t('static.procurementUnit.multiplier'),
-          type: 'text',
+          type: 'numeric', mask: '#,##.00', decimal: '.',
           readOnly: true
         },
         {
@@ -473,7 +474,8 @@ export default class ListProcurementUnit extends Component {
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
-          type: 'text',
+          type: 'calendar',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
           readOnly: true
         },
         {
@@ -509,7 +511,11 @@ export default class ListProcurementUnit extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      contextMenu: false,
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;

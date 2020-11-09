@@ -1451,7 +1451,8 @@ export default class WhatIfReportComponent extends React.Component {
             planningUnitChange: false,
             programSelect: value,
             programId: value != "" && value != undefined ? value.value : 0,
-            planningUnit: ""
+            planningUnit: "",
+            rows: []
         })
         var programId = value != "" && value != undefined ? value.value : 0;
         if (programId != 0) {
@@ -1766,6 +1767,7 @@ export default class WhatIfReportComponent extends React.Component {
                         inList: invList,
                         coList: conList,
                         shList: shiList,
+                        rows: []
                     })
 
                     var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
