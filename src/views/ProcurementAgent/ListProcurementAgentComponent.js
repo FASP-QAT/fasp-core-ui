@@ -495,11 +495,12 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants';
 
 
 const entityname = i18n.t('static.procurementagent.procurementagent')
@@ -692,7 +693,7 @@ class ListProcurementAgentComponent extends Component {
             data[6] = procurementAgentList[j].approvedToShippedLeadTime;
             data[7] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
             data[8] = procurementAgentList[j].lastModifiedBy.username;
-            data[9] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[9] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[10] = procurementAgentList[j].active;
 
 
@@ -712,7 +713,7 @@ class ListProcurementAgentComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 130, 100, 80, 100, 80, 150, 100],
+            colWidths: [0, 80, 100, 130, 80, 80, 80, 0, 80, 100, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -741,17 +742,16 @@ class ListProcurementAgentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
-                    type: 'text',
                     type: 'hidden',
                 },
                 {
@@ -761,7 +761,8 @@ class ListProcurementAgentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 },
                 {
@@ -798,6 +799,8 @@ class ListProcurementAgentComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {

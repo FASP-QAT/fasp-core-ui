@@ -28,7 +28,8 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         tracerCategoryName: Yup.string()
-            .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))

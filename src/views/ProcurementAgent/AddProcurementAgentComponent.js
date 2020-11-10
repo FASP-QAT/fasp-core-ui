@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SketchPicker } from 'react-color';
-import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import reactCSS from 'reactcss'
 
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -35,7 +35,8 @@ const validationSchema = function (values) {
         //     .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentCode: Yup.string()
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))

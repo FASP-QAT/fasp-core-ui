@@ -596,7 +596,7 @@ class AuthenticationService {
                     break;
                 case "/realmCountry/listRealmCountryPlanningUnit":
                 case "/realmCountry/listRealmCountryPlanningUnit/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT")) {
                         return true;
                     }
                     break;
@@ -829,7 +829,7 @@ class AuthenticationService {
                 case "/procurementUnit/listProcurementUnit":
                 case "/procurementUnit/listProcurementUnit/:message":
                 case "/procurementUnit/listProcurementUnit/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_UNIT")) {
                         return true;
                     }
                     break;
@@ -1064,17 +1064,17 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/costOfInventory":
-                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_COST_OF_INVENTORY_REPORT")) {
                         return true;
                     }
                     break;
                 case "/report/inventoryTurns":
-                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_INVENTORY_TURNS_REPORT")) {
                         return true;
                     }
                     break;
                 case "/report/budgets":
-                    if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
                         return true;
                     }
                     break;

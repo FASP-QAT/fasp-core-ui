@@ -80,6 +80,172 @@ export default class PipelineProgramDataStepFive extends Component {
 
 
     componentDidMount() {
+        var realmId = AuthenticationService.getRealmId();
+        var realmCountryIdd = document.getElementById("realmCountryId").value;
+        var healthAreaIdd = document.getElementById("healthAreaId").value;
+        var organisationIdd = document.getElementById("organisationId").value;
+        console.log("realmCountryIdd", realmCountryIdd);
+        console.log("healthAreaIdd", healthAreaIdd);
+        console.log("organisationIdd", organisationIdd);
+        if (realmCountryIdd != "") {
+            ProgramService.getRealmCountryList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        let realmCountryCode = response.data.filter(c => (c.realmCountryId == realmCountryIdd))[0].country.countryCode;
+                        this.props.generateCountryCode(realmCountryCode);
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } if (healthAreaIdd != "") {
+            ProgramService.getHealthAreaList(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        let healthAreaCode = response.data.filter(c => (c.healthAreaId == healthAreaIdd))[0].healthAreaCode;
+                        this.props.generateHealthAreaCode(healthAreaCode);
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } if (organisationIdd != "") {
+            ProgramService.getOrganisationList(realmId)
+            .then(response => {
+                if (response.status == 200) {
+                    let organisationCode = response.data.filter(c => (c.organisationId == organisationIdd))[0].organisationCode;
+                    this.props.generateOrganisationCode(organisationCode);
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+         
+        }
 
         // AuthenticationService.setupAxiosInterceptors();
         // ProgramService.getRegionList(document.getElementById('realmCountryId').value)

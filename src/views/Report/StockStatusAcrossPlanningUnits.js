@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -27,8 +27,9 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
@@ -62,8 +63,8 @@ class StockStatusAcrossPlanningUnits extends Component {
             lang: localStorage.getItem('lang'),
             tracerCategories: [],
             tracerCategoryValues: [],
-      tracerCategoryLabels: [],
-      planningUnitList:[],
+            tracerCategoryLabels: [],
+            planningUnitList: [],
             loading: true,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
@@ -76,8 +77,8 @@ class StockStatusAcrossPlanningUnits extends Component {
     getTracerCategoryList() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
-        
-        if (programId > 0 && versionId!=0) {
+
+        if (programId > 0 && versionId != 0) {
             if (versionId.includes('Local')) {
                 const lan = 'en';
                 var db1;
@@ -98,55 +99,56 @@ class StockStatusAcrossPlanningUnits extends Component {
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
-                       
+
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId) {
 
                                 proList.push(myResult[i].planningUnit)
                             }
                         }
-  console.log('proList',proList)                       
+                        console.log('proList', proList)
                         var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
-                    var planningunitRequest1 = planningunitOs1.getAll();
-                  //  var pllist = []
-                    planningunitRequest1.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    planningunitRequest1.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest1.result;
-                        var flList = []
-                         console.log(myResult)
-                        for (var i = 0; i < myResult.length; i++) {
-                              for (var j = 0; j < proList.length; j++) {
-                                 if (myResult[i].planningUnitId == proList[j].id) {
-                                    console.log(myResult[i].planningUnitId , proList[j].id)
-                         
-                                flList.push(myResult[i].forecastingUnit)
-                                planningList.push(myResult[i])
+                        var planningunitRequest1 = planningunitOs1.getAll();
+                        //  var pllist = []
+                        planningunitRequest1.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest1.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest1.result;
+                            var flList = []
+                            console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                for (var j = 0; j < proList.length; j++) {
+                                    if (myResult[i].planningUnitId == proList[j].id) {
+                                        console.log(myResult[i].planningUnitId, proList[j].id)
+
+                                        flList.push(myResult[i].forecastingUnit)
+                                        planningList.push(myResult[i])
+                                    }
+                                }
                             }
-                        }}
-console.log('flList',flList)
+                            console.log('flList', flList)
 
-var tcList = [];
-flList.filter(function(item){
-  var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
-  if(i <= -1){
-    tcList.push({tracerCategoryId:item.tracerCategory.id,label:item.tracerCategory.label});
-  }
-  return null;
-});
-                     
-                        console.log('tcList',tcList)
-this.setState({
-    tracerCategories:tcList,
-    planningUnitList:planningList
-},()=>{this.fetchData()})
+                            var tcList = [];
+                            flList.filter(function (item) {
+                                var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                                if (i <= -1) {
+                                    tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                                }
+                                return null;
+                            });
 
-                   
-                  
-                    }.bind(this);
+                            console.log('tcList', tcList)
+                            this.setState({
+                                tracerCategories: tcList,
+                                planningUnitList: planningList
+                            }, () => { this.fetchData() })
+
+
+
+                        }.bind(this);
 
                     }.bind(this);
                 }.bind(this)
@@ -154,57 +156,58 @@ this.setState({
 
             }
             else {
-   
 
-            let realmId = AuthenticationService.getRealmId();
-            TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
-                if (response.status == 200) {
-                    this.setState({
-                        tracerCategories: response.data
-                    },()=>{this.fetchData()})
-                }
+                let realmId = AuthenticationService.getRealmId();
+                TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
+                    if (response.status == 200) {
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                            tracerCategories: response.data
+                        }, () => { this.fetchData() })
+                    }
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );}
+                );
+            }
 
         } else {
             this.setState({
@@ -228,16 +231,16 @@ this.setState({
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         this.state.tracerCategoryLabels.map(ele =>
-            csvRow.push('"'+(i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20')+'"'))
-         
+            csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
+
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
 
@@ -272,7 +275,7 @@ this.setState({
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -308,8 +311,8 @@ this.setState({
                         align: 'left'
                     })
                     var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8,170 , planningText)
-          
+                    doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
                 }
 
             }
@@ -669,12 +672,12 @@ this.setState({
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = data1;
-            data[2] = this.formatterDouble(dataStockStatus[j].mos);
-            data[3] = this.formatterDouble(dataStockStatus[j].minMos);
-            data[4] = this.formatterDouble(dataStockStatus[j].maxMos);
-            data[5] = this.formatter(dataStockStatus[j].stock);
-            data[6] = this.formatter(dataStockStatus[j].amc);
-            data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('MMM-yy') : null);
+            data[2] = (dataStockStatus[j].mos);
+            data[3] = (dataStockStatus[j].minMos);
+            data[4] = (dataStockStatus[j].maxMos);
+            data[5] = (dataStockStatus[j].stock);
+            data[6] = (dataStockStatus[j].amc);
+            data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
 
             dataArray[count] = data;
             count++;
@@ -692,7 +695,7 @@ this.setState({
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [150, 100, 80, 80, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -705,27 +708,29 @@ this.setState({
                 },
                 {
                     title: i18n.t('static.report.mos'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.0', decimal: '.',
                 },
                 {
                     title: i18n.t('static.supplyPlan.minStockMos'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.0', decimal: '.',
                 },
                 {
                     title: i18n.t('static.supplyPlan.maxStockMos'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.0', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##',
                 },
                 {
                     title: i18n.t('static.report.amc'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##',
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                    width:120
                 },
             ],
             editable: false,
@@ -837,7 +842,11 @@ this.setState({
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -945,17 +954,17 @@ this.setState({
 
     handleTracerCategoryChange = (tracerCategoryIds) => {
         tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
-          return parseInt(a.value) - parseInt(b.value);
+            return parseInt(a.value) - parseInt(b.value);
         })
         this.setState({
-          tracerCategoryValues: tracerCategoryIds.map(ele => ele),
-          tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
+            tracerCategoryValues: tracerCategoryIds.map(ele => ele),
+            tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
         }, () => {
-    
-          this.fetchData()
+
+            this.fetchData()
         })
-      }
-    
+    }
+
 
 
     fetchData = () => {
@@ -965,8 +974,8 @@ this.setState({
         let endDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0).getDate()));
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
         let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
-    console.log('this.state.tracerCategoryValues.length',this.state.tracerCategoryValues.length)
-        if (programId != 0 && versionId != 0 && this.state.tracerCategoryValues.length>0) {
+        console.log('this.state.tracerCategoryValues.length', this.state.tracerCategoryValues.length)
+        if (programId != 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
             if (versionId.includes('Local')) {
 
                 this.setState({ loading: true })
@@ -1001,53 +1010,54 @@ this.setState({
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
-                      
-                            this.state.planningUnitList.map(planningUnit => {
-                                console.log(planningUnit)
-this.state.tracerCategoryValues.map(tc=>{
-    if(tc.value==planningUnit.forecastingUnit.tracerCategory.id){
-                                var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnitId);
-                                let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
-                                var maxDate = moments.length > 0 ? moment.max(moments) : ''
-                                var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
-                                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
-                                console.log(planningUnit)
-                                if (list.length > 0) {
-                                    var json = {
-                                        planningUnit: {id:planningUnit.planningUnitId,label:planningUnit.label},
-                                        lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                        mos: includePlanningShipments.toString() == 'true' ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-                                        minMos: list[0].minStockMoS,
-                                        maxMos: list[0].maxStockMoS,
-                                        stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
-                                        amc: list[0].amc
-                                    }
-                                    data.push(json)
 
-                                } else {
-                                    var json = {
-                                        planningUnit: {id:planningUnit.planningUnitId,label:planningUnit.label},
-                                        lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                        mos: null,
-                                        minMos: planningUnit.minMonthsOfStock,
-                                        maxMos: planningUnit.minMonthsOfStock + planningUnit.reorderFrequencyInMonths,
-                                        stock: 0,
-                                        amc: 0
+                        this.state.planningUnitList.map(planningUnit => {
+                            console.log(planningUnit)
+                            this.state.tracerCategoryValues.map(tc => {
+                                if (tc.value == planningUnit.forecastingUnit.tracerCategory.id) {
+                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnitId);
+                                    let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
+                                    var maxDate = moments.length > 0 ? moment.max(moments) : ''
+                                    var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
+                                    var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
+                                    console.log(planningUnit)
+                                    if (list.length > 0) {
+                                        var json = {
+                                            planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
+                                            lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
+                                            mos: includePlanningShipments.toString() == 'true' ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
+                                            minMos: list[0].minStockMoS,
+                                            maxMos: list[0].maxStockMoS,
+                                            stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
+                                            amc: list[0].amc
+                                        }
+                                        data.push(json)
+
+                                    } else {
+                                        var json = {
+                                            planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
+                                            lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
+                                            mos: null,
+                                            minMos: planningUnit.minMonthsOfStock,
+                                            maxMos: planningUnit.minMonthsOfStock + planningUnit.reorderFrequencyInMonths,
+                                            stock: 0,
+                                            amc: 0
+                                        }
+                                        data.push(json)
                                     }
-                                    data.push(json)
                                 }
-                            }
-                            })})
-                            console.log(data)
-                            this.setState({
-                                selData: data,
-                                message: ''
-                            }, () => {
-                                this.filterDataAsperstatus();
-                            });
-                        }.bind(this)
-
+                            })
+                        })
+                        console.log(data)
+                        this.setState({
+                            selData: data,
+                            message: ''
+                        }, () => {
+                            this.filterDataAsperstatus();
+                        });
                     }.bind(this)
+
+                }.bind(this)
 
 
 
@@ -1193,7 +1203,7 @@ this.state.tracerCategoryValues.map(tc=>{
                 // this.buildJExcel();
             });
 
-        }else {
+        } else {
             this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [], selData: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
@@ -1229,7 +1239,7 @@ this.state.tracerCategoryValues.map(tc=>{
                 )
             }, this);
 
-            const { tracerCategories } = this.state;
+        const { tracerCategories } = this.state;
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1450,7 +1460,7 @@ this.state.tracerCategoryValues.map(tc=>{
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => {this.getTracerCategoryList();  }}
+                                                            onChange={(e) => { this.getTracerCategoryList(); }}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -1478,26 +1488,26 @@ this.state.tracerCategoryValues.map(tc=>{
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <div className="controls">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
 
-                        <MultiSelect
-                          name="tracerCategoryId"
-                          id="tracerCategoryId"
-                          bsSize="sm"
-                          value={this.state.tracerCategoryValues}
-                          onChange={(e) => { this.handleTracerCategoryChange(e) }}
-                          options=
-                          {tracerCategories.length > 0?
-                             tracerCategories.map((item, i) => {
-                              return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+                                                    <MultiSelect
+                                                        name="tracerCategoryId"
+                                                        id="tracerCategoryId"
+                                                        bsSize="sm"
+                                                        value={this.state.tracerCategoryValues}
+                                                        onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                                                        options=
+                                                        {tracerCategories.length > 0 ?
+                                                            tracerCategories.map((item, i) => {
+                                                                return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
 
-                            }, this):[]} />
+                                                            }, this) : []} />
 
-                      </div>
-                    </FormGroup>
-                            
+                                                </div>
+                                            </FormGroup>
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.withinstock')}</Label>
                                                 <div className="controls ">
