@@ -473,7 +473,7 @@ export default class ProgramOnboarding extends Component {
         //     program.draftToSubmittedLeadTime = event.target.value;
         // } 
         if (event.target.name == 'programCode1') {
-            program.programCode = event.target.value;
+            program.programCode = event.target.value.toUpperCase();
         }
 
         if (event.target.name == 'plannedToSubmittedLeadTime') {
