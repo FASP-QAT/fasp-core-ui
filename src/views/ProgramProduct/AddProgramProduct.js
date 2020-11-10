@@ -15,11 +15,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-<<<<<<< HEAD
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC,MONTHS_IN_FUTURE_FOR_AMC } from "../../Constants";
-=======
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
->>>>>>> dev
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC,MONTHS_IN_FUTURE_FOR_AMC,JEXCEL_PRO_KEY } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -814,11 +810,7 @@ class AddprogramPlanningUnit extends Component {
     }
 
     addRowInJexcel = function () {
-<<<<<<< HEAD
-        var json = this.el.getJson(); 
-=======
         var json = this.el.getJson(null, false);
->>>>>>> dev
         var data = [];
         data[0] = "-1";
         data[1] = "";
