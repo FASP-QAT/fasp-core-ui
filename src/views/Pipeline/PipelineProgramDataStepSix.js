@@ -3,9 +3,15 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
+import step1 from '../../assets/img/1-step.png'
+import step2 from '../../assets/img/2-step.png'
+import step3 from '../../assets/img/3-step.png'
+import step4 from '../../assets/img/4-step.png'
+import step5 from '../../assets/img/5-step.png'
+import step6 from '../../assets/img/6-step.png'
 import * as Yup from 'yup';
 
-import Setupprogram from '../../assets/img/SetupProgram.png'
+// import Setupprogram from '../../assets/img/SetupProgram.png'
 import {
     Button, FormFeedback, CardBody, Row,
     Form, FormGroup, Label, Input, Col
@@ -568,9 +574,38 @@ export default class PipelineProgramDataStepSix extends Component {
                                                 value={this.props.items.program.programNotes} />
                                             <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <img src={Setupprogram} style={{ width: '500px' }} />
+                                        <FormGroup className="col-md-12">
+                                            <ul id="progress">
+                                                <li>
+                                                    <i ><img className="img-left" src={step1} /></i>
+                                                    <i ><img className="img-right" src={step2} /></i>
+                                                    <span>{i18n.t('static.setupprogram.PlannedtoSubmitted')}</span>
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step3} /></i>
+                                                    <span>{i18n.t('static.setupprogram.SubmittedtoApproved')}</span>
+
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step4} /></i>
+                                                    <span>{i18n.t('static.setupprogram.ApprovedtoShipped')}</span>
+
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step5} /></i>
+                                                    <span>{i18n.t('static.setupprogram.ShippedtoArrived')}</span>
+
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step6} /></i>
+                                                    <span>{i18n.t('static.setupprogram.ArrivedtoReceived')}</span>
+                                                </li>
+                                            </ul>
+                                            {/* <img src={Setupprogram} style={{ width: '500px'}} /> */}
                                         </FormGroup>
+                                        {/* <FormGroup className="col-md-6">
+                                            <img src={Setupprogram} style={{ width: '500px' }} />
+                                        </FormGroup> */}
                                         <FormGroup className="col-md-12">
                                             <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                             &nbsp;
