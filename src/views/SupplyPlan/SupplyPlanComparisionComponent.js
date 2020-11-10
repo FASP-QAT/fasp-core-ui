@@ -195,7 +195,6 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.monthsOfStock").replaceAll(' ', '%20') + ' : ' + this.state.minMonthsOfStock + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
         csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
@@ -350,16 +349,13 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 120, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.supplyPlan.monthsOfStock') + ' : ' + this.state.minMonthsOfStock, doc.internal.pageSize.width / 10, 130, {
+                    doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 140, {
+                    doc.text(i18n.t('static.report.reorderFrequencyInMonths') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.reorderFrequencyInMonths') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 150, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 160, {
+                    doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
                         align: 'left'
                     })
                 }
@@ -384,7 +380,7 @@ export default class SupplyPlanComponent extends React.Component {
         var h1 = 100;
         var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 160, 750, 340, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 150, 750, 340, 'CANVAS');
         // doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             item.monthName.concat(" ").concat(item.monthYear)
