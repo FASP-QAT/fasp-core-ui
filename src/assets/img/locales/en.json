@@ -1464,5 +1464,11 @@
     "static.loadProgram.oldVersion":"Older version is loaded",
     "static.loadProgram.latestVersion":"Latest version is loaded",
     "static.loadProgram.notDownloaded":"Program is not loaded",
-    "static.problemList.problemStatus":"Open / Addressed"
+    "static.problemList.problemStatus":"Open / Addressed",
+    "static.setupprogram.PlannedtoSubmitted":"Planned to Submitted",
+    "static.setupprogram.SubmittedtoApproved":"Submitted to Approved",
+    "static.setupprogram.ApprovedtoShipped":"Approved to Shipped",
+    "static.setupprogram.ShippedtoArrived":"Shipped to Arrived",
+    "static.setupprogram.ArrivedtoReceived":"Arrived to Received"
+
 }
