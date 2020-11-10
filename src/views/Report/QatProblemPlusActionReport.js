@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from 'react-dom';
-import jexcel from 'jexcel';
 // import "./style.css";
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";

@@ -690,11 +690,12 @@ import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonF
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DATE_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 let initialValues = {
     startDate: '',
@@ -751,6 +752,7 @@ class PlanningUnitCapacity extends Component {
         this.addRow = this.addRow.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
 
     hideSecondComponent() {
@@ -775,10 +777,12 @@ class PlanningUnitCapacity extends Component {
         var validation = this.checkValidation();
         console.log("validation************", validation);
         if (validation) {
-            var tableJson = this.el.getJson();
+            // var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
+                var rd = this.el.getRowData(i);
+                var map1 = new Map(Object.entries(rd));
                 if (parseInt(map1.get("7")) === 1) {
                     let json = {
                         planningUnitCapacityId: parseInt(map1.get("6")),
@@ -796,8 +800,7 @@ class PlanningUnitCapacity extends Component {
                         startDate: moment(map1.get("2")).format("YYYY-MM-DD"),
 
                         stopDate: moment(map1.get("3")).format("YYYY-MM-DD"),
-
-                        capacity: map1.get("4"),
+                        capacity: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("5"),
                     }
                     changedpapuList.push(json);
@@ -972,7 +975,10 @@ class PlanningUnitCapacity extends Component {
                 },
                 {
                     title: i18n.t('static.planningunit.capacity'),
-                    type: 'number',
+                    type: 'numeric',
+                    // decimal:'.',
+                    mask: '#,##.00',
+                    disabledMaskOnEdition: true
                 },
                 {
                     title: i18n.t('static.common.status'),
@@ -988,12 +994,22 @@ class PlanningUnitCapacity extends Component {
                 }
 
             ],
+            oncreateeditor: function (a, b, c, d, e) {
+                console.log("In create editor")
+                e.type = 'text';
+                if (e.value) {
+                    e.selectionStart = e.value.length;
+                    e.selectionEnd = e.value.length;
+                }
+            },
             pagination: localStorage.getItem("sesRecordCount"),
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
+            parseFormulas: true,
             position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -1001,12 +1017,14 @@ class PlanningUnitCapacity extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
+            onpaste: this.onPaste,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
             },
             onload: this.loaded,
+            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info
@@ -1121,27 +1139,27 @@ class PlanningUnitCapacity extends Component {
                     }
 
                     if (x) {
-                        if (obj.options.allowComments == true) {
-                            items.push({ type: 'line' });
+                        // if (obj.options.allowComments == true) {
+                        //     items.push({ type: 'line' });
 
-                            var title = obj.records[y][x].getAttribute('title') || '';
+                        //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                            items.push({
-                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                onclick: function () {
-                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                }
-                            });
+                        //     items.push({
+                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                        //         onclick: function () {
+                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                        //         }
+                        //     });
 
-                            if (title) {
-                                items.push({
-                                    title: obj.options.text.clearComments,
-                                    onclick: function () {
-                                        obj.setComments([x, y], '');
-                                    }
-                                });
-                            }
-                        }
+                        //     if (title) {
+                        //         items.push({
+                        //             title: obj.options.text.clearComments,
+                        //             onclick: function () {
+                        //                 obj.setComments([x, y], '');
+                        //             }
+                        //         });
+                        //     }
+                        // }
                     }
                 }
 
@@ -1167,6 +1185,18 @@ class PlanningUnitCapacity extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                (instance.jexcel).setValueFromCoords(0, data[i].y, getLabelText(this.state.planningUnit.label, this.state.lang), true);
+                z = data[i].y;
+            }
+        }
     }
 
 
@@ -1473,8 +1503,13 @@ class PlanningUnitCapacity extends Component {
         // }
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_NO_REGEX;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
                 // if (isNaN(parseInt(value)) || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1512,7 +1547,7 @@ class PlanningUnitCapacity extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("H").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(7, y);
@@ -1599,7 +1634,7 @@ class PlanningUnitCapacity extends Component {
                 // }
 
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

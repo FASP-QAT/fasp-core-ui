@@ -154,6 +154,7 @@ class Program extends Component {
 
     componentDidMount() {
         this.getLocalPrograms();
+        this.getPrograms();
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
             // AuthenticationService.setupAxiosInterceptors();
@@ -555,7 +556,7 @@ class Program extends Component {
                                 <strong>{i18n.t('static.program.download')}</strong>
                             </CardHeader> */}
                             <CardBody className="pb-lg-2 pt-lg-2">
-                                <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
+                                <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>

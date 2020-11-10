@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -58,8 +58,9 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import MultiSelect from "react-multi-select-component";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
@@ -514,7 +515,7 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.noofmonth'),
-          type: 'text',
+          type: 'numeric', mask: '#,##.00', decimal: '.',
         },
         {
           title: i18n.t('static.report.error'),
@@ -529,26 +530,26 @@ class ForecastMetrics extends Component {
       },
 
       updateTable: function (el, cell, x, y, source, value, id) {
+        if (y != null) {
+          var elInstance = el.jexcel;
+          var colArr = ['A', 'B', 'C', 'D', 'E']
+          var rowData = elInstance.getRowData(y);
 
-        var elInstance = el.jexcel;
-        var colArr = ['A', 'B', 'C', 'D', 'E']
-        var rowData = elInstance.getRowData(y);
+          var forecastError = rowData[4];
 
-        var forecastError = rowData[4];
-
-        if (forecastError > 50) {
-          for (var i = 0; i < colArr.length; i++) {
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-            let textColor = 'red'//contrast('#f48282');
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-          }
-        } else {
-          for (var i = 0; i < colArr.length; i++) {
-            elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+          if (forecastError > 50) {
+            for (var i = 0; i < colArr.length; i++) {
+              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+              //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+              let textColor = 'red'//contrast('#f48282');
+              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
+            }
+          } else {
+            for (var i = 0; i < colArr.length; i++) {
+              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            }
           }
         }
-
       }.bind(this),
 
       onload: this.loaded,
@@ -568,7 +569,11 @@ class ForecastMetrics extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
-      contextMenu: false,
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;

@@ -334,8 +334,9 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -343,7 +344,7 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 
 
 const entityname = i18n.t('static.region.region');
@@ -394,7 +395,7 @@ class RegionListComponent extends Component {
                     align: 'center'
                 })
 
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
             }
@@ -475,7 +476,7 @@ class RegionListComponent extends Component {
 
         var csvRow = [];
 
-        csvRow.push('"'+(i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
 
@@ -488,7 +489,7 @@ class RegionListComponent extends Component {
         headers.push(i18n.t('static.common.status'));
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln==null?'':ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
+        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -521,7 +522,7 @@ class RegionListComponent extends Component {
             data[0] = regionList[j].regionId
             data[1] = getLabelText(regionList[j].realmCountry.country.label, this.state.lang)
             data[2] = getLabelText(regionList[j].label, this.state.lang)
-            data[3] = (regionList[j].capacityCbm).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            data[3] = (regionList[j].capacityCbm);
             data[4] = regionList[j].gln
             data[5] = regionList[j].active;
             regionListArray[count] = data;
@@ -561,7 +562,7 @@ class RegionListComponent extends Component {
                 ,
                 {
                     title: i18n.t('static.region.capacitycbm'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -599,7 +600,11 @@ class RegionListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
 
         };
         var regionEl = jexcel(document.getElementById("tableDiv"), options);
@@ -747,7 +752,7 @@ class RegionListComponent extends Component {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     this.setState({
-                        realmCountryList: response.data.map(ele=>ele.realmCountry)
+                        realmCountryList: response.data.map(ele => ele.realmCountry)
                     },
                         () => { })
                 } else {

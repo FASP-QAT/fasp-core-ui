@@ -6,9 +6,10 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card, Row
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionQuantimed, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -18,7 +19,7 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
@@ -100,8 +101,8 @@ export default class QunatimedImportStepFive extends Component {
 
         jExcelLoadedFunctionQuantimed(instance);
 
-        var asterisk = document.getElementsByClassName("resizable")[1];
-        var tr = asterisk.firstChild;        
+        var asterisk = document.getElementsByClassName("resizable")[2];
+        var tr = asterisk.firstChild;
         tr.children[7].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
         tr.children[8].title = `${i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * ${i18n.t('static.quantimed.importpercentage')} * ${i18n.t('static.quantimed.conversionFactor')} = ${i18n.t('static.quantimed.newconsupmtionqty')}`
     }
@@ -124,7 +125,7 @@ export default class QunatimedImportStepFive extends Component {
 
     formSubmit() {
 
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         var count = 0;
         for (var y = 0; y < tableJson.length; y++) {
             var map1 = new Map(Object.entries(tableJson[y]));
@@ -458,6 +459,8 @@ export default class QunatimedImportStepFive extends Component {
                     allowDeleteRow: false,
                     tableOverflow: false,
                     onload: this.loaded_four,
+                    license: JEXCEL_PRO_KEY,
+                    filters: true
                     // tableHeight: '500px',
                 };
 
