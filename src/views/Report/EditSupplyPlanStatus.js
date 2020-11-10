@@ -1,19 +1,20 @@
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { Formik } from 'formik';
-import jexcel from 'jexcel';
 import moment from "moment";
 import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
 import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
 import * as Yup from 'yup';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -2769,106 +2770,126 @@ class EditSupplyPlanStatus extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [10, 10, 30, 50, 10, 100, 10, 60, 180, 180, 60, 100, 10, 10, 10, 10, 10, 70, 70, 100],
             // colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
                     title: 'problemReportId',
                     type: 'hidden',
-
+                    width: 0
                 },
                 {
                     title: 'problemActionIndex',
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: i18n.t('static.program.programCode'),
                     type: 'hidden',
+                    width: 0
                     // readOnly:true
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    readOnly: true,
+                    width: 70
                 },
                 {
                     title: i18n.t('static.region.region'),
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 120
                 },
                 {
                     title: i18n.t('static.report.month'),
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: i18n.t('static.report.createdDate'),
                     type: 'hidden',
-                    readOnly: true
+                    readOnly: true,
+                    width: 0
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 120
                 },
                 {
                     title: i18n.t('static.report.suggession'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 120
                 },
                 {
                     title: i18n.t('static.report.problemStatus'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 80
                 },
                 {
                     title: i18n.t('static.editSupplyPlan.notes'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 120
                 },
                 {
                     title: i18n.t('static.common.action'),
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: 'planningUnitId',
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: 'problemId',
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: 'actionUrl',
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: 'criticalitiId',
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: i18n.t('static.problemAction.criticality'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 100
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
+                    width: 80
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
                     type: 'text',
+                    width: 120
                 },
                 {
                     title: 'isChanged',
                     type: 'hidden',
+                    width: 0
                 },
                 {
                     title: 'transList',
                     type: 'hidden',
+                    width: 0
                 },
 
 
@@ -2900,6 +2921,9 @@ class EditSupplyPlanStatus extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
+            filters: true,
+            parseFormulas: true,
+            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 // console.log("y====",y);
