@@ -266,6 +266,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="text"
                                             maxLength={6}
+                                            value={this.props.items.program.programCode}
                                             name="programCode1" id="programCode1" />
                                         <FormFeedback className="red">{errors.programCode1}</FormFeedback>
                                     </FormGroup>

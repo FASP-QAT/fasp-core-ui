@@ -38,7 +38,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         name: Yup.string()
             .required(i18n.t('static.user.validusername'))
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string')),
         emailId: Yup.string()
             .email(i18n.t('static.user.invalidemail'))
             .required(i18n.t('static.user.validemail')),
@@ -103,7 +104,7 @@ export default class UserTicketComponent extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {            
+        this.state = {
             user: {
                 summary: summaryText_1,
                 realm: "",
@@ -283,7 +284,7 @@ export default class UserTicketComponent extends Component {
 
         RealmService.getRealmListAll()
             .then(response => {
-                if (response.status == 200) {                    
+                if (response.status == 200) {
                     this.setState({
                         realms: response.data,
                         realmId: this.props.items.userRealmId, loading: false
@@ -292,13 +293,13 @@ export default class UserTicketComponent extends Component {
                         this.setState({
                             realms: (response.data).filter(c => c.realmId == this.props.items.userRealmId)
                         })
-    
+
                         let { user } = this.state;
                         user.realm = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                         this.setState({
                             user
-                        }, () => {                               
-    
+                        }, () => {
+
                         })
                     }
                 } else {
@@ -520,7 +521,7 @@ export default class UserTicketComponent extends Component {
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                
+
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;

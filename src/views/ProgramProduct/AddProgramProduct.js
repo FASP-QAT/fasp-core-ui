@@ -15,7 +15,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC,MONTHS_IN_FUTURE_FOR_AMC,JEXCEL_PRO_KEY } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -812,12 +812,12 @@ class AddprogramPlanningUnit extends Component {
     addRowInJexcel = function () {
         var json = this.el.getJson(null, false);
         var data = [];
-        data[0] = 0;
+        data[0] = "-1";
         data[1] = "";
         data[2] = "";
         data[3] = "";
-        data[4] = "";
-        data[5] = "";
+        data[4] = MONTHS_IN_FUTURE_FOR_AMC;
+        data[5] = MONTHS_IN_PAST_FOR_AMC;
         data[6] = "";
         data[7] = "";
         data[8] = 0;

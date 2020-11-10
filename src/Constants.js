@@ -47,7 +47,8 @@ export const LABEL_REGEX = /^([a-zA-Z]+\s)*[a-zA-Z]+$/
 export const ALPHABETS_REGEX = /^[a-zA-Z]+$/
 export const LABEL_WITH_SPECIAL_SYMBOL_REGEX = /^([a-zA-Z/]+\s)*[a-zA-Z/]+$/
 export const BATCH_NO_REGEX = /^[ A-Za-z0-9/-]*$/
-export const UNIT_LABEL_REGEX = /^([a-zA-Z0-9/+-]+\s)*[a-zA-Z0-9/+-]+$/
+// export const UNIT_LABEL_REGEX = /^([a-zA-Z0-9/+-]+\s)*[a-zA-Z0-9/+-]+$/
+export const UNIT_LABEL_REGEX = /^([a-zA-Z0-9]+\s)*[a-zA-Z0-9]+$/
 export const NEGATIVE_INTEGER_NO_REGEX = /^[-+]?\d*$/
 export const ALPHABET_NUMBER_REGEX = /^([a-zA-Z0-9])*[a-zA-Z0-9]+$/
 export const BUDGET_NAME_REGEX = /^([a-zA-Z0-9,-]+\s)*[a-zA-Z0-9,-]+$/
@@ -89,3 +90,5 @@ export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.n
 export const JEXCEL_MONTH_PICKER_FORMAT="Mon-YYYY"
 export const OPEN_PROBLEM_STATUS_ID=1
 export const JEXCEL_PRO_KEY="YTliMDJhNzEzZjBjZjg3NGJhOTE1ODI5MzRiOWMxMTFjZjQ3MDUyNjAxZGM1Njc5MzYyNjlhODYzYjZjMzQxODhjODFlYjI5NDJiMTI4YjQ3OGQ5ZDIyYmU1NTgwMzFkNGVhMWNjYjdmZTUxZGQ5NDQ2Zjc2OTFjNjgyODY3NjgsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqb3hOak0wT1RRek5qQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2liRzlqWVd4b2IzTjBJbDBzSW5Cc1lXNGlPaUl6SW4wPQ=="
+export const SPECIAL_CHARECTER_WITHOUT_NUM = /^([^0-9\s])+$/
+export const SPECIAL_CHARECTER_WITH_NUM = /^([^\s])+$/
