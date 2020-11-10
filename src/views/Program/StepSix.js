@@ -5,10 +5,11 @@ import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import Setupprogram from '../../assets/img/SetupProgram.png'
-import * as Yup from 'yup'
+import * as Yup from 'yup';
+import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
 import {
     Button, FormFeedback, CardBody, Row,
-    Form, FormGroup, Label, Input,Col,
+    Form, FormGroup, Label, Input, Col,
 } from 'reactstrap';
 
 const initialValuesSix = {
@@ -17,14 +18,14 @@ const initialValuesSix = {
     airFreightPerc: '',
     seaFreightPerc: '',
     // deliveredToReceivedLeadTime: '',
-    plannedToSubmittedLeadTime: '',
-    submittedToApprovedLeadTime: '',
-    approvedToShippedLeadTime: '',
+    plannedToSubmittedLeadTime: PLANNED_TO_SUBMITTED,
+    submittedToApprovedLeadTime: SUBMITTED_TO_APPROVED,
+    approvedToShippedLeadTime: APPROVED_TO_SHIPPED,
     // healthAreaId: '',
     programNotes: '',
-    shippedToArrivedByAirLeadTime: '',
-    shippedToArrivedBySeaLeadTime: '',
-    arrivedToDeliveredLeadTime: '',
+    shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
+    shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
+    arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
     programCode: ''
 
 }
@@ -190,6 +191,7 @@ export default class StepSix extends Component {
         return (
 
             <Formik
+                enableReinitialize={true}
                 initialValues={initialValuesSix}
                 validate={validateSix(validationSchemaSix)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -210,7 +212,7 @@ export default class StepSix extends Component {
                     }) => (
                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' autocomplete="off">
                                 <Row>
-          
+
                                     {/* <FormGroup row >
                                        
                                             <FormGroup className="col-md-6">
@@ -239,40 +241,40 @@ export default class StepSix extends Component {
                                     </FormGroup>
                                         
                                  </FormGroup> */}
-                                  <FormGroup style={{display:'flex'}} className="col-md-6">
-                  <Col xs="6" className="pl-0">
-                  <FormGroup >
-                                        <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
-                                        <Input
-                                            type="text" name="programCode"
-                                            bsSize="sm"
-                                            disabled
-                                            value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode}
-                                            id="programCode" />
-                                        <FormFeedback className="red">{errors.programCode}</FormFeedback>
-                                        </FormGroup>
-                  </Col>
-                  <Col xs="1" className="" style={{marginTop:'32px'}}>
-                  <i class="fa fa-minus" aria-hidden="true"></i>
-                  </Col>
-                  <Col xs="5" className="pr-0">
-                  <FormGroup className="pt-2">
-                                        <Label htmlFor="company"></Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            // valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
-                                            // invalid={touched.airFreightPerc && !!errors.airFreightPerc}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="text"
-                                            maxLength={6}
-                                            value={this.props.items.program.programCode}
-                                            name="programCode1" id="programCode1" />
-                                        <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                    <FormGroup style={{ display: 'flex' }} className="col-md-6">
+                                        <Col xs="6" className="pl-0">
+                                            <FormGroup >
+                                                <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
+                                                <Input
+                                                    type="text" name="programCode"
+                                                    bsSize="sm"
+                                                    disabled
+                                                    value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode}
+                                                    id="programCode" />
+                                                <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col xs="1" className="" style={{ marginTop: '32px' }}>
+                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                        </Col>
+                                        <Col xs="5" className="pr-0">
+                                            <FormGroup className="pt-2">
+                                                <Label htmlFor="company"></Label>
+                                                <Input
+                                                    onBlur={handleBlur}
+                                                    // valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
+                                                    // invalid={touched.airFreightPerc && !!errors.airFreightPerc}
+                                                    bsSize="sm"
+                                                    onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                                    type="text"
+                                                    maxLength={6}
+                                                    value={this.props.items.program.programCode}
+                                                    name="programCode1" id="programCode1" />
+                                                <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                            </FormGroup>
+                                        </Col>
                                     </FormGroup>
-                  </Col>
-                </FormGroup>
-                                    
+
                                     {/* <FormGroup className="col-md-6">
                                         <Label htmlFor="company"></Label>
                                         <Input
@@ -351,6 +353,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.plannedToSubmittedLeadTime}
                                             name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime" />
                                         <FormFeedback className="red">{errors.plannedToSubmittedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -364,6 +367,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.submittedToApprovedLeadTime}
                                             name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -377,6 +381,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.approvedToShippedLeadTime}
                                             name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -390,6 +395,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.shippedToArrivedByAirLeadTime}
                                             name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
                                         <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -406,6 +412,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.shippedToArrivedBySeaLeadTime}
                                             name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
                                         <FormFeedback className="red">{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -421,6 +428,7 @@ export default class StepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.arrivedToDeliveredLeadTime}
                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                         <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -439,7 +447,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                    <img src={Setupprogram} style={{ width: '500px'}} />
+                                        <img src={Setupprogram} style={{ width: '500px' }} />
                                     </FormGroup>
 
                                     <FormGroup className="col-md-12">
