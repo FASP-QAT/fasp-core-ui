@@ -474,7 +474,7 @@ export default class UnitListComponent extends Component {
             data[2] = unitList[j].unitCode;
             data[3] = getLabelText(unitList[j].dimension.label, this.state.lang)
             data[4] = unitList[j].lastModifiedBy.username;
-            data[5] = (unitList[j].lastModifiedDate ? (unitList[j].lastModifiedDate) : null)
+            data[5] = (unitList[j].lastModifiedDate ? moment(unitList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             data[6] = unitList[j].active;
 
             unitListArray[count] = data;

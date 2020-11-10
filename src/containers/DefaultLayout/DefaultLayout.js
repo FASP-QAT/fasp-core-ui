@@ -1123,7 +1123,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.dashboad.planningunitcountry'),
                                 url: '/realmCountry/listRealmCountryPlanningUnit',
                                 icon: 'fa fa-globe',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.forecastingunit'),
@@ -1153,7 +1153,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.procurementUnit.procurementUnit'),
                                 url: '/procurementUnit/listProcurementUnit',
                                 icon: 'fa fa-building',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT') ? false : true) }
                               },
 
                               {
@@ -1430,7 +1430,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
-                        // attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
@@ -1865,7 +1865,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.inventoryReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_REGION')) || (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_REGION')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.report.expiredInventory'),
@@ -1877,14 +1877,14 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.dashboard.costOfInventory'),
                                 url: '/report/costOfInventory',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.inventoryTurns'),
                                 url: '/report/inventoryTurns',
                                 // icon: 'fa fa-exchange'
                                 icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.stockAdjustment'),

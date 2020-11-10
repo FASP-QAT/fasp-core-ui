@@ -22,10 +22,11 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Link } from "react-router-dom";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -357,13 +358,13 @@ export default class CostOfInventory extends Component {
 
         var csvRow = [];
 
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))+'"')
-        csvRow.push('"'+(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')) + '"')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
 
@@ -398,7 +399,7 @@ export default class CostOfInventory extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -554,8 +555,7 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'number',
-                    mask:'#,###',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -565,13 +565,12 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                    type: 'numeric',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true,
-                    mask:'#,##.00'
                 },
                 {
                     title: i18n.t('static.report.costUsd'),
-                    type: 'number',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
             ],
@@ -597,7 +596,11 @@ export default class CostOfInventory extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;

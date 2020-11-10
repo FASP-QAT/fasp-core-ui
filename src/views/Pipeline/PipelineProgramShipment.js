@@ -1465,7 +1465,7 @@ export default class PipelineProgramShipment extends Component {
 
                 <AuthenticationServiceComponent history={this.props.history} />
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
-                    <h5>{i18n.t(this.state.message)}</h5>
+                    <h5 class="red">{i18n.t(this.state.message)}</h5>
                     <div id="shipmenttableDiv">
                     </div>
                     <div className="ml-2" >

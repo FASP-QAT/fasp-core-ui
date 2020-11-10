@@ -537,9 +537,9 @@ class ListUserComponent extends Component {
             data[3] = userList[j].phoneNumber;
             data[4] = userList[j].emailId;
             data[5] = userList[j].faildAttempts;
-            data[6] = (userList[j].lastLoginDate ? (userList[j].lastLoginDate) : null)
+            data[6] = (userList[j].lastLoginDate ? moment(userList[j].lastLoginDate).format("YYYY-MM-DD") : null)
             data[7] = userList[j].lastModifiedBy.username;
-            data[8] = (userList[j].lastModifiedDate ? (userList[j].lastModifiedDate) : null)
+            data[8] = (userList[j].lastModifiedDate ? moment(userList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             data[9] = userList[j].active;
 
 

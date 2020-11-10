@@ -364,7 +364,7 @@ export default class LanguageListComponent extends Component {
                                 data[1] = langaugeList[j].languageName;
                                 data[2] = langaugeList[j].languageCode;
                                 data[3] = langaugeList[j].lastModifiedBy.username;
-                                data[4] = (langaugeList[j].lastModifiedDate ? (langaugeList[j].lastModifiedDate) : null)
+                                data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
                                 data[5] = langaugeList[j].active;
 
                                 languageArray[count] = data;

@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
-import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPACE_REGEX } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -30,17 +30,19 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         fundingSourceName: Yup.string()
-            .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
         fundingSourceCode: Yup.string()
             // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
-        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
-        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
-        // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
+            // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))
             // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
         // .required(i18n.t('static.fundingsource.fundingsourceCodeText'))
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -172,7 +174,7 @@ export default class FundingSourceTicketComponent extends Component {
                     fundingSource.realmName = (response.data).filter(c => c.realmId == this.props.items.userRealmId)[0].label.label_en;
                     this.setState({
                         fundingSource
-                    }, () => {                        
+                    }, () => {
 
                     })
                 }
@@ -505,7 +507,7 @@ export default class FundingSourceTicketComponent extends Component {
                                                 bsSize="sm"
                                                 valid={!errors.realmName && this.state.fundingSource.realmName != ''}
                                                 invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e);}}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                                 value={this.state.realmId}
                                                 required >

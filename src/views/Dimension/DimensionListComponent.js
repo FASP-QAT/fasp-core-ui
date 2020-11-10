@@ -293,7 +293,7 @@ export default class DimensionListComponent extends Component {
             data[0] = dimensionList[j].dimensionId
             data[1] = getLabelText(dimensionList[j].label, this.state.lang)
             data[2] = dimensionList[j].lastModifiedBy.username;
-            data[3] = (dimensionList[j].lastModifiedDate ? (dimensionList[j].lastModifiedDate) : null)
+            data[3] = (dimensionList[j].lastModifiedDate ? moment(dimensionList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             dimensionArray[count] = data;
             count++;
         }

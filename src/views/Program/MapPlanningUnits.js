@@ -7,7 +7,7 @@ import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE,MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from '../../Constants.js';
 export default class MapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -29,19 +29,15 @@ export default class MapPlanningUnits extends Component {
     addRow = function () {
         console.log("add row called");
         var data = [];
-        // data[0] = 0;
-        // data[1] = "";
-        // data[2] = "";
-        // data[3] = "";
-        // data[4] = "";
-        // data[5] = "";
-        // data[6] = "";
-        // data[7] = "";
-        // data[8] = 0;
-        // data[9] = 0;
-        // data[10] = 1;
-        // data[11] = 1;
-        // data[12] = this.props.match.params.programId;
+        data[0] = "-1";
+        data[1] = "";
+        data[2] = ""; 
+        data[3] = "";
+        data[4] = MONTHS_IN_FUTURE_FOR_AMC;
+        data[5] = MONTHS_IN_PAST_FOR_AMC;
+        data[6] = "";
+        data[7] = "";
+        data[8] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -532,12 +528,12 @@ export default class MapPlanningUnits extends Component {
                                 var productDataArr = []
                                 // if (productDataArr.length == 0) {
                                 data = [];
-                                data[0] = "";
+                                data[0] = "-1";
                                 data[1] = "";
-                                data[2] = "";
+                                data[2] = ""; 
                                 data[3] = "";
-                                data[4] = "";
-                                data[5] = "";
+                                data[4] = MONTHS_IN_FUTURE_FOR_AMC;
+                                data[5] = MONTHS_IN_PAST_FOR_AMC;
                                 data[6] = "";
                                 data[7] = "";
                                 data[8] = "";
@@ -587,7 +583,7 @@ export default class MapPlanningUnits extends Component {
                                             type: 'number'
                                         },
                                         {
-                                            title: i18n.t('static.supplyPlan.shelfLife'),
+                                            title: i18n.t('static.report.shelfLife'),
                                             type: 'number'
                                         },
                                         {

@@ -6,14 +6,15 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import AuthenticationService from '../Common/AuthenticationService';
 import QuantimedImportService from '../../api/QuantimedImportService';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
@@ -147,7 +148,7 @@ export default class QunatimedImportStepTwo extends Component {
     }
 
     updatePlanningUnitNotFound = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
 
         for (var y = 0; y < json.length; y++) {
 
@@ -162,7 +163,7 @@ export default class QunatimedImportStepTwo extends Component {
 
     programPlanningUnitChanged = function (instance, cell, x, y, value) {
 
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null,false);
         var hasDuplicate = false;
 
         if (x == 2) {
@@ -233,7 +234,7 @@ export default class QunatimedImportStepTwo extends Component {
 
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         var totalDoNotImport = 0;
 
         for (var y = 0; y < json.length; y++) {
@@ -278,7 +279,7 @@ export default class QunatimedImportStepTwo extends Component {
     }
 
     checkDuplicateCountry = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null,false);
         let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
@@ -332,7 +333,7 @@ export default class QunatimedImportStepTwo extends Component {
                     var myResult = [];
                     myResult = planningunitRequest.result;
                     
-                    var tableJson = this.el.getJson();                    
+                    var tableJson = this.el.getJson(null,false);                    
 
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
@@ -566,6 +567,8 @@ export default class QunatimedImportStepTwo extends Component {
                             allowDeleteRow: false,
                             tableOverflow: false,
                             onload: this.loaded,
+                            license: JEXCEL_PRO_KEY,
+                            filters:true
                             // tableHeight: '500px',
                         };
                         myVar = jexcel(document.getElementById("paputableDiv"), options);

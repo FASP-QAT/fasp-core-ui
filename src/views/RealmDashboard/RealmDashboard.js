@@ -389,7 +389,7 @@ class RealmDashboard extends Component {
                     </ButtonGroup>
                   </div>
 
-                  <div className="TextTittle ">Country </div>
+                  <div className="TextTittle ">{i18n.t('static.program.realmcountrydashboard')} </div>
                   <div className="text-count">{this.state.dashboard.REALM_COUNTRY_COUNT}</div>
                   <div className="chart-wrapper mt-4 pb-2" >
                     {/* <Line data={cardChartData3} options={cardChartOpts3} height={70} /> */}

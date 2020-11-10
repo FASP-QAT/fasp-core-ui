@@ -359,7 +359,7 @@ export default class ReactListComponent extends Component {
                             data[4] = realmList[j].minMosMaxGaurdrail;
                             data[5] = realmList[j].maxMosMaxGaurdrail;
                             data[6] = realmList[j].lastModifiedBy.username;
-                            data[7] = (realmList[j].lastModifiedDate ? (realmList[j].lastModifiedDate) : null)
+                            data[7] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
                             data[8] = realmList[j].active;
 
                             realmArray[count] = data;

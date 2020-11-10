@@ -33,7 +33,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -48,8 +48,9 @@ import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import MultiSelect from 'react-multi-select-component';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 
 class warehouseCapacity extends Component {
     constructor(props) {
@@ -757,7 +758,7 @@ class warehouseCapacity extends Component {
             data[1] = getLabelText(regionList[j].region.label, this.state.lang)
             data[2] = (regionList[j].programList.map((item, idx1) => { return (getLabelText(regionList[j].programList[idx1].label, this.state.lang)) })).join(' \n')
             data[3] = regionList[j].gln
-            data[4] = (regionList[j].capacityCbm).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            data[4] = (regionList[j].capacityCbm);
 
             regionListArray[count] = data;
             count++;
@@ -801,7 +802,7 @@ class warehouseCapacity extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.region.capacitycbm'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 }
             ],
@@ -825,7 +826,11 @@ class warehouseCapacity extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
 
         };
         var regionEl = jexcel(document.getElementById("tableDiv"), options);

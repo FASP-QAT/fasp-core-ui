@@ -433,7 +433,7 @@ export default class CountryListComponent extends Component {
             data[2] = countryList[j].countryCode;
             data[3] = countryList[j].countryCode2;
             data[4] = countryList[j].lastModifiedBy.username;
-            data[5] = (countryList[j].lastModifiedDate ? countryList[j].lastModifiedDate : null)
+            data[5] = (countryList[j].lastModifiedDate ? moment(countryList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             data[6] = countryList[j].active;
 
             countryArray[count] = data;
