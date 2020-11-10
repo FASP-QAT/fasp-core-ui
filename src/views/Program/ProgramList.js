@@ -495,7 +495,7 @@ export default class ProgramList extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100],
+      colWidths: [100, 100, 200, 100, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {

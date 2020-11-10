@@ -756,7 +756,7 @@ export default class PipelineProgramSetup extends Component {
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == 'programCode1') {
-            program.programCode = event.target.value;
+            program.programCode = event.target.value.toUpperCase();
         }
         if (event.target.name == "programName") {
             program.label.label_en = event.target.value;
@@ -1026,8 +1026,20 @@ export default class PipelineProgramSetup extends Component {
 
                                     program.programNotes = response.data.note;
                                     program.label.label_en = response.data.programname;
-                                    program.monthsInPastForAmc=MONTHS_IN_PAST_FOR_AMC;
-                                    program.monthsInFutureForAmc=MONTHS_IN_FUTURE_FOR_AMC;
+
+                                    if (response.data.defaultleadtimeplan != 0 && response.data.defaultleadtimeplan != "") {
+                                        program.plannedToSubmittedLeadTime = response.data.defaultleadtimeplan;
+                                    }
+                                    if (response.data.defaultleadtimeorder != 0 && response.data.defaultleadtimeorder != "") {
+                                        program.submittedToApprovedLeadTime = 0.5;
+                                        program.approvedToShippedLeadTime = parseFloat(response.data.defaultleadtimeorder - 0.5);
+                                    }
+                                    if (response.data.defaultleadtimeship != 0 && response.data.defaultleadtimeship != "") {
+                                        program.arrivedToDeliveredLeadTime = 0.5;
+                                        program.shippedToArrivedBySeaLeadTime = parseFloat(response.data.defaultleadtimeship - 0.5);
+                                    }
+                                    program.monthsInPastForAmc = MONTHS_IN_PAST_FOR_AMC;
+                                    program.monthsInFutureForAmc = MONTHS_IN_FUTURE_FOR_AMC;
                                     this.setState({ program: program });
                                 } else {
                                     this.setState({

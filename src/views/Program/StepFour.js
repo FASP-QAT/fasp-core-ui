@@ -176,9 +176,10 @@ export default class StepFour extends Component {
                             handleSubmit,
                             isSubmitting,
                             isValid,
-                            setTouched
+                            setTouched,
+                            handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='organisationForm'>
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -200,7 +201,7 @@ export default class StepFour extends Component {
                                         <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
