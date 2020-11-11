@@ -572,6 +572,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -580,6 +581,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -587,6 +589,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -594,6 +597,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -601,6 +605,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -608,6 +613,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -615,6 +621,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -625,14 +632,6 @@ export default class MapPlanningUnits extends Component {
                                         // }
 
                                     ],
-                                    oncreateeditor: function (a, b, c, d, e) {
-                                        console.log("In create editor")
-                                        e.type = 'text';
-                                        if (e.value) {
-                                            e.selectionStart = e.value.length;
-                                            e.selectionEnd = e.value.length;
-                                        }
-                                    },
                                     pagination: false,
                                     search: true,
                                     columnSorting: true,

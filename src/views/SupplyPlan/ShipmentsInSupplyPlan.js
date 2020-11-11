@@ -81,12 +81,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var rowData = (instance.jexcel).getRowData(0);
-                (instance.jexcel).setValueFromCoords(2, data[i].y, rowData[2], true);
-                (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(6, data[i].y, rowData[6], true);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, rowData[7], true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    var rowData = (instance.jexcel).getRowData(0);
+                    (instance.jexcel).setValueFromCoords(2, data[i].y, rowData[2], true);
+                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, rowData[6], true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, rowData[7], true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -461,14 +464,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80 },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100 },
-                                                { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true },
+                                                { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                 { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
-                                                { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true },
-                                                { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 120, mask: '#,##.00', decimal: '.' },
-                                                { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true },
+                                                { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 80, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
+                                                { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 120, mask: '#,##.00', textEditor: true, decimal: '.' },
+                                                { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 80, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                 { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
@@ -505,7 +508,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             license: JEXCEL_PRO_KEY,
                                             onchangepage: this.onchangepage,
                                             oncreateeditor: function (a, b, c, d, e) {
-                                                e.type = 'text';
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)
                                                 }
@@ -662,6 +664,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         {
                                                                             title: i18n.t('static.supplyPlan.shipmentQty'),
                                                                             type: 'numeric',
+                                                                            textEditor: true,
                                                                             mask: '#,##.00', decimal: '.'
                                                                         },
                                                                         {
@@ -3515,11 +3518,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 columnDrag: true,
                 columns: [
                     { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'dropdown', source: adjustedOrderQty, width: 120 },
-                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
-                    { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120 },
+                    { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                    { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.roundingOption'), source: [{ id: 1, name: i18n.t('static.supplyPlan.roundDown') }, { id: 2, name: i18n.t('static.supplyPlan.roundUp') }], width: 120 },
-                    { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', readOnly: true, mask: '#,##.00', decimal: '.', width: 120 },
+                    { title: i18n.t('static.supplyPlan.finalOrderQty'), type: 'numeric', textEditor: true, readOnly: true, mask: '#,##.00', decimal: '.', width: 120 },
                     { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                     { type: 'hidden', readOnly: true, title: i18n.t('static.procurementAgentPlanningUnit.moq'), width: 0 },
                     { type: 'hidden', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), width: 0 },

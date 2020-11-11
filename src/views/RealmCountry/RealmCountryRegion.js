@@ -162,6 +162,7 @@ class RealmCountryRegion extends Component {
                                 {
                                     title: i18n.t('static.region.capacitycbm'),
                                     type: 'numeric',
+                                    textEditor: true,
                                     decimal: '.',
                                     mask: '#,##.00',
                                     disabledMaskOnEdition: true
@@ -169,6 +170,7 @@ class RealmCountryRegion extends Component {
                                 {
                                     title: i18n.t('static.region.gln'),
                                     type: 'number',
+                                    textEditor: true,
                                 },
                                 {
                                     title: i18n.t('static.checkbox.active'),
@@ -188,17 +190,6 @@ class RealmCountryRegion extends Component {
                                 }
 
                             ],
-                            oncreateeditor: function (instance, cell, x, y, dom, options) {
-                                console.log("In create editor", dom)
-                                if (x == 2) {
-                                    console.log("In create editor!!!!!", dom.value.toString().length);
-                                    dom.type = 'text';
-                                    if (dom.value) {
-                                        dom.selectionStart = dom.value.toString().length;
-                                        dom.selectionEnd = dom.value.toString().length;
-                                    }
-                                }
-                            },
                             pagination: localStorage.getItem("sesRecordCount"),
                             filters: true,
                             search: true,
@@ -508,11 +499,14 @@ class RealmCountryRegion extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-                (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
-                (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                    (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                    z = data[i].y;
+                }
             }
         }
     }

@@ -51,7 +51,7 @@ export default class PipelineProgramShipment extends Component {
         var valid = true;
         var list = this.state.pipelineShipmentData;
         console.log(list)
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         console.log(json)
         for (var y = 0; y < json.length; y++) {
 
@@ -167,7 +167,7 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
 
-                
+
             }
             var col = ("J").concat(parseInt(y) + 1);
             var value = (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
@@ -314,7 +314,7 @@ export default class PipelineProgramShipment extends Component {
         var regexDecimal = /^[0-9]+.[0-9]+$/
         var shipmentStatusId = 0;
         if (x == 0) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -326,7 +326,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 1) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -352,7 +352,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 3) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1074,32 +1074,36 @@ export default class PipelineProgramShipment extends Component {
                 {
                     title: i18n.t('static.shipment.qty'),
                     type: 'numeric',
-                                                mask: '#,##.00',
-                                                disabledMaskOnEdition: true,
-                                                decimal: '.'
+                    textEditor: true,
+                    mask: '#,##.00',
+                    disabledMaskOnEdition: true,
+                    decimal: '.'
                     // source: regionList
                     // readOnly: true
                 }, {
                     title: i18n.t('static.shipment.rate'),
                     type: 'numeric',
-                                                mask: '#,##.00',
-                                                disabledMaskOnEdition: true,
-                                                decimal: '.'
+                    mask: '#,##.00',
+                    textEditor: true,
+                    disabledMaskOnEdition: true,
+                    decimal: '.'
                     // source: regionList
                     // readOnly: true
                 }, {
                     title: i18n.t('static.shipment.freightcost'),
                     type: 'numeric',
-                                                mask: '#,##.00',
-                                                disabledMaskOnEdition: true,
-                                                decimal: '.'
+                    textEditor: true,
+                    mask: '#,##.00',
+                    disabledMaskOnEdition: true,
+                    decimal: '.'
                     // source: dataSourceList
                 }, {
                     title: i18n.t('static.shipment.productcost'),
                     type: 'numeric',
-                                                mask: '#,##.00',
-                                                disabledMaskOnEdition: true,
-                                                decimal: '.'
+                    textEditor: true,
+                    mask: '#,##.00',
+                    disabledMaskOnEdition: true,
+                    decimal: '.'
                     // source: dataSourceList
                 }, {
                     title: i18n.t('static.shipment.edd'),
@@ -1158,14 +1162,6 @@ export default class PipelineProgramShipment extends Component {
                 }
 
             ],
-            oncreateeditor: function (a, b, c, d, e) {
-                console.log("In create editor")
-                e.type = 'text';
-                if (e.value) {
-                    e.selectionStart = e.value.length;
-                    e.selectionEnd = e.value.length;
-                }
-            },
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1208,7 +1204,7 @@ export default class PipelineProgramShipment extends Component {
     SubmitShipment() {
         this.loaded()
 
-        var data = this.el.getJson(null,false).map((ele,y) => ({
+        var data = this.el.getJson(null, false).map((ele, y) => ({
             "shipmentId": null,
             "procurementUnit": null,
 
@@ -1293,7 +1289,7 @@ export default class PipelineProgramShipment extends Component {
         // this.SubmitShipment()
         this.loaded()
         this.setState({ loading: true });
-        var data = this.el.getJson(null,false).map((ele,y) => ({
+        var data = this.el.getJson(null, false).map((ele, y) => ({
             "shipmentId": null,
             "procurementUnit": null,
             "planningUnit": ele[0],

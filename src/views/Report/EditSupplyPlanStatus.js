@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -368,7 +368,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     leftClickedConsumption = () => {
-        var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED;
+        var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
@@ -376,7 +376,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     rightClickedConsumption = () => {
-        var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
+        var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
@@ -384,7 +384,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     leftClickedAdjustments = () => {
-        var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED;
+        var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
@@ -392,7 +392,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     rightClickedAdjustments = () => {
-        var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
+        var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })

@@ -741,25 +741,25 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.unit.multiplier'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
 
                                                     },
                                                     {
                                                         title: i18n.t('static.program.reorderFrequencyInMonths'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
 
                                                     },
                                                     {
                                                         title: i18n.t('static.supplyPlan.minStockMos'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.mosfuture'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.mospast'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.id'),
@@ -767,15 +767,15 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.pipeline.localprocurementleadtime'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.shelfLife'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.common.status'),
@@ -784,14 +784,6 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     }
                                                 ],
                                                 pagination: localStorage.getItem("sesRecordCount"),
-                                                oncreateeditor: function (a, b, c, d, e) {
-                                                    console.log("In create editor")
-                                                    e.type = 'text';
-                                                    if (e.value) {
-                                                        e.selectionStart = e.value.length;
-                                                        e.selectionEnd = e.value.length;
-                                                    }
-                                                },
                                                 filters: true,
                                                 contextMenu: function (obj, x, y, e) {
                                                     return [];

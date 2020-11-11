@@ -485,14 +485,16 @@ export default class PipelineProgramConsumption extends Component {
                                                 type: 'numeric',
                                                 mask: '#,##.00',
                                                 disabledMaskOnEdition: true,
-                                                decimal: '.'
+                                                decimal: '.',
+                                                textEditor: true
                                             },
                                             {
                                                 title: i18n.t('static.consumption.daysofstockout'),
                                                 type: 'numeric',
                                                 disabledMaskOnEdition: true,
                                                 mask: '#,##.00',
-                                                decimal: '.'
+                                                decimal: '.',
+                                                textEditor: true
                                             },
                                             {
                                                 title: i18n.t('static.program.notes'),
@@ -512,14 +514,6 @@ export default class PipelineProgramConsumption extends Component {
                                         contextMenu: function (obj, x, y, e) {
                                             return [];
                                         }.bind(this),
-                                        oncreateeditor: function (a, b, c, d, e) {
-                                            console.log("In create editor")
-                                            e.type = 'text';
-                                            if (e.value) {
-                                                e.selectionStart = e.value.length;
-                                                e.selectionEnd = e.value.length;
-                                            }
-                                        },
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,

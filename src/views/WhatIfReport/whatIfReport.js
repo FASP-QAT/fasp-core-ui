@@ -11,7 +11,7 @@ import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, PERCENTAGE_REGEX, DATE_FORMAT_CAP_WITHOUT_DATE, INTEGER_NO_REGEX, USD_CURRENCY_ID } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, PERCENTAGE_REGEX, DATE_FORMAT_CAP_WITHOUT_DATE, INTEGER_NO_REGEX, USD_CURRENCY_ID, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -2597,7 +2597,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     leftClickedConsumption() {
-        var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED;
+        var monthCountConsumption = (this.state.monthCountConsumption) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
@@ -2605,7 +2605,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     rightClickedConsumption() {
-        var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
+        var monthCountConsumption = (this.state.monthCountConsumption) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
@@ -2613,7 +2613,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     leftClickedAdjustments() {
-        var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED;
+        var monthCountAdjustments = (this.state.monthCountAdjustments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
@@ -2621,7 +2621,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     rightClickedAdjustments() {
-        var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
+        var monthCountAdjustments = (this.state.monthCountAdjustments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
