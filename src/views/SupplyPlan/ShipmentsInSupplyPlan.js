@@ -57,21 +57,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var index = (instance.jexcel).getValue(`X${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
                 if (index == "" || index == null || index == undefined) {
-                (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
-                (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
-                (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(23, data[i].y, -1, true);
-                (instance.jexcel).setValueFromCoords(24, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(25, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(26, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(27, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(28, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
-                (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
-                (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
-                z = data[i].y;
+                    (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
+                    (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
+                    (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(23, data[i].y, -1, true);
+                    (instance.jexcel).setValueFromCoords(24, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(25, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(26, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(27, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(28, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
+                    (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
+                    z = data[i].y;
                 }
             }
         }
@@ -461,7 +461,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80 },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100 },
-                                                { type: 'numeric', readOnly: true, title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true },
+                                                { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 100, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true },
                                                 { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
@@ -498,19 +498,22 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             copyCompatibility: true,
                                             editable: shipmentEditable,
                                             onchange: this.shipmentChanged,
-                                            oneditionstart: this.shipmentEditStart,
+                                            // oneditionstart: this.shipmentEditStart,
                                             allowExport: false,
                                             parseFormulas: true,
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
-                                            onchangepage:this.onchangepage,
+                                            onchangepage: this.onchangepage,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 e.type = 'text';
+                                                if (c == 10) {
+                                                    this.shipmentEditStart(a, b, c, d, e)
+                                                }
                                                 // if (e.value) {
                                                 //     e.selectionStart = e.value.length;
                                                 //     e.selectionEnd = e.value.length;
                                                 // }
-                                            },
+                                            }.bind(this),
                                             onpaste: this.onPaste,
                                             text: {
                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
@@ -519,6 +522,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             },
                                             onload: this.loadedShipments,
                                             updateTable: function (el, cell, x, y, source, value, id) {
+                                                console.log("In update table", y);
                                                 if (y != null) {
                                                     var elInstance = el.jexcel;
                                                     // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
@@ -533,18 +537,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     //     }
                                                     // } else {
                                                     // }
-                                                    if (x == 6 || x == 2) {
-                                                        var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[6] && p.planningUnit.id == rowData[2]);
-                                                        if (rowData[6] == "" || (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
-                                                            console.log("In if")
-                                                            var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                                                            cell.classList.add('readonly');
-                                                        } else {
-                                                            console.log("In else")
-                                                            var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
-                                                            cell.classList.remove('readonly');
-                                                        }
-                                                    }
+                                                    // if (x == 6 || x == 2) {
+                                                    //     var procurementAgentPlanningUnit = papuResult.filter(p => p.procurementAgent.id == rowData[6] && p.planningUnit.id == rowData[2]);
+                                                    //     if (rowData[6] == "" || (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null)))) {
+                                                    //         console.log("In if")
+                                                    //         var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                    //         console.log("Cell=------------------>",cell)
+                                                    //         cell.classList.add('readonly');
+                                                    //     } else {
+                                                    //         console.log("In else")
+                                                    //         var cell = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                                    //         console.log("Cell=------------------>",cell)
+                                                    //         cell.classList.remove('readonly');
+                                                    //     }
+                                                    // }
                                                 }
                                             }.bind(this),
                                             contextMenu: function (obj, x, y, e) {
@@ -1267,8 +1273,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         shipmentInstance.orderBy(4, 0);
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-        var jsonLength=1*(document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        console.log("JsonLength----------->", jsonLength);
+        console.log("shipmentInstance----------->", shipmentInstance)
         for (var i = 0; i < jsonLength; i++) {
+            console.log("i------------>", i)
             var rowData = shipmentInstance.getRowData(i);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
@@ -1326,8 +1341,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentInstance = el.jexcel;
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-        var jsonLength=pageNo*(document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-        for (var i = 0; i < jsonLength; i++) {
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        console.log("JsonLength------------>", jsonLength, "pageNo", pageNo)
+        for (var i = start; i < jsonLength; i++) {
+            console.log("D--------------->", i, "JsonLength", jsonLength);
             var rowData = shipmentInstance.getRowData(i);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
@@ -1356,7 +1380,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var element = document.getElementById("shipmentsDetailsTable");
                     element.classList.remove("jexcelremoveReadonlybackground");
                 }
-
                 if (rowData[11].toString() == "true") {
                     console.log("In if");
                     shipmentInstance.setStyle(col, "color", "#000");
@@ -1538,7 +1561,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     shipmentChanged = function (instance, cell, x, y, value) {
-        var elInstance = this.state.shipmentsEl;
+        console.log("Y--------------->", y, "x", x, "Value", value);
+        var elInstance = instance.jexcel;
+        console.log("El instance------------>", elInstance)
         var rowData = elInstance.getRowData(y);
         var planningUnitId = rowData[2];
         this.props.updateState("shipmentError", "");
@@ -3378,6 +3403,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     render() { return (<div></div>) }
 
     shipmentEditStart = function (instance, cell, x, y, value) {
+        console.log("In edit start");
         var papuResult = this.state.procurementAgentPlanningUnitListAll;
         var elInstance = this.state.shipmentsEl;
         var rowData = elInstance.getRowData(y);
