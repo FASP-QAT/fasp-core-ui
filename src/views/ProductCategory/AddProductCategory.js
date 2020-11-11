@@ -1,6 +1,5 @@
 import React from "react";
 import "./style.css";
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import SortableTree, {
     getFlatDataFromTree,
     getTreeFromFlatData,

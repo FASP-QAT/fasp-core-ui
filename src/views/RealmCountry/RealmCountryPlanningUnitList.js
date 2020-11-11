@@ -744,14 +744,15 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmCountryService from '../../api/RealmCountryService';
-import jexcel from 'jexcel';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY } from '../../Constants';
 const entityname = i18n.t('static.dashboad.planningunitcountry');
 export default class RealmCountryPlanningUnitList extends Component {
 
@@ -1422,6 +1423,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         show: '',
                                                         entries: '',
                                                     },
+                                                    filters: true,
+                                                    license: JEXCEL_PRO_KEY,
                                                     onload: this.loaded,
                                                     contextMenu: function (obj, x, y, e) {
                                                         var items = [];
