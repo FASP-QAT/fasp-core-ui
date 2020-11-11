@@ -468,13 +468,16 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 ],
                                                 oncreateeditor: function (a, b, c, d, e) {
                                                     console.log("In create editor")
+                                                    console.log("In create editor!!!!!!")
                                                     e.type = 'text';
                                                     console.log("D------------->", e.value);
                                                     console.log("D---------->", e.value.length);
                                                     console.log("D----------->e.selectionStart", e.selectionStart);
+                                                    e.value = 10000;
                                                     if (e.value) {
-                                                        e.selectionStart = e.value.length;
-                                                        e.selectionEnd = e.value.length;
+                                                        // e.selectionStart = e.value;
+
+                                                        // e.selectionEnd = e.value.length;
                                                     }
                                                 },
                                                 pagination: false,
@@ -492,6 +495,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 onchange: this.batchInfoChangedConsumption,
                                                 editable: consumptionBatchEditable,
                                                 license: JEXCEL_PRO_KEY,
+                                                onpaste: this.onPasteForBatchInfo,
                                                 text: {
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                                     show: '',

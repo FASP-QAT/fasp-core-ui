@@ -188,12 +188,15 @@ class RealmCountryRegion extends Component {
                                 }
 
                             ],
-                            oncreateeditor: function (a, b, c, d, e) {
-                                console.log("In create editor")
-                                e.type = 'text';
-                                if (e.value) {
-                                    e.selectionStart = e.value.length;
-                                    e.selectionEnd = e.value.length;
+                            oncreateeditor: function (instance, cell, x, y, dom, options) {
+                                console.log("In create editor", dom)
+                                if (x == 2) {
+                                    console.log("In create editor!!!!!", dom.value.toString().length);
+                                    dom.type = 'text';
+                                    if (dom.value) {
+                                        dom.selectionStart = dom.value.toString().length;
+                                        dom.selectionEnd = dom.value.toString().length;
+                                    }
                                 }
                             },
                             pagination: localStorage.getItem("sesRecordCount"),
