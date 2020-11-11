@@ -834,7 +834,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
 
     addRow = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en;
         data[1] = "";
@@ -873,7 +873,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             this.setState({
                 loading: true
             })
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -980,7 +980,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     }
 
     checkDuplicatePlanningUnit = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
 
         let tempArray = tableJson;
@@ -1009,7 +1009,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(9, y);
@@ -1138,7 +1138,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 // this.el.setValueFromCoords(2, y, value, true);
-                var text = this.el.getValueFromCoords(1, y);
+                // var text = this.el.getValueFromCoords(1, y);
+                var text = this.el.getValue(`B${parseInt(y) + 1}`, true)
+                console.log("TEXT-------->", text);
                 this.el.setValueFromCoords(2, y, text, true);
             }
         }
