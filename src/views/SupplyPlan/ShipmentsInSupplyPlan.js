@@ -57,21 +57,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var index = (instance.jexcel).getValue(`X${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
                 if (index == "" || index == null || index == undefined) {
-                (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
-                (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
-                (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(23, data[i].y, -1, true);
-                (instance.jexcel).setValueFromCoords(24, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(25, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(26, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(27, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(28, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
-                (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
-                (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
-                z = data[i].y;
+                    (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
+                    (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
+                    (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(23, data[i].y, -1, true);
+                    (instance.jexcel).setValueFromCoords(24, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(25, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(26, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(27, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(28, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
+                    (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
+                    z = data[i].y;
                 }
             }
         }
@@ -503,7 +503,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             parseFormulas: true,
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
-                                            onchangepage:this.onchangepage,
+                                            onchangepage: this.onchangepage,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 e.type = 'text';
                                                 // if (e.value) {
@@ -1267,8 +1267,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         shipmentInstance.orderBy(4, 0);
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-        var jsonLength=1*(document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        console.log("JsonLength----------->", jsonLength);
+        console.log("shipmentInstance----------->", shipmentInstance)
         for (var i = 0; i < jsonLength; i++) {
+            console.log("i------------>", i)
             var rowData = shipmentInstance.getRowData(i);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
@@ -1326,7 +1335,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentInstance = el.jexcel;
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-        var jsonLength=pageNo*(document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
         for (var i = 0; i < jsonLength; i++) {
             var rowData = shipmentInstance.getRowData(i);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
