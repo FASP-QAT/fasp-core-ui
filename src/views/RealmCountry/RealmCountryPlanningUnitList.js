@@ -744,14 +744,16 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmCountryService from '../../api/RealmCountryService';
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY } from '../../Constants';
 const entityname = i18n.t('static.dashboad.planningunitcountry');
 export default class RealmCountryPlanningUnitList extends Component {
 
@@ -817,6 +819,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
 
     cancelClicked() {
@@ -849,6 +852,20 @@ export default class RealmCountryPlanningUnitList extends Component {
         );
     };
 
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
+                (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
+                (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
+                (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                z = data[i].y;
+            }
+        }
+    }
+
     formSubmit = function () {
         // var duplicateValidation = this.checkDuplicatePlanningUnit();
         var validation = this.checkValidation();
@@ -874,7 +891,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                         unit: {
                             unitId: parseInt(map1.get("4"))
                         },
-                        multiplier: map1.get("5"),
+                        // multiplier: map1.get("5"),
+                        multiplier: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("6"),
                         realmCountry: {
                             id: parseInt(map1.get("7"))
@@ -1079,7 +1097,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                 // }
 
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(5, y);
+                // var value = this.el.getValueFromCoords(5, y);
+                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1194,6 +1213,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             if (this.el.getValueFromCoords(x, y) != "") {
@@ -1365,7 +1385,11 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         },
                                                         {
                                                             title: i18n.t('static.unit.multiplier'),
-                                                            type: 'number',
+                                                            // type: 'number',
+                                                            type: 'numeric',
+                                                            decimal: '.',
+                                                            mask: '#,##.00',
+                                                            disabledMaskOnEdition: true
 
                                                         },
 
@@ -1387,6 +1411,14 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         }
 
                                                     ],
+                                                    oncreateeditor: function (a, b, c, d, e) {
+                                                        console.log("In create editor")
+                                                        e.type = 'text';
+                                                        if (e.value) {
+                                                            e.selectionStart = e.value.length;
+                                                            e.selectionEnd = e.value.length;
+                                                        }
+                                                    },
                                                     updateTable: function (el, cell, x, y, source, value, id) {
                                                         var elInstance = el.jexcel;
                                                         var rowData = elInstance.getRowData(y);
@@ -1401,6 +1433,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
                                                     },
                                                     pagination: localStorage.getItem("sesRecordCount"),
+                                                    filters: true,
                                                     search: true,
                                                     columnSorting: true,
                                                     tableOverflow: true,
@@ -1416,6 +1449,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                     oneditionend: this.onedit,
                                                     copyCompatibility: true,
                                                     allowManualInsertRow: false,
+                                                    parseFormulas: true,
+                                                    onpaste: this.onPaste,
                                                     text: {
                                                         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1423,6 +1458,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         entries: '',
                                                     },
                                                     onload: this.loaded,
+                                                    license: JEXCEL_PRO_KEY,
                                                     contextMenu: function (obj, x, y, e) {
                                                         var items = [];
                                                         //Add consumption batch info
@@ -1541,27 +1577,27 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                             }
 
                                                             if (x) {
-                                                                if (obj.options.allowComments == true) {
-                                                                    items.push({ type: 'line' });
+                                                                // if (obj.options.allowComments == true) {
+                                                                //     items.push({ type: 'line' });
 
-                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+                                                                //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                                    items.push({
-                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                        onclick: function () {
-                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                        }
-                                                                    });
+                                                                //     items.push({
+                                                                //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                //         onclick: function () {
+                                                                //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                //         }
+                                                                //     });
 
-                                                                    if (title) {
-                                                                        items.push({
-                                                                            title: obj.options.text.clearComments,
-                                                                            onclick: function () {
-                                                                                obj.setComments([x, y], '');
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                }
+                                                                //     if (title) {
+                                                                //         items.push({
+                                                                //             title: obj.options.text.clearComments,
+                                                                //             onclick: function () {
+                                                                //                 obj.setComments([x, y], '');
+                                                                //             }
+                                                                //         });
+                                                                //     }
+                                                                // }
                                                             }
                                                         }
 
