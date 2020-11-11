@@ -517,11 +517,12 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
 
 
 const entityname = i18n.t('static.datasource.datasource');
@@ -650,7 +651,7 @@ export default class DataSourceListComponent extends Component {
             data[3] = getLabelText(dataSourceList[j].label, this.state.lang)
             data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
             data[5] = dataSourceList[j].lastModifiedBy.username;
-            data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;
             dataSourceArray[count] = data;
             count++;
@@ -703,7 +704,8 @@ export default class DataSourceListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 },
                 {
@@ -740,7 +742,11 @@ export default class DataSourceListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var dataSourceEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataSourceEl;

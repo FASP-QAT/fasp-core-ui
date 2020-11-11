@@ -175,9 +175,10 @@ export default class StepThree extends Component {
                             handleSubmit,
                             isSubmitting,
                             isValid,
-                            setTouched
+                            setTouched,
+                            handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='healthAreaForm'>
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -198,7 +199,7 @@ export default class StepThree extends Component {
                                     </FormGroup>
                                     <FormGroup>
 
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

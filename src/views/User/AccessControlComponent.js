@@ -1163,11 +1163,12 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 // const entityname = i18n.t('static.dashboad.planningunitcapacity')
 
 class AccessControlComponent extends Component {
@@ -1207,7 +1208,7 @@ class AccessControlComponent extends Component {
         this.filterProgram = this.filterProgram.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
 
@@ -1426,6 +1427,7 @@ class AccessControlComponent extends Component {
 
             ],
             pagination: localStorage.getItem("sesRecordCount"),
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1438,6 +1440,8 @@ class AccessControlComponent extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
+            parseFormulas: true,
+            onpaste: this.onPaste,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1445,6 +1449,7 @@ class AccessControlComponent extends Component {
                 entries: '',
             },
             onload: this.loaded,
+            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info
@@ -1553,27 +1558,27 @@ class AccessControlComponent extends Component {
                     }
 
                     if (x) {
-                        if (obj.options.allowComments == true) {
-                            items.push({ type: 'line' });
+                        // if (obj.options.allowComments == true) {
+                        //     items.push({ type: 'line' });
 
-                            var title = obj.records[y][x].getAttribute('title') || '';
+                        //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                            items.push({
-                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                onclick: function () {
-                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                }
-                            });
+                        //     items.push({
+                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                        //         onclick: function () {
+                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                        //         }
+                        //     });
 
-                            if (title) {
-                                items.push({
-                                    title: obj.options.text.clearComments,
-                                    onclick: function () {
-                                        obj.setComments([x, y], '');
-                                    }
-                                });
-                            }
-                        }
+                        //     if (title) {
+                        //         items.push({
+                        //             title: obj.options.text.clearComments,
+                        //             onclick: function () {
+                        //                 obj.setComments([x, y], '');
+                        //             }
+                        //         });
+                        //     }
+                        // }
                     }
                 }
 
@@ -1612,12 +1617,21 @@ class AccessControlComponent extends Component {
             data, 0, 1
         );
     }
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.user.username, true);
+                z = data[i].y;
+            }
+        }
+    }
     submitForm() {
         var validation = this.checkValidation();
         console.log("validation************", validation);
         if (validation) {
 
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -2058,7 +2072,7 @@ class AccessControlComponent extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
             //Country

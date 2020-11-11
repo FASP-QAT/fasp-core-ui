@@ -24,6 +24,7 @@ import StepFour from './StepFour.js';
 import StepFive from './StepFive';
 import StepSix from './StepSix.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
@@ -63,15 +64,17 @@ export default class ProgramOnboarding extends Component {
                 // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
-                submittedToApprovedLeadTime: '',
-                approvedToShippedLeadTime: '',
+                submittedToApprovedLeadTime: SUBMITTED_TO_APPROVED,
+                approvedToShippedLeadTime: APPROVED_TO_SHIPPED,
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
 
-                shippedToArrivedByAirLeadTime: '',
-                shippedToArrivedBySeaLeadTime: '',
-                arrivedToDeliveredLeadTime: '',
+                shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
+                shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
+                arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
 
+                plannedToSubmittedLeadTime:PLANNED_TO_SUBMITTED,
+                
                 healthArea: {
                     id: ''
                 },
@@ -366,6 +369,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepFive').style.display = 'none';
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
+        let { program } = this.state;
+        program.healthArea.id = '';
+        this.setState({ program }, () => { console.log(this.state) })
     }
 
     previousToStepThree() {
@@ -377,6 +383,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepFive').style.display = 'none';
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
+        let { program } = this.state;
+        program.organisation.id = '';
+        this.setState({ program }, () => { console.log(this.state) })
     }
 
     previousToStepFour() {
@@ -388,6 +397,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepFive').style.display = 'none';
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
+        let { program } = this.state;
+        program.regionArray = [];
+        this.setState({ program }, () => { console.log(this.state) })
     }
     previousToStepFive() {
         this.setState({ progressPer: 68 });
@@ -448,6 +460,9 @@ export default class ProgramOnboarding extends Component {
             this.refs.organisationChild.getOrganisationList();
             this.refs.regionChild.getRegionList();
 
+            program.organisation.id = '';
+            program.healthArea.id = '';
+            program.regionArray = [];
 
         } if (event.target.name == 'organisationId') {
             var index = event.nativeEvent.target.selectedIndex;
@@ -473,7 +488,7 @@ export default class ProgramOnboarding extends Component {
         //     program.draftToSubmittedLeadTime = event.target.value;
         // } 
         if (event.target.name == 'programCode1') {
-            program.programCode = event.target.value;
+            program.programCode = event.target.value.toUpperCase();
         }
 
         if (event.target.name == 'plannedToSubmittedLeadTime') {
@@ -1061,7 +1076,7 @@ export default class ProgramOnboarding extends Component {
                                     </Row> */}
                                 </div>
                                 <div id="stepSeven">
-                                    <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
+                                    <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
                                     <FormGroup className="mt-2">
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         &nbsp;

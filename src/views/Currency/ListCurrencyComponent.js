@@ -388,7 +388,7 @@ export default class CurrencyListComponent extends Component {
                             data[2] = currencyList[j].currencyCode;
                             data[3] = currencyList[j].conversionRateToUsd;
                             data[4] = currencyList[j].lastModifiedBy.username;
-                            data[5] = (currencyList[j].lastModifiedDate ? (currencyList[j].lastModifiedDate) : null)
+                            data[5] = (currencyList[j].lastModifiedDate ? moment(currencyList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
 
                             currencyArray[count] = data;
                             count++;
@@ -438,7 +438,7 @@ export default class CurrencyListComponent extends Component {
                                     title: i18n.t('static.common.lastModifiedDate'),
                                     readOnly: true,
                                     type: 'calendar',
-                                    options: { format: JEXCEL_DATE_FORMAT_SM }
+                                    options: { format: JEXCEL_DATE_FORMAT_SM },
                                 },
                             ],
                             text: {

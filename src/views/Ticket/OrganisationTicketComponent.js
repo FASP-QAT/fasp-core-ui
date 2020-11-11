@@ -13,7 +13,7 @@ import HealthAreaService from '../../api/HealthAreaService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 import OrganisationService from '../../api/OrganisationService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -41,7 +41,8 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -517,7 +518,7 @@ export default class OrganisationTicketComponent extends Component {
         this.setState({
             organisation: organisation,
             realm: this.props.items.userRealmId,
-            countryId: ''        
+            countryId: ''
         },
             () => { });
     }

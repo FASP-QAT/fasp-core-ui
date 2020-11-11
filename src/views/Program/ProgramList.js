@@ -359,12 +359,13 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
 import moment from 'moment';
 import RealmCountryService from '../../api/RealmCountryService';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
@@ -475,7 +476,7 @@ export default class ProgramList extends Component {
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
       data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
       data[7] = programList[j].lastModifiedBy.username;
-      data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
 
       programArray[count] = data;
@@ -494,7 +495,7 @@ export default class ProgramList extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100],
+      colWidths: [100, 100, 200, 100, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -538,7 +539,8 @@ export default class ProgramList extends Component {
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
-          type: 'text',
+          type: 'calendar',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
           readOnly: true
         },
 
@@ -565,6 +567,11 @@ export default class ProgramList extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       // contextMenu: function (obj, x, y, e) {
       //   var items = [];
       //   if (y != null) {
@@ -588,7 +595,6 @@ export default class ProgramList extends Component {
       //   return items;
       // }.bind(this)
 
-      contextMenu: false
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;

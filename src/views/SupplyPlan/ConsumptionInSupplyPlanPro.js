@@ -469,6 +469,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 oncreateeditor: function (a, b, c, d, e) {
                                                     console.log("In create editor")
                                                     e.type = 'text';
+                                                    console.log("D------------->", e.value);
+                                                    console.log("D---------->", e.value.length);
+                                                    console.log("D----------->e.selectionStart", e.selectionStart);
                                                     if (e.value) {
                                                         e.selectionStart = e.value.length;
                                                         e.selectionEnd = e.value.length;
@@ -722,7 +725,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
             console.log("D-------------------------->Qty", parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")));
             console.log("D-------------------------->Batch QTy entered by user", parseInt(consumptionBatchQty));
-            if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).replaceAll(",","")) < parseInt(consumptionBatchQty)) {
+            if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).replaceAll(",", "")) < parseInt(consumptionBatchQty)) {
                 inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                 valid = false;
             } else {

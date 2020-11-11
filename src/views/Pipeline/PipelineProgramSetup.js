@@ -19,6 +19,7 @@ import PipelineProgramInventory from './PipelineProgramInventory.js';
 import PipelineProgramPlanningUnits from './PipelineProgramPlanningUnits.js';
 import PipelineProgramProcurementAgent from './PipelineProgramProcurementAgent';
 import PipelineProgramShipment from './PipelineProgramShipment';
+import { MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC } from "../../Constants";
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -29,6 +30,7 @@ export default class PipelineProgramSetup extends Component {
             pipelineProgramSetupPer: 0,
             program:
             {
+                programCode: '',
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -95,7 +97,12 @@ export default class PipelineProgramSetup extends Component {
 
             consumptionStatus: false,
             inventoryStatus: false,
-            shipmentStatus: false
+            shipmentStatus: false,
+            realmCountryCode: '',
+            organisationCode: '',
+            healthAreaCode: '',
+            programInfoStatus: false,
+            programInfoRegionStatus: false
             // pipelineConsumptionList: []
         }
         this.endProgramInfoStepOne = this.endProgramInfoStepOne.bind(this);
@@ -123,10 +130,24 @@ export default class PipelineProgramSetup extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+
+        this.generateCountryCode = this.generateCountryCode.bind(this);
+        this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
+        this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
+    }
+    generateCountryCode(code) {
+        this.setState({ realmCountryCode: code })
+    }
+    generateHealthAreaCode(code) {
+        this.setState({ healthAreaCode: code })
+    }
+    generateOrganisationCode(code) {
+        this.setState({ organisationCode: code })
+
     }
 
     endProgramInfoStepOne() {
-        this.setState({ progressPer: 25 });
+        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'block';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -136,7 +157,7 @@ export default class PipelineProgramSetup extends Component {
 
     }
     endProgramInfoStepTwo() {
-        this.setState({ progressPer: 50 });
+        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'block';
@@ -145,7 +166,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     endProgramInfoStepThree() {
-        this.setState({ progressPer: 75 });
+        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -154,7 +175,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     endProgramInfoStepFour() {
-        this.setState({ progressPer: 100 });
+        this.setState({ progressPer: 100, programInfoStatus: true, programInfoRegionStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -449,11 +470,11 @@ export default class PipelineProgramSetup extends Component {
             });
     }
 
-    
+
     finishedStepSix = () => {
         // this.refs.consumptionChild.startLoading();
         var consumption = this.refs.consumptionChild.saveConsumption();
-        
+
         console.log("consumption-----data---", consumption);
         // AuthenticationService.setupAxiosInterceptors();
         // this.refs.consumptionChild.startLoading();
@@ -555,7 +576,7 @@ export default class PipelineProgramSetup extends Component {
     }
 
     backToprogramInfoStepOne() {
-        this.setState({ progressPer: 0 });
+        this.setState({ progressPer: 0, programInfoRegionStatus: false, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'block';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -564,7 +585,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepTwo() {
-        this.setState({ progressPer: 25 });
+        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'block';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -573,7 +594,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepThree() {
-        this.setState({ progressPer: 50 });
+        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'block';
@@ -582,7 +603,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepFour() {
-        this.setState({ progressPer: 75 });
+        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -607,6 +628,7 @@ export default class PipelineProgramSetup extends Component {
             dataSourceStatus: false,
             fundingSourceStatus: false,
             procurmentAgnetStatus: false,
+            programInfoRegionStatus: false, programInfoStatus: true
         });
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
@@ -733,6 +755,9 @@ export default class PipelineProgramSetup extends Component {
 
     dataChange(event) {
         let { program } = this.state;
+        if (event.target.name == 'programCode1') {
+            program.programCode = event.target.value.toUpperCase();
+        }
         if (event.target.name == "programName") {
             program.label.label_en = event.target.value;
         } if (event.target.name == "realmId") {
@@ -1001,6 +1026,20 @@ export default class PipelineProgramSetup extends Component {
 
                                     program.programNotes = response.data.note;
                                     program.label.label_en = response.data.programname;
+
+                                    if (response.data.defaultleadtimeplan != 0 && response.data.defaultleadtimeplan != "") {
+                                        program.plannedToSubmittedLeadTime = response.data.defaultleadtimeplan;
+                                    }
+                                    if (response.data.defaultleadtimeorder != 0 && response.data.defaultleadtimeorder != "") {
+                                        program.submittedToApprovedLeadTime = 0.5;
+                                        program.approvedToShippedLeadTime = parseFloat(response.data.defaultleadtimeorder - 0.5);
+                                    }
+                                    if (response.data.defaultleadtimeship != 0 && response.data.defaultleadtimeship != "") {
+                                        program.arrivedToDeliveredLeadTime = 0.5;
+                                        program.shippedToArrivedBySeaLeadTime = parseFloat(response.data.defaultleadtimeship - 0.5);
+                                    }
+                                    program.monthsInPastForAmc = MONTHS_IN_PAST_FOR_AMC;
+                                    program.monthsInFutureForAmc = MONTHS_IN_FUTURE_FOR_AMC;
                                     this.setState({ program: program });
                                 } else {
                                     this.setState({
@@ -1356,19 +1395,19 @@ export default class PipelineProgramSetup extends Component {
                                                     <PipelineProgramDataStepOne realmId={this.state.program.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne}></PipelineProgramDataStepOne>
                                                 </div> */}
                                                 <div id="pipelineProgramDataStepOne">
-                                                    <PipelineProgramDataStepTwo realmId={this.state.program.realmCountry.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList}></PipelineProgramDataStepTwo>
+                                                    <PipelineProgramDataStepTwo realmId={this.state.program.realmCountry.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList} generateCountryCode={this.generateCountryCode}></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
-                                                    <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepThree>
+                                                    <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} dataChange={this.dataChange} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>
                                                 </div>
                                                 <div id="pipelineProgramDataStepThree">
-                                                    <PipelineProgramDataStepFour endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepFour>
+                                                    <PipelineProgramDataStepFour endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo} items={this.state} dataChange={this.dataChange} generateOrganisationCode={this.generateOrganisationCode}></PipelineProgramDataStepFour>
                                                 </div>
                                                 <div id="pipelineProgramDataStepFour">
-                                                    <PipelineProgramDataStepFive backToprogramInfoStepThree={this.backToprogramInfoStepThree} endProgramInfoStepFour={this.endProgramInfoStepFour} items={this.state} updateFieldData={this.updateFieldData}></PipelineProgramDataStepFive>
+                                                    {this.state.programInfoRegionStatus && <PipelineProgramDataStepFive backToprogramInfoStepThree={this.backToprogramInfoStepThree} endProgramInfoStepFour={this.endProgramInfoStepFour} items={this.state} updateFieldData={this.updateFieldData} generateCountryCode={this.generateCountryCode} generateHealthAreaCode={this.generateHealthAreaCode} generateOrganisationCode={this.generateOrganisationCode}></PipelineProgramDataStepFive>}
                                                 </div>
                                                 <div id="pipelineProgramDataStepFive">
-                                                    <PipelineProgramDataStepSix endProgramInfoStepFive={this.endProgramInfoStepFive} ref="programInfoChild" backToprogramInfoStepFour={this.backToprogramInfoStepFour} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepSix>
+                                                    {this.state.programInfoStatus && <PipelineProgramDataStepSix endProgramInfoStepFive={this.endProgramInfoStepFive} ref="programInfoChild" backToprogramInfoStepFour={this.backToprogramInfoStepFour} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepSix>}
                                                     {/* <h3>Program Data</h3>
                                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                     &nbsp;

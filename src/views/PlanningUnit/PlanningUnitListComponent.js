@@ -394,13 +394,14 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ProductService from '../../api/ProductService';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -735,7 +736,7 @@ export default class PlanningUnitListComponent extends Component {
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = planningUnitList[j].multiplier;
             data[5] = planningUnitList[j].lastModifiedBy.username;
-            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = planningUnitList[j].active;
 
 
@@ -789,7 +790,8 @@ export default class PlanningUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 },
                 {
@@ -825,6 +827,8 @@ export default class PlanningUnitListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {

@@ -3,10 +3,18 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
-import * as Yup from 'yup'
+import step1 from '../../assets/img/1-step.png'
+import step2 from '../../assets/img/2-step.png'
+import step3 from '../../assets/img/3-step.png'
+import step4 from '../../assets/img/4-step.png'
+import step5 from '../../assets/img/5-step.png'
+import step6 from '../../assets/img/6-step.png'
+import * as Yup from 'yup';
+
+// import Setupprogram from '../../assets/img/SetupProgram.png'
 import {
     Button, FormFeedback, CardBody, Row,
-    Form, FormGroup, Label, Input,
+    Form, FormGroup, Label, Input, Col
 } from 'reactstrap';
 
 const initialValuesSix = {
@@ -200,8 +208,10 @@ export default class PipelineProgramDataStepSix extends Component {
 
     // }
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramManagerList(1)
+        // AuthenticationService.setupAxiosInterceptors(); 
+
+        var realmId = AuthenticationService.getRealmId();
+        ProgramService.getProgramManagerList(realmId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -314,6 +324,37 @@ export default class PipelineProgramDataStepSix extends Component {
 
                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' style={{ display: this.state.loading ? "none" : "block" }}>
                                     <Row >
+                                        <FormGroup style={{ display: 'flex' }} className="col-md-6">
+                                            <Col xs="6" className="pl-0">
+                                                <FormGroup >
+                                                    <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
+                                                    <Input
+                                                        type="text" name="programCode"
+                                                        bsSize="sm"
+                                                        disabled
+                                                        value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode}
+                                                        id="programCode" />
+                                                    <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col xs="1" className="" style={{ marginTop: '32px' }}>
+                                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </Col>
+                                            <Col xs="5" className="pr-0">
+                                                <FormGroup className="pt-2">
+                                                    <Label htmlFor="company"></Label>
+                                                    <Input
+                                                        onBlur={handleBlur}
+                                                        bsSize="sm"
+                                                        onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                                        type="text"
+                                                        value={this.props.items.program.programCode}
+                                                        maxLength={6}
+                                                        name="programCode1" id="programCode1" />
+                                                    <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                                </FormGroup>
+                                            </Col>
+                                        </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
@@ -327,6 +368,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                                 id="programName" />
                                             <FormFeedback className="red">{errors.programName}</FormFeedback>
                                         </FormGroup>
+
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
@@ -375,7 +417,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input 
+                                            <Input
                                                 onBlur={handleBlur}
                                                 valid={!errors.plannedToSubmittedLeadTime && this.props.items.program.plannedToSubmittedLeadTime != ''}
                                                 invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime}
@@ -532,6 +574,38 @@ export default class PipelineProgramDataStepSix extends Component {
                                                 value={this.props.items.program.programNotes} />
                                             <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                         </FormGroup>
+                                        <FormGroup className="col-md-12">
+                                            <ul id="progress">
+                                                <li>
+                                                    <i ><img className="img-left" src={step1} /></i>
+                                                    <i ><img className="img-right" src={step2} /></i>
+                                                    <span>{i18n.t('static.setupprogram.PlannedtoSubmitted')}</span>
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step3} /></i>
+                                                    <span>{i18n.t('static.setupprogram.SubmittedtoApproved')}</span>
+
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step4} /></i>
+                                                    <span>{i18n.t('static.setupprogram.ApprovedtoShipped')}</span>
+
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step5} /></i>
+                                                    <span>{i18n.t('static.setupprogram.ShippedtoArrived')}</span>
+
+                                                </li>
+                                                <li>
+                                                    <i ><img className="img-right" src={step6} /></i>
+                                                    <span>{i18n.t('static.setupprogram.ArrivedtoReceived')}</span>
+                                                </li>
+                                            </ul>
+                                            {/* <img src={Setupprogram} style={{ width: '500px'}} /> */}
+                                        </FormGroup>
+                                        {/* <FormGroup className="col-md-6">
+                                            <img src={Setupprogram} style={{ width: '500px' }} />
+                                        </FormGroup> */}
                                         <FormGroup className="col-md-12">
                                             <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                             &nbsp;

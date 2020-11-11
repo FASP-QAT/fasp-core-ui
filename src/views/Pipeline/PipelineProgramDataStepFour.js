@@ -96,7 +96,8 @@ export default class PipelineProgramDataStepFour extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(1)
+        var realmId=AuthenticationService.getRealmId();
+        ProgramService.getOrganisationList(realmId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
