@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -14,7 +16,7 @@ import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT } from '../../Constants.js'
+import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT, JEXCEL_PRO_KEY } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
 
@@ -49,7 +51,7 @@ export default class PipelineProgramShipment extends Component {
         var valid = true;
         var list = this.state.pipelineShipmentData;
         console.log(list)
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         console.log(json)
         for (var y = 0; y < json.length; y++) {
 
@@ -129,7 +131,7 @@ export default class PipelineProgramShipment extends Component {
             }
 
             var col = ("G").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[6]).toString();
+            var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
 
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -141,7 +143,7 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
             var col = ("H").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[7]).toString();
+            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
 
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -154,7 +156,7 @@ export default class PipelineProgramShipment extends Component {
             }
 
             var col = ("I").concat(parseInt(y) + 1);
-            var value = (this.el.getRowData(y)[8]).toString();
+            var value = (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
 
             if (value != "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -165,9 +167,10 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
 
-                var col = ("J").concat(parseInt(y) + 1);
+                
             }
-            var value = (this.el.getRowData(y)[9]).toString();
+            var col = ("J").concat(parseInt(y) + 1);
+            var value = (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
 
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -311,7 +314,7 @@ export default class PipelineProgramShipment extends Component {
         var regexDecimal = /^[0-9]+.[0-9]+$/
         var shipmentStatusId = 0;
         if (x == 0) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null,false);
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -323,7 +326,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 1) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null,false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -349,7 +352,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 3) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null,false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -393,6 +396,7 @@ export default class PipelineProgramShipment extends Component {
         if (x == 6) {
             var reg = /^[0-9\b]+$/;
             var col = ("G").concat(parseInt(y) + 1);
+            value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -411,6 +415,7 @@ export default class PipelineProgramShipment extends Component {
         if (x == 7) {
             var reg = /^[0-9\b]+$/;
             var col = ("H").concat(parseInt(y) + 1);
+            value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -428,6 +433,7 @@ export default class PipelineProgramShipment extends Component {
         } if (x == 8) {
             var reg = /^[0-9\b]+$/;
             var col = ("I").concat(parseInt(y) + 1);
+            value = (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -446,6 +452,7 @@ export default class PipelineProgramShipment extends Component {
         if (x == 9) {
             var reg = /^[0-9\b]+$/;
             var col = ("J").concat(parseInt(y) + 1);
+            value = (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1066,21 +1073,33 @@ export default class PipelineProgramShipment extends Component {
                 },
                 {
                     title: i18n.t('static.shipment.qty'),
-                    type: 'text',
+                    type: 'numeric',
+                                                mask: '#,##.00',
+                                                disabledMaskOnEdition: true,
+                                                decimal: '.'
                     // source: regionList
                     // readOnly: true
                 }, {
                     title: i18n.t('static.shipment.rate'),
-                    type: 'text',
+                    type: 'numeric',
+                                                mask: '#,##.00',
+                                                disabledMaskOnEdition: true,
+                                                decimal: '.'
                     // source: regionList
                     // readOnly: true
                 }, {
                     title: i18n.t('static.shipment.freightcost'),
-                    type: 'text',
+                    type: 'numeric',
+                                                mask: '#,##.00',
+                                                disabledMaskOnEdition: true,
+                                                decimal: '.'
                     // source: dataSourceList
                 }, {
                     title: i18n.t('static.shipment.productcost'),
-                    type: 'text',
+                    type: 'numeric',
+                                                mask: '#,##.00',
+                                                disabledMaskOnEdition: true,
+                                                decimal: '.'
                     // source: dataSourceList
                 }, {
                     title: i18n.t('static.shipment.edd'),
@@ -1139,7 +1158,16 @@ export default class PipelineProgramShipment extends Component {
                 }
 
             ],
+            oncreateeditor: function (a, b, c, d, e) {
+                console.log("In create editor")
+                e.type = 'text';
+                if (e.value) {
+                    e.selectionStart = e.value.length;
+                    e.selectionEnd = e.value.length;
+                }
+            },
             pagination: localStorage.getItem("sesRecordCount"),
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -1152,13 +1180,16 @@ export default class PipelineProgramShipment extends Component {
             onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
                 show: '',
                 entries: '',
             },
             onload: this.loadedCommonFunctionJExcel,
+            license: JEXCEL_PRO_KEY,
 
         };
 
@@ -1177,7 +1208,7 @@ export default class PipelineProgramShipment extends Component {
     SubmitShipment() {
         this.loaded()
 
-        var data = this.el.getJson().map(ele => ({
+        var data = this.el.getJson(null,false).map((ele,y) => ({
             "shipmentId": null,
             "procurementUnit": null,
 
@@ -1187,11 +1218,11 @@ export default class PipelineProgramShipment extends Component {
             "fundingSource": ele[3],
             "shipmentStatus": ele[4],
             "shipmentMode": ele[5],
-            "suggestedQty": ele[6],
-            "quantity": ele[6],
-            "rate": ele[7],
-            "freightCost": ele[8],
-            "productCost": ele[9],
+            "suggestedQty": (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "quantity": (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "rate": (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "freightCost": (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "productCost": (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
             "expectedDeliveryDate": ele[10],
             "orderedDate": ele[11],
             "plannedDate": ele[12],
@@ -1261,8 +1292,8 @@ export default class PipelineProgramShipment extends Component {
     SubmitProgram() {
         // this.SubmitShipment()
         this.loaded()
-        this.setState({loading:true});
-        var data = this.el.getJson().map(ele => ({
+        this.setState({ loading: true });
+        var data = this.el.getJson(null,false).map((ele,y) => ({
             "shipmentId": null,
             "procurementUnit": null,
             "planningUnit": ele[0],
@@ -1271,11 +1302,11 @@ export default class PipelineProgramShipment extends Component {
             "fundingSource": ele[3],
             "shipmentStatus": ele[4],
             "shipmentMode": ele[5],
-            "suggestedQty": ele[6],
-            "quantity": ele[6],
-            "rate": ele[7],
-            "freightCost": ele[8],
-            "productCost": ele[9],
+            "suggestedQty": (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "quantity": (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "rate": (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "freightCost": (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
+            "productCost": (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "")),
             "expectedDeliveryDate": ele[10],
             "orderedDate": ele[11],
             "plannedDate": ele[12],
@@ -1297,7 +1328,7 @@ export default class PipelineProgramShipment extends Component {
                 console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
-                    changedData: false, 
+                    changedData: false,
                     // loading: true
                 }, () => console.log("=====", this.state));
 
