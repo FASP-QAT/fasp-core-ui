@@ -362,7 +362,7 @@ class EditFundingSourceComponent extends Component {
                                                                 {i18n.t('static.program.yes')}
                                                             </Label>
                                                         </FormGroup>
-                                                        <FormGroup check inline >
+                                                        <FormGroup check inline style={{marginLeft:'-18px'}}>
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="radio"
