@@ -54,7 +54,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-
+                var index = (instance.jexcel).getValue(`X${parseInt(data[i].y) + 1}`, true)
+                console.log("D---------------->", index);
+                if (index == "" || index == null || index == undefined) {
                 (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
                 (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
@@ -70,6 +72,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 z = data[i].y;
+                }
             }
         }
     }
@@ -500,6 +503,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             parseFormulas: true,
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
+                                            onchangepage:this.onchangepage,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 e.type = 'text';
                                                 // if (e.value) {
@@ -1263,7 +1267,67 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         shipmentInstance.orderBy(4, 0);
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-        for (var i = 0; i < json.length; i++) {
+        var jsonLength=1*(document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        for (var i = 0; i < jsonLength; i++) {
+            var rowData = shipmentInstance.getRowData(i);
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
+            for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(i) + 1);
+                if (rowData[0].toString() == "false") {
+                    shipmentInstance.setStyle(col, "background-color", "transparent");
+                    shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
+                } else {
+                    shipmentInstance.setStyle(col, "background-color", "transparent");
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    // cell.classList.add('readonly');
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                    // cell.classList.add('readonly');
+                    var element = document.getElementById("shipmentsDetailsTable");
+                    element.classList.remove("jexcelremoveReadonlybackground");
+                }
+
+                if (rowData[11].toString() == "true") {
+                    console.log("In if");
+                    shipmentInstance.setStyle(col, "color", "#000");
+                    shipmentInstance.setStyle(col, "color", "red");
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
+                    cell.classList.add('shipmentEntryEmergency');
+                } else {
+                    console.log("In else")
+                    shipmentInstance.setStyle(col, "color", "#000");
+                    var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`K${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                    var cell = shipmentInstance.getCell(`B${parseInt(i) + 1}`)
+                    cell.classList.remove('shipmentEntryEmergency');
+                }
+            }
+        }
+    }
+
+    onchangepage(el, pageNo, oldPageNo) {
+        var shipmentInstance = el.jexcel;
+        var json = shipmentInstance.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
+        var jsonLength=pageNo*(document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        for (var i = 0; i < jsonLength; i++) {
             var rowData = shipmentInstance.getRowData(i);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {

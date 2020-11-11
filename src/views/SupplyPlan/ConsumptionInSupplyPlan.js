@@ -42,12 +42,16 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
-                (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(14, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, `=F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1}`, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true)
+                console.log("D---------------->", index);
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
+                    (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(14, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, `=F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1}`, true);
+                    z = data[i].y;
+                }
             }
         }
     }

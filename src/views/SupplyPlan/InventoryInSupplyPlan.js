@@ -42,17 +42,21 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var adjustmentType = this.props.items.inventoryType;
-                console.log("Adjutsment type", adjustmentType);
-                (instance.jexcel).setValueFromCoords(12, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(13, data[i].y, "", true);
-                (instance.jexcel).setValueFromCoords(14, data[i].y, -1, true);
-                (instance.jexcel).setValueFromCoords(15, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(16, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(8, data[i].y, `=F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
-                (instance.jexcel).setValueFromCoords(9, data[i].y, `=G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
-                (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`O${parseInt(data[i].y) + 1}`, true)
+                console.log("D---------------->", index);
+                if (index == "" || index == null || index == undefined) {
+                    var adjustmentType = this.props.items.inventoryType;
+                    console.log("Adjutsment type", adjustmentType);
+                    (instance.jexcel).setValueFromCoords(12, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(13, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(14, data[i].y, -1, true);
+                    (instance.jexcel).setValueFromCoords(15, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(16, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, `=F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, `=G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
+                    (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -348,6 +352,23 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         editable: inventoryEditable,
                         onchange: this.inventoryChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
+                            if (y != null) {
+                                var elInstance = el.jexcel;
+                                var json = elInstance.getJson(null, false);
+                                // for (var z = 0; z < json.length; z++) {
+                                    var rowData = elInstance.getRowData(y);
+                                    var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+                                    if (rowData[14] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                        for (var c = 0; c < colArr.length; c++) {
+                                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                            cell.classList.add('readonly');
+                                        }
+                                    } else {
+
+                                    }
+                                // }
+                            }
 
                         }.bind(this),
                         contextMenu: function (obj, x, y, e) {
@@ -510,7 +531,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 onpaste: this.onPasteForBatchInfo,
                                                 onchange: this.batchInfoChangedInventory,
                                                 copyCompatibility: true,
-                                                parseFormulas:true,
+                                                parseFormulas: true,
                                                 editable: inventoryBatchEditable,
                                                 text: {
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -707,21 +728,21 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             tr.children[11].classList.add('AsteriskTheadtrTd');
         }
         // (instance.jexcel).orderBy(0, 0);
-        var elInstance = instance.jexcel;
-        var json = elInstance.getJson(null, false);
-        for (var z = 0; z < json.length; z++) {
-            var rowData = elInstance.getRowData(z);
-            var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
-                    cell.classList.add('readonly');
-                }
-            } else {
+        // var elInstance = instance.jexcel;
+        // var json = elInstance.getJson(null, false);
+        // for (var z = 0; z < json.length; z++) {
+        //     var rowData = elInstance.getRowData(z);
+        //     var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+        //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+        //     if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+        //         for (var c = 0; c < colArr.length; c++) {
+        //             var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+        //             cell.classList.add('readonly');
+        //         }
+        //     } else {
 
-            }
-        }
+        //     }
+        // }
     }
 
     inventoryChanged = function (instance, cell, x, y, value) {
