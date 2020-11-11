@@ -126,7 +126,7 @@ class Budgets extends Component {
             show: false,
             loading: true,
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth()+2 },
+            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             fundingSourceValues: [],
             fundingSourceLabels: [],
@@ -146,7 +146,7 @@ class Budgets extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
     }
     show() {
-      
+
     }
     handleRangeChange(value, text, listIndex) {
         //
@@ -297,12 +297,12 @@ class Budgets extends Component {
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push('"' +(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' +(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' +(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-  
+
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
@@ -340,7 +340,7 @@ class Budgets extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -374,7 +374,7 @@ class Budgets extends Component {
                     })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 150, fundingSourceText)
-                  
+
                 }
 
             }
@@ -432,9 +432,9 @@ class Budgets extends Component {
         let programId = document.getElementById('programId').value
         let versionId = document.getElementById('versionId').value
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
-      
+
         // console.log('programIds.length', programIds.length)
-        if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length>0) {
+        if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length > 0) {
             if (versionId.includes('Local')) {
 
                 var db1;
@@ -454,11 +454,16 @@ class Budgets extends Component {
                     budgetRequest.onsuccess = function (event) {
                         var budgetResult = [];
                         budgetResult = budgetRequest.result;
-                        console.log('*******',budgetResult)
+                        console.log('B*******', budgetResult)
                         for (var k = 0, j = 0; k < budgetResult.length; k++) {
-                            if (budgetResult[k].program.id == programId &&  moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)')&& (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
+                            console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
+                            console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
+                            // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
+                            if (budgetResult[k].program.id == programId && (budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
                                 budgetList[j++] = budgetResult[k]
                         }
+                        console.log("budgetList---", budgetList);
+                        console.log("B** budget 1 ---", budgetList);
                         var transaction = db1.transaction(['programData'], 'readwrite');
                         var programTransaction = transaction.objectStore('programData');
                         var version = (versionId.split('(')[0]).trim()
@@ -472,24 +477,25 @@ class Budgets extends Component {
                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
-                            console.log(programJson)
+                            console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
                                 var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                                console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
                                     console.log(ele)
                                     plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
                                 });
-                                console.log(plannedShipmentbudget)
+                                console.log("B** planned shipment budget ---", plannedShipmentbudget);
                                 var OrderedShipmentbudget = 0;
                                 var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7)))
-                                console.log(shiplist)
+                                console.log("B** shiplist ---", shiplist);
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
                                     OrderedShipmentbudget = OrderedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
                                 });
-                                console.log(OrderedShipmentbudget)
-                                console.log("budget list==>", budgetList[l]);
+                                console.log("B** order shipment budget ---", OrderedShipmentbudget);
+                                console.log("B** budget list l ==>", budgetList[l]);
                                 var json = {
                                     budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
@@ -502,8 +508,11 @@ class Budgets extends Component {
                                     budgetAmt: budgetList[l].budgetAmt / 1000000
 
                                 }
+
                                 data.push(json)
+                                console.log("B** json ---", json);
                             }
+                            console.log("B** data ---", data);
                             this.setState({
                                 selBudget: data,
                                 message: ''
@@ -519,7 +528,7 @@ class Budgets extends Component {
 
             } else {
                 this.setState({ loading: true })
-                var inputjson = { "programId": programId, "versionId": versionId ,"startDate":startDate,"stopDate":endDate,"fundingSourceIds":fundingSourceIds}
+                var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
@@ -598,9 +607,9 @@ class Budgets extends Component {
             }
         } else if (programId == 0) {
             this.setState({ selBudget: [], message: i18n.t('static.common.selectProgram') });
-        } else  if (versionId == 0){
+        } else if (versionId == 0) {
             this.setState({ selBudget: [], message: i18n.t('static.program.validversion') });
-        }else {
+        } else {
             this.setState({ selBudget: [], message: i18n.t('static.fundingSource.selectFundingSource') });
         }
     }
@@ -1174,7 +1183,7 @@ class Budgets extends Component {
 
                         <Col md="11 pl-0">
                             <div className="row">
-                            <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
                                     <div className="controls  Regioncalender">
 
