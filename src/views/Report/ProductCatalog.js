@@ -17,7 +17,7 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { Online } from 'react-detect-offline';
+import { Online, Offline } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -70,7 +70,8 @@ class ProductCatalog extends Component {
             message: '',
             planningUnits: [],
             versions: [],
-
+            planningUnitList: [],
+            productCategoriesOffline: [],
             planningUnitValues: [],
             planningUnitLabels: [],
 
@@ -244,73 +245,148 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+            if (navigator.onLine) {
+                TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
-                if (response.status == 200) {
-                    this.setState({
-                        tracerCategories: response.data
-                    })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
+                    if (response.status == 200) {
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                            tracerCategories: response.data
+                        })
+                    }
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-            // .catch(error => {
-            //     if (error.message === "Network Error") {
-            //         this.setState({ message: error.message });
-            //     } else {
-            //         switch (error.response ? error.response.status : "") {
-            //             case 500:
-            //             case 401:
-            //             case 404:
-            //             case 406:
-            //             case 412:
-            //                 this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-            //                 break;
-            //             default:
-            //                 this.setState({ message: 'static.unkownError' });
-            //                 break;
-            //         }
-            //     }
-            // }
-            // );
+                );
+                // .catch(error => {
+                //     if (error.message === "Network Error") {
+                //         this.setState({ message: error.message });
+                //     } else {
+                //         switch (error.response ? error.response.status : "") {
+                //             case 500:
+                //             case 401:
+                //             case 404:
+                //             case 406:
+                //             case 412:
+                //                 this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                //                 break;
+                //             default:
+                //                 this.setState({ message: 'static.unkownError' });
+                //                 break;
+                //         }
+                //     }
+                // }
+                // );
+            } else {
+                const lan = 'en';
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                    var planningunitRequest = planningunitOs.getAll();
+                    var planningList = []
+                    planningunitRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    planningunitRequest.onsuccess = function (e) {
+                        var myResult = [];
+                        myResult = planningunitRequest.result;
+                        // var programId = (document.getElementById("programId").value).split("_")[0];
+                        var proList = []
+
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].program.id == programId) {
+
+                                proList.push(myResult[i].planningUnit)
+                            }
+                        }
+                        console.log('proList', proList)
+                        var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
+                        var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
+                        var planningunitRequest1 = planningunitOs1.getAll();
+                        //  var pllist = []
+                        planningunitRequest1.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest1.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest1.result;
+                            var flList = []
+                            console.log(myResult)
+                            for (var i = 0; i < myResult.length; i++) {
+                                for (var j = 0; j < proList.length; j++) {
+                                    if (myResult[i].planningUnitId == proList[j].id) {
+                                        console.log(myResult[i].planningUnitId, proList[j].id)
+
+                                        flList.push(myResult[i].forecastingUnit)
+                                        planningList.push(myResult[i])
+                                    }
+                                }
+                            }
+                            console.log('flList', flList)
+
+                            var tcList = [];
+                            flList.filter(function (item) {
+                                var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                                if (i <= -1) {
+                                    tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                                }
+                                return null;
+                            });
+
+                            console.log('tcList', tcList)
+                            this.setState({
+                                tracerCategories: tcList,
+                                planningUnitList: planningList
+                            }, () => { this.fetchData() })
+
+
+
+                        }.bind(this);
+
+                    }.bind(this);
+                }.bind(this)
+            }
 
         } else {
             this.setState({
@@ -328,78 +404,140 @@ class ProductCatalog extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
-        ProgramService.getProgramList()
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    programs: response.data, loading: false
-                }, () => { })
-            }).catch(
-                error => {
+        if (navigator.onLine) {
+            ProgramService.getProgramList()
+                .then(response => {
+                    console.log(JSON.stringify(response.data))
                     this.setState({
-                        programs: [], loading: false
+                        programs: response.data, loading: false
                     }, () => { })
-                    if (error.message === "Network Error") {
+                }).catch(
+                    error => {
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                            programs: [], loading: false
+                        }, () => { })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
+                );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             programs: [], loading: false
+            //         }, () => { })
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', loading: false });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
+        } else {
+            console.log('offline')
+            this.consolidatedProgramList()
+            this.setState({ loading: false })
+        }
+    }
+
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { programs } = this.state
+        var proList = programs;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
+
+                        var f = 0
+                        for (var k = 0; k < this.state.programs.length; k++) {
+                            if (this.state.programs[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
+                        }
+                        if (f == 0) {
+                            proList.push(programData)
+                        }
+                    }
+
+
                 }
-            );
-        // .catch(
-        //     error => {
-        //         this.setState({
-        //             programs: [], loading: false
-        //         }, () => { })
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message, loading: false });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError', loading: false });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
+
+                this.setState({
+                    programs: proList
+                })
+
+            }.bind(this);
+
+        }.bind(this);
+
+
     }
 
 
@@ -413,40 +551,99 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
+            if (navigator.onLine) {
+                ProductService.getProductCategoryListByProgram(realmId, programId)
+                    .then(response => {
+                        console.log(response.data);
+                        // var list = response.data.slice(1);
+                        var list = response.data;
+                        console.log("my list=======", list);
 
-            ProductService.getProductCategoryListByProgram(realmId, programId)
-                .then(response => {
-                    console.log(response.data);
-                    // var list = response.data.slice(1);
-                    var list = response.data;
-                    console.log("my list=======", list);
-
-                    this.setState({
-                        productCategories: list
-                    })
-                }).catch(
-                    error => {
                         this.setState({
-                            productCategories: []
+                            productCategories: list
                         })
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    break;
+                    }).catch(
+                        error => {
+                            this.setState({
+                                productCategories: []
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({ message: error.message });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                        break;
+                                    default:
+                                        this.setState({ message: 'static.unkownError' });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+            } else {
+                this.setState({ loading: true })
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        loading: false
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
+                    var ppuRequest = ppuOs.getAll();
+                    ppuRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext')
+                        })
+                    }.bind(this);
+
+                    ppuRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
+                    ppuRequest.onsuccess = function (e) {
+                        var result3 = ppuRequest.result;
+                        result3 = result3.filter(c => c.program.id == programId);
+                        console.log("4------>", result3);
+
+                        var outPutList = [];
+                        var json;
+                        for (var i = 0; i < result3.length; i++) {
+                            console.log("product category id---", result3[i]);
+                            console.log("product category id---", result3[i].productCategory.id);
+                            console.log("product category label---", result3[i].productCategory.label.label_en);
+                            json = {
+                                id: result3[i].productCategory.id,
+                                label: getLabelText(result3[i].productCategory.label, this.state.lang)
+                            }
+                            outPutList = outPutList.concat(json);
+                            // outPutList.push(json);
+                        }
+                        console.log("outPutList-----------", outPutList);
+                        // const data = [ /* any list of objects */ ];
+                        const set = new Set(outPutList.map(item => JSON.stringify(item)));
+                        const dedup = [...set].map(item => JSON.parse(item));
+                        console.log(`Removed ${outPutList.length - dedup.length} elements`);
+                        console.log("dedup----------------", dedup);
+                        this.setState({
+                            loading: false,
+                            productCategoriesOffline: dedup
+                        })
+                    }.bind(this);
+                }.bind(this);
+            }
         } else {
             this.setState({
                 message: i18n.t('static.common.selectProgram'),
@@ -898,7 +1095,9 @@ class ProductCatalog extends Component {
         const { programs } = this.state;
         const { productCategories } = this.state;
         const { tracerCategories } = this.state;
+        const { productCategoriesOffline } = this.state;
 
+        console.log("productCategoriesOffline---", productCategoriesOffline)
 
         const columns = [
 
@@ -1107,32 +1306,64 @@ class ProductCatalog extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
-                                    <div className="controls SelectField">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="productCategoryId"
-                                                id="productCategoryId"
-                                                bsSize="sm"
-                                                onChange={this.fetchData}
-                                            // onChange={(e) => { this.getPlanningUnit(); }}
-                                            >
-                                                {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
-                                                {productCategories.length > 0
-                                                    && productCategories.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                            </option>
-                                                        )
-                                                    }, this)}
+                                <Online>
+                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                        <div className="controls SelectField">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="productCategoryId"
+                                                    id="productCategoryId"
+                                                    bsSize="sm"
+                                                    onChange={this.fetchData}
+                                                // onChange={(e) => { this.getPlanningUnit(); }}
+                                                >
 
-                                            </Input>
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                                                    {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
+                                                    {productCategories.length > 0
+                                                        && productCategories.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+
+                                                </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                </Online>
+                                <Offline>
+                                    <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                        <div className="controls SelectField">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="productCategoryId"
+                                                    id="productCategoryId"
+                                                    bsSize="sm"
+                                                    onChange={this.fetchData}
+                                                // onChange={(e) => { this.getPlanningUnit(); }}
+                                                >
+
+                                                    <option value="-1">{i18n.t('static.common.allcategories')}</option>
+                                                    {productCategoriesOffline.length > 0
+                                                        && productCategoriesOffline.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.id}>
+                                                                    {item.label}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+
+                                                </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                </Offline>
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">
