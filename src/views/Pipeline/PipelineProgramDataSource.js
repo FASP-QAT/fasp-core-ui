@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService'
@@ -10,7 +11,7 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 export default class PipelineProgramDataSource extends Component {
     constructor(props) {
         super(props);
@@ -38,7 +39,7 @@ export default class PipelineProgramDataSource extends Component {
     dropdownFilter = function (instance, cell, c, r, source) {
         console.log('activeDataSourceList', this.state.activeDataSourceList)
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 1];
+        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         var puList = (this.state.activeDataSourceList).filter(c => c.dataSourceType.id == value);
 
         for (var k = 0; k < puList.length; k++) {
@@ -52,7 +53,7 @@ export default class PipelineProgramDataSource extends Component {
     }
     loaded() {
         var list = this.state.dataSourceList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
@@ -89,7 +90,7 @@ export default class PipelineProgramDataSource extends Component {
 
         //Data source
         if (x == 3) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -113,14 +114,14 @@ export default class PipelineProgramDataSource extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
+            var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
 
             var currentDataSource = this.el.getRowData(y)[1];
 
-            if (value == "") {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -151,7 +152,7 @@ export default class PipelineProgramDataSource extends Component {
 
     saveDataSource() {
         var list = this.state.dataSourceList;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var dataSourceArray = []
         console.log(json.length)
         console.log(json)
@@ -293,8 +294,11 @@ export default class PipelineProgramDataSource extends Component {
                                                         readonly: true
                                                     }
                                                 ],
-                                                pagination:localStorage.getItem("sesRecordCount"),
-                                                contextMenu: false,
+                                                pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    return [];
+                                                }.bind(this),
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
@@ -315,6 +319,7 @@ export default class PipelineProgramDataSource extends Component {
                                                     entries: '',
                                                 },
                                                 onload: this.loadedJexcelCommonFunction,
+                                                license: JEXCEL_PRO_KEY,
                                                 // onload: this.loaded
 
                                             };
