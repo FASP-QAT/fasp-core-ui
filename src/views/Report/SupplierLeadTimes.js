@@ -94,10 +94,11 @@ class SupplierLeadTimes extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
+            console.log("outPutList[j].totalSeaLeadTime-----------------", outPutList[j].totalSeaLeadTime);
             // data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[0] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[1] = outPutList[j].procurementAgent.code
-            data[2] = outPutList[j].plannedSubmittedLeadTime
+            data[2] = outPutList[j].plannedToSubmittedLeadTime
             data[3] = outPutList[j].submittedToApprovedLeadTime
             data[4] = outPutList[j].approvedToShippedLeadTime
             data[5] = outPutList[j].shippedToArrivedBySeaLeadTime
