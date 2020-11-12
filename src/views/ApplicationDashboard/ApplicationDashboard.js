@@ -1236,7 +1236,7 @@ class ApplicationDashboard extends Component {
                             {/* <i className="icon-settings"></i> */}
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>{i18n.t('static.report.qatProblemActionReport')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
                             {/* <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem> */}
 
                           </DropdownMenu>
