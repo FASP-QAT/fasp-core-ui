@@ -256,29 +256,29 @@ class RealmCountry extends Component {
 
                                                 ],
                                                 updateTable: function (el, cell, x, y, source, value, id) {
-                                                    if(y!=null){
-                                                    var elInstance = el.jexcel;
-                                                    var rowData = elInstance.getRowData(y);
-                                                    // var productCategoryId = rowData[0];
-                                                    var realmCountryId = rowData[5];
-                                                    if (realmCountryId == 0) {
-                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                        cell1.classList.remove('readonly');
+                                                    if (y != null) {
+                                                        var elInstance = el.jexcel;
+                                                        var rowData = elInstance.getRowData(y);
+                                                        // var productCategoryId = rowData[0];
+                                                        var realmCountryId = rowData[5];
+                                                        if (realmCountryId == 0) {
+                                                            var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                            cell1.classList.remove('readonly');
 
-                                                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                        // cell2.classList.remove('readonly');
-
-
-                                                    } else {
-                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                        cell1.classList.add('readonly');
-
-                                                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                        // cell2.classList.add('readonly');
+                                                            // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                                                            // cell2.classList.remove('readonly');
 
 
+                                                        } else {
+                                                            var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                            cell1.classList.add('readonly');
+
+                                                            // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                                                            // cell2.classList.add('readonly');
+
+
+                                                        }
                                                     }
-                                                }
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
@@ -685,10 +685,13 @@ class RealmCountry extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realm.label.label_en, true);
-                (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realm.label.label_en, true);
+                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    z = data[i].y;
+                }
             }
         }
     }

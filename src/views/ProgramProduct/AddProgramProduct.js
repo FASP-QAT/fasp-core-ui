@@ -15,7 +15,7 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC,MONTHS_IN_FUTURE_FOR_AMC,JEXCEL_PRO_KEY } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, JEXCEL_PRO_KEY } from "../../Constants";
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -322,6 +322,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.product.reorderFrequency'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -330,6 +331,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.product.minMonthOfStock'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -337,6 +339,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.program.monthfutureamc'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -344,6 +347,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.program.monthpastamc'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -351,6 +355,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.product.localProcurementAgentLeadTime'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     decimal: '.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -358,6 +363,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.report.shelfLife'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -365,6 +371,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                                     type: 'numeric',
+                                                                    textEditor: true,
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true
@@ -409,14 +416,6 @@ class AddprogramPlanningUnit extends Component {
                                                                     cell2.classList.add('readonly');
 
 
-                                                                }
-                                                            },
-                                                            oncreateeditor: function (a, b, c, d, e) {
-                                                                console.log("In create editor")
-                                                                e.type = 'text';
-                                                                if (e.value) {
-                                                                    e.selectionStart = e.value.length;
-                                                                    e.selectionEnd = e.value.length;
                                                                 }
                                                             },
                                                             pagination: localStorage.getItem("sesRecordCount"),
@@ -834,12 +833,15 @@ class AddprogramPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(12, data[i].y, this.state.programId, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(12, data[i].y, this.state.programId, true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -896,7 +898,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Reorder frequency
                 var col = ("C").concat(parseInt(y) + 1);
-                value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -919,7 +921,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Min months of stock
                 var col = ("D").concat(parseInt(y) + 1);
-                value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -942,7 +944,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Months in future for AMC
                 var col = ("E").concat(parseInt(y) + 1);
-                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -965,7 +967,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Months in past for AMC
                 var col = ("F").concat(parseInt(y) + 1);
-                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -988,7 +990,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Local procurement lead time
                 var col = ("G").concat(parseInt(y) + 1);
-                value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 var reg = JEXCEL_DECIMAL_LEAD_TIME
                 // console.log("value-----", value);
@@ -1013,7 +1015,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Shelf life
                 var col = ("H").concat(parseInt(y) + 1);
-                value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
                 // console.log("value-----", value);
@@ -1037,7 +1039,7 @@ class AddprogramPlanningUnit extends Component {
 
                 //Catalog price
                 var col = ("I").concat(parseInt(y) + 1);
-                value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 // var reg = DECIMAL_NO_REGEX;
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE
@@ -1140,7 +1142,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 2) {
             console.log("changed 4");
             // var reg = /^[0-9\b]+$/;
-            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1167,7 +1169,7 @@ class AddprogramPlanningUnit extends Component {
         //Min months of stock
         if (x == 3) {
             console.log("changed 5");
-            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
@@ -1195,7 +1197,7 @@ class AddprogramPlanningUnit extends Component {
         //Months in future for AMC
         if (x == 4) {
             console.log("changed 6");
-            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
@@ -1223,7 +1225,7 @@ class AddprogramPlanningUnit extends Component {
         //Months in past for AMC
         if (x == 5) {
             console.log("changed 7");
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
@@ -1252,7 +1254,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 6) {
             console.log("changed 8");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("G").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1280,7 +1282,7 @@ class AddprogramPlanningUnit extends Component {
         //Shelf life
         if (x == 7) {
             console.log("changed 9");
-            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
@@ -1309,7 +1311,7 @@ class AddprogramPlanningUnit extends Component {
         if (x == 8) {
             console.log("changed 10");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1335,7 +1337,7 @@ class AddprogramPlanningUnit extends Component {
             }
         }
 
-        if(x==10){
+        if (x == 10) {
             this.el.setValueFromCoords(11, y, 1, true);
         }
         this.setState({ isValidData: valid });
@@ -1373,13 +1375,13 @@ class AddprogramPlanningUnit extends Component {
                         planningUnit: {
                             id: map.get("1"),
                         },
-                        reorderFrequencyInMonths: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        minMonthsOfStock: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        monthsInFutureForAmc: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        monthsInPastForAmc: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        localProcurementLeadTime: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        shelfLife: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        catalogPrice: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
+                        reorderFrequencyInMonths: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        minMonthsOfStock: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        monthsInFutureForAmc: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        monthsInPastForAmc: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        localProcurementLeadTime: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        shelfLife: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        catalogPrice: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map.get("10")
                     }
                     planningUnitArray.push(planningUnitJson);

@@ -60,11 +60,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var rowData = (instance.jexcel).getRowData(0);
-                (instance.jexcel).setValueFromCoords(3, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(4, data[i].y, rowData[4], true);
-                (instance.jexcel).setValueFromCoords(5, data[i].y, rowData[5], true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`D${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    var rowData = (instance.jexcel).getRowData(0);
+                    (instance.jexcel).setValueFromCoords(3, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(4, data[i].y, rowData[4], true);
+                    (instance.jexcel).setValueFromCoords(5, data[i].y, rowData[5], true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -287,10 +290,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 80, },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 80, },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
-                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 80 },
+                            { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
@@ -313,13 +316,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         parseFormulas: true,
                         filters: filterOption,
                         license: JEXCEL_PRO_KEY,
-                        oncreateeditor: function (a, b, c, d, e) {
-                            e.type = 'text';
-                            // if (e.value) {
-                            //     e.selectionStart = e.value.length;
-                            //     e.selectionEnd = e.value.length;
-                            // }
-                        },
                         onpaste: this.onPaste,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -438,7 +434,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 consumptionBatchInfoQty += parseInt(batchInfo[sb].consumptionQty);
                                                 json.push(data);
                                             }
-                                            if (parseInt(consumptionQty) > consumptionBatchInfoQty && batchInfo.length > 0) {
+                                            if (parseInt(consumptionQty) > consumptionBatchInfoQty) {
                                                 var qty = parseInt(consumptionQty) - parseInt(consumptionBatchInfoQty);
                                                 var data = [];
                                                 data[0] = -1; //A
@@ -449,41 +445,27 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 data[5] = date;
                                                 json.push(data);
                                             }
-                                            if (batchInfo.length == 0) {
-                                                var data = [];
-                                                data[0] = "";
-                                                data[1] = ""
-                                                data[2] = "";
-                                                data[3] = 0;
-                                                data[4] = y;
-                                                data[5] = date;
-                                                json.push(data)
-                                            }
+                                            // if (batchInfo.length == 0) {
+                                            //     var data = [];
+                                            //     data[0] = "";
+                                            //     data[1] = ""
+                                            //     data[2] = "";
+                                            //     data[3] = 0;
+                                            //     data[4] = y;
+                                            //     data[5] = date;
+                                            //     json.push(data)
+                                            // }
                                             var options = {
                                                 data: json,
                                                 columnDrag: true,
                                                 columns: [
                                                     { title: i18n.t('static.supplyPlan.batchId'), type: 'dropdown', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
                                                     { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
-                                                    { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, decimal: '.', width: 80 },
+                                                    { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.', width: 80 },
                                                     { title: i18n.t('static.supplyPlan.consumptionTransBatchInfoId'), type: 'hidden', width: 0 },
                                                     { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
                                                     { type: 'hidden' }
                                                 ],
-                                                oncreateeditor: function (a, b, c, d, e) {
-                                                    console.log("In create editor")
-                                                    console.log("In create editor!!!!!!")
-                                                    e.type = 'text';
-                                                    console.log("D------------->", e.value);
-                                                    console.log("D---------->", e.value.length);
-                                                    console.log("D----------->e.selectionStart", e.selectionStart);
-                                                    e.value = 10000;
-                                                    if (e.value) {
-                                                        // e.selectionStart = e.value;
-
-                                                        // e.selectionEnd = e.value.length;
-                                                    }
-                                                },
                                                 pagination: false,
                                                 search: false,
                                                 columnSorting: true,
@@ -838,6 +820,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var elInstance = this.state.consumptionBatchInfoTableEl;
         var json = elInstance.getJson(null, false);
         var mapArray = [];
+        var totalConsumptionBatchQty = 0;
+        var rowNumber = json[0][4];
+
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             mapArray.push(map);
@@ -931,10 +916,24 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+                validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
                 if (validation == false) {
                     valid = false;
                 }
+                totalConsumptionBatchQty += parseInt(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            }
+        }
+        if (valid == true) {
+            console.log("D-------------->In valid ==true");
+            var consumptionInstance = this.state.consumptionEl;
+            var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
+            console.log("D------------>Consumption Qty------------->", consumptionQty);
+            console.log("D---------------->", totalConsumptionBatchQty);
+            if (parseInt(consumptionQty) < parseInt(totalConsumptionBatchQty)) {
+                console.log("In if");
+                this.props.updateState("consumptionBatchInfoNoStockError", i18n.t('static.consumption.missingBatch'));
+                this.props.hideThirdComponent();
+                valid = false;
             }
         }
         // }
@@ -975,32 +974,34 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 totalConsumption += parseInt(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
             }
             var allConfirm = true;
-            if (countForNonFefo == 0) {
-                var cf = window.confirm(i18n.t("static.batchDetails.warningFefo"));
-                if (cf == true) {
-                    var consumptionInstance = this.state.consumptionEl;
-                    var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
-                    if (consumptionQty != "" && consumptionQty != totalConsumption) {
-                        var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
-                        if (cf1 == true) {
-                        } else {
-                            allConfirm = false;
-                        }
-                    }
-                } else {
-                    allConfirm = false;
-                }
-            } else {
-                var consumptionInstance = this.state.consumptionEl;
-                var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
-                if (consumptionQty != "" && consumptionQty < totalConsumption) {
-                    var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
-                    if (cf1 == true) {
-                    } else {
-                        allConfirm = false;
-                    }
-                }
-            }
+            var consumptionInstance = this.state.consumptionEl;
+            var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
+            // if (countForNonFefo == 0) {
+            //     var cf = window.confirm(i18n.t("static.batchDetails.warningFefo"));
+            //     if (cf == true) {
+            //         var consumptionInstance = this.state.consumptionEl;
+            //         var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
+            //         if (consumptionQty != "" && consumptionQty != totalConsumption) {
+            //             var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+            //             if (cf1 == true) {
+            //             } else {
+            //                 allConfirm = false;
+            //             }
+            //         }
+            //     } else {
+            //         allConfirm = false;
+            //     }
+            // } else {
+            //     var consumptionInstance = this.state.consumptionEl;
+            //     var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
+            //     if (consumptionQty != "" && consumptionQty < totalConsumption) {
+            //         var cf1 = window.confirm(i18n.t("static.batchDetails.warningQunatity"))
+            //         if (cf1 == true) {
+            //         } else {
+            //             allConfirm = false;
+            //         }
+            //     }
+            // }
             if (allConfirm == true) {
                 if (consumptionQty < totalConsumption) {
                     consumptionInstance.setValueFromCoords(5, rowNumber, totalConsumption, true);

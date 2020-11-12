@@ -25,21 +25,21 @@ export default class PipelineProgramInventory extends Component {
         this.state = {
             loading: true
         }
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
 
-    startLoading(){
-        this.setState({loading:true});
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    stopLoading() {
+        this.setState({ loading: false });
     }
-    
+
     dropdownFilter = function (instance, cell, c, r, source) {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
-        var value = (instance.jexcel.getJson(null,false)[r])[c - 7];
+        var value = (instance.jexcel.getJson(null, false)[r])[c - 7];
         console.log("==========>planningUnitValue", value);
         console.log("========>", this.state.realmCountryPlanningUnitList);
         var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value && c.realmCountry.id == realmCountryId);
@@ -58,11 +58,11 @@ export default class PipelineProgramInventory extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -74,7 +74,7 @@ export default class PipelineProgramInventory extends Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -86,7 +86,7 @@ export default class PipelineProgramInventory extends Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -228,7 +228,7 @@ export default class PipelineProgramInventory extends Component {
 
     loaded() {
         var list = this.state.inventoryList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
@@ -280,9 +280,9 @@ export default class PipelineProgramInventory extends Component {
 
 
     saveInventory() {
-        var json = this.el.getJson(null,false);
-        this.setState({loading:true});
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
+        this.setState({ loading: true });
+        var json = this.el.getJson(null, false);
         var list = this.state.inventoryList;
         var inventoryArray = []
         for (var i = 0; i < json.length; i++) {
@@ -449,19 +449,20 @@ export default class PipelineProgramInventory extends Component {
                                         {
                                             title: i18n.t('static.inventory.inventory'),
                                             type: 'numeric',
-                                                mask: '#,##.00',
-                                                disabledMaskOnEdition: true,
-                                                decimal: '.'
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true,
+                                            textEditor: true,
+                                            decimal: '.'
 
                                         },
 
                                         {
                                             title: i18n.t('static.inventory.manualAdjustment'),
-                                            type: 'text',
                                             type: 'numeric',
-                                                mask: '[-]#,##.00',
-                                                disabledMaskOnEdition: true,
-                                                decimal: '.'
+                                            mask: '[-]#,##.00',
+                                            disabledMaskOnEdition: true,
+                                            decimal: '.',
+                                            textEditor: true,
                                         },
                                         {
                                             title: 'Note',
@@ -473,14 +474,6 @@ export default class PipelineProgramInventory extends Component {
                                     contextMenu: function (obj, x, y, e) {
                                         return [];
                                     }.bind(this),
-                                    oncreateeditor: function (a, b, c, d, e) {
-                                        console.log("In create editor")
-                                        e.type = 'text';
-                                        if (e.value) {
-                                            e.selectionStart = e.value.length;
-                                            e.selectionEnd = e.value.length;
-                                        }
-                                    },
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,

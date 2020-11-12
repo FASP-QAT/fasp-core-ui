@@ -113,10 +113,13 @@ class PlanningUnitCountry extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
-                (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -251,6 +254,7 @@ class PlanningUnitCountry extends Component {
                                                     {
                                                         title: i18n.t('static.unit.multiplier'),
                                                         type: 'numeric',
+                                                        textEditor: true,
                                                         mask: '#,##.00',
                                                         disabledMaskOnEdition: true
 
@@ -275,14 +279,6 @@ class PlanningUnitCountry extends Component {
 
                                                 ],
                                                 onpaste: this.onPaste,
-                                                oncreateeditor: function (a, b, c, d, e) {
-                                                    console.log("In create editor")
-                                                    e.type = 'text';
-                                                    if (e.value) {
-                                                        e.selectionStart = e.value.length;
-                                                        e.selectionEnd = e.value.length;
-                                                    }
-                                                },
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
@@ -723,7 +719,7 @@ class PlanningUnitCountry extends Component {
                             unitId: parseInt(map1.get("4"))
                         },
                         // multiplier: map1.get("5"),
-                        multiplier: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
+                        multiplier: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("6"),
                         realmCountry: {
                             id: parseInt(map1.get("7"))
@@ -930,7 +926,7 @@ class PlanningUnitCountry extends Component {
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             // var reg = /^[0-9\b]+$/;
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             if (value != "") {
                 if (!(reg.test(value))) {
@@ -1054,7 +1050,7 @@ class PlanningUnitCountry extends Component {
                 // }
 
                 var col = ("F").concat(parseInt(y) + 1);
-                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

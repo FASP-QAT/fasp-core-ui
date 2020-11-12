@@ -971,6 +971,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             {
                                                                 title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                                                 type: 'numeric',
+                                                                textEditor: true,
                                                                 decimal: '.',
                                                                 mask: '#,##.00',
                                                                 disabledMaskOnEdition: true
@@ -978,6 +979,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             {
                                                                 title: i18n.t('static.procurementAgent.MOQ'),
                                                                 type: 'numeric',
+                                                                textEditor: true,
                                                                 mask: '#,##.00',
                                                                 disabledMaskOnEdition: true
                                                             },
@@ -985,11 +987,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro1'),
                                                                 type: 'numeric',
                                                                 mask: '#,##.00',
+                                                                textEditor: true,
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgent.UnitPerPalletEuro2'),
                                                                 type: 'numeric',
+                                                                textEditor: true,
                                                                 mask: '#,##.00',
                                                                 disabledMaskOnEdition: true
                                                             },
@@ -998,12 +1002,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'numeric',
                                                                 // decimal: '.',
                                                                 mask: '#,##.00',
+                                                                textEditor: true,
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgentPlanningUnit.volume'),
                                                                 type: 'numeric',
                                                                 decimal: '.',
+                                                                textEditor: true,
                                                                 mask: '#,##.00',
                                                                 disabledMaskOnEdition: true
 
@@ -1011,6 +1017,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             {
                                                                 title: i18n.t('static.procurementAgentPlanningUnit.weight'),
                                                                 type: 'numeric',
+                                                                textEditor: true,
                                                                 decimal: '.',
                                                                 mask: '#,##.00',
                                                                 disabledMaskOnEdition: true
@@ -1029,14 +1036,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             }
 
                                                         ],
-                                                        oncreateeditor: function (a, b, c, d, e) {
-                                                            console.log("In create editor")
-                                                            e.type = 'text';
-                                                            if (e.value) {
-                                                                e.selectionStart = e.value.length;
-                                                                e.selectionEnd = e.value.length;
-                                                            }
-                                                        },
                                                         pagination: localStorage.getItem("sesRecordCount"),
                                                         filters: true,
                                                         search: true,
@@ -1410,10 +1409,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
-                (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(12, data[i].y, 1, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
+                    (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(12, data[i].y, 1, true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -1439,13 +1441,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                             id: parseInt(map1.get("0")),
                         },
                         skuCode: map1.get("2"),
-                        catalogPrice: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        moq: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        unitsPerPalletEuro1: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        unitsPerPalletEuro2: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        unitsPerContainer: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        volume: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
-                        weight: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",",""),
+                        catalogPrice: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        moq: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        unitsPerPalletEuro1: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        unitsPerPalletEuro2: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        unitsPerContainer: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        volume: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        weight: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("10"),
                         procurementAgentPlanningUnitId: parseInt(map1.get("11"))
                     }
@@ -1633,7 +1635,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //catelog price
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
@@ -1657,7 +1659,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //moq
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -1675,7 +1677,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per pallet euro1
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -1693,7 +1695,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per pallet euro2
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -1711,7 +1713,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         //unit per container
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
-            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -1730,7 +1732,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         if (x == 8) {
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             var col = ("I").concat(parseInt(y) + 1);
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1753,7 +1755,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         if (x == 9) {
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             var col = ("J").concat(parseInt(y) + 1);
-            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1844,7 +1846,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
                 var col = ("D").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1869,7 +1871,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                 //MOQ
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1890,7 +1892,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                 //unitPerPalletEuro1
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1911,7 +1913,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                 //unitPerPalletEuro2
                 var col = ("G").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1932,7 +1934,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                 //unitPerContainer
                 var col = ("H").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1953,7 +1955,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                 //volume
                 var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");
@@ -1989,7 +1991,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
                 //weight
                 var col = ("J").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",","");
+                var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");

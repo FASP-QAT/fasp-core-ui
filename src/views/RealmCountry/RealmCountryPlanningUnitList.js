@@ -855,12 +855,15 @@ export default class RealmCountryPlanningUnitList extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-                (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
-                (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -1386,8 +1389,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         },
                                                         {
                                                             title: i18n.t('static.unit.multiplier'),
-                                                            // type: 'number',
                                                             type: 'numeric',
+                                                            textEditor: true,
                                                             decimal: '.',
                                                             mask: '#,##.00',
                                                             disabledMaskOnEdition: true
@@ -1412,14 +1415,6 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         }
 
                                                     ],
-                                                    oncreateeditor: function (a, b, c, d, e) {
-                                                        console.log("In create editor")
-                                                        e.type = 'text';
-                                                        if (e.value) {
-                                                            e.selectionStart = e.value.length;
-                                                            e.selectionEnd = e.value.length;
-                                                        }
-                                                    },
                                                     updateTable: function (el, cell, x, y, source, value, id) {
                                                         var elInstance = el.jexcel;
                                                         var rowData = elInstance.getRowData(y);
