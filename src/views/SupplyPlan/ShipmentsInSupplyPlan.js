@@ -1276,7 +1276,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         shipmentInstance.orderBy(4, 0);
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-        var jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength;
+        if (this.props.shipmentPage == "shipmentDataEntry") {
+            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)){
+                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            }
+        } else {
+            jsonLength = json.length;
+        }
         if (jsonLength == undefined) {
             jsonLength = 15
         }
