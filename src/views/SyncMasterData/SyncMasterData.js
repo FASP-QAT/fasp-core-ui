@@ -437,6 +437,7 @@ export default class SyncMasterData extends Component {
                         var programIds = myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
                         });
+                        
 
                         console.log("Validation", validation);
                         if (validation) {
