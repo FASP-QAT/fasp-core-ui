@@ -205,7 +205,7 @@ export default class SyncMasterData extends Component {
                                     if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                         minDate = shipmentDataList[index].expectedDeliveryDate;
                                     }
-                                    if (shipmentDataList[index].receivedDate!=null && shipmentDataList[index].receivedDate!="" && shipmentDataList[index].receivedDate!="" && shipmentDataList[index].receivedDate!=undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                    if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                         minDate = shipmentDataList[index].receivedDate;
                                     }
                                     shipmentDataList[index] = shipArray[j];
@@ -413,11 +413,17 @@ export default class SyncMasterData extends Component {
                         var myResult = [];
                         myResult = pGetRequest.result;
                         var validation = this.syncProgramData(lastSyncDate, myResult);
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var pIds = [];
+                        var programIds = myResult.filter(c => c.userId == userId).map(program => {
+                            pIds.push(program.programId);
+                        });
                         console.log("Validation", validation);
                         if (validation) {
                             AuthenticationService.setupAxiosInterceptors();
                             if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
-                                MasterSyncService.getSyncAllMasters(lastSyncDateRealm)
+                                MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, programIds)
                                     .then(response => {
                                         if (response.status == 200) {
                                             console.log("M sync Response", response.data)
@@ -639,7 +645,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                     var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
                                                                                                                                                                     console.log("M sync supplier transaction start")
                                                                                                                                                                     var supplierObjectStore = supplierTransaction.objectStore('supplier');
-                                                                                                                                                                    var json = (response.supplierList);
+                                                                                                                                                                    var json = [];
                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                         supplierObjectStore.put(json[i]);
                                                                                                                                                                     }
