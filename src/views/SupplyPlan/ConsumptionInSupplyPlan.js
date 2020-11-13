@@ -331,7 +331,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             var lastY = -1;
                             if (y != null && lastY != y) {
                                 var rowData = elInstance.getRowData(y);
-                                if (rowData[12] != -1) {
+                                if (rowData[12] != -1 && rowData[12] != "" && rowData[12] != undefined) {
                                     console.log("RowData", rowData);
                                     var lastEditableDate = "";
                                     if (rowData[2] == 1) {

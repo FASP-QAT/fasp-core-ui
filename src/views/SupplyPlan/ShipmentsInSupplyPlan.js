@@ -1278,7 +1278,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
         var jsonLength;
         if (this.props.shipmentPage == "shipmentDataEntry") {
-            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)){
+            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
                 jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             }
         } else {
@@ -1926,12 +1926,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
 
-        if (x == 11 || x == 0 || x == 29) {
-            console.log("In 19");
+        if (x == 11 || x == 0 || x == 29 || x == 3) {
+            console.log("In 19", rowData[3]);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
-                if (rowData[0].toString() == "false") {
+                if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
+                    console.log("D---------------> in if");
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
@@ -1989,7 +1990,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     cell.classList.add('shipmentEntryDelete');
                 } else {
-                    if (rowData[0].toString() == "false") {
+                    if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "#D3D3D3");
                         var cell = elInstance.getCell(`Q${parseInt(y) + 1}`)
