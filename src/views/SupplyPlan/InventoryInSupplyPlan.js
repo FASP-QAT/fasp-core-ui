@@ -304,7 +304,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data: inventoryDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [null, adjustmentType == 1 ? moment(Date.now()).endOf('month').format("MMM-YY") : null] }, width: 80, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [null, adjustmentType == 1 ? moment(Date.now()).endOf('month').format("YYYY-MM-DD") : null] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
