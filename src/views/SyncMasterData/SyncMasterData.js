@@ -428,14 +428,15 @@ export default class SyncMasterData extends Component {
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var pIds = [];
-                        var programIds = myResult.filter(c => c.userId == userId).map(program => {
+                        var programIds = (myResult.filter(c => c.userId == userId)).map(program => {
                             pIds.push(program.programId);
                         });
+                        console.log("D--------------->", pIds);
                         console.log("Validation", validation);
                         if (validation) {
                             AuthenticationService.setupAxiosInterceptors();
                             if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
-                                MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, programIds)
+                                MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)
                                     .then(response => {
                                         if (response.status == 200) {
                                             console.log("M sync Response", response.data)
