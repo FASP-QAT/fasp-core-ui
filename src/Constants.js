@@ -84,4 +84,5 @@ export const FORECASTED_CONSUMPTION_MONTHS_IN_PAST = 4
 export const INVENTORY_MONTHS_IN_PAST = 6
 export const USD_CURRENCY_ID = 1
 export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.net/servicedesk/customer/portals'
-export const JEXCEL_MONTH_PICKER_FORMAT="Mon-YYYY"
+export const JEXCEL_MONTH_PICKER_FORMAT = "Mon-YYYY"
+export const FINAL_VERSION_TYPE = 2;

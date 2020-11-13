@@ -7,7 +7,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, FINAL_VERSION_TYPE } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -2546,7 +2546,7 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-      if (problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length > 0) {
+      if (problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
