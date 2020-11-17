@@ -304,7 +304,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data: inventoryDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [null, adjustmentType == 1 ? moment(Date.now()).endOf('month').format("MMM-YY") : null] }, width: 80, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [null, adjustmentType == 1 ? moment(Date.now()).endOf('month').format("YYYY-MM-DD") : null] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
@@ -355,7 +355,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 var rowData = elInstance.getRowData(y);
                                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-                                if (rowData[14] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                if (rowData[14] != -1 && rowData[14] != "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
                                     for (var c = 0; c < colArr.length; c++) {
                                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                                         cell.classList.add('readonly');
@@ -745,11 +745,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (valid == false) {
                 elInstance.setValueFromCoords(16, y, 1, true);
             } else {
-                if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
-                    inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
-                } else {
-                    positiveValidation("A", y, elInstance);
-                }
+                // if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                //     inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
+                // } else {
+                    // positiveValidation("A", y, elInstance);
+                // }
             }
         }
         if (x == 1) {
