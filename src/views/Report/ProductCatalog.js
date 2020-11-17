@@ -105,7 +105,7 @@ class ProductCatalog extends Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
-        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
