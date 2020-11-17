@@ -431,7 +431,7 @@ export default class SupplyPlanComponent extends React.Component {
             csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + ele.info.monthsInFutureForAMC + "\"")
             csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + ele.info.shelfLife + "\"")
             csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + ele.info.minStockMoSQty + "\"")
-            csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + ele.info.reorderFrequency + "\"")                        
+            csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + ele.info.reorderFrequency + "\"")
             csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + ele.info.maxStockMoSQty + "\"")
 
             csvRow.push('')
@@ -1487,8 +1487,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <div className="" >
 
                                                     <div className="graphwidth">
-                                                        <div className="chart-wrapper chart-graph-report">
-                                                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                        <div className="col-md-12">
+                                                            <div className="chart-wrapper chart-graph-report">
+                                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>

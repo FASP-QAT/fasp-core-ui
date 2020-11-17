@@ -3671,8 +3671,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         <div className="" >
 
                                             <div className="graphwidth">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                <div className="col-md-12">
+                                                    <div className="chart-wrapper chart-graph-report">
+                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
