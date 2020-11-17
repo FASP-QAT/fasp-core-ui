@@ -51,6 +51,7 @@ export default class StepThree extends Component {
         this.state = {
             healthAreaList: []
         }
+        this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
 
     touchAllThree(setTouched, errors) {
@@ -75,9 +76,16 @@ export default class StepThree extends Component {
         }
     }
 
+    generateHealthAreaCode(event) {
+        let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
+        // alert(healthAreaCode);
+        this.props.generateHealthAreaCode(healthAreaCode);
+    }
+
     getHealthAreaList() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
+        // ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
+        ProgramService.getHealthAreaListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -167,9 +175,10 @@ export default class StepThree extends Component {
                             handleSubmit,
                             isSubmitting,
                             isValid,
-                            setTouched
+                            setTouched,
+                            handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='healthAreaForm'>
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -181,7 +190,7 @@ export default class StepThree extends Component {
                                             name="healthAreaId"
                                             id="healthAreaId"
                                             className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateHealthAreaCode(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmHealthArea}
@@ -190,7 +199,7 @@ export default class StepThree extends Component {
                                     </FormGroup>
                                     <FormGroup>
 
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

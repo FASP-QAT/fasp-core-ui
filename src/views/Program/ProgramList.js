@@ -359,12 +359,13 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
 import moment from 'moment';
 import RealmCountryService from '../../api/RealmCountryService';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
@@ -409,8 +410,21 @@ export default class ProgramList extends Component {
 
   filterData() {
     let countryId = document.getElementById("countryId").value;
-    console.log("countryId--------->", countryId)
-    if (countryId != 0) {
+    var selStatus = document.getElementById("active").value;
+    console.log("countryId--------->", countryId);
+    console.log("selStatus--------->", selStatus);
+    if (countryId != 0 && selStatus != "") {
+      console.log("1------------");
+      let tempSelStatus = (selStatus == "true" ? true : false)
+      // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+      const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId && c.active == tempSelStatus)
+      this.setState({
+        selProgram: selProgram
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (countryId != 0) {
+      console.log("2------------");
       // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
       const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId)
       this.setState({
@@ -418,7 +432,17 @@ export default class ProgramList extends Component {
       }, () => {
         this.buildJExcel();
       });
+    } else if (selStatus != "") {
+      console.log("3------------");
+      let tempSelStatus = (selStatus == "true" ? true : false)
+      const selProgram = this.state.programList.filter(c => c.active == tempSelStatus)
+      this.setState({
+        selProgram: selProgram
+      }, () => {
+        this.buildJExcel();
+      });
     } else {
+      console.log("4------------");
       this.setState({
         selProgram: this.state.programList
       }, () => {
@@ -452,7 +476,7 @@ export default class ProgramList extends Component {
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
       data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
       data[7] = programList[j].lastModifiedBy.username;
-      data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
 
       programArray[count] = data;
@@ -471,7 +495,7 @@ export default class ProgramList extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [150, 150, 100],
+      colWidths: [100, 100, 200, 100, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -515,7 +539,8 @@ export default class ProgramList extends Component {
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
-          type: 'text',
+          type: 'calendar',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
           readOnly: true
         },
 
@@ -542,6 +567,11 @@ export default class ProgramList extends Component {
       allowExport: false,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       // contextMenu: function (obj, x, y, e) {
       //   var items = [];
       //   if (y != null) {
@@ -565,7 +595,6 @@ export default class ProgramList extends Component {
       //   return items;
       // }.bind(this)
 
-      contextMenu: false
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
     this.el = languageEl;
@@ -598,7 +627,8 @@ export default class ProgramList extends Component {
     console.log("props--------------------", this.props);
     // AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
-    ProgramService.getProgramList().then(response => {
+    // ProgramService.getProgramList().then(response => {
+    ProgramService.getProgramListAll().then(response => {
       if (response.status == 200) {
         console.log("resp--------------------", response.data);
         this.setState({
@@ -607,7 +637,8 @@ export default class ProgramList extends Component {
           // loading: false
         },
           () => {
-            this.buildJExcel();
+            // this.buildJExcel();
+            this.filterData();
           })
       } else {
         this.setState({
@@ -787,7 +818,7 @@ export default class ProgramList extends Component {
             </div>
           </div>
           <CardBody className="pb-lg-0">
-            <Col md="3 pl-0" >
+            {/* <Col md="3 pl-0" >
               <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
 
@@ -803,12 +834,51 @@ export default class ProgramList extends Component {
                       <option value="0">{i18n.t('static.common.all')}</option>
                       {countries}
                     </Input>
-                    {/* <InputGroupAddon addonType="append">
-                      <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                    </InputGroupAddon> */}
                   </InputGroup>
                 </div>
               </FormGroup>
+            </Col> */}
+
+            <Col md="6 pl-0">
+              <div className="d-md-flex Selectdiv2">
+                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="countryId"
+                        id="countryId"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="0">{i18n.t('static.common.all')}</option>
+                        {countries}
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="active"
+                        id="active"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="">{i18n.t('static.common.all')}</option>
+                        <option value="true" selected>{i18n.t('static.common.active')}</option>
+                        <option value="false">{i18n.t('static.common.disabled')}</option>
+
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+              </div>
             </Col>
 
             {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">

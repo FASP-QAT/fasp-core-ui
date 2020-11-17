@@ -14,7 +14,7 @@ import CountryService from '../../api/CountryService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -43,8 +43,9 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.healtharea.healthareatext')),
         technicalAreaCode: Yup.string()
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-            .max(6, i18n.t('static.organisation.organisationcodemax6digittext'))        
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .max(6, i18n.t('static.organisation.organisationcodemax6digittext'))
         // .required(i18n.t('static.technicalArea.technicalAreaCodeText')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -382,7 +383,7 @@ export default class TechnicalAreaTicketComponent extends Component {
         technicalArea.technicalAreaCode = '';
         technicalArea.notes = '';
         this.setState({
-            technicalArea: technicalArea,                        
+            technicalArea: technicalArea,
             realmId: this.props.items.userRealmId,
             countryId: ''
         },

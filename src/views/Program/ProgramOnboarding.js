@@ -24,15 +24,17 @@ import StepFour from './StepFour.js';
 import StepFive from './StepFive';
 import StepSix from './StepSix.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: true, 
+            loading: true,
             program: {
-                uniqueCode:'',
-                programCode: '<%RC%>-<%TA%>-<%OR%>-',
+                uniqueCode: '',
+                // programCode: '<%RC%>-<%TA%>-<%OR%>-',
+                programCode: '',
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -62,15 +64,17 @@ export default class ProgramOnboarding extends Component {
                 // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
-                submittedToApprovedLeadTime: '',
-                approvedToShippedLeadTime: '',
+                submittedToApprovedLeadTime: SUBMITTED_TO_APPROVED,
+                approvedToShippedLeadTime: APPROVED_TO_SHIPPED,
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
 
-                shippedToArrivedByAirLeadTime: '',
-                shippedToArrivedBySeaLeadTime: '',
-                arrivedToDeliveredLeadTime: '',
+                shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
+                shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
+                arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
 
+                plannedToSubmittedLeadTime:PLANNED_TO_SUBMITTED,
+                
                 healthArea: {
                     id: ''
                 },
@@ -88,7 +92,10 @@ export default class ProgramOnboarding extends Component {
             regionList: [],
             message: '',
 
-            progressPer: 0
+            progressPer: 0,
+            realmCountryCode: '',
+            organisationCode: '',
+            healthAreaCode: '',
         }
         this.Capitalize = this.Capitalize.bind(this);
 
@@ -117,6 +124,9 @@ export default class ProgramOnboarding extends Component {
         this.removeMessageText = this.removeMessageText.bind(this);
 
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
+        this.generateCountryCode = this.generateCountryCode.bind(this);
+        this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
+        this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
     componentDidMount() {
         let { program } = this.state;
@@ -359,6 +369,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepFive').style.display = 'none';
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
+        let { program } = this.state;
+        program.healthArea.id = '';
+        this.setState({ program }, () => { console.log(this.state) })
     }
 
     previousToStepThree() {
@@ -370,6 +383,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepFive').style.display = 'none';
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
+        let { program } = this.state;
+        program.organisation.id = '';
+        this.setState({ program }, () => { console.log(this.state) })
     }
 
     previousToStepFour() {
@@ -381,6 +397,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepFive').style.display = 'none';
         document.getElementById('stepSix').style.display = 'none';
         document.getElementById('stepSeven').style.display = 'none';
+        let { program } = this.state;
+        program.regionArray = [];
+        this.setState({ program }, () => { console.log(this.state) })
     }
     previousToStepFive() {
         this.setState({ progressPer: 68 });
@@ -406,6 +425,17 @@ export default class ProgramOnboarding extends Component {
         let { program } = this.state
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+    generateCountryCode(code) {
+        // console.log("ALA-----", code);
+        this.setState({ realmCountryCode: code })
+    }
+    generateHealthAreaCode(code) {
+        this.setState({ healthAreaCode: code })
+    }
+    generateOrganisationCode(code) {
+        this.setState({ organisationCode: code })
+
+    }
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programName") {
@@ -414,8 +444,8 @@ export default class ProgramOnboarding extends Component {
             program.realm.realmId = event.target.value;
             this.refs.child.getRealmId();
             this.refs.countryChild.getRealmCountryList();
-            this.refs.healthAreaChild.getHealthAreaList();
-            this.refs.organisationChild.getOrganisationList();
+            // this.refs.healthAreaChild.getHealthAreaList();
+            // this.refs.organisationChild.getOrganisationList();
             this.refs.sixChild.getProgramManagerList();
         } if (event.target.name == 'realmCountryId') {
 
@@ -423,16 +453,23 @@ export default class ProgramOnboarding extends Component {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[0];
-            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
+            // program.programCode = dname.replace(new_string, event.nativeEvent.target[index].text);
 
             program.realmCountry.realmCountryId = event.target.value;
+            this.refs.healthAreaChild.getHealthAreaList();
+            this.refs.organisationChild.getOrganisationList();
             this.refs.regionChild.getRegionList();
+
+            program.organisation.id = '';
+            program.healthArea.id = '';
+            program.regionArray = [];
+
         } if (event.target.name == 'organisationId') {
             var index = event.nativeEvent.target.selectedIndex;
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[2];
-            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
+            // program.programCode = dname.replace(new_string, event.nativeEvent.target[index].text);
 
             program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
@@ -444,12 +481,15 @@ export default class ProgramOnboarding extends Component {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[3];
-            program.programCode = dname.replace(new_string,"").concat(event.target.value.toUpperCase());
-            program.uniqueCode=event.target.value.toUpperCase()
-        } 
+            // program.programCode = dname.replace(new_string, "").concat(event.target.value.toUpperCase());
+            program.uniqueCode = event.target.value.toUpperCase()
+        }
         // if (event.target.name == 'draftToSubmittedLeadTime') {
         //     program.draftToSubmittedLeadTime = event.target.value;
         // } 
+        if (event.target.name == 'programCode1') {
+            program.programCode = event.target.value.toUpperCase();
+        }
 
         if (event.target.name == 'plannedToSubmittedLeadTime') {
             program.plannedToSubmittedLeadTime = event.target.value;
@@ -466,7 +506,7 @@ export default class ProgramOnboarding extends Component {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
             var new_string = email_array[1];
-            program.programCode = dname.replace(new_string,event.nativeEvent.target[index].text);
+            // program.programCode = dname.replace(new_string, event.nativeEvent.target[index].text);
 
             program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
@@ -814,7 +854,7 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepTwo">
-                                    <StepTwo ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} getRegionList={this.getRegionList} items={this.state}></StepTwo>
+                                    <StepTwo ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} getRegionList={this.getRegionList} items={this.state} generateCountryCode={this.generateCountryCode}></StepTwo>
                                     {/* getRegionList={this.getRegionList}  */}
                                     {/* realmCountryList={this.state.realmCountryList} */}
                                     {/* <FormGroup>
@@ -835,7 +875,7 @@ export default class ProgramOnboarding extends Component {
 
                                 </div>
                                 <div id="stepThree">
-                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state}></StepThree>
+                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state} generateHealthAreaCode={this.generateHealthAreaCode}></StepThree>
                                     {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -857,7 +897,7 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepFour">
-                                    <StepFour ref='organisationChild' finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state}></StepFour>
+                                    <StepFour ref='organisationChild' finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} generateOrganisationCode={this.generateOrganisationCode}></StepFour>
 
                                     {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
@@ -1036,7 +1076,7 @@ export default class ProgramOnboarding extends Component {
                                     </Row> */}
                                 </div>
                                 <div id="stepSeven">
-                                    <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
+                                    <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
                                     <FormGroup className="mt-2">
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         &nbsp;

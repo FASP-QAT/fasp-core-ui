@@ -80,8 +80,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     programPlanningUnitList = [];
                 }
                 console.log("Filtered planning unit list", programPlanningUnitList);
+                programPlanningUnitList = programPlanningUnitList.filter(c => c != undefined);
                 // Loop across filtered planning unit
                 for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
+                    console.log("D----------------------------->PlanningUnitId", programPlanningUnitList[ppL].planningUnit.id)
                     // Getting max data entry date
                     var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
                     var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
@@ -140,8 +142,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Calculations of exipred stock
                         var expiredStock = 0;
                         var expiredStockWps = 0;
+                        console.log("D-------------->Date start---------------->", startDate);
+                        console.log("D------------>PrevMonthSUpplyPlan------->", prevMonthSupplyPlan);
+                        console.log("D----------batchDetails", batchDetails);
                         var expiredBatchDetailsOfPrevMonth = batchDetails.filter(c => c.expiryDate >= startDate && c.expiryDate <= endDate);
+                        console.log("D----------------->expiredBatchDetailsOfPrevMonth-------------->", expiredBatchDetailsOfPrevMonth);
                         for (var e = 0; e < expiredBatchDetailsOfPrevMonth.length; e++) {
+                            console.log("D-----------> In for loop", expiredBatchDetailsOfPrevMonth[e].qty);
                             expiredStock += parseInt(expiredBatchDetailsOfPrevMonth[e].qty);
                             expiredStockWps += parseInt(expiredBatchDetailsOfPrevMonth[e].qtyWps);
                             var index = batchDetails.findIndex(c => c.batchNo == expiredBatchDetailsOfPrevMonth[e].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiredBatchDetailsOfPrevMonth[e].expiryDate).format("YYYY-MM"));
@@ -253,7 +260,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Adding erp shipments
-                                console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty);
+                                console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty, "Planning unit", shipmentArr[j].planningUnit.id, "Shipmentg sttays", shipmentArr[j].shipmentStatus.id, "Shipment Ud", shipmentArr[j].shipmentId);
                                 erpTotalQty += parseInt((shipmentArr[j].shipmentQty));
                                 console.log("D Shipment Arr----------------->ErpTotalQty", erpTotalQty);
                                 // Adding shipments based on status
@@ -275,6 +282,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             // Adding shipments qty batch wise
                             var batchListForShipments = shipmentArr[j].batchInfoList;
                             console.log("Batch list for shipments", batchListForShipments);
+                            console.log("D--------------->shipmentArr[j]", shipmentArr[j].shipmentId);
                             for (var b = 0; b < batchListForShipments.length; b++) {
                                 var batchNo = batchListForShipments[b].batch.batchNo;
                                 var expiryDate = batchListForShipments[b].batch.expiryDate
@@ -318,10 +326,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         myArray[index].shipmentWps = parseInt(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
                                     }
                                 }
+                                console.log("D------------>MyArray", myArray);
                                 var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
-                                shipmentBatchQtyTotal += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
-                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
-                                    shipmentBatchQtyTotalWps += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                console.log("D------------------>Index--------->", index, "BatchNo----------->", batchNo, "Expiry date---------->", expiryDate);
+                                if (index != -1) {
+                                    shipmentBatchQtyTotal += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                    if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                        shipmentBatchQtyTotalWps += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                    }
                                 }
                             }
                         }
@@ -516,7 +528,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Calculating expected stock
                         var expectedStock = 0;
                         expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty != "" ? parseInt(consumptionQty) : 0) + (adjustmentQty != "" ? parseInt(adjustmentQty) : 0);
-
+                        console.log("D--------------->Expected stock------------>", expectedStock);
+                        console.log("D------------>openingBalance------------ -->", openingBalance, "---Expired stock-->", expiredStock, "--shipmentTotalQty-->", shipmentTotalQty, "--consumptionQty--->", consumptionQty, "---adjustmentQty--->", adjustmentQty);
                         // Calculating expected stock wps
                         var expectedStockWps = 0;
                         expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty != "" ? parseInt(consumptionQty) : 0) + (adjustmentQty != "" ? parseInt(adjustmentQty) : 0);
@@ -527,7 +540,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
                         console.log("regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
-                            console.log("In first if");
+                            console.log("D-------------->In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
                             console.log("In second if");
@@ -740,6 +753,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
                         console.log("Consumption QTy", consumptionQty);
                         console.log("Conditipn print", consumptionQty === "" ? null : consumptionQty);
+                        for (var bd = 0; bd < batchDetails.length; bd++) {
+                            console.log("D------------------->", batchDetails[bd].batchNo, "Qty", batchDetails[bd].qty, "Expired Qty", batchDetails[bd].expiredQty);
+                        }
                         var json = {
                             programId: programJsonForStoringTheResult.programId,
                             versionId: programJsonForStoringTheResult.currentVersion.versionId,
@@ -788,7 +804,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             regionCountForStock: regionsReportingActualInventory
                         }
                         console.log("D Shipment Arr----------------->JSON", json);
-                        console.log("Json", json);
+                        console.log("Json", json.batchDetails.length > 0 ? json.batchDetails[0].expiredQty : "");
                         console.log("D Shipment Arr----------------->supplyPlanData---------------->", supplyPlanData);
                         supplyPlanData.push(json);
                         console.log("D Shipment Arr----------------->supplyPlanData1--------->", supplyPlanData);

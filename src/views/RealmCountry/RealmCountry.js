@@ -19,10 +19,11 @@ import CurrencyService from "../../api/CurrencyService";
 import UnitService from "../../api/UnitService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 let initialValues = {
     defaultCurrency: {
         currencyId: '',
@@ -86,7 +87,7 @@ class RealmCountry extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -255,34 +256,38 @@ class RealmCountry extends Component {
 
                                                 ],
                                                 updateTable: function (el, cell, x, y, source, value, id) {
-                                                    var elInstance = el.jexcel;
-                                                    var rowData = elInstance.getRowData(y);
-                                                    // var productCategoryId = rowData[0];
-                                                    var realmCountryId = rowData[5];
-                                                    if (realmCountryId == 0) {
-                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                        cell1.classList.remove('readonly');
+                                                    if (y != null) {
+                                                        var elInstance = el.jexcel;
+                                                        var rowData = elInstance.getRowData(y);
+                                                        // var productCategoryId = rowData[0];
+                                                        var realmCountryId = rowData[5];
+                                                        if (realmCountryId == 0) {
+                                                            var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                            cell1.classList.remove('readonly');
 
-                                                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                        // cell2.classList.remove('readonly');
-
-
-                                                    } else {
-                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                        cell1.classList.add('readonly');
-
-                                                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                                                        // cell2.classList.add('readonly');
+                                                            // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                                                            // cell2.classList.remove('readonly');
 
 
+                                                        } else {
+                                                            var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                            cell1.classList.add('readonly');
+
+                                                            // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                                                            // cell2.classList.add('readonly');
+
+
+                                                        }
                                                     }
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
                                                 wordWrap: true,
                                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                                parseFormulas: true,
                                                 position: 'top',
                                                 allowInsertColumn: false,
                                                 allowManualInsertColumn: false,
@@ -292,7 +297,9 @@ class RealmCountry extends Component {
                                                 onfocus: this.focus,
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
+                                                onpaste: this.onPaste,
                                                 allowManualInsertRow: false,
+                                                license: JEXCEL_PRO_KEY,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -412,27 +419,27 @@ class RealmCountry extends Component {
                                                         }
 
                                                         if (x) {
-                                                            if (obj.options.allowComments == true) {
-                                                                items.push({ type: 'line' });
+                                                            // if (obj.options.allowComments == true) {
+                                                            //     items.push({ type: 'line' });
 
-                                                                var title = obj.records[y][x].getAttribute('title') || '';
+                                                            //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                                items.push({
-                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                    onclick: function () {
-                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                    }
-                                                                });
+                                                            //     items.push({
+                                                            //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                            //         onclick: function () {
+                                                            //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                            //         }
+                                                            //     });
 
-                                                                if (title) {
-                                                                    items.push({
-                                                                        title: obj.options.text.clearComments,
-                                                                        onclick: function () {
-                                                                            obj.setComments([x, y], '');
-                                                                        }
-                                                                    });
-                                                                }
-                                                            }
+                                                            //     if (title) {
+                                                            //         items.push({
+                                                            //             title: obj.options.text.clearComments,
+                                                            //             onclick: function () {
+                                                            //                 obj.setComments([x, y], '');
+                                                            //             }
+                                                            //         });
+                                                            //     }
+                                                            // }
                                                         }
                                                     }
 
@@ -660,7 +667,7 @@ class RealmCountry extends Component {
             );
     }
     addRow = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.state.realm.label.label_en;
         data[1] = "";
@@ -674,11 +681,25 @@ class RealmCountry extends Component {
             data, 0, 1
         );
     };
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realm.label.label_en, true);
+                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    z = data[i].y;
+                }
+            }
+        }
+    }
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicateCountry();
         var validation = this.checkValidation();
         if (validation == true && duplicateValidation == true) {
-            var tableJson = this.el.getJson();
+            var tableJson = this.el.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
@@ -764,7 +785,7 @@ class RealmCountry extends Component {
         }
     }
     checkDuplicateCountry = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
 
         let tempArray = tableJson;
@@ -849,7 +870,7 @@ class RealmCountry extends Component {
 
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(6, y);

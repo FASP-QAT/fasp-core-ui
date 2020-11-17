@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import {
     Card, CardBody, CardHeader,
@@ -13,7 +14,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
-import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
 
 
@@ -59,14 +60,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.changed = this.changed.bind(this);
         this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-
+        this.onPaste = this.onPaste.bind(this);
     }
 
     addRowInJexcel = function () {
         // $('#my').jexcel('insertRow', [ 'Pears', 10, 0.59, '=B2*C2' ], 1);
         // this.el.insertRow();
         // var json = this.el.getJson();
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var data = [];
         data[0] = this.props.match.params.procurementAgentId;
         data[1] = "";
@@ -80,6 +81,22 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             data
         );
     }
+
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                    z = data[i].y;
+                }
+            }
+        }
+    }
+
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -103,7 +120,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     }
 
     checkDuplicatePlanningUnit = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
 
         let tempArray = tableJson;
@@ -140,11 +157,12 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             this.setState({
                 loading: false
             })
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             console.log("Rows on submit", json)
             var procurementUnitArray = []
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
+                console.log("D-------------->Map--------", map);
                 if (map.get("7") == 1) {
                     if (map.get("6") == "") {
                         var pId = 0;
@@ -160,8 +178,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             id: map.get("1"),
                         },
                         skuCode: map.get("2"),
-                        vendorPrice: map.get("3"),
-                        approvedToShippedLeadTime: map.get("4"),
+                        vendorPrice: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        approvedToShippedLeadTime: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         gtin: map.get("5")
                     }
                     procurementUnitArray.push(procurementUnitJson);
@@ -231,7 +249,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             // var col = ("L").concat(parseInt(y) + 1);
@@ -303,7 +321,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 // }
 
                 var col = ("D").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(3, y);
+                var value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -324,7 +342,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }
 
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_LEAD_TIME;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -377,7 +395,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         })
 
         if (x == 1) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -453,9 +471,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value != "") {
                 // if (isNaN(parseInt(value)) || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -474,9 +493,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_DECIMAL_LEAD_TIME;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value != "") {
                 // if (isNaN(parseInt(value)) || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -621,11 +641,19 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             {
                                                 title: i18n.t('static.procurementAgentProcurementUnit.vendorPrice'),
                                                 type: 'numeric',
+                                                decimal: '.',
+                                                mask: '#,##.00',
+                                                textEditor: true,
+                                                disabledMaskOnEdition: true
 
                                             },
                                             {
                                                 title: i18n.t('static.program.approvetoshipleadtime'),
                                                 type: 'numeric',
+                                                decimal: '.',
+                                                textEditor: true,
+                                                mask: '#,##.00',
+                                                disabledMaskOnEdition: true
                                             },
                                             {
                                                 title: i18n.t('static.procurementAgentProcurementUnit.gtin'),
@@ -643,6 +671,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                                         ],
                                         pagination: localStorage.getItem("sesRecordCount"),
+                                        filters: true,
                                         search: true,
                                         columnSorting: true,
                                         tableOverflow: true,
@@ -655,6 +684,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         onchange: this.changed,
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
+                                        parseFormulas: true,
+                                        onpaste: this.onPaste,
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -662,6 +693,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             entries: '',
                                         },
                                         onload: this.loaded,
+                                        license: JEXCEL_PRO_KEY,
                                         contextMenu: function (obj, x, y, e) {
                                             var items = [];
                                             //Add consumption batch info
@@ -776,27 +808,27 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 }
 
                                                 if (x) {
-                                                    if (obj.options.allowComments == true) {
-                                                        items.push({ type: 'line' });
+                                                    // if (obj.options.allowComments == true) {
+                                                    //     items.push({ type: 'line' });
 
-                                                        var title = obj.records[y][x].getAttribute('title') || '';
+                                                    //     var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                        items.push({
-                                                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                            onclick: function () {
-                                                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                            }
-                                                        });
+                                                    //     items.push({
+                                                    //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                    //         onclick: function () {
+                                                    //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                    //         }
+                                                    //     });
 
-                                                        if (title) {
-                                                            items.push({
-                                                                title: obj.options.text.clearComments,
-                                                                onclick: function () {
-                                                                    obj.setComments([x, y], '');
-                                                                }
-                                                            });
-                                                        }
-                                                    }
+                                                    //     if (title) {
+                                                    //         items.push({
+                                                    //             title: obj.options.text.clearComments,
+                                                    //             onclick: function () {
+                                                    //                 obj.setComments([x, y], '');
+                                                    //             }
+                                                    //         });
+                                                    //     }
+                                                    // }
                                                 }
                                             }
 

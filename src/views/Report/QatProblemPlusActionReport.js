@@ -1,8 +1,6 @@
 import React from "react";
 import ReactDOM from 'react-dom';
-import jexcel from 'jexcel';
 // import "./style.css";
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js';
@@ -24,7 +22,6 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';

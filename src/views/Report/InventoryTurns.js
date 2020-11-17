@@ -21,10 +21,11 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Link } from "react-router-dom";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -353,13 +354,13 @@ export default class InventoryTurns extends Component {
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
 
@@ -394,7 +395,7 @@ export default class InventoryTurns extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -533,10 +534,10 @@ export default class InventoryTurns extends Component {
         for (var j = 0; j < costOfInventory.length; j++) {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang);
-            data[1] = this.formatter(costOfInventory[j].totalConsumption);
-            data[2] = this.formatter(costOfInventory[j].avergeStock);
-            data[3] = this.formatter(costOfInventory[j].noOfMonths);
-            data[4] = this.formatterDouble(costOfInventory[j].inventoryTurns);
+            data[1] = (costOfInventory[j].totalConsumption);
+            data[2] = (costOfInventory[j].avergeStock);
+            data[3] = (costOfInventory[j].noOfMonths);
+            data[4] = (costOfInventory[j].inventoryTurns);
 
             costOfInventoryArray[count] = data;
             count++;
@@ -565,22 +566,22 @@ export default class InventoryTurns extends Component {
                 },
                 {
                     title: i18n.t('static.report.totconsumption'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.avergeStock'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.report.noofmonth'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.inventoryTurns'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
             ],
@@ -606,7 +607,11 @@ export default class InventoryTurns extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;

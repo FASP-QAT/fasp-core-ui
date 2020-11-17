@@ -341,11 +341,12 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
 import moment from 'moment';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
 const entityname = i18n.t('static.fundingsource.fundingsource');
 
 
@@ -411,7 +412,7 @@ class FundingSourceListComponent extends Component {
             data[2] = getLabelText(fundingSourceList[j].label, this.state.lang)
             data[3] = fundingSourceList[j].fundingSourceCode
             data[4] = fundingSourceList[j].lastModifiedBy.username;
-            data[5] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[5] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[6] = fundingSourceList[j].allowedInBudget;
             data[7] = fundingSourceList[j].active;
 
@@ -461,8 +462,9 @@ class FundingSourceListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM }
                 },
                 {
                     title: i18n.t('static.fundingSource.allowInBudget'),
@@ -504,7 +506,11 @@ class FundingSourceListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var fundingSourceEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = fundingSourceEl;

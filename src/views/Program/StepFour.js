@@ -52,6 +52,7 @@ export default class StepFour extends Component {
         this.state = {
             organisationList: []
         }
+        this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
     }
 
     touchAllFour(setTouched, errors) {
@@ -76,9 +77,16 @@ export default class StepFour extends Component {
         }
     }
 
+    generateOrganisationCode(event) {
+        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        // alert(organisationCode);
+        this.props.generateOrganisationCode(organisationCode);
+    }
+
     getOrganisationList() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
+        // ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
+        ProgramService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -168,9 +176,10 @@ export default class StepFour extends Component {
                             handleSubmit,
                             isSubmitting,
                             isValid,
-                            setTouched
+                            setTouched,
+                            handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='organisationForm'>
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -182,7 +191,7 @@ export default class StepFour extends Component {
                                             name="organisationId"
                                             id="organisationId"
                                             className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateOrganisationCode(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmOrganisation}
@@ -192,7 +201,7 @@ export default class StepFour extends Component {
                                         <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;

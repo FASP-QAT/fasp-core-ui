@@ -238,11 +238,12 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { DATE_FORMAT_CAP } from '../../Constants.js'
+import { DATE_FORMAT_CAP, JEXCEL_PRO_KEY } from '../../Constants.js'
 import moment from 'moment';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
-import { JEXCEL_PAGINATION_OPTION} from '../../Constants.js';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 
@@ -347,6 +348,7 @@ export default class PipelineProgramList extends Component {
             },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
+            filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -362,7 +364,10 @@ export default class PipelineProgramList extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+            license: JEXCEL_PRO_KEY,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -371,14 +376,12 @@ export default class PipelineProgramList extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+    selected = function (instance, x1, y1, x2, y2, value) {
+        console.log("Original Value---->>>>>", x1, "---------->", x2);
+        console.log("Original Value---->>>>>", y1, "---------->", y2);
+        if (y1 == y2) {
             this.props.history.push({
-                pathname: `/pipeline/pieplineProgramSetup/${this.el.getValueFromCoords(0, x)}`,
+                pathname: `/pipeline/pieplineProgramSetup/${this.el.getValueFromCoords(0, y1)}`,
             });
         }
     }.bind(this);

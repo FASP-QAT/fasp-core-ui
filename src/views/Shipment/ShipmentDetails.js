@@ -6,7 +6,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -393,7 +393,7 @@ export default class ShipmentDetails extends React.Component {
                         this.setState({
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
-                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                         if ((this.state.shipmentType).value == 1) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
                         } else {

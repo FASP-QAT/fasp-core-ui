@@ -169,9 +169,10 @@ export default class StepFive extends Component {
                             isValid,
                             setTouched,
                             setFieldValue,
-                            setFieldTouched
+                            setFieldTouched,
+                            handleReset
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='regionForm'>
+                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='regionForm'>
                                     <FormGroup className="Selectcontrol-bdrNone">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                         <Select
@@ -200,7 +201,7 @@ export default class StepFive extends Component {
                                         <FormFeedback className="red">{errors.regionId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                         {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button> */}
                                         &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
