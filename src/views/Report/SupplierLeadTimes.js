@@ -1247,20 +1247,22 @@ class SupplierLeadTimes extends Component {
                             }.bind(this);
 
                             papuRequest.onsuccess = function (e) {
-                                var result2 = papuRequest.result;
-                                console.log("3------>", result2);
+                                var result2;
+                                console.log("procurementAgentIds------>", procurementAgentIds);
 
                                 if (procurementAgentIds.length > 0) {
                                     var procurementAgentFilteredList = []
                                     for (var i = 0; i < procurementAgentIds.length; i++) {
-                                        var l = result2.filter(c => c.procurementAgent.id == procurementAgentIds[i]);
+                                        var l = (papuRequest.result).filter(c => c.procurementAgent.id == parseInt(procurementAgentIds[i]));
+                                        console.log("l------------", l);
                                         for (var j = 0; j < l.length; j++) {
                                             procurementAgentFilteredList.push(l[j]);
                                         }
+                                        console.log("procurementAgentFilteredList---", procurementAgentFilteredList)
                                     }
                                     result2 = procurementAgentFilteredList;
                                 }
-
+                                console.log("my result ===", (papuRequest.result).filter(c => c.procurementAgent.id == 2))
                                 var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                 var paOs = paTransaction.objectStore('procurementAgent');
                                 var paRequest = paOs.getAll();
@@ -1273,35 +1275,43 @@ class SupplierLeadTimes extends Component {
 
                                 paRequest.onsuccess = function (e) {
                                     var result3 = paRequest.result;
-                                    console.log("4------>", result3);
+                                    console.log("result3------>", result3);
                                     // this.setState({ loading: true })
                                     var outPutList = [];
+                                    console.log("result1---", result1);
+                                    console.log("result2---", result2)
                                     for (var i = 0; i < result1.length; i++) {
                                         var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
                                         var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
+                                        console.log("result1[i].localProcurementLeadTime---", result1[i].localProcurementLeadTime);
+                                        console.log("filteredList----", filteredList);
                                         var program = result1[i].program;
                                         for (var j = 0; j < filteredList.length; j++) {
                                             var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).submittedToApprovedLeadTime;
                                             var approvedToShippedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).approvedToShippedLeadTime;
                                             // var draftToSubmittedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).draftToSubmittedLeadTime;
-
+                                            console.log("filteredList[j]-------", filteredList[j])
+                                            console.log("filteredList[j].procurementAgent---", filteredList[j].procurementAgent);
+                                            // var json;
+                                            // for(){
                                             var json = {
                                                 planningUnit: filteredList[j].planningUnit,
                                                 procurementAgent: filteredList[j].procurementAgent,
-                                                localProcurementAgentLeadTime: localProcurementAgentLeadTime,
+                                                localProcurementAgentLeadTime: '',
                                                 approvedToShippedLeadTime: approvedToShippedLeadTime,
                                                 program: program,
                                                 country: result.realmCountry.country,
-                                                plannedSubmittedLeadTime: result.plannedToSubmittedLeadTime,
+                                                plannedToSubmittedLeadTime: result.plannedToSubmittedLeadTime,
                                                 // draftToSubmittedLeadTime: draftToSubmittedLeadTime,
                                                 shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
                                                 arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
                                                 submittedToApprovedLeadTime: submittedToApprovedLeadTime,
 
-                                                totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
-                                                totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(submittedToApprovedLeadTime),
+                                                totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(submittedToApprovedLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime),
+                                                totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(submittedToApprovedLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime),
                                             }
+                                            // }
                                             var noProcurmentAgentJson = {
                                                 planningUnit: filteredList[j].planningUnit,
                                                 procurementAgent: {
@@ -1310,13 +1320,14 @@ class SupplierLeadTimes extends Component {
                                                         label_fr: '',
                                                         label_sp: '',
                                                         label_pr: ''
-                                                    }
+                                                    },
+                                                    code: 'Not Selected'
                                                 },
-                                                localProcurementAgentLeadTime: localProcurementAgentLeadTime,
+                                                localProcurementAgentLeadTime: '',
                                                 approvedToShippedLeadTime: result.approvedToShippedLeadTime,
                                                 program: program,
                                                 country: result.realmCountry.country,
-                                                plannedSubmittedLeadTime: result.plannedToSubmittedLeadTime,
+                                                plannedToSubmittedLeadTime: result.plannedToSubmittedLeadTime,
                                                 // draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
                                                 shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
@@ -1325,7 +1336,32 @@ class SupplierLeadTimes extends Component {
                                                 totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
                                                 totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
                                             }
+                                            var localProcurmentAgentJson = {
+                                                planningUnit: filteredList[j].planningUnit,
+                                                procurementAgent: {
+                                                    label: {
+                                                        label_en: '',
+                                                        label_fr: '',
+                                                        label_sp: '',
+                                                        label_pr: ''
+                                                    },
+                                                    code: 'Local'
+                                                },
+                                                localProcurementAgentLeadTime: localProcurementAgentLeadTime,
+                                                approvedToShippedLeadTime: '',
+                                                program: '',
+                                                country: '',
+                                                plannedToSubmittedLeadTime: '',
+                                                // draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
+                                                shippedToArrivedBySeaLeadTime: '',
+                                                shippedToArrivedByAirLeadTime: '',
+                                                arrivedToDeliveredLeadTime: '',
+                                                submittedToApprovedLeadTime: '',
+                                                totalAirLeadTime: '',
+                                                totalSeaLeadTime: '',
+                                            }
                                             outPutList.push(noProcurmentAgentJson);
+                                            outPutList.push(localProcurmentAgentJson);
                                             outPutList.push(json);
                                         }
                                     }
