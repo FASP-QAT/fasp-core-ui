@@ -745,11 +745,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (valid == false) {
                 elInstance.setValueFromCoords(16, y, 1, true);
             } else {
-                if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
-                    inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
-                } else {
-                    positiveValidation("A", y, elInstance);
-                }
+                // if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                //     inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
+                // } else {
+                    // positiveValidation("A", y, elInstance);
+                // }
             }
         }
         if (x == 1) {
