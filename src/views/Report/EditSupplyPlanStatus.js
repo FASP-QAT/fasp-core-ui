@@ -31,6 +31,7 @@ import { Link } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
 import MultiSelect from 'react-multi-select-component';
+import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 
 const entityname = i18n.t('static.program.program');
 
@@ -196,12 +197,13 @@ class EditSupplyPlanStatus extends Component {
                 monthsInFutureForAmc: '',
                 regionArray: [],
                 regionList: [],
-                problemStatusListForEdit: []
+                problemStatusListForEdit: [],
             },
             statuses: [],
             regionList: [],
             editable: false,
-            problemStatusValues: [{label: "Open", value: 1},{label: "Addressed", value: 3}]
+            problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            problemReportChanged: 0
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -213,6 +215,7 @@ class EditSupplyPlanStatus extends Component {
         this.rowChanged = this.rowChanged.bind(this);
         this.toggleTransView = this.toggleTransView.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -223,6 +226,9 @@ class EditSupplyPlanStatus extends Component {
     }
 
     rowChanged = function (instance, cell, x, y, value) {
+        this.setState({
+            problemReportChanged: 1
+        })
         var elInstance = this.state.problemEl;
         var rowData = elInstance.getRowData(y);
         if (x != 20 && rowData[20] != 1) {
@@ -1844,12 +1850,13 @@ class EditSupplyPlanStatus extends Component {
 
         ProgramService.getProblemStatusList().then(response => {
             console.log('**' + JSON.stringify(response.data))
-            var myResult = (response.data).filter(c => c.userManaged == true);
+            var myResult = (response.data)
             var proList = []
             for (var i = 0; i < myResult.length; i++) {
                 var Json = {
                     name: getLabelText(myResult[i].label, lan),
-                    id: myResult[i].id
+                    id: myResult[i].id,
+                    userManaged: myResult[i].userManaged
                 }
                 proList.push(Json);
             }
@@ -2687,7 +2694,7 @@ class EditSupplyPlanStatus extends Component {
                                             id="problemStatusId"
                                             options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             value={this.state.problemStatusValues}
-                                            // onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                            onChange={(e) => { this.handleProblemStatusChange(e) }}
                                             labelledBy={i18n.t('static.common.select')}
                                         />
                                     </InputGroup>
@@ -2713,12 +2720,41 @@ class EditSupplyPlanStatus extends Component {
                         </div>
                     </Col>
                     <div className="table-responsive RemoveStriped">
-                        <div id="problemListDiv" className="jexcelremoveReadonlybackground" />
+                        <div id="problemListDiv" className="" />
                     </div>
                 </TabPane>
 
             </>
         );
+    }
+
+    handleProblemStatusChange = (event) => {
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log('***', event)
+            var problemStatusIds = event
+            problemStatusIds = problemStatusIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemStatusValues: problemStatusIds.map(ele => ele),
+                problemStatusLabels: problemStatusIds.map(ele => ele.label),
+                problemReportChanged: 0
+            }, () => {
+                console.log("problemStatusValues===>", this.state.problemStatusValues);
+                this.fetchData()
+            })
+        }
     }
 
     getNote(row, lang) {
@@ -2728,112 +2764,128 @@ class EditSupplyPlanStatus extends Component {
     }
 
     fetchData() {
-        // alert("hi 2");
-        this.setState({
-            problemList: [],
-            message: '',
-            loading: true
-        },
-            () => {
-                this.el = jexcel(document.getElementById("problemListDiv"), '');
-                this.el.destroy();
-            });
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-        let problemStatusId = 1;
-        // let reviewedStatusId = document.getElementById('reviewedStatusId').value;
-        var problemReportList = this.state.data;
-        var problemReportFilterList = problemReportList;
-        console.log("problemReportList====>", problemReportList);
-        if (problemStatusId != 0) {
-            // if (problemStatusId == -1) {
-            //     problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
-            // } else {
-            //     if (problemStatusId == 2) {
-            //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-            //         problemReportFilterList = problemReportFilterList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
-            //     } else {
-            //         problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == problemStatusId);
-            //     }
-            // }
-            // if (reviewedStatusId != -1) {
-            //     if (reviewedStatusId == 0) {
-            //         problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
-            //     } else {
-            //         problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
-            //     }
-            // }
-            this.setState({
-                problemList: problemReportFilterList,
-                message: ''
-            },
-                () => {
-                    this.buildJExcel();
-                });
-
-            // if (problemStatusId == -1 && reviewedStatusId == 0) {
-            //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == false);
-            //     this.setState({
-            //         problemList: problemReportFilterList,
-            //         message: ''
-            //     },
-            //         () => {
-            //             this.buildJExcel();
-            //         });
-            // }
-            // else if (problemStatusId != -1 && reviewedStatusId == 0) {
-            //     if (problemStatusId == 2) {
-            //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-            //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-            //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == false);
-            //     } else {
-            //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == false);
-            //     }
-            //     this.setState({
-            //         problemList: problemReportFilterList,
-            //         message: ''
-            //     },
-            //         () => {
-            //             this.buildJExcel();
-            //         });
-            // } else if (problemStatusId == -1 && reviewedStatusId == 1) {
-            //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == true);
-            //     this.setState({
-            //         problemList: problemReportFilterList,
-            //         message: ''
-            //     },
-            //         () => {
-            //             this.buildJExcel();
-            //         });
-            // }
-            // else if (problemStatusId != -1 && reviewedStatusId == 1) {
-            //     if (problemStatusId == 2) {
-            //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-            //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-            //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == true);
-            //     } else {
-            //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == true);
-            //     }
-            //     this.setState({
-            //         problemList: problemReportFilterList,
-            //         message: ''
-            //     },
-            //         () => {
-            //             this.buildJExcel();
-            //         });
-            // }
-
-
-
+            }
+        } else {
+            cont = true;
         }
-        else if (problemStatusId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
+        if (cont == true) {
+            // alert("hi 2");
+            this.setState({
+                problemList: [],
+                message: '',
+                loading: true,
+                problemReportChanged: 0
+            },
                 () => {
                     this.el = jexcel(document.getElementById("problemListDiv"), '');
                     this.el.destroy();
                 });
-        }
 
+            // let problemStatusId = ;
+            let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
+            console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
+            let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            var problemReportList = this.state.data;
+            var problemReportFilterList = problemReportList;
+            console.log("problemReportList====>", problemReportList);
+            if (problemStatusIds != []) {
+                var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
+                if (reviewedStatusId != -1) {
+                    if (reviewedStatusId == 0) {
+                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                    } else {
+                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                    }
+                }
+                console.log("problemReportFilterList after filter------------->", problemReportFilterList)
+                this.setState({
+                    problemList: problemReportFilterList,
+                    message: ''
+                },
+                    () => {
+                        this.buildJExcel();
+                    });
+
+                // if (problemStatusId == -1 && reviewedStatusId == 0) {
+                //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == false);
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // }
+                // else if (problemStatusId != -1 && reviewedStatusId == 0) {
+                //     if (problemStatusId == 2) {
+                //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == false);
+                //     } else {
+                //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == false);
+                //     }
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // } else if (problemStatusId == -1 && reviewedStatusId == 1) {
+                //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == true);
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // }
+                // else if (problemStatusId != -1 && reviewedStatusId == 1) {
+                //     if (problemStatusId == 2) {
+                //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == true);
+                //     } else {
+                //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == true);
+                //     }
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // }
+
+
+
+            }
+            else if (problemStatusIds == []) {
+                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
+                    () => {
+                        this.el = jexcel(document.getElementById("problemListDiv"), '');
+                        this.el.destroy();
+                    });
+            }
+        }
     }
+
+    filterProblemStatus = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var json = instance.jexcel.getJson(null, false)
+        mylist = this.state.problemStatusListForEdit;
+        mylist = mylist.filter(c => c.userManaged == true);
+        return mylist;
+    }.bind(this)
 
     buildJExcel() {
         let problemList = this.state.problemList;
@@ -2901,7 +2953,7 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'hidden',
                     readOnly: true,
                     width: 70
                 },
@@ -2943,7 +2995,8 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t('static.report.problemStatus'),
                     type: 'dropdown',
                     source: this.state.problemStatusListForEdit,
-                    width: 80
+                    width: 80,
+                    filter: this.filterProblemStatus
                 },
                 {
                     title: i18n.t('static.editSupplyPlan.notes'),
@@ -3005,6 +3058,44 @@ class EditSupplyPlanStatus extends Component {
 
 
             ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (this.state.editable) {
+                    var rowData = elInstance.getRowData(y)[12];
+                    if (rowData == 4) {
+                        var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                }
+
+                // var elInstance = instance.jexcel;
+                // var json = elInstance.getJson();
+                // for (var j = 0; j < json.length; j++) {
+                // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
+                // var colArr = ['U']
+                var rowData = elInstance.getRowData(y);
+                var criticalityId = rowData[16];
+                var problemStatusId = rowData[12];
+                if (criticalityId == 3 && problemStatusId != 4 && problemStatusId != 2) {
+                    console.log("In if");
+                    var cell = elInstance.getCell(("R").concat(parseInt(y) + 1))
+                    console.log("cell classlist------------------>", cell.classList);
+                    cell.classList.add('highCriticality');
+                } else if (criticalityId == 2 && problemStatusId != 4 && problemStatusId != 2) {
+                    console.log("In if 1");
+                    var cell = elInstance.getCell(("R").concat(parseInt(y) + 1))
+                    cell.classList.add('mediumCriticality');
+                } else if (criticalityId == 1 && problemStatusId != 4 && problemStatusId != 2) {
+                    console.log("In if 2");
+                    var cell = elInstance.getCell(("R").concat(parseInt(y) + 1))
+                    cell.classList.add('lowCriticality');
+                    // }
+                }
+            }.bind(this),
             editable: this.state.editable,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
@@ -3059,7 +3150,6 @@ class EditSupplyPlanStatus extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        (instance.jexcel).filter(10,[1,2]);
     }
 
     updateFieldData = (value) => {
@@ -3191,6 +3281,15 @@ class EditSupplyPlanStatus extends Component {
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
+                        <ProblemListFormulas ref="formulaeChild" />
+                        <div className="Card-header-addicon">
+                            <div className="card-header-actions">
+                                <a className="">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
+                                    {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                </a>
+                            </div>
+                        </div>
                         {/* <CardHeader>
                             <i className="icon-note"></i><strong>{i18n.t('static.report.updatestatus')}</strong>{' '}
                         </CardHeader> */}
@@ -3728,15 +3827,18 @@ class EditSupplyPlanStatus extends Component {
                                     if (map.get("20") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
-                                            problemStatusId: map.get("12"),
+                                            problemStatus: {
+                                                id: map.get("12")
+                                            },
                                             reviewed: map.get("18"),
                                             notes: map.get("19")
                                         });
                                     }
-                                    if (map.get("18") == false) {
+                                    if (map.get("18") == false && map.get("12") != 4) {
                                         isAllCheckForReviewed = false
                                     }
                                 }
+                                console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
                                 if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
                                     console.log("reviewedProblemList===>", reviewedProblemList);
@@ -3786,7 +3888,7 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         );
                                 } else {
-                                    alert("YOUR MESSAGE");
+                                    alert("To approve a supply plan – Reviewed must all be checked.");
                                 }
 
                             }}
