@@ -3,7 +3,7 @@
 //export const API_URL = 'http://localhost:8081'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
-export const API_URL = 'https://github.com/AltiusIndia/fasp-core-ui.git'
+export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL='http://192.168.43.70:8080/FASP'
 export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 5;
