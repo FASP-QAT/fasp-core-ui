@@ -3109,16 +3109,16 @@ class EditSupplyPlanStatus extends Component {
                 var rowData = elInstance.getRowData(y);
                 var criticalityId = rowData[16];
                 var problemStatusId = rowData[12];
-                if (criticalityId == 3 && problemStatusId != 4 && problemStatusId != 2) {
+                if (criticalityId == 3) {
                     console.log("In if");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
-                } else if (criticalityId == 2 && problemStatusId != 4 && problemStatusId != 2) {
+                } else if (criticalityId == 2) {
                     console.log("In if 1");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
-                } else if (criticalityId == 1 && problemStatusId != 4 && problemStatusId != 2) {
+                } else if (criticalityId == 1) {
                     console.log("In if 2");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');

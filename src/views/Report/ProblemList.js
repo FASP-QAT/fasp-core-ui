@@ -671,21 +671,21 @@ export default class ConsumptionDetails extends React.Component {
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
             var problemStatusId = rowData[12];
-            if (criticalityId == 3 && problemStatusId != 4 && problemStatusId != 2) {
+            if (criticalityId == 3) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
                     let textColor = contrast('#f48282');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (criticalityId == 2 && problemStatusId != 4 && problemStatusId != 2) {
+            } else if (criticalityId == 2) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
                     let textColor = contrast('orange');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (criticalityId == 1 && problemStatusId != 4 && problemStatusId != 2) {
+            } else if (criticalityId == 1) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
