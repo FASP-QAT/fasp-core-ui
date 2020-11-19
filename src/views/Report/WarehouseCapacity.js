@@ -399,6 +399,12 @@ class warehouseCapacity extends Component {
                         this.fetchData()
                     });
                 }
+            }else{
+                this.setState({
+                    programLst: []
+                }, () => {
+                    this.fetchData()
+                });
             }
 
         })
