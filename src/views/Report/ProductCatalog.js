@@ -1349,7 +1349,8 @@ class ProductCatalog extends Component {
                                                 // onChange={(e) => { this.getPlanningUnit(); }}
                                                 >
 
-                                                    <option value="-1">{i18n.t('static.common.allcategories')}</option>
+                                                    {/* <option value="-1">{i18n.t('static.common.allcategories')}</option> */}
+                                                    <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {productCategoriesOffline.length > 0
                                                         && productCategoriesOffline.map((item, i) => {
                                                             return (
