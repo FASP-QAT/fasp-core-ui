@@ -1472,5 +1472,6 @@
     "static.jexcel.of": "de",
     "static.budget.budgetCode": "Código del presupuesto",
     "static.organisation.organisationheader": "Organización",
-    "static.report.totconsumption": "Consumo total"
+    "static.report.totconsumption": "Consumo total",
+    "static.report.orderNo1": "Identificador de pedido del agente de compras"
 }

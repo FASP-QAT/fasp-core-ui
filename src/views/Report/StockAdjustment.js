@@ -657,7 +657,7 @@ class StockAdjustmentComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.report.month'),
+                    title: i18n.t('static.inventoryDate.inventoryReport'),
                     type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
                     readOnly: true
                 },
@@ -789,7 +789,8 @@ class StockAdjustmentComponent extends Component {
 
                                 var json = {
                                     program: programJson,
-                                    inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
+                                    // inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
+                                    inventoryDate: ele.inventoryDate,
                                     planningUnit: ele.planningUnit,
                                     stockAdjustemntQty: ele.adjustmentQty,
                                     lastModifiedBy: programJson.currentVersion.lastModifiedBy,
@@ -800,7 +801,7 @@ class StockAdjustmentComponent extends Component {
                                 data.push(json)
                             })
                         })
-                        console.log(data)
+                        console.log("inventory List--------->", data);;
                         this.setState({
                             data: data
                             , message: ''
