@@ -231,8 +231,8 @@ class EditSupplyPlanStatus extends Component {
         })
         var elInstance = this.state.problemEl;
         var rowData = elInstance.getRowData(y);
-        if (x != 20 && rowData[20] != 1) {
-            elInstance.setValueFromCoords(20, y, 1, true);
+        if (x != 22 && rowData[22] != 1) {
+            elInstance.setValueFromCoords(22, y, 1, true);
         }
     }
     hideFirstComponent() {
@@ -2912,13 +2912,23 @@ class EditSupplyPlanStatus extends Component {
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-            data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
-            data[18] = problemList[j].reviewed
-            data[19] = ''
-            data[20] = 0
-            data[21] = problemList[j].problemTransList
+            
+            data[17] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
+            data[18] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
+
+            data[19] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+            data[20] = problemList[j].reviewed
+            data[21] = ''
+            
+            data[22] = 0
+            data[23] = problemList[j].problemTransList
             problemArray[count] = data;
             count++;
+
+
+           
+
+
         }
         // if (problemList.length == 0) {
         //     data = [];
@@ -2999,9 +3009,9 @@ class EditSupplyPlanStatus extends Component {
                     filter: this.filterProblemStatus
                 },
                 {
-                    title: i18n.t('static.editSupplyPlan.notes'),
+                    title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: true,
+                    readOnly: true, 
                     width: 120
                 },
                 {
@@ -3029,6 +3039,20 @@ class EditSupplyPlanStatus extends Component {
                     type: 'hidden',
                     width: 0
                 },
+                
+                {
+                    title: i18n.t('static.report.reviewNotes'),
+                    type: 'text',
+                    width: 120
+
+                },
+                {
+                    title: i18n.t('static.report.reviewedDate'),
+                    type: 'text',
+                    width: 80
+
+                },
+
                 {
                     title: i18n.t('static.problemAction.criticality'),
                     type: 'text',
@@ -3045,6 +3069,7 @@ class EditSupplyPlanStatus extends Component {
                     type: 'text',
                     width: 120
                 },
+               
                 {
                     title: 'isChanged',
                     type: 'hidden',
@@ -3082,16 +3107,16 @@ class EditSupplyPlanStatus extends Component {
                 var problemStatusId = rowData[12];
                 if (criticalityId == 3 && problemStatusId != 4 && problemStatusId != 2) {
                     console.log("In if");
-                    var cell = elInstance.getCell(("R").concat(parseInt(y) + 1))
+                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2 && problemStatusId != 4 && problemStatusId != 2) {
                     console.log("In if 1");
-                    var cell = elInstance.getCell(("R").concat(parseInt(y) + 1))
+                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
                 } else if (criticalityId == 1 && problemStatusId != 4 && problemStatusId != 2) {
                     console.log("In if 2");
-                    var cell = elInstance.getCell(("R").concat(parseInt(y) + 1))
+                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');
                     // }
                 }
@@ -3824,19 +3849,33 @@ class EditSupplyPlanStatus extends Component {
                                 var isAllCheckForReviewed = true;
                                 for (var i = 0; i < json.length; i++) {
                                     var map = new Map(Object.entries(json[i]));
-                                    if (map.get("20") == 1) {
+
+                                    if (map.get("22") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
                                             problemStatus: {
                                                 id: map.get("10")
                                             },
-                                            reviewed: map.get("18"),
-                                            notes: map.get("19")
+                                            reviewed: map.get("20"),
+                                            notes: map.get("21")
                                         });
                                     }
-                                    if (map.get("18") == false && map.get("12") != 4) {
+                                    if (map.get("20") == false && map.get("12") != 4) {
                                         isAllCheckForReviewed = false
                                     }
+                                    // if (map.get("20") == 1) {
+                                    //     reviewedProblemList.push({
+                                    //         problemReportId: map.get("0"),
+                                    //         problemStatus: {
+                                    //             id: map.get("10")
+                                    //         },
+                                    //         reviewed: map.get("18"),
+                                    //         notes: map.get("19")
+                                    //     });
+                                    // }
+                                    // if (map.get("18") == false && map.get("12") != 4) {
+                                    //     isAllCheckForReviewed = false
+                                    // }
                                 }
                                 console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
                                 if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
