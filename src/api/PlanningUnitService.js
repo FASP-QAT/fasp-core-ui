@@ -35,7 +35,7 @@ class PlanningUnitService {
         );
     }
 
-    editPlanningUnitCapacity(json){
+    editPlanningUnitCapacity(json) {
         return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
         );
     }
@@ -45,6 +45,10 @@ class PlanningUnitService {
     }
     getPlanningUnitByProgramIds(json) {
         return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
+        );
+    }
+    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId) {
+        return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}`, {}
         );
     }
 }

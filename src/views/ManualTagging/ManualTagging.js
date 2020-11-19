@@ -657,6 +657,8 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@material-ui/core/TextField';
 
 
 
@@ -666,6 +668,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            searchedValue: '',
             result: '',
             message: '',
             outputList: [],
@@ -677,25 +680,34 @@ export default class ManualTagging extends Component {
             shipmentId: '',
             reason: "1",
             haslinked: false,
-            alreadyLinkedmessage: ""
+            alreadyLinkedmessage: "",
+            tracercategoryPlanningUnit: [],
+            planningUnitId: '',
+            planningUnitName: '',
+            autocompleteData: [],
+            orderNo: '',
+            primeLineNo: '',
+            procurementAgentId: '',
+            displayButton: false
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.formatPlanningUnitLabel = this.formatPlanningUnitLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
-        this.getOrderDetails = this.getOrderDetails.bind(this);
+        // this.getOrderDetails = this.getOrderDetails.bind(this);
         this.link = this.link.bind(this);
         this.getProgramList = this.getProgramList.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
     }
     link() {
-        var orderNo = document.getElementById("orderNo").value;
-        var primeLineNo = document.getElementById("primeLineNo").value;
+        // var orderNo = document.getElementById("orderNo").value;
+        var conversionFactor = document.getElementById("conversionFactor").value;
         this.setState({ loading: true })
-        ManualTaggingService.linkShipmentWithARTMIS(orderNo, primeLineNo, this.state.shipmentId)
+        ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor)
             .then(response => {
                 console.log("response m tagging---", response)
                 this.setState({
@@ -756,29 +768,33 @@ export default class ManualTagging extends Component {
                 }
             );
     }
-    getOrderDetails() {
+    getConvertedQATShipmentQty = () => {
+        var conversionFactor = document.getElementById("conversionFactor").value;
+        var erpShipmentQty = document.getElementById("erpShipmentQty").value;
+        if (conversionFactor != null && conversionFactor != "") {
+            var result = erpShipmentQty * conversionFactor;
+            document.getElementById("convertedQATShipmentQty").value = result;
+        }
+    }
+
+
+    getOrderDetails = () => {
+        console.log("combo box value-------------------------------", document.getElementById("combo-box-demo").value);
+        // var roNoOrderNo = event.label;
+        var roNoOrderNo = this.state.searchedValue;
+        console.log("roNoOrderNo---", roNoOrderNo);
+        var searchId = document.getElementById("searchId").value;
         var programId = document.getElementById("programId").value;
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var orderNo = document.getElementById("orderNo").value;
-        console.log("orderNo---", orderNo);
-        var primeLineNo = document.getElementById("primeLineNo").value;
-        console.log("primeLineNo---", primeLineNo);
-        if (orderNo != "" && primeLineNo != "") {
-            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(programId, planningUnitId, orderNo, primeLineNo)
+        var erpPlanningUnitId = document.getElementById("erpPlanningUnitId").value;
+        if (roNoOrderNo != "") {
+            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, searchId, programId, erpPlanningUnitId)
                 .then(response => {
                     console.log("artmis response===", response.data);
-                    var artmisList = [];
-                    if (response.data.reason == "") {
-                        artmisList.push(response.data);
-                    }
-
-                    console.log("--------->>", response.data);
-                    // console.log("--------->",response.data[0].reason);
+                    document.getElementById("erpShipmentQty").value = '';
+                    document.getElementById("convertedQATShipmentQty").value = '';
                     this.setState({
-                        reason: response.data.reason,
-                        artmisList,
-                        result: '',
-                        alreadyLinkedmessage: ''
+                        artmisList: response.data,
+                        displayButton: false
                     })
                 }).catch(
                     error => {
@@ -821,27 +837,28 @@ export default class ManualTagging extends Component {
                         }
                     }
                 );
-        } else if (orderNo == "" && primeLineNo == "") {
-            this.setState({
-                artmisList: [],
-                result: i18n.t('static.manualtagging.result'),
-                alreadyLinkedmessage: ''
-            })
         }
-        else if (orderNo == "") {
-            this.setState({
-                artmisList: [],
-                result: i18n.t('static.manualtagging.resultOrderNoBlank'),
-                alreadyLinkedmessage: ''
-            })
-        }
-        else if (primeLineNo == "") {
-            this.setState({
-                artmisList: [],
-                result: i18n.t('static.manualtagging.resultPrimeLineNoBlank'),
-                alreadyLinkedmessage: ''
-            })
-        }
+        // else if (orderNo == "" && primeLineNo == "") {
+        //     this.setState({
+        //         artmisList: [],
+        //         result: i18n.t('static.manualtagging.result'),
+        //         alreadyLinkedmessage: ''
+        //     })
+        // }
+        // else if (orderNo == "") {
+        //     this.setState({
+        //         artmisList: [],
+        //         result: i18n.t('static.manualtagging.resultOrderNoBlank'),
+        //         alreadyLinkedmessage: ''
+        //     })
+        // }
+        // else if (primeLineNo == "") {
+        //     this.setState({
+        //         artmisList: [],
+        //         result: i18n.t('static.manualtagging.resultPrimeLineNoBlank'),
+        //         alreadyLinkedmessage: ''
+        //     })
+        // }
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
@@ -866,6 +883,9 @@ export default class ManualTagging extends Component {
         var programId = document.getElementById("programId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
 
+        var planningUnitSelect = document.getElementById("planningUnitId");
+        var planningUnitName = planningUnitSelect.options[planningUnitSelect.selectedIndex].text;
+
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
             if (this.state.haslinked) {
@@ -880,8 +900,11 @@ export default class ManualTagging extends Component {
                     console.log("manual tagging response===", response);
                     this.setState({
                         outputList: response.data,
+                        planningUnitId: planningUnitId,
+                        planningUnitName: planningUnitName
                         // message: ''
                     }, () => {
+                        // this.getPlanningUnitListByTracerCategory(planningUnitId);
                         this.buildJExcel();
                     });
                 }).catch(
@@ -947,8 +970,118 @@ export default class ManualTagging extends Component {
         }
 
     }
+    getPlanningUnitListByTracerCategory = (planningUnitId, procurementAgentId) => {
+        PlanningUnitService.getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId)
+            .then(response => {
+                console.log("tracercategoryPlanningUnit response===", response);
+                this.setState({
+                    tracercategoryPlanningUnit: response.data
+                });
+                document.getElementById("erpPlanningUnitId").value = planningUnitId;
+                // document.getElementById('select_value').value ="val3";
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    searchErpOrderData = (term) => {
+        if (term != null && term != "") {
+            var searchId = document.getElementById("searchId").value;
+            var erpPlanningUnitId = document.getElementById("erpPlanningUnitId").value;
+            var programId = document.getElementById("programId").value;
+            console.log("programId ---", programId);
+            console.log("erpPlanningUnitId ---", erpPlanningUnitId);
 
+            ManualTaggingService.searchErpOrderData(term.toUpperCase(), searchId, programId, erpPlanningUnitId)
+                .then(response => {
+                    console.log("searchErpOrderData response===", response);
+
+                    var autocompleteData = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        autocompleteData[i] = { value: response.data[i].id, label: response.data[i].label }
+                    }
+                    this.setState({
+                        autocompleteData
+                    });
+                    // document.getElementById("erpPlanningUnitId").value = planningUnitId;
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+    }
     addNewCountry() {
         if (navigator.onLine) {
             this.props.history.push(`/country/addCountry`)
@@ -1139,7 +1272,8 @@ export default class ManualTagging extends Component {
 
                                 this.setState({
                                     shipmentId: this.el.getValueFromCoords(0, y),
-                                    outputListAfterSearch
+                                    outputListAfterSearch,
+                                    procurementAgentId: outputListAfterSearch[0].procurementAgent.id
                                 })
                                 this.toggleLarge();
 
@@ -1179,7 +1313,8 @@ export default class ManualTagging extends Component {
 
             this.setState({
                 shipmentId: this.el.getValueFromCoords(0, x),
-                outputListAfterSearch
+                outputListAfterSearch,
+                procurementAgentId: outputListAfterSearch[0].procurementAgent.id
             })
             this.toggleLarge();
         }
@@ -1281,7 +1416,15 @@ export default class ManualTagging extends Component {
         return getLabelText(cell, this.state.lang);
     }
 
+    formatPlanningUnitLabel(cell, row) {
+        console.log("cell------", cell);
+        console.log("row------", row);
+        return getLabelText(cell, this.state.lang) + " (" + row.planningUnit.id + ")";
+    }
+
     toggleLarge() {
+        console.log("procurementAgentId---", this.state.procurementAgentId)
+        this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
             artmisList: [],
             reason: "1",
@@ -1314,6 +1457,19 @@ export default class ManualTagging extends Component {
     }
 
     render() {
+        const selectRow = {
+            mode: 'radio',
+            clickToSelect: true,
+            onSelect: (row, isSelect, rowIndex, e) => {
+                document.getElementById("erpShipmentQty").value = row.quantity;
+                this.getConvertedQATShipmentQty();
+                this.setState({
+                    orderNo: row.orderNo,
+                    primeLineNo: row.primeLineNo,
+                    displayButton: true
+                });
+            }
+        };
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
@@ -1332,6 +1488,16 @@ export default class ManualTagging extends Component {
             )
         }, this);
 
+        const { tracercategoryPlanningUnit } = this.state;
+        let tracerCategoryPlanningUnitList = tracercategoryPlanningUnit.length > 0 && tracercategoryPlanningUnit.map((item, i) => {
+            return (
+                <option key={i} value={item.planningUnit.id}>
+                    {getLabelText(item.planningUnit.label, this.state.lang) + '(' + item.skuCode + ')'}
+                </option>
+            )
+        }, this);
+
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1341,8 +1507,25 @@ export default class ManualTagging extends Component {
 
         const columns = [
             {
+                dataField: 'planningUnit.label',
+                text: i18n.t('static.supplyPlan.qatProduct'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '20px' },
+                formatter: this.formatPlanningUnitLabel
+            },
+            {
                 dataField: 'shipmentId',
                 text: i18n.t('static.commit.qatshipmentId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '20px' }
+            },
+            {
+                dataField: 'orderNo',
+                text: i18n.t('static.manualTagging.procOrderNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1362,13 +1545,13 @@ export default class ManualTagging extends Component {
                 style: { width: '20px' }
             },
             {
-                dataField: 'shipmentStatus.label.label_en',
+                dataField: 'shipmentStatus.label',
                 text: i18n.t('static.supplyPlan.mtshipmentStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '20px' }
-                // formatter: this.formatLabel
+                style: { width: '20px' },
+                formatter: this.formatLabel
             }, {
                 dataField: 'procurementAgent.code',
                 text: i18n.t('static.report.procurementAgentName'),
@@ -1385,15 +1568,15 @@ export default class ManualTagging extends Component {
                 headerAlign: 'center',
                 style: { width: '40px' }
             },
-            {
-                dataField: 'budget.label.label_en',
-                text: i18n.t('static.budgetHead.budget'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '40px' }
-                // formatter: this.formatLabel
-            },
+            // {
+            //     dataField: 'budget.label.label_en',
+            //     text: i18n.t('static.budgetHead.budget'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     style: { width: '40px' }
+            //     // formatter: this.formatLabel
+            // },
             {
                 dataField: 'shipmentQty',
                 text: i18n.t('static.supplyPlan.shipmentQty'),
@@ -1408,6 +1591,13 @@ export default class ManualTagging extends Component {
 
         const columns1 = [
             {
+                dataField: 'erpOrderId',
+                text: i18n.t('static.manualTagging.linkColumn'),
+                align: 'center',
+                hidden: true,
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'roNo',
                 text: i18n.t('static.manualTagging.RONO'),
                 sort: true,
@@ -1421,14 +1611,30 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
-            }, {
-                dataField: 'orderType',
-                text: i18n.t('static.manualTagging.OrderType'),
+            },
+            {
+                dataField: 'orderNo',
+                text: i18n.t('static.manualTagging.erpShipmentNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'primeLineNo',
+                text: i18n.t('static.manualTagging.erpShipmentLineNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 // formatter: this.formatLabel
             },
+            //  {
+            //     dataField: 'orderType',
+            //     text: i18n.t('static.manualTagging.OrderType'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     // formatter: this.formatLabel
+            // },
             {
                 dataField: 'currentEstimatedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
@@ -1439,27 +1645,28 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'status',
-                text: i18n.t('static.status.status'),
+                text: i18n.t('static.manualTagging.erpStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
-            {
-                dataField: 'planningUnitSkuCode',
-                text: i18n.t('static.manualTagging.planningUnitSKUCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            {
-                dataField: 'planningUnitLabel',
-                text: i18n.t('static.planningUnit.planningUnitName'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
+
+            // {
+            //     dataField: 'planningUnitSkuCode',
+            //     text: i18n.t('static.manualTagging.planningUnitSKUCode'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     // formatter: this.formatLabel
+            // },
+            // {
+            //     dataField: 'planningUnitLabel',
+            //     text: i18n.t('static.planningUnit.planningUnitName'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     formatter: this.formatLabel
+            // },
 
             // {
             //     dataField: 'procurementUnitSkuCode',
@@ -1487,28 +1694,28 @@ export default class ManualTagging extends Component {
             {
                 dataField: 'quantity',
                 // text: i18n.t('static.shipment.qty'),
-                text: i18n.t('static.supplyPlan.shipmentQty'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'price',
-                text: i18n.t('static.manualTagging.price'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.addCommas
-            },
-            {
-                dataField: 'shippingCost',
-                text: i18n.t('static.manualTagging.shippingCost'),
+                text: i18n.t('static.manualTagging.erpShipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
             }
+            // {
+            //     dataField: 'price',
+            //     text: i18n.t('static.manualTagging.price'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     formatter: this.addCommas
+            // },
+            // {
+            //     dataField: 'shippingCost',
+            //     text: i18n.t('static.manualTagging.shippingCost'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     formatter: this.addCommas
+            // }
         ];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -1636,70 +1843,8 @@ export default class ManualTagging extends Component {
                                 <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
                             </ModalHeader>
                             <ModalBody>
-                                <Col md="12 pl-0">
-                                    <div className="d-md-flex">
-                                        <FormGroup className="col-md-3 pl-0">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.OrderNo')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="text"
-                                                        name="orderNo"
-                                                        id="orderNo"
-                                                        bsSize="sm"
-                                                        autocomplete="off"
-                                                        onChange={this.getOrderDetails}
-                                                    >
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.primeLineNo')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="text"
-                                                        name="primeLineNo"
-                                                        id="primeLineNo"
-                                                        bsSize="sm"
-                                                        autocomplete="off"
-                                                        onChange={this.getOrderDetails}
-                                                    >
-                                                    </Input>
-                                                    {/* <InputGroupAddon addonType="append"> */}
-                                                    {/* <Button color="secondary Gobtn btn-sm" onClick={this.getOrderDetails}>{i18n.t('static.common.go')}</Button> */}
-                                                    {/* </InputGroupAddon> */}
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                    </div>
-                                </Col>
                                 <div>
-                                    <ToolkitProvider
-                                        keyField="optList"
-                                        data={this.state.artmisList}
-                                        columns={columns1}
-                                        search={{ searchFormatted: true }}
-                                        hover
-                                        filter={filterFactory()}
-                                    >
-                                        {
-                                            props => (
-                                                <div className="TableCust FortablewidthMannualtaggingtable1">
-
-                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-
-                                                        rowEvents={{
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
-                                                </div>
-                                            )
-                                        }
-                                    </ToolkitProvider>
-                                </div><br />
-                                <div>
+                                    <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>
                                     <ToolkitProvider
                                         keyField="optList"
                                         data={this.state.outputListAfterSearch}
@@ -1710,7 +1855,7 @@ export default class ManualTagging extends Component {
                                     >
                                         {
                                             props => (
-                                                <div className="TableCust FortablewidthMannualtaggingtable2">
+                                                <div className="TableCust FortablewidthMannualtaggingtable2 ">
                                                     {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -1725,7 +1870,163 @@ export default class ManualTagging extends Component {
                                             )
                                         }
                                     </ToolkitProvider>
-                                </div>
+                                </div><br />
+                                <div>
+                                    <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            <FormGroup className="col-md-4">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="erpPlanningUnitId"
+                                                            id="erpPlanningUnitId"
+                                                            bsSize="sm"
+                                                            autocomplete="off"
+                                                            onChange={this.getOrderDetails}
+                                                        >
+                                                            <option value="">All</option>
+                                                            {tracerCategoryPlanningUnitList}
+
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-4">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.searchBy')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="searchId"
+                                                            id="searchId"
+                                                            bsSize="sm"
+                                                            autocomplete="off"
+                                                        // onChange={this.filterData}
+                                                        >
+                                                            <option value="1">{i18n.t('static.manualTagging.RONO')}</option>
+                                                            <option value="2">{i18n.t('static.report.orderNo')}</option>
+
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3 pl-0">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
+                                                <div className="controls "
+                                                >
+                                                    <Autocomplete
+                                                        id="combo-box-demo"
+                                                        options={this.state.autocompleteData}
+                                                        getOptionLabel={(option) => option.label}
+                                                        style={{ width: 300 }}
+                                                        onChange={(event, value) => {
+                                                            this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+
+                                                        }} // prints the selected value
+                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                            onChange={(e) => this.searchErpOrderData(e.target.value)} />}
+                                                    />
+
+                                                </div>
+                                            </FormGroup>
+
+                                        </div>
+                                    </Col>
+                                    <ToolkitProvider
+                                        keyField="erpOrderId"
+                                        data={this.state.artmisList}
+                                        columns={columns1}
+                                        search={{ searchFormatted: true }}
+                                        hover
+                                        filter={filterFactory()}
+                                    >
+                                        {
+                                            props => (
+                                                <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
+
+                                                    <BootstrapTable
+                                                        // keyField='erpOrderId'
+                                                        ref={n => this.node = n}
+                                                        selectRow={selectRow}
+                                                        hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+
+                                                        rowEvents={{
+
+                                                        }}
+                                                        {...props.baseProps}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    </ToolkitProvider>
+                                </div><br />
+                                <Col md="12 pl-0">
+                                    <div className="d-md-flex">
+                                        <FormGroup className="col-md-3 pl-0">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpShipmentQty')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="erpShipmentQty"
+                                                        id="erpShipmentQty"
+                                                        bsSize="sm"
+                                                        autocomplete="off"
+                                                        readOnly={true}
+                                                    >
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <div className="col-md-1">
+
+                                            <div className="calculationSignformanualtaing" style={{ paddingTop: '28px', paddingLeft: '23px' }}>
+                                                <h3>*</h3>
+                                            </div>
+                                        </div>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.conversionFactor')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="conversionFactor"
+                                                        id="conversionFactor"
+                                                        bsSize="sm"
+                                                        autocomplete="off"
+                                                        onChange={this.getConvertedQATShipmentQty}
+                                                    >
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <div className="col-md-1">
+                                            <div className="calculationSignformanualtaing" style={{ paddingTop: '28px', paddingLeft: '23px' }}>
+                                                <h3>=</h3>
+                                            </div>
+                                        </div>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.convertedQATShipmentQty')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="convertedQATShipmentQty"
+                                                        id="convertedQATShipmentQty"
+                                                        bsSize="sm"
+                                                        autocomplete="off"
+                                                        readOnly={true}
+                                                    >
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                    </div>
+                                </Col>
+
                                 <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5>
                                 <h5><div style={{ color: 'red' }} >
                                     {i18n.t(this.state.result)}</div></h5>
@@ -1733,7 +2034,7 @@ export default class ManualTagging extends Component {
                             </ModalBody>
                             <ModalFooter>
 
-                                {this.state.reason == "" &&
+                                {this.state.displayButton &&
                                     <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
                                 }
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
