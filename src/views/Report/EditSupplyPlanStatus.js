@@ -3828,7 +3828,7 @@ class EditSupplyPlanStatus extends Component {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
                                             problemStatus: {
-                                                id: map.get("12")
+                                                id: map.get("10")
                                             },
                                             reviewed: map.get("18"),
                                             notes: map.get("19")
