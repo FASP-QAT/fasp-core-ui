@@ -728,8 +728,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     items.push({
                                                                                         title: i18n.t("static.common.deleterow"),
                                                                                         onclick: function () {
+                                                                                            this.props.updateState("shipmentBatchInfoChangedFlag", 1);
                                                                                             obj.deleteRow(parseInt(y));
-                                                                                        }
+                                                                                        }.bind(this)
                                                                                     });
                                                                                 }
                                                                             }
@@ -1116,8 +1117,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             items.push({
                                                                 title: i18n.t("static.common.deleterow"),
                                                                 onclick: function () {
+                                                                    this.props.updateState("shipmentChangedFlag", 1);
                                                                     obj.deleteRow(parseInt(y));
-                                                                }
+                                                                }.bind(this)
                                                             });
                                                         }
                                                     }

@@ -561,8 +561,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                                 items.push({
                                                                     title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
+                                                                        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
                                                                         obj.deleteRow(parseInt(y));
-                                                                    }
+                                                                    }.bind(this)
                                                                 });
                                                             }
                                                         }
@@ -599,8 +600,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             items.push({
                                                 title: i18n.t("static.common.deleterow"),
                                                 onclick: function () {
+                                                    this.props.updateState("inventoryChangedFlag", 1);
                                                     obj.deleteRow(parseInt(y));
-                                                }
+                                                }.bind(this)
                                             });
                                         }
                                     }
