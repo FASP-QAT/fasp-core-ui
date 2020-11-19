@@ -658,7 +658,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             type: 'calendar',
                                                                             options: {
                                                                                 format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
-                                                                                validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                                                validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), null]
                                                                             }
                                                                         },
                                                                         {

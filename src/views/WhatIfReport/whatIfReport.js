@@ -1060,8 +1060,8 @@ export default class WhatIfReportComponent extends React.Component {
         var A = [header]
 
         var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ... this.state.openingBalanceArray]
-        var consumptionArr = [...["\"" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\""], ...this.state.consumptionTotalData]
-        var shipmentArr = [...["\"" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\""], ...this.state.shipmentsTotalData]
+        var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
+        var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
         var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
         var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
 

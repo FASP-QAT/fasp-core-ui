@@ -305,7 +305,7 @@ var planningUnitId =p.value
                                     var keyValue = shipmentAmt[key];
                                     console.log("keyName--", keyName);
                                     console.log("keyValue--", keyValue);
-                                    json[keyName] = keyValue;
+                                    json[keyName] = parseFloat(keyValue).toFixed(2);
                                 }
                                 outPutList.push(json);
                             }

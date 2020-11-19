@@ -2405,12 +2405,12 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-exchange',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                               },
-                              {
-                                name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
-                                url: '/report/shipmentGlobalDemandView',
-                                icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                              //   url: '/report/shipmentGlobalDemandView',
+                              //   icon: 'fa fa-wpforms',
+                              //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
+                              // },
                               {
                                 name: i18n.t('static.report.shipmentCostReport'),
                                 url: '/report/procurementAgentExport',

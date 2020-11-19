@@ -696,11 +696,11 @@ class ProcurementAgentExport extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)]
         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
         if (viewby == 1) {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (parseFloat(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (parseFloat(ele.totalCost).toFixed(2))])));
         } else if (viewby == 2) {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (parseFloat(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (parseFloat(ele.totalCost).toFixed(2))])));
         } else {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.productCost, ele.freightPerc, ele.freightCost, ele.totalCost])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (parseFloat(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (parseFloat(ele.totalCost).toFixed(2))])));
         }
 
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
@@ -814,14 +814,14 @@ class ProcurementAgentExport extends Component {
         let data = [];
         if (viewby == 1) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else if (viewby == 2) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else {
             columns.splice(0, 2);
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.productCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.totalCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         }
         let startY = 220 + (this.state.planningUnitValues.length * 3)
         let content = {
@@ -868,10 +868,10 @@ class ProcurementAgentExport extends Component {
             data[1] = (viewby == 1) ? shipmentCosttList[j].procurementAgent.code : ((viewby == 2) ? shipmentCosttList[j].fundingSource.code : {})
             data[2] = getLabelText(shipmentCosttList[j].planningUnit.label, this.state.lang)
             data[3] = (shipmentCosttList[j].qty)
-            data[4] = (shipmentCosttList[j].productCost)
+            data[4] = shipmentCosttList[j].productCost.toFixed(2)
             data[5] = shipmentCosttList[j].freightPerc.toFixed(2)
             data[6] = (shipmentCosttList[j].freightCost)
-            data[7] = (shipmentCosttList[j].totalCost)
+            data[7] = shipmentCosttList[j].totalCost.toFixed(2)
 
             shipmentCostArray[count] = data;
             count++;
@@ -1437,8 +1437,8 @@ class ProcurementAgentExport extends Component {
                                     isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
-                                this.state.map.fundingSourceValues.map(f => {
-                                    var fundingSourceId
+                                this.state.fundingSourceValues.map(f => {
+                                    var fundingSourceId = f.value
                                     const fundingSourceFilter = isPlannedShipment.filter(c => c.fundingSource.id == fundingSourceId);
 
                                     // const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
