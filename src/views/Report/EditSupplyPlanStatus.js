@@ -162,6 +162,7 @@ class EditSupplyPlanStatus extends Component {
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            problemCategoryList: [],
 
             program: {
                 programId: this.props.match.params.programId,
@@ -203,6 +204,7 @@ class EditSupplyPlanStatus extends Component {
             regionList: [],
             editable: false,
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            problemCategoryList: [],
             problemReportChanged: 0
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -1937,6 +1939,32 @@ class EditSupplyPlanStatus extends Component {
                     problemStatusList: proList
                 })
 
+                var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
+                var problemCategoryOs = problemCategoryTransaction.objectStore('problemCategory');
+                var problemCategoryRequest = problemCategoryOs.getAll();
+
+                problemCategoryRequest.onerror = function (event) {
+                    // Handle errors!
+                    // this.hideSecondComponent();
+                };
+                problemCategoryRequest.onsuccess = function (e) {
+
+                    var myResultC = [];
+                    myResultC = problemCategoryRequest.result;
+                    var procList = []
+                    for (var i = 0; i < myResultC.length; i++) {
+                        var Json = {
+                            name: getLabelText(myResultC[i].label, lan),
+                            id: myResultC[i].id
+                        }
+                        procList[i] = Json
+                    }
+                    this.setState({
+                        problemCategoryList: procList
+                    })
+
+                }.bind(this)
+
             }.bind(this);
         }.bind(this);
 
@@ -2195,6 +2223,13 @@ class EditSupplyPlanStatus extends Component {
                 ]
 
             };
+        const { problemCategoryList } = this.state;
+        let problemCategories = problemCategoryList.length > 0
+            && problemCategoryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
         return (
             <>
                 <TabPane tabId="1">
@@ -2677,26 +2712,49 @@ class EditSupplyPlanStatus extends Component {
                         <div className="d-md-flex Selectdiv2">
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                <div className="controls SelectField">
+                                {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                <div className="controls problemListSelectField">
+                                    <MultiSelect
+                                        name="problemStatusId"
+                                        id="problemStatusId"
+                                        options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
+                                        value={this.state.problemStatusValues}
+                                        onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
+                                <div className="controls problemListSelectField">
                                     <InputGroup>
-                                        {/* <Input type="select"
+                                        <Input type="select"
                                             bsSize="sm"
-                                            name="problemStatusId" id="problemStatusId"
+                                            // value={this.state.hqStatusId}
+                                            name="problemTypeId" id="problemTypeId"
+                                            onChange={this.fetchData}
+                                        >
+                                            <option value="-1">{i18n.t('static.common.all')}</option>
+                                            <option value="1">{i18n.t('static.report.problemAction.automatic')}</option>
+                                            <option value="2">{i18n.t('static.report.problemAction.manual')}</option>
+                                            {/* <option value="3">Automatic / Manual</option> */}
+                                        </Input>
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.problemActionReport.problemCategory')}</Label>
+                                <div className="controls problemListSelectField">
+                                    <InputGroup>
+                                        <Input type="select"
+                                            bsSize="sm"
+                                            name="problemCategoryId" id="problemCategoryId"
                                             onChange={this.fetchData}
                                         // value={1}
                                         >
-                                            <option value="-1">Open / Addressed</option>
-                                            {problemStatus}
-                                        </Input> */}
-
-                                        <MultiSelect
-                                            name="problemStatusId"
-                                            id="problemStatusId"
-                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
-                                            value={this.state.problemStatusValues}
-                                            onChange={(e) => { this.handleProblemStatusChange(e) }}
-                                            labelledBy={i18n.t('static.common.select')}
-                                        />
+                                            <option value="-1">{i18n.t("static.common.all")}</option>
+                                            {problemCategories}
+                                        </Input>
                                     </InputGroup>
                                 </div>
                             </FormGroup>
@@ -2719,7 +2777,15 @@ class EditSupplyPlanStatus extends Component {
                             </FormGroup>
                         </div>
                     </Col>
-                    <div className="table-responsive RemoveStriped">
+                    <br />
+                    <FormGroup className="col-md-6 mt-5 pl-0" >
+                        <ul className="legendcommitversion list-group">
+                            <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
+                            <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
+                            <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
+                        </ul>
+                    </FormGroup>
+                    <div className="table-responsive RemoveStriped qat-problemListSearch">
                         <div id="problemListDiv" className="" />
                     </div>
                 </TabPane>
@@ -2794,6 +2860,8 @@ class EditSupplyPlanStatus extends Component {
             let reviewedStatusId = document.getElementById('reviewedStatusId').value;
             var problemReportList = this.state.data;
             var problemReportFilterList = problemReportList;
+            let problemTypeId = document.getElementById('problemTypeId').value;
+            let problemCategoryId = document.getElementById('problemCategoryId').value;
             console.log("problemReportList====>", problemReportList);
             if (problemStatusIds != []) {
                 var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2804,6 +2872,12 @@ class EditSupplyPlanStatus extends Component {
                     } else {
                         problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
                     }
+                }
+                if (problemTypeId != -1) {
+                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
+                }
+                if (problemCategoryId != -1) {
+                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
                 }
                 console.log("problemReportFilterList after filter------------->", problemReportFilterList)
                 this.setState({
