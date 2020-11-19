@@ -244,7 +244,7 @@ export default class ConsumptionDetails extends React.Component {
             data[20] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
             // data[20] = problemList[j].problemType.id
             data[18] = problemList[j].reviewNotes
-            data[19] = problemList[j].reviewedDate
+            data[19] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
 
 
             problemArray[count] = data;
@@ -479,8 +479,8 @@ export default class ConsumptionDetails extends React.Component {
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
                 this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
-                (ele.reviewNotes).replaceAll(' ', '%20'),
-                ele.reviewedDate == "" ? '' : moment(ele.reviewedDate).format('MMM-YY').replaceAll(' ', '%20'),
+                ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
+                (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
                 getLabelText(ele.realmProblem.criticality.label, this.state.lang).replaceAll(' ', '%20')
             ])));
         for (var i = 0; i < A.length; i++) {
@@ -588,11 +588,11 @@ export default class ConsumptionDetails extends React.Component {
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
             this.getNote(ele, this.state.lang),
-            
+
             ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
             ele.reviewNotes,
-            ele.reviewedDate == "" ? '' : moment(ele.reviewedDate).format('MMM-YY').replaceAll(' ', '%20'),
-            
+            (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`),
+
             getLabelText(ele.realmProblem.criticality.label, this.state.lang)
         ]);
 
