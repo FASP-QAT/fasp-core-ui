@@ -243,7 +243,7 @@ export default class ConsumptionDetails extends React.Component {
             data[17] = problemList[j].reviewed
             data[20] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
             // data[20] = problemList[j].problemType.id
-            data[18] = problemList[j].reviewNotes
+            data[18] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
             data[19] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
 
 
