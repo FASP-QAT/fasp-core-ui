@@ -467,8 +467,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 }
                                                 json.push(data);
                                             }
-                                            if (parseInt(inventoryQty) != inventoryBatchInfoQty) {
-                                                if ((adjustmentType == 1 && parseInt(inventoryQty) > inventoryBatchInfoQty) || (adjustmentType == 2 && parseInt(inventoryBatchInfoQty) > 0 ? parseInt(inventoryBatchInfoQty) < parseInt(inventoryQty) : parseInt(inventoryBatchInfoQty) > parseInt(inventoryQty))) {
+                                            // if (parseInt(inventoryQty) != inventoryBatchInfoQty) {
+                                                if ((adjustmentType == 1 && parseInt(inventoryQty) > inventoryBatchInfoQty) || 
+                                                (adjustmentType == 2 && parseInt(inventoryBatchInfoQty) > 0 ? parseInt(inventoryBatchInfoQty) < parseInt(inventoryQty) : parseInt(inventoryBatchInfoQty) > parseInt(inventoryQty)) || parseInt(inventoryBatchInfoQty)==0) {
                                                     var qty = parseInt(inventoryQty) - parseInt(inventoryBatchInfoQty);
                                                     var data = [];
                                                     data[0] = -1; //A
@@ -485,7 +486,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                     data[6] = y; //F
                                                     data[7] = date;
                                                     json.push(data);
-                                                }
+                                                // }
                                             }
                                             // if (batchInfo.length == 0) {
                                             //     var data = [];
