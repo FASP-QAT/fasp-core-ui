@@ -229,13 +229,13 @@ export default class SyncMasterData extends Component {
                             for (var pr = 0; pr < problemReportArray.length; pr++) {
                                 console.log("problemReportArray[pr].problemReportId---------->", problemReportArray[pr].problemReportId);
                                 var index = problemReportList.findIndex(c => c.problemReportId == problemReportArray[pr].problemReportId)
-                                console.log("Index----------->", index);
+                                console.log("D------------->Index----------->", index,"D------------>",problemReportArray[pr].problemStatus.id);
                                 if (index == -1) {
                                     problemReportList.push(problemReportArray[pr]);
                                 } else {
                                     console.log("In else");
                                     problemReportList[index].reviewed = problemReportArray[pr].reviewed;
-                                    problemReportList[index].problemStatus.id = problemReportArray[pr].problemStatus.id;
+                                    problemReportList[index].problemStatus = problemReportArray[pr].problemStatus;
                                     problemReportList[index].reviewNotes = problemReportArray[pr].reviewNotes;
                                     problemReportList[index].reviewedDate = (problemReportArray[pr].reviewedDate);
 

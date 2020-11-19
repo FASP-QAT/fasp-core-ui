@@ -2888,7 +2888,9 @@ class EditSupplyPlanStatus extends Component {
     }.bind(this)
 
     buildJExcel() {
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
         console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;

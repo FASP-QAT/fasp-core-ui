@@ -2597,7 +2597,11 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-      if (problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
+      var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+      if (problemReportList.filter(c =>
+        c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
+        moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {

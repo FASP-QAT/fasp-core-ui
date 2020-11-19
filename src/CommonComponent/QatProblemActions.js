@@ -293,7 +293,7 @@ export default class QatProblemActions extends Component {
                                                                 filterObj.problemStatus = problemStatusObject;
                                                             } else {
                                                                 // auto open logic for index -1 =====************=========
-                                                                if (filteredConsumptionList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (filteredConsumptionList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -391,7 +391,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index 1************========= problemActionList[index].isFound = 1;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -521,7 +521,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 filterObj.problemStatus = problemStatusObject;
                                                             } else {
-                                                                if (filterInventoryList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (filterInventoryList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -613,7 +613,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // problemActionList[index].isFound = 1 ==== auto open logic for problem;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -790,7 +790,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // make shipmet problem status eual to open========
-                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                     openProblem(indexShipment, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -804,7 +804,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -978,7 +978,7 @@ export default class QatProblemActions extends Component {
                                                                 filterObj.problemStatus = problemStatusObject;
 
                                                             } else {
-                                                                if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -1065,7 +1065,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // problemActionList[index].isFound = 1===== auto open logic;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -1281,7 +1281,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -1295,7 +1295,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
 
@@ -1558,7 +1558,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -1572,7 +1572,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -1835,7 +1835,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -1849,7 +1849,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -2109,7 +2109,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -2123,7 +2123,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -2323,7 +2323,7 @@ export default class QatProblemActions extends Component {
 
                                                                     } else {
                                                                         // auto open problem logic==========>
-                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2437,7 +2437,7 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex++;
                                                                     } else {
                                                                         // auto open problem logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2621,7 +2621,7 @@ export default class QatProblemActions extends Component {
 
                                                                     } else {
                                                                         // auto open logic for index1
-                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2733,7 +2733,7 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex++;
                                                                     } else {
                                                                         // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2901,7 +2901,7 @@ export default class QatProblemActions extends Component {
 
                                                                     } else {
                                                                         // auto open logic for index1
-                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -3015,7 +3015,7 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex++;
                                                                     } else {
                                                                         // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -3249,7 +3249,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -3348,7 +3348,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 //auto open for index=======>
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -3577,7 +3577,7 @@ export default class QatProblemActions extends Component {
                                                             filterObj.problemStatus = problemStatusObject;
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -3672,7 +3672,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index=======>
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -3897,7 +3897,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1=======>
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -3993,7 +3993,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -4217,7 +4217,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1 ======>
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -4312,7 +4312,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index =======>
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -4537,7 +4537,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -4633,7 +4633,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -4866,7 +4866,7 @@ export default class QatProblemActions extends Component {
                                                             filterObj.problemStatus = problemStatusObject;
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -4964,7 +4964,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -5071,7 +5071,7 @@ export default class QatProblemActions extends Component {
 
                                                             if (consumptionListFortMinusOneDate1.length > 0 && consumptionListFortMinusThreeDate1.length > 0 && consumptionListFortMinusTwoDate1.length == 0) {
                                                                 // auto open logic for index1
-                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
@@ -5200,7 +5200,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // problemActionList[index].isFound = 1 auot open logic for index;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -5315,7 +5315,7 @@ export default class QatProblemActions extends Component {
                                                             if (consumptionListFortDate1.length > 0 && consumptionListFortMinusTwoDate1.length > 0 && consumptionListFortMinusOneDate1.length == 0) {
                                                                 console.log("1============>");
                                                                 // auto open logic for index1
-                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
@@ -5448,7 +5448,7 @@ export default class QatProblemActions extends Component {
                                                             } else {
                                                                 console.log("5============>");
                                                                 // problemActionList[index].isFound = 1 auot open logic for index;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
