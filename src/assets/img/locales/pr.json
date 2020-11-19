@@ -1472,5 +1472,6 @@
     "static.jexcel.of": "do",
     "static.budget.budgetCode": "Código de Orçamento",
     "static.organisation.organisationheader": "Organização",
-    "static.report.totconsumption": "Consumo Total"
+    "static.report.totconsumption": "Consumo Total",
+    "static.report.orderNo1": "ID do pedido do Procurador"
 }

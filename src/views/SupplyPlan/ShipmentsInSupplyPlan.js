@@ -658,7 +658,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             type: 'calendar',
                                                                             options: {
                                                                                 format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
-                                                                                validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                                                validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), null]
                                                                             }
                                                                         },
                                                                         {
@@ -728,8 +728,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     items.push({
                                                                                         title: i18n.t("static.common.deleterow"),
                                                                                         onclick: function () {
+                                                                                            this.props.updateState("shipmentBatchInfoChangedFlag", 1);
                                                                                             obj.deleteRow(parseInt(y));
-                                                                                        }
+                                                                                        }.bind(this)
                                                                                     });
                                                                                 }
                                                                             }
@@ -1116,8 +1117,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             items.push({
                                                                 title: i18n.t("static.common.deleterow"),
                                                                 onclick: function () {
+                                                                    this.props.updateState("shipmentChangedFlag", 1);
                                                                     obj.deleteRow(parseInt(y));
-                                                                }
+                                                                }.bind(this)
                                                             });
                                                         }
                                                     }
