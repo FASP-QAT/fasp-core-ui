@@ -15,12 +15,13 @@ import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DECIMAL_NO_REGEX,JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -99,6 +100,7 @@ class PlanningUnitCountry extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -106,6 +108,23 @@ class PlanningUnitCountry extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
+
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                    z = data[i].y;
+                }
+            }
+        }
+    }
+
+
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getPlanningUnitCountryForId(this.props.match.params.realmCountryId).then(response => {
@@ -234,7 +253,10 @@ class PlanningUnitCountry extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.unit.multiplier'),
-                                                        type: 'number',
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        mask: '#,##.00',
+                                                        disabledMaskOnEdition: true
 
                                                     },
 
@@ -256,6 +278,7 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 ],
+                                                onpaste: this.onPaste,
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
@@ -270,6 +293,7 @@ class PlanningUnitCountry extends Component {
 
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
                                                 search: true,
                                                 columnSorting: true,
                                                 tableOverflow: true,
@@ -285,6 +309,7 @@ class PlanningUnitCountry extends Component {
                                                 oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 allowManualInsertRow: false,
+                                                license: JEXCEL_PRO_KEY,
                                                 text: {
                                                     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -693,7 +718,8 @@ class PlanningUnitCountry extends Component {
                         unit: {
                             unitId: parseInt(map1.get("4"))
                         },
-                        multiplier: map1.get("5"),
+                        // multiplier: map1.get("5"),
+                        multiplier: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("6"),
                         realmCountry: {
                             id: parseInt(map1.get("7"))
@@ -900,8 +926,9 @@ class PlanningUnitCountry extends Component {
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             // var reg = /^[0-9\b]+$/;
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_NO_REGEX;
-            if (this.el.getValueFromCoords(x, y) != "") {
+            if (value != "") {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1023,7 +1050,7 @@ class PlanningUnitCountry extends Component {
                 // }
 
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(5, y);
+                value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

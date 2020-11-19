@@ -7,7 +7,7 @@ import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
-import { DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, SPACE_REGEX } from '../../Constants.js';
 import { Date } from 'core-js';
 import moment from 'moment';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
@@ -42,7 +42,8 @@ const validationSchema = function (values) {
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetCode: Yup.string()
-            .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .max(30, i18n.t('static.common.max30digittext'))
             .required(i18n.t('static.budget.budgetDisplayNameText')),
         currency: Yup.string()
@@ -381,7 +382,7 @@ export default class BudgetTicketComponent extends Component {
         budget.stopDate = '';
         budget.notes = '';
         this.setState({
-            budget : budget,
+            budget: budget,
             programId: '',
             fundingSourceId: '',
             currencyId: ''

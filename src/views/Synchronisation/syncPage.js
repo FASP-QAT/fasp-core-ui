@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -173,7 +174,11 @@ export default class syncPage extends Component {
       },
       pagination: false,
       search: false,
-      contextMenu: false,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       columnSorting: false,
       tableOverflow: false,
       wordWrap: true,
@@ -231,16 +236,21 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
+    console.log("D------------>Index----------->", index)
+    consumptionInstance.options.editable = true;
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     for (var j = 0; j < 13; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
+      console.log("D--------->Col", col);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
+      console.log("D----------->", valueToCompare, "D-------->", valueToCompareWith);
       if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
         consumptionInstance.setStyle(col, "background-color", "transparent");
       } else {
+        console.log("D-----------> in else");
         consumptionInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
         consumptionInstance.setValueFromCoords(18, index, 2, true);
       }
@@ -259,6 +269,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     consumptionInstance.orderBy(18, 0);
+    consumptionInstance.options.editable = false;
     this.toggleLarge('', '', 0, '');
     this.setState({ loading: false })
   }
@@ -268,6 +279,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
+    consumptionInstance.options.editable = true;
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -293,6 +305,7 @@ export default class syncPage extends Component {
       consumptionInstance.setValueFromCoords(18, (index), 3, true);
     }
     consumptionInstance.orderBy(18, 0);
+    consumptionInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -344,7 +357,11 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      contextMenu: false,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       onload: this.loadedResolveConflictsInventory
     };
     var resolveConflictInventory = jexcel(document.getElementById("resolveConflictsInventoryTable"), options);
@@ -394,6 +411,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
+    inventoryInstance.options.editable = true;
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -419,6 +437,7 @@ export default class syncPage extends Component {
       inventoryInstance.setValueFromCoords(19, index, 2, true);
     }
     inventoryInstance.orderBy(19, 0);
+    inventoryInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -431,6 +450,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
+    inventoryInstance.options.editable = true;
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -456,6 +476,7 @@ export default class syncPage extends Component {
       inventoryInstance.setValueFromCoords(19, (index), 3, true);
     }
     inventoryInstance.orderBy(19, 0);
+    inventoryInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -521,7 +542,11 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      contextMenu: false,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       onload: this.loadedResolveConflictsShipment
     };
     var resolveConflictShipment = jexcel(document.getElementById("resolveConflictsShipmentTable"), options);
@@ -632,7 +657,11 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      contextMenu: false,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
+      contextMenu: function (obj, x, y, e) {
+        return [];
+      }.bind(this),
       onload: this.loadedResolveConflictsProblem
     };
     var resolveConflictProblem = jexcel(document.getElementById("resolveConflictsProblemTable"), options);
@@ -682,6 +711,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
+    shipmentInstance.options.editable = true;
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -707,6 +737,7 @@ export default class syncPage extends Component {
       shipmentInstance.setValueFromCoords(33, index, 2, true);
     }
     shipmentInstance.orderBy(33, 0);
+    shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -719,6 +750,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
+    shipmentInstance.options.editable = true;
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -744,6 +776,7 @@ export default class syncPage extends Component {
       shipmentInstance.setValueFromCoords(33, (index), 3, true);
     }
     shipmentInstance.orderBy(33, 0);
+    shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -777,6 +810,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictProblem;
     var problemInstance = this.state.mergedProblemListJexcel;
     var index = document.getElementById("indexProblem").value;
+    problemInstance.options.editable = true;
     problemInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -793,6 +827,7 @@ export default class syncPage extends Component {
     }
 
     problemInstance.orderBy(20, 0);
+    problemInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -805,6 +840,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictProblem;
     var problemInstance = this.state.mergedProblemListJexcel;
     var index = document.getElementById("indexProblem").value;
+    problemInstance.options.editable = true;
     problemInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -820,6 +856,7 @@ export default class syncPage extends Component {
       }
     }
     problemInstance.orderBy(20, 0);
+    problemInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -1337,6 +1374,8 @@ export default class syncPage extends Component {
                                       show: '',
                                       entries: '',
                                     },
+                                    filters: true,
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                       var items = [];
                                       //Resolve conflicts
@@ -1503,6 +1542,8 @@ export default class syncPage extends Component {
                                       show: '',
                                       entries: '',
                                     },
+                                    filters: true,
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                       var items = [];
                                       //Resolve conflicts
@@ -1664,6 +1705,8 @@ export default class syncPage extends Component {
                                     allowDeleteRow: false,
                                     editable: false,
                                     onload: this.loadedFunctionForMergeShipment,
+                                    filters: true,
+                                    license: JEXCEL_PRO_KEY,
                                     text: {
                                       showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
@@ -1789,6 +1832,7 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[16] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -1886,6 +1930,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(18, 0);
+    elInstance.options.editable = false;
   }
 
 
@@ -1897,6 +1942,7 @@ export default class syncPage extends Component {
     console.log("El instanmce", elInstance);
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -1997,6 +2043,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(19, 0);
+    elInstance.options.editable = false;
   }
 
   loadedFunctionForMergeShipment = function (instance) {
@@ -2004,6 +2051,7 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[31] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -2102,6 +2150,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(33, 0);
+    elInstance.options.editable = false;
   }
 
   getNote(row, lang) {
@@ -2115,6 +2164,7 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       console.log("jsonData[c])[18]=====>", (jsonData[c])[18]);
       if ((jsonData[c])[18] == "") {
@@ -2185,6 +2235,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(20, 0);
+    elInstance.options.editable = false;
   }
 
   tabPane() {
@@ -2546,7 +2597,7 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-      if (problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length > 0) {
+      if (problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
@@ -2995,6 +3046,8 @@ export default class syncPage extends Component {
           allowDeleteRow: false,
           editable: false,
           onload: this.loadedFunctionForMergeProblemList,
+          filters: true,
+          license: JEXCEL_PRO_KEY,
           text: {
             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
             show: '',

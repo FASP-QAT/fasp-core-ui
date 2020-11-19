@@ -307,11 +307,12 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 const entityname = i18n.t('static.currency.currencyMaster');
 export default class CurrencyListComponent extends Component {
 
@@ -387,7 +388,7 @@ export default class CurrencyListComponent extends Component {
                             data[2] = currencyList[j].currencyCode;
                             data[3] = currencyList[j].conversionRateToUsd;
                             data[4] = currencyList[j].lastModifiedBy.username;
-                            data[5] = (currencyList[j].lastModifiedDate ? moment(currencyList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+                            data[5] = (currencyList[j].lastModifiedDate ? moment(currencyList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
 
                             currencyArray[count] = data;
                             count++;
@@ -425,7 +426,7 @@ export default class CurrencyListComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.currency.conversionrateusd'),
-                                    type: 'text',
+                                    type: 'numeric', mask: '#,##.00', decimal: '.',
                                     readOnly: true
                                 },
                                 {
@@ -435,8 +436,9 @@ export default class CurrencyListComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedDate'),
-                                    type: 'text',
-                                    readOnly: true
+                                    readOnly: true,
+                                    type: 'calendar',
+                                    options: { format: JEXCEL_DATE_FORMAT_SM },
                                 },
                             ],
                             text: {
@@ -455,14 +457,16 @@ export default class CurrencyListComponent extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
                             onselection: this.selected,
-
-
                             oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowExport: false,
                             paginationOptions: JEXCEL_PAGINATION_OPTION,
                             position: 'top',
-                            contextMenu: false
+                            filters: true,
+                            license: JEXCEL_PRO_KEY,
+                            contextMenu: function (obj, x, y, e) {
+                                return [];
+                            }.bind(this),
                         };
                         var languageEl = jexcel(document.getElementById("tableDiv"), options);
                         this.el = languageEl;

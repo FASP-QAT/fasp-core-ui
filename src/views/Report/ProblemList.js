@@ -1,4 +1,5 @@
-import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+
 import React from "react";
 import ReactDOM from 'react-dom';
 import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
@@ -24,16 +25,16 @@ import i18n from '../../i18n';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import actualIcon from '../../assets/img/actual.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-
+import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import MultiSelect from 'react-multi-select-component';
 const entityname = i18n.t('static.report.problem');
-
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -308,6 +309,7 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.report.problemStatus'),
                     type: 'text',
+                    width: 60
                 },
                 {
                     title: i18n.t('static.program.notes'),
@@ -377,7 +379,8 @@ export default class ConsumptionDetails extends React.Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
+            filters: true,
+            license: JEXCEL_PRO_KEY,
 
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -1098,9 +1101,14 @@ export default class ConsumptionDetails extends React.Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
+                    <ProblemListFormulas ref="formulaeChild" />
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
+                                <a className="card-header-action">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
+                                    {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                </a>
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />} &nbsp;
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
                                 {this.state.programId != 0 && <a href="javascript:void();" title="Recalculate" onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}

@@ -243,12 +243,13 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 const entityname = i18n.t('static.dimension.dimension');
 export default class DimensionListComponent extends Component {
 
@@ -292,7 +293,7 @@ export default class DimensionListComponent extends Component {
             data[0] = dimensionList[j].dimensionId
             data[1] = getLabelText(dimensionList[j].label, this.state.lang)
             data[2] = dimensionList[j].lastModifiedBy.username;
-            data[3] = (dimensionList[j].lastModifiedDate ? moment(dimensionList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[3] = (dimensionList[j].lastModifiedDate ? moment(dimensionList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             dimensionArray[count] = data;
             count++;
         }
@@ -329,8 +330,9 @@ export default class DimensionListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'calendar',
+                    readOnly: true,
+                    options: { format: JEXCEL_DATE_FORMAT_SM }
                 },
             ],
             text: {
@@ -354,7 +356,11 @@ export default class DimensionListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var DimensionListEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = DimensionListEl;

@@ -52,12 +52,14 @@ class Program extends Component {
             color: '',
             lang: localStorage.getItem('lang'),
             realmId: AuthenticationService.getRealmId(),
-            loading: true
+            loading: true,
+            programList: []
         };
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
+        this.getLocalPrograms = this.getLocalPrograms.bind(this);
     }
     getMoreVersions(programId, pageNo) {
         // console.log("val---", val);
@@ -151,6 +153,8 @@ class Program extends Component {
     }
 
     componentDidMount() {
+        this.getLocalPrograms();
+        this.getPrograms();
         if (AuthenticationService.getRealmId() == -1) {
             document.getElementById("realmDiv").style.display = "block"
             // AuthenticationService.setupAxiosInterceptors();
@@ -215,6 +219,60 @@ class Program extends Component {
             this.getTree();
         }
 
+    }
+
+    getLocalPrograms() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                this.setState({
+                    // supplyPlanError: i18n.t('static.program.errortext'),
+                    // loading: false,
+                    // color: "red"
+                })
+                // this.hideFirstComponent()
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
+                        var programJson = {
+                            programId: programJson1.programId,
+                            versionId: programJson1.currentVersion.versionId
+                        }
+                        proList.push(programJson);
+                    }
+                }
+                console.log("D--------------->ProList", proList);
+                this.setState({
+                    programList: proList,
+                    // loading: false
+                })
+            }.bind(this)
+        }.bind(this)
     }
 
     getTree() {
@@ -498,6 +556,11 @@ class Program extends Component {
                                 <strong>{i18n.t('static.program.download')}</strong>
                             </CardHeader> */}
                             <CardBody className="pb-lg-2 pt-lg-2">
+                                <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
+                                    <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
+                                    <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
@@ -534,13 +597,13 @@ class Program extends Component {
                                                 {
                                                     this.state.countryList.map(item => (
                                                         <li>
-                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.realmCountry.id)} />
+                                                            <input type="checkbox" id={"c1-".concat(item.realmCountry.id)} />
                                                             <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
                                                                     item.healthAreaList.map(item1 => (
                                                                         <li>
-                                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
+                                                                            <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
                                                                             <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
@@ -552,12 +615,14 @@ class Program extends Component {
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
                                                                                                         <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
-                                                                                                        <label htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                        {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
+                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
-                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId)} />
-                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.programId)}></label>
+                                                                                            {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))}
+                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)} />
+                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)}></label>
                                                                                             <ul>
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
@@ -642,7 +707,7 @@ class Program extends Component {
         var programCheckedCount = 0;
         var programInvalidCheckedCount = 0;
         var count = 0;
-        
+
         // console.log("versionCheckBox-------------", versionCheckBox);
         for (var i = 0; i < versionCheckBox.length; i++) {
             if (versionCheckBox[i].checked) {
@@ -830,6 +895,7 @@ class Program extends Component {
                                             this.setState({ loading: false })
                                             // this.refs.programListChild.checkNewerVersions();
                                             this.getPrograms();
+                                            this.getLocalPrograms();
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingDownloadedProgramData.onerror = function (event) {
@@ -900,6 +966,7 @@ class Program extends Component {
                                                             })
                                                             this.hideFirstComponent();
                                                             this.getPrograms();
+                                                            this.getLocalPrograms();
                                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
 
                                                         }.bind(this);

@@ -26,7 +26,7 @@ export function jExcelLoadedFunction(instance, number) {
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
         document.getElementsByClassName("jexcel_search")[number].value = "";
-        elInstance.resetSearch();
+        elInstance.search('')
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
@@ -103,7 +103,7 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
         document.getElementsByClassName("jexcel_search")[number].value = "";
-        elInstance.resetSearch();
+        elInstance.search('')
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);
@@ -147,7 +147,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     clearBtn.type = "button";
     clearBtn.onclick = function () {
         document.getElementsByClassName("jexcel_search")[number].value = "";
-        elInstance.resetSearch();
+        elInstance.search('')
     };
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
@@ -187,7 +187,7 @@ export function jExcelLoadedFunctionQuantimed(instance) {
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
         document.getElementsByClassName("jexcel_search")[1].value = "";
-        elInstance.resetSearch();
+        elInstance.search('')
     };
     clearBtn.appendChild(clarText);
     searchContainer.appendChild(clearBtn);

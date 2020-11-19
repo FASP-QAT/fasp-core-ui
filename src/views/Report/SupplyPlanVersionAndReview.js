@@ -19,9 +19,10 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
     Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
@@ -136,11 +137,11 @@ class SupplyPlanVersionAndReview extends Component {
             data[0] = getLabelText(matricsList[j].program.label, this.state.lang)
             data[1] = matricsList[j].versionId
             data[2] = getLabelText(matricsList[j].versionType.label, this.state.lang)
-            data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
             data[4] = matricsList[j].createdBy.username
             data[5] = getLabelText(matricsList[j].versionStatus.label, this.state.lang)
-            data[6] = (matricsList[j].versionStatus.id == 2) ? (matricsList[j].lastModifiedBy.username) : ''
-            data[7] = (matricsList[j].versionStatus.id == 2) ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
+            data[6] = (matricsList[j].lastModifiedBy.username)
+            data[7] = (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null)
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
@@ -160,7 +161,7 @@ class SupplyPlanVersionAndReview extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 50, 50],
+            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -170,7 +171,7 @@ class SupplyPlanVersionAndReview extends Component {
                 },
                 {
                     title: i18n.t('static.report.version'),
-                    type: 'text',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -181,7 +182,8 @@ class SupplyPlanVersionAndReview extends Component {
 
                 {
                     title: i18n.t('static.report.veruploaddate'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.veruploaduser'),
@@ -235,7 +237,11 @@ class SupplyPlanVersionAndReview extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -249,33 +255,35 @@ class SupplyPlanVersionAndReview extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            var hasRole=false;
-            console.log("AuthenticationService.getLoggedInUserRole()====>",AuthenticationService.getLoggedInUserRole());
-            AuthenticationService.getLoggedInUserRole().map(c=>{if(c.roleId=='ROLE_SUPPLY_PLAN_REVIEWER'){
-                hasRole=true;
+            var hasRole = true;
+            // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
+            // AuthenticationService.getLoggedInUserRole().map(c => {
+            //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+            //         hasRole = true;
 
-            }});
+            //     }
+            // });
 
-            if(hasRole) {
-            
-            let programId = document.getElementById("programId").value;
-            // let countryId = document.getElementById("countryId").value;
-            // let versionStatusId = this.el.getValueFromCoords(5, x);
-            // let versionTypeId =this.el.getValueFromCoords(2, x);
+            if (hasRole) {
 
-            console.log("instance----->", instance.jexcel, "----------->", x);
-            var elInstance = instance.jexcel;
-            var rowData = elInstance.getRowData(x);
-            console.log("rowData==>", rowData);
-            let versionStatusId = rowData[10];
-            let versionTypeId = rowData[9];
-            console.log("====>", versionStatusId, "====>", versionTypeId);
-            
+                let programId = document.getElementById("programId").value;
+                // let countryId = document.getElementById("countryId").value;
+                // let versionStatusId = this.el.getValueFromCoords(5, x);
+                // let versionTypeId =this.el.getValueFromCoords(2, x);
+
+                console.log("instance----->", instance.jexcel, "----------->", x);
+                var elInstance = instance.jexcel;
+                var rowData = elInstance.getRowData(x);
+                console.log("rowData==>", rowData);
+                let versionStatusId = rowData[10];
+                let versionTypeId = rowData[9];
+                console.log("====>", versionStatusId, "====>", versionTypeId);
+
                 // if (versionStatusId == 1 && versionTypeId == 2) {
-                    this.props.history.push({
-                        pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+                this.props.history.push({
+                    pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
 
-                    });
+                });
                 // }
             }
 
@@ -746,14 +754,16 @@ class SupplyPlanVersionAndReview extends Component {
     exportCSV(columns) {
 
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
-
-        csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('"'+(i18n.t('static.common.status') + ' : ' + document.getElementById("versionStatusId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + document.getElementById("versionStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
         const headers = [];

@@ -932,7 +932,7 @@ label.arrow_label:after {
   height: 100%;
   color: red; 
   top: 0px;
-  left: 6px;
+  left: 2px;
   cursor: col-resize;
   content: "*" !important; 
 font-size: 14px;
@@ -2571,6 +2571,11 @@ input::placeholder {
     background-color: red;
     border-color: 1px solid red;
   }
+
+  .greenlegend {
+    background-color: #118b70;
+    border-color: 1px solid #118b70;
+  }
   .skipedShipmentsEmegencylegend{
     background-color: #FA8072;
     border-color: 1px solid #FA8072;
@@ -3533,6 +3538,10 @@ margin-left: -45px;
     background-position: top right,top left;
 }
 
+.jexcel>thead>tr>td.jexcel_filters_icon_active{
+  background-image:url('/src/assets/img/filter.png')!important;
+}
+
 .localProcurementAgent{
     background-image:url('/src/assets/img/localProcurement.png');
     background-repeat: no-repeat;
@@ -3727,4 +3736,109 @@ background-color: yellow;
 }
 .problemListSelectField {
   width: 165px;
+}
+.greenColor{
+  color: #118b70;
+}
+
+.redColor{
+  color: red;
+}
+
+.jexcel_filter{
+  border-top: 0px!important;
+}
+
+.jexcel_content{
+  box-shadow: none!important;
+}
+
+.jtabs{
+  position: inherit!important;
+  max-width: none!important;
+}
+
+/* Global CSS, you probably don't need that */
+
+#progress {
+  padding: 0;
+  list-style-type: none;
+  font-family: arial;
+  font-size: 12px;
+  clear: both;
+  line-height: 15px;
+  margin: 0 -1px;
+  text-align: center;
+}
+
+#progress li {
+  float: left;
+  padding: 10px 30px 10px 40px;
+  background: #002f6c;
+  color: #fff;
+  position: relative;
+  border-top: 1px solid #002f6c;
+  border-bottom: 1px solid #002f6c;
+  // width: 16%;
+  width: 155px;
+  height:52px;
+  margin: 34px 12px;
+}
+
+#progress li:before {
+  content: '';
+  border-left: 21px solid #fff;
+  border-top: 25px solid transparent;
+  border-bottom: 25px solid transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  
+}
+#progress li:after {
+  content: '';
+  border-left: 21px solid #002f6c;
+  border-top: 25px solid transparent;
+  border-bottom: 25px solid transparent;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  z-index: 20;
+}
+
+#progress li.active {
+  background: #002f6c;
+}
+
+#progress li.active:after {
+  border-left-color: #002f6c;
+}
+.img-left{
+  float:left;
+  width:34px;
+  height:34px;
+  margin-top:-45px;
+  margin-left:-39px;
+}
+.img-right{
+  float:right;
+  width:34px;
+  height:34px;
+  margin-top:-45px;
+  margin-right:-49px;
+}
+
+.highCriticality{
+background-color: #f48282!important;
+color: #000000!important;
+}
+
+.mediumCriticality{
+  background-color: orange!important;
+  color: #000000!important;
+}
+
+.lowCriticality{
+  background-color: yellow!important;
+  color: #000000!important;
 }

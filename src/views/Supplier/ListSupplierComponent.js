@@ -320,11 +320,13 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
 import moment from 'moment';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants';
 const entityname = i18n.t('static.supplier.supplier');
 class SupplierListComponent extends Component {
     constructor(props) {
@@ -415,7 +417,7 @@ class SupplierListComponent extends Component {
             data[1] = getLabelText(supplierList[j].realm.label, this.state.lang)
             data[2] = getLabelText(supplierList[j].label, this.state.lang)
             data[3] = supplierList[j].lastModifiedBy.username;
-            data[4] = (supplierList[j].lastModifiedDate ? moment(supplierList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[4] = (supplierList[j].lastModifiedDate ? moment(supplierList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[5] = supplierList[j].active;
             supplierArray[count] = data;
             count++;
@@ -457,7 +459,8 @@ class SupplierListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 },
                 {
@@ -491,7 +494,11 @@ class SupplierListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var supplierEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = supplierEl;

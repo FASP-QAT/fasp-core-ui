@@ -352,11 +352,12 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DimensionService from '../../api/DimensionService.js';
 import getLabelText from '../../CommonComponent/getLabelText.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -473,7 +474,7 @@ export default class UnitListComponent extends Component {
             data[2] = unitList[j].unitCode;
             data[3] = getLabelText(unitList[j].dimension.label, this.state.lang)
             data[4] = unitList[j].lastModifiedBy.username;
-            data[5] = (unitList[j].lastModifiedDate ? moment(unitList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+            data[5] = (unitList[j].lastModifiedDate ? moment(unitList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             data[6] = unitList[j].active;
 
             unitListArray[count] = data;
@@ -522,7 +523,8 @@ export default class UnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'text',
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 },
                 {
@@ -558,7 +560,11 @@ export default class UnitListComponent extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
-            contextMenu: false
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;

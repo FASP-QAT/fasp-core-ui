@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from '../../Constants.js';
 export default class MapPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -29,19 +30,15 @@ export default class MapPlanningUnits extends Component {
     addRow = function () {
         console.log("add row called");
         var data = [];
-        // data[0] = 0;
-        // data[1] = "";
-        // data[2] = "";
-        // data[3] = "";
-        // data[4] = "";
-        // data[5] = "";
-        // data[6] = "";
-        // data[7] = "";
-        // data[8] = 0;
-        // data[9] = 0;
-        // data[10] = 1;
-        // data[11] = 1;
-        // data[12] = this.props.match.params.programId;
+        data[0] = "-1";
+        data[1] = "";
+        data[2] = ""; 
+        data[3] = "";
+        data[4] = MONTHS_IN_FUTURE_FOR_AMC;
+        data[5] = MONTHS_IN_PAST_FOR_AMC;
+        data[6] = "";
+        data[7] = "";
+        data[8] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -96,7 +93,7 @@ export default class MapPlanningUnits extends Component {
             }
             //reorder frequency
             var col = ("C").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(2, y);
+            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -117,7 +114,7 @@ export default class MapPlanningUnits extends Component {
             }
             //min month of stock
             var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -138,7 +135,7 @@ export default class MapPlanningUnits extends Component {
             }
             //month in future amc
             var col = ("E").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(4, y);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -159,7 +156,7 @@ export default class MapPlanningUnits extends Component {
             }
             //month in past amc
             var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -180,7 +177,7 @@ export default class MapPlanningUnits extends Component {
             }
             //procuementAgent lead time
             var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_LEAD_TIME
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -201,7 +198,7 @@ export default class MapPlanningUnits extends Component {
             }
             //shelf life
             var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(7, y);
+            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -222,7 +219,7 @@ export default class MapPlanningUnits extends Component {
             }
             //catelog price
             var col = ("I").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(8, y);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -294,6 +291,7 @@ export default class MapPlanningUnits extends Component {
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             var col = ("C").concat(parseInt(y) + 1);
+            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -313,6 +311,7 @@ export default class MapPlanningUnits extends Component {
         if (x == 3) {
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("D").concat(parseInt(y) + 1);
+            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -332,6 +331,7 @@ export default class MapPlanningUnits extends Component {
         if (x == 4) {
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -351,6 +351,7 @@ export default class MapPlanningUnits extends Component {
         if (x == 5) {
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -371,6 +372,7 @@ export default class MapPlanningUnits extends Component {
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var reg = JEXCEL_DECIMAL_LEAD_TIME
             var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -391,6 +393,7 @@ export default class MapPlanningUnits extends Component {
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("H").concat(parseInt(y) + 1);
+            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -412,6 +415,7 @@ export default class MapPlanningUnits extends Component {
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var col = ("I").concat(parseInt(y) + 1);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -532,12 +536,12 @@ export default class MapPlanningUnits extends Component {
                                 var productDataArr = []
                                 // if (productDataArr.length == 0) {
                                 data = [];
-                                data[0] = "";
+                                data[0] = "-1";
                                 data[1] = "";
-                                data[2] = "";
+                                data[2] = ""; 
                                 data[3] = "";
-                                data[4] = "";
-                                data[5] = "";
+                                data[4] = MONTHS_IN_FUTURE_FOR_AMC;
+                                data[5] = MONTHS_IN_PAST_FOR_AMC;
                                 data[6] = "";
                                 data[7] = "";
                                 data[8] = "";
@@ -567,32 +571,60 @@ export default class MapPlanningUnits extends Component {
                                         },
                                         {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
-                                            type: 'number',
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
 
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
-                                            type: 'number'
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.program.monthfutureamc'),
-                                            type: 'number'
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
-                                            type: 'number'
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
-                                            type: 'number'
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
-                                            type: 'number'
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
                                         },
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                            type: 'number'
+                                            type: 'numeric',
+                                            textEditor: true,
+                                            decimal: '.',
+                                            mask: '#,##.00',
+                                            disabledMaskOnEdition: true
                                         },
                                         // {
                                         //     title: 'Batch Required',
@@ -605,6 +637,7 @@ export default class MapPlanningUnits extends Component {
                                     columnSorting: true,
                                     tableOverflow: true,
                                     wordWrap: true,
+                                    parseFormulas: true,
                                     // paginationOptions: [10, 25, 50, 100],
                                     // position: 'top',
                                     allowInsertColumn: false,
@@ -620,6 +653,7 @@ export default class MapPlanningUnits extends Component {
                                         entries: '',
                                     },
                                     onload: this.loaded,
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                         var items = [];
                                         //Add consumption batch info
@@ -906,13 +940,13 @@ export default class MapPlanningUnits extends Component {
                 planningUnit: {
                     id: map.get("1"),
                 },
-                reorderFrequencyInMonths: map.get("2"),
-                minMonthsOfStock: map.get("3"),
-                monthsInFutureForAmc: map.get("4"),
-                monthsInPastForAmc: map.get("5"),
-                localProcurementLeadTime: map.get("6"),
-                shelfLife: map.get("7"),
-                catalogPrice: map.get("8"),
+                reorderFrequencyInMonths: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                minMonthsOfStock: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInFutureForAmc: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInPastForAmc: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                localProcurementLeadTime: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                shelfLife: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                catalogPrice: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 active: true,
                 programPlanningUnitId: 0
 

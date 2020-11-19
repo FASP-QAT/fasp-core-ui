@@ -12,6 +12,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+    getProgramListAll() {
+        return axios.get(`${API_URL}/api/program/all`, {
+        });
+    }
     loadProgramList() {
         return axios.get(`${API_URL}/api/loadProgram/`, {
         });
@@ -139,6 +143,20 @@ class ProgramService {
         return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
         );
 
+    }
+    getHealthAreaListByRealmCountryId(json) {
+        return axios.get(`${API_URL}/api/healthArea/realmCountryId/${json}`, {}
+        );
+    }
+
+    getOrganisationListByRealmCountryId(json) {
+        return axios.get(`${API_URL}/api/organisation/realmCountryId/${json}`, {}
+        );
+    }
+
+    getProblemStatusList() {
+        return axios.get(`${API_URL}/api/problemStatus`, {}
+        );
     }
 
 }

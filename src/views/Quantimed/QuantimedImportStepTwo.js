@@ -6,14 +6,15 @@ import {
     Form, FormGroup, Label, Input, CardFooter, Col, Card
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import jexcel from 'jexcel';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
-import "../../../node_modules/jexcel/dist/jexcel.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import AuthenticationService from '../Common/AuthenticationService';
 import QuantimedImportService from '../../api/QuantimedImportService';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
@@ -147,7 +148,7 @@ export default class QunatimedImportStepTwo extends Component {
     }
 
     updatePlanningUnitNotFound = function () {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
 
         for (var y = 0; y < json.length; y++) {
 
@@ -162,7 +163,7 @@ export default class QunatimedImportStepTwo extends Component {
 
     programPlanningUnitChanged = function (instance, cell, x, y, value) {
 
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         var hasDuplicate = false;
 
         if (x == 2) {
@@ -199,7 +200,7 @@ export default class QunatimedImportStepTwo extends Component {
             }
             else {
                 var index = this.state.planningUnitListForMultiplier.findIndex(c => c.planningUnitId == value);
-                if(index != -1) {
+                if (index != -1) {
                     cf = parseFloat(1 / (this.state.planningUnitListForMultiplier[index].multiplier)).toFixed(4);
                 }
                 this.el.setStyle(col, "background-color", "transparent");
@@ -226,14 +227,14 @@ export default class QunatimedImportStepTwo extends Component {
                 }
             }
 
-            this.el.setValue(col_D, value);                        
-            this.el.setValueFromCoords(4, y, cf, true);            
+            this.el.setValue(col_D, value);
+            this.el.setValueFromCoords(4, y, cf, true);
         }
     }
 
     checkValidation = function () {
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null, false);
         var totalDoNotImport = 0;
 
         for (var y = 0; y < json.length; y++) {
@@ -243,7 +244,7 @@ export default class QunatimedImportStepTwo extends Component {
                 totalDoNotImport = totalDoNotImport + 1;
             }
         }
-        
+
 
         for (var y = 0; y < json.length; y++) {
             // var value = this.el.getValueFromCoords(2, y);            
@@ -278,7 +279,7 @@ export default class QunatimedImportStepTwo extends Component {
     }
 
     checkDuplicateCountry = function () {
-        var tableJson = this.el.getJson();
+        var tableJson = this.el.getJson(null, false);
         let count = 0;
         let tempArray = tableJson;
         var hasDuplicate = false;
@@ -331,20 +332,20 @@ export default class QunatimedImportStepTwo extends Component {
                 planningunitRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = planningunitRequest.result;
-                    
-                    var tableJson = this.el.getJson();                    
+
+                    var tableJson = this.el.getJson(null, false);
 
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
-                        var value = map1.get("2");                        
-                        this.props.items.importData.products[i].programPlanningUnitId = value;                        
+                        var value = map1.get("2");
+                        this.props.items.importData.products[i].programPlanningUnitId = value;
                     }
 
                     for (var j = 0; j < this.props.items.importData.products.length; j++) {
                         var puid = this.props.items.importData.products[j].programPlanningUnitId;
-                        
+
                         if (puid != "-1") {
-                            var index = myResult.findIndex(c => c.planningUnitId == puid);                            
+                            var index = myResult.findIndex(c => c.planningUnitId == puid);
                             if (index != -1) {
                                 var mtp = (myResult[index]).multiplier;
                                 if (mtp > 0) {
@@ -510,7 +511,7 @@ export default class QunatimedImportStepTwo extends Component {
                                 if (index_2 != -1) {
                                     selectedPlanningUnitId = this.state.programPlanningUnits[index_2].value;
                                     var index_3 = this.state.planningUnitListForMultiplier.findIndex(c => c.planningUnitId == selectedPlanningUnitId);
-                                    if(index_3 != -1) {
+                                    if (index_3 != -1) {
                                         conversionFactor = parseFloat(1 / (this.state.planningUnitListForMultiplier[index_3].multiplier)).toFixed(4);
                                     } else {
                                         conversionFactor = "";
@@ -539,13 +540,13 @@ export default class QunatimedImportStepTwo extends Component {
                                 'Previous Program Planning Unit',
                                 i18n.t('static.quantimed.conversionFactor')
                             ],
-                            colWidths: [30, 80, 80, 80, 15],
+                            colWidths: [80, 120, 120, 0, 80],
                             columns: [
                                 { type: 'text', readOnly: true },
                                 { type: 'text', readOnly: true },
                                 { type: 'dropdown', source: programPlanningUnitsArr, autocomplete: true },
                                 { type: 'hidden' },
-                                { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true},
+                                { type: 'numeric', mask: '#,##.##', decimal: '.', readOnly: true },
                             ],
                             text: {
                                 // showingPage: 'Showing {0} to {1} of {1}',
@@ -556,7 +557,6 @@ export default class QunatimedImportStepTwo extends Component {
                             pagination: false,
                             search: true,
                             columnSorting: false,
-                            tableOverflow: true,
                             wordWrap: true,
                             paginationOptions: [],
                             allowInsertColumn: false,
@@ -564,8 +564,10 @@ export default class QunatimedImportStepTwo extends Component {
                             onchange: this.programPlanningUnitChanged,
                             // oneditionstart: this.editStart,
                             allowDeleteRow: false,
-                            tableOverflow: false,
+                            tableOverflow: true,
                             onload: this.loaded,
+                            license: JEXCEL_PRO_KEY,
+                            filters: true
                             // tableHeight: '500px',
                         };
                         myVar = jexcel(document.getElementById("paputableDiv"), options);
@@ -597,17 +599,15 @@ export default class QunatimedImportStepTwo extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
-                <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     {/* <Card> */}
-                    <CardBody className="table-responsive pt-md-1 pb-md-1">
-
-                        <Col xs="12" sm="12">
-
+                    <CardBody className="pl-0 pr-0 pt-lg-0">
+                        {/* <Col xs="12" sm="12"> */}
+                        <div className="table-responsive">
                             <div id="paputableDiv" >
                             </div>
-
-                        </Col>
+                        </div>
+                        {/* </Col> */}
                         {/* </CardBody>
                     <CardFooter> */}
                         <br></br>
@@ -615,7 +615,7 @@ export default class QunatimedImportStepTwo extends Component {
                             {/* <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={this.props.finishedStepTwo}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
                             <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                &nbsp;
+                            &nbsp;
                         </FormGroup>
                         {/* </CardFooter> */}
                     </CardBody>

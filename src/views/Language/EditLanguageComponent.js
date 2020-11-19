@@ -9,7 +9,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
-import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
 let initialValues = {
@@ -25,7 +25,8 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
-            .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
+            .matches(SPECIAL_CHARECTER_WITHOUT_NUM, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.language.languagecodetext'))
         // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 

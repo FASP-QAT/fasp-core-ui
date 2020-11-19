@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
-import { SPACE_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX } from '../../Constants';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -33,7 +33,8 @@ const validationSchema = function (values) {
         realmName: Yup.string()
             .required(i18n.t('static.common.realmtext').concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.realm.realmName')))),
         procurementAgentCode: Yup.string()
-        .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly')),
+            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly')),
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string')),
         // .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
@@ -450,7 +451,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-                
+
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;

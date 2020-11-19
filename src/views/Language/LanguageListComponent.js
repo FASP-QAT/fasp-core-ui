@@ -265,10 +265,11 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
@@ -363,7 +364,7 @@ export default class LanguageListComponent extends Component {
                                 data[1] = langaugeList[j].languageName;
                                 data[2] = langaugeList[j].languageCode;
                                 data[3] = langaugeList[j].lastModifiedBy.username;
-                                data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+                                data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
                                 data[5] = langaugeList[j].active;
 
                                 languageArray[count] = data;
@@ -382,7 +383,7 @@ export default class LanguageListComponent extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [150, 150, 100],
+                                colWidths: [0,150, 150, 100,100,100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
                                     {
@@ -407,7 +408,8 @@ export default class LanguageListComponent extends Component {
                                     },
                                     {
                                         title: i18n.t('static.common.lastModifiedDate'),
-                                        type: 'text',
+                                        type: 'calendar',
+                                        options: { format: JEXCEL_DATE_FORMAT_SM },
                                         readOnly: true
                                     },
                                     {
@@ -436,14 +438,16 @@ export default class LanguageListComponent extends Component {
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
                                 onselection: this.selected,
-
-
                                 oneditionend: this.onedit,
                                 copyCompatibility: true,
                                 allowExport: false,
                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                                 position: 'top',
-                                contextMenu: false
+                                filters: true,
+                                license: JEXCEL_PRO_KEY,
+                                contextMenu: function (obj, x, y, e) {
+                                    return [];
+                                }.bind(this),
                             };
                             var languageEl = jexcel(document.getElementById("tableDiv"), options);
                             this.el = languageEl;
