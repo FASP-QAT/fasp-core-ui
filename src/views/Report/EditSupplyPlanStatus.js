@@ -2675,7 +2675,7 @@ class EditSupplyPlanStatus extends Component {
                 <TabPane tabId="2">
                     <Col md="9 pl-0 mt-3">
                         <div className="d-md-flex Selectdiv2">
-                            <FormGroup className="mt-md-2 mb-md-0 ">
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
                                 <div className="controls SelectField">
                                     <InputGroup>
@@ -2914,21 +2914,21 @@ class EditSupplyPlanStatus extends Component {
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-            
+
             data[17] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
             data[18] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
 
             data[19] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
             data[20] = problemList[j].reviewed
             data[21] = ''
-            
+
             data[22] = 0
             data[23] = problemList[j].problemTransList
             problemArray[count] = data;
             count++;
 
 
-           
+
 
 
         }
@@ -3013,7 +3013,7 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: true, 
+                    readOnly: true,
                     width: 120
                 },
                 {
@@ -3041,17 +3041,19 @@ class EditSupplyPlanStatus extends Component {
                     type: 'hidden',
                     width: 0
                 },
-                
+
                 {
                     title: i18n.t('static.report.reviewNotes'),
                     type: 'text',
-                    width: 120
+                    width: 120,
+                    readOnly: true
 
                 },
                 {
                     title: i18n.t('static.report.reviewedDate'),
                     type: 'text',
-                    width: 80
+                    width: 80,
+                    readOnly: true
 
                 },
 
@@ -3071,7 +3073,7 @@ class EditSupplyPlanStatus extends Component {
                     type: 'text',
                     width: 120
                 },
-               
+
                 {
                     title: 'isChanged',
                     type: 'hidden',
