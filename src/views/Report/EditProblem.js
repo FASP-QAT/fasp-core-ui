@@ -303,6 +303,7 @@ export default class EditLanguageComponent extends Component {
     }
 
     getProblemStatusById(problemStatusInputId) {
+        console.log("hi==========================hi");
         var problemStatusObject = {};
         var db1;
         getDatabase();
@@ -424,6 +425,7 @@ export default class EditLanguageComponent extends Component {
 
         // AuthenticationService.setupAxiosInterceptors();
         this.getProblemStatus();
+        this.getProblemStatusById(this.props.match.params.problemStatusId);
         let problemReportId = this.props.match.params.problemReportId;
         let programId = this.props.match.params.programId;
         let problemActionIndex = this.props.match.params.index;
@@ -472,7 +474,7 @@ export default class EditLanguageComponent extends Component {
                             problemReport: problemReport,
                             data: problemReport.problemTransList,
                             notes: this.getNote(problemReport),
-                            loading:false
+                            loading: false
                         },
                             () => {
 
@@ -484,7 +486,7 @@ export default class EditLanguageComponent extends Component {
                             problemReport: problemReport,
                             data: problemReport.problemTransList,
                             notes: this.getNote(problemReport),
-                            loading:false
+                            loading: false
                         },
                             () => {
 
@@ -523,22 +525,24 @@ export default class EditLanguageComponent extends Component {
                         //     }
                         // }
 
-                        var hasRole=false;
-                        AuthenticationService.getLoggedInUserRole().map(c=>{if(c.roleId=='ROLE_SUPPLY_PLAN_REVIEWER'){
-                            hasRole=true;
-            
-                        }});
+                        var hasRole = false;
+                        AuthenticationService.getLoggedInUserRole().map(c => {
+                            if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                                hasRole = true;
+
+                            }
+                        });
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             var Json = {
                                 name: getLabelText(myResult[i].label, lan),
                                 id: myResult[i].id
                             }
-                            proList[i] = Json 
+                            proList[i] = Json
                         }
 
                         this.setState({
-                            problemStatusList: hasRole==true ? proList : proList.filter(c=>c.id != 2)
+                            problemStatusList: hasRole == true ? proList : proList.filter(c => c.id != 2)
                         })
 
 
@@ -751,7 +755,7 @@ export default class EditLanguageComponent extends Component {
                                             tempProblemTransList.push(tempProblemTransObj);
 
                                             filterObj.problemTransList = tempProblemTransList;
-
+                                            // console.log("=========>problem status obj",this.state.problemStatusObject);
                                             filterObj.problemStatus = this.state.problemStatusObject;
 
 

@@ -56,7 +56,7 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
-            problemStatusValues: [{label: "Open", value: 1},{label: "Addressed", value: 3}]
+            problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]
         }
 
         this.fetchData = this.fetchData.bind(this);
@@ -439,7 +439,7 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push('')
         // csvRow.push('"' + (i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         this.state.problemStatusValues.map(ele =>
-            csvRow.push('"'+(i18n.t('static.report.problemStatus') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20')+'"'))
+            csvRow.push('"' + (i18n.t('static.report.problemStatus') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -449,7 +449,7 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
-        headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
         // headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'));
         // headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
@@ -457,19 +457,27 @@ export default class ConsumptionDetails extends React.Component {
         headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
+
+        headers.push(i18n.t('static.supplyPlanReview.review').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.reviewNotes').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.reviewedDate').replaceAll(' ', '%20'));
+
         headers.push(i18n.t('static.problemAction.criticality').replaceAll(' ', '%20'));
         // columns.map((item, idx) => { item.hidden == true ? '' : headers[idx] = ((item.text).replaceAll(' ', '%20'))});
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.data.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 // (ele.program.code).replaceAll(' ', '%20'),
-                ele.versionId,
+                // ele.versionId,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 // moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
                 this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
+                (ele.reviewNotes).replaceAll(' ', '%20'),
+                ele.reviewedDate == "" ? '' : moment(ele.reviewedDate).format('MMM-YY').replaceAll(' ', '%20'),
                 getLabelText(ele.realmProblem.criticality.label, this.state.lang).replaceAll(' ', '%20')
             ])));
         for (var i = 0; i < A.length; i++) {
@@ -554,24 +562,34 @@ export default class ConsumptionDetails extends React.Component {
 
         const headers = [];
         // headers.push(i18n.t('static.program.programCode'));
-        headers.push(i18n.t('static.program.versionId'));
+        // headers.push(i18n.t('static.program.versionId'));
         headers.push(i18n.t('static.planningunit.planningunit'));
         // headers.push(i18n.t('static.report.createdDate'));
         headers.push(i18n.t('static.report.problemDescription'));
         headers.push(i18n.t('static.report.suggession'));
         headers.push(i18n.t('static.report.problemStatus'));
         headers.push(i18n.t('static.program.notes'));
+
+        headers.push(i18n.t('static.supplyPlanReview.review'));
+        headers.push(i18n.t('static.report.reviewNotes'));
+        headers.push(i18n.t('static.report.reviewedDate'));
+
         headers.push(i18n.t('static.problemAction.criticality'));
         // columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [
             // (ele.program.code),
-            ele.versionId,
+            // ele.versionId,
             getLabelText(ele.planningUnit.label, this.state.lang),
             // moment(ele.createdDate).format('MMM-YY'),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
             this.getNote(ele, this.state.lang),
+            
+            ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
+            ele.reviewNotes,
+            ele.reviewedDate == "" ? '' : moment(ele.reviewedDate).format('MMM-YY').replaceAll(' ', '%20'),
+            
             getLabelText(ele.realmProblem.criticality.label, this.state.lang)
         ]);
 
@@ -582,11 +600,15 @@ export default class ConsumptionDetails extends React.Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 50 },
+                0: { cellWidth: 70 },
                 1: { cellWidth: 100 },
-                2: { cellWidth: 170 },
-                3: { cellWidth: 180 },
-                5: { cellWidth: 150 },
+                2: { cellWidth: 150 },
+                3: { cellWidth: 40 },
+                4: { cellWidth: 150 },
+                5: { cellWidth: 40 },
+                6: { cellWidth: 150 },
+                7: { cellWidth: 50 },
+                8: { cellWidth: 40 },
 
             }
         };
@@ -857,7 +879,7 @@ export default class ConsumptionDetails extends React.Component {
             problemStatusValues: problemStatusIds.map(ele => ele),
             problemStatusLabels: problemStatusIds.map(ele => ele.label)
         }, () => {
-            console.log("problemStatusValues===>",this.state.problemStatusValues);
+            console.log("problemStatusValues===>", this.state.problemStatusValues);
             this.fetchData()
         })
 
