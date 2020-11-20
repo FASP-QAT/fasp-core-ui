@@ -510,8 +510,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                                     title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
                                                                         console.log("y---------->", y);
+                                                                        this.props.updateState("consumptionBatchInfoChangedFlag", 1);
                                                                         obj.deleteRow(parseInt(y));
-                                                                    }
+                                                                    }.bind(this)
                                                                 });
                                                             }
                                                         }
@@ -552,8 +553,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             title: i18n.t("static.common.deleterow"),
                                             onclick: function () {
                                                 console.log("y---------->", y);
+                                                this.props.updateState("consumptionChangedFlag", 1);
                                                 obj.deleteRow(parseInt(y));
-                                            }
+                                            }.bind(this)
                                         });
                                     }
                                 }

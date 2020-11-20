@@ -1483,5 +1483,6 @@
     "static.manualTagging.erpShipmentNo": "Remessa ERP #",
     "static.manualTagging.erpShipmentLineNo": "Linha de Remessa ERP #",
     "static.manualTagging.erpShipmentQty": "Quantidade de Remessa ERP",
-    "static.manualTagging.erpStatus": "Status ERP"
+    "static.manualTagging.erpStatus": "Status ERP",
+    "static.report.orderNo1": "ID do pedido do Procurador"
 }

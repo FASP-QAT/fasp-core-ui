@@ -668,6 +668,9 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            planningUnitIdUpdated: '',
+            erpPlanningUnitId: '',
+            conversionFactorEntered: false,
             searchedValue: '',
             result: '',
             message: '',
@@ -771,9 +774,12 @@ export default class ManualTagging extends Component {
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
         var erpShipmentQty = document.getElementById("erpShipmentQty").value;
-        if (conversionFactor != null && conversionFactor != "") {
+        if (conversionFactor != null && conversionFactor != "" && conversionFactor != 0) {
             var result = erpShipmentQty * conversionFactor;
             document.getElementById("convertedQATShipmentQty").value = result;
+            this.setState({ conversionFactorEntered: true })
+        } else {
+            this.setState({ conversionFactorEntered: false })
         }
     }
 
@@ -785,7 +791,7 @@ export default class ManualTagging extends Component {
         console.log("roNoOrderNo---", roNoOrderNo);
         var searchId = document.getElementById("searchId").value;
         var programId = document.getElementById("programId").value;
-        var erpPlanningUnitId = document.getElementById("erpPlanningUnitId").value;
+        var erpPlanningUnitId = this.state.erpPlanningUnitId;
         if (roNoOrderNo != "") {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, searchId, programId, erpPlanningUnitId)
                 .then(response => {
@@ -900,6 +906,7 @@ export default class ManualTagging extends Component {
                     console.log("manual tagging response===", response);
                     this.setState({
                         outputList: response.data,
+                        planningUnitIdUpdated: planningUnitId,
                         planningUnitId: planningUnitId,
                         planningUnitName: planningUnitName
                         // message: ''
@@ -970,15 +977,24 @@ export default class ManualTagging extends Component {
         }
 
     }
-    getPlanningUnitListByTracerCategory = (planningUnitId, procurementAgentId) => {
-        PlanningUnitService.getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId)
+    getPlanningUnitListByTracerCategory = (term) => {
+        console.log("planning unit term---", term)
+        this.setState({ planningUnitName: term });
+        PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term)
             .then(response => {
                 console.log("tracercategoryPlanningUnit response===", response);
+                var tracercategoryPlanningUnit = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    var label = response.data[i].planningUnit.label.label_en + '(' + response.data[i].skuCode + ')';
+                    tracercategoryPlanningUnit[i] = { value: response.data[i].planningUnit.id, label: label }
+                }
                 this.setState({
-                    tracercategoryPlanningUnit: response.data
+                    tracercategoryPlanningUnit
                 });
-                document.getElementById("erpPlanningUnitId").value = planningUnitId;
-                // document.getElementById('select_value').value ="val3";
+                // this.setState({
+                //     tracercategoryPlanningUnit: response.data
+                // });
+                // document.getElementById("erpPlanningUnitId").value = planningUnitId;
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -1267,13 +1283,14 @@ export default class ManualTagging extends Component {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                 var outputListAfterSearch = [];
                                 let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
-                                console.log("row-------------", row);
+                                console.log("row---------***----", row);
                                 outputListAfterSearch.push(row);
 
                                 this.setState({
                                     shipmentId: this.el.getValueFromCoords(0, y),
                                     outputListAfterSearch,
-                                    procurementAgentId: outputListAfterSearch[0].procurementAgent.id
+                                    procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
+                                    planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
                                 })
                                 this.toggleLarge();
 
@@ -1314,7 +1331,8 @@ export default class ManualTagging extends Component {
             this.setState({
                 shipmentId: this.el.getValueFromCoords(0, x),
                 outputListAfterSearch,
-                procurementAgentId: outputListAfterSearch[0].procurementAgent.id
+                procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
+                planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
             })
             this.toggleLarge();
         }
@@ -1419,12 +1437,12 @@ export default class ManualTagging extends Component {
     formatPlanningUnitLabel(cell, row) {
         console.log("cell------", cell);
         console.log("row------", row);
-        return getLabelText(cell, this.state.lang) + " (" + row.planningUnit.id + ")";
+        return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
     }
 
     toggleLarge() {
         console.log("procurementAgentId---", this.state.procurementAgentId)
-        this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
+        // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
             artmisList: [],
             reason: "1",
@@ -1488,14 +1506,14 @@ export default class ManualTagging extends Component {
             )
         }, this);
 
-        const { tracercategoryPlanningUnit } = this.state;
-        let tracerCategoryPlanningUnitList = tracercategoryPlanningUnit.length > 0 && tracercategoryPlanningUnit.map((item, i) => {
-            return (
-                <option key={i} value={item.planningUnit.id}>
-                    {getLabelText(item.planningUnit.label, this.state.lang) + '(' + item.skuCode + ')'}
-                </option>
-            )
-        }, this);
+        // const { tracercategoryPlanningUnit } = this.state;
+        // let tracerCategoryPlanningUnitList = tracercategoryPlanningUnit.length > 0 && tracercategoryPlanningUnit.map((item, i) => {
+        //     return (
+        //         <option key={i} value={item.planningUnit.id}>
+        //             {getLabelText(item.planningUnit.label, this.state.lang) + '(' + item.skuCode + ')'}
+        //         </option>
+        //     )
+        // }, this);
 
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -1878,7 +1896,26 @@ export default class ManualTagging extends Component {
                                             <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
                                                 <div className="controls ">
-                                                    <InputGroup>
+                                                    <Autocomplete
+                                                        id="combo-box-demo1"
+                                                        // value={this.state.selectedPlanningUnit}
+                                                        defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
+                                                        options={this.state.tracercategoryPlanningUnit}
+                                                        getOptionLabel={(option) => option.label}
+                                                        style={{ width: 300 }}
+                                                        onChange={(event, value) => {
+                                                            // this.getOrderDetails()
+                                                            this.setState({
+                                                                erpPlanningUnitId: value.id,
+                                                                planningUnitIdUpdated: value.id,
+                                                                planningUnitName: value.label.label_en
+                                                            }, () => { this.getOrderDetails() });
+
+                                                        }} // prints the selected value
+                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                            onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
+                                                    />
+                                                    {/* <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="erpPlanningUnitId"
@@ -1891,7 +1928,7 @@ export default class ManualTagging extends Component {
                                                             {tracerCategoryPlanningUnitList}
 
                                                         </Input>
-                                                    </InputGroup>
+                                                    </InputGroup> */}
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
@@ -1992,7 +2029,8 @@ export default class ManualTagging extends Component {
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
-                                                        type="text"
+                                                        type="number"
+                                                        min={0.1}
                                                         name="conversionFactor"
                                                         id="conversionFactor"
                                                         bsSize="sm"
@@ -2034,7 +2072,7 @@ export default class ManualTagging extends Component {
                             </ModalBody>
                             <ModalFooter>
 
-                                {this.state.displayButton &&
+                                {this.state.displayButton && this.state.conversionFactorEntered &&
                                     <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
                                 }
                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

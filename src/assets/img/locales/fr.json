@@ -1483,5 +1483,6 @@
     "static.manualTagging.erpShipmentNo": "Numéro d'envoi ERP",
     "static.manualTagging.erpShipmentLineNo": "Numéro de ligne d'expédition ERP",
     "static.manualTagging.erpShipmentQty": "Quantité d'expédition ERP",
-    "static.manualTagging.erpStatus": "Statut ERP"
+    "static.manualTagging.erpStatus": "Statut ERP",
+    "static.report.orderNo1": "N° de commande de l'agent d'approvisionnement"
 }

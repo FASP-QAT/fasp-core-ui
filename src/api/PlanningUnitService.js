@@ -47,8 +47,8 @@ class PlanningUnitService {
         return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
         );
     }
-    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId) {
-        return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}`, {}
+    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId,term) {
+        return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
         );
     }
 }

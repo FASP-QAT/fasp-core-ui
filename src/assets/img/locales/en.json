@@ -1485,5 +1485,7 @@
     "static.manualTagging.erpShipmentNo": "ERP Shipment #",
     "static.manualTagging.erpShipmentLineNo": "ERP Shipment Line #",
     "static.manualTagging.erpShipmentQty": "ERP Shipment Qty",
-    "static.manualTagging.erpStatus": "ERP Status"
+    "static.manualTagging.erpStatus": "ERP Status",
+    "static.report.orderNo1": "ERP Shipment",
+    "static.inventoryDate.inventoryReport": "Inventory Last Reported On"
 }
