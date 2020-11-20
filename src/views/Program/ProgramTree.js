@@ -842,10 +842,15 @@ class Program extends Component {
                                 }
                                 var isExists = 0;
                                 var downloadProgram = false;
+                                console.log("D------------------>", programAndVersionListLocal);
+                                console.log("D------------------>", programAndVersionList);
                                 for (var r = 0; r < programAndVersionList.length; r++) {
-                                    if (programAndVersionListLocal.includes(programAndVersionList[r])) {
+                                    var filterList = programAndVersionListLocal.filter(c => c.programId == programAndVersionList[r].programId && c.version == programAndVersionList[r].version);
+                                    console.log("D---------------->filterList", filterList)
+                                    if (filterList.length > 0) {
                                         isExists += 1;
                                     }
+
                                 }
                                 if (isExists > 0) {
                                     confirmAlert({
@@ -855,7 +860,68 @@ class Program extends Component {
                                             {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
-                                                    downloadProgram = true;
+                                                    console.log("D-------------------->Yes clicked");
+                                                    console.log("D--------------> in download program")
+                                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                                    for (var r = 0; r < json.length; r++) {
+                                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                        var version = json[r].requestedProgramVersion;
+                                                        if (version == -1) {
+                                                            version = json[r].currentVersion.versionId
+                                                        }
+                                                        var item = {
+                                                            id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                            programId: json[r].programId,
+                                                            version: version,
+                                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                            programData: encryptedText.toString(),
+                                                            userId: userId
+                                                        };
+                                                        // console.log("Item------------>", item);
+                                                        var putRequest = programSaveData.put(item);
+
+                                                    }
+                                                    transactionForSavingData.oncomplete = function (event) {
+                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                                        for (var r = 0; r < json.length; r++) {
+                                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                            var version = json[r].requestedProgramVersion;
+                                                            if (version == -1) {
+                                                                version = json[r].currentVersion.versionId
+                                                            }
+                                                            var item = {
+                                                                id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                                programId: json[r].programId,
+                                                                version: version,
+                                                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                                programData: encryptedText.toString(),
+                                                                userId: userId
+                                                            };
+                                                            // console.log("Item------------>", item);
+                                                            var putRequest = downloadedProgramSaveData.put(item);
+
+                                                        }
+                                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                                            this.setState({
+                                                                message: 'static.program.downloadsuccess',
+                                                                color: 'green',
+                                                                loading: false
+                                                            })
+                                                            this.hideFirstComponent();
+                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                            this.setState({ loading: false })
+                                                            // this.refs.programListChild.checkNewerVersions();
+                                                            this.getPrograms();
+                                                            this.getLocalPrograms();
+                                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
+                                                        }.bind(this)
+                                                    }.bind(this)
                                                 }
                                             }, {
                                                 label: i18n.t('static.program.no'),
@@ -874,6 +940,7 @@ class Program extends Component {
                                     downloadProgram = true;
                                 }
                                 if (downloadProgram) {
+                                    console.log("D--------------> in download program")
                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {
