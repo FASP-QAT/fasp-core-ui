@@ -194,11 +194,11 @@ class SupplyPlanVersionAndReview extends Component {
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.report.approver'),
+                    title: i18n.t('static.report.reviewer'),
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.report.approveddate'),
+                    title: i18n.t('static.report.approvedRevieweddate'),
                     type: 'text',
                     readOnly: true
                 }, {
@@ -1042,14 +1042,14 @@ class SupplyPlanVersionAndReview extends Component {
             }
             , {
                 dataField: 'lastModifiedBy.username',
-                text: i18n.t('static.report.approver'),
+                text: i18n.t('static.report.reviewer'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.checkValue
             }, {
                 dataField: 'lastModifiedDate',
-                text: i18n.t('static.report.approveddate'),
+                text: i18n.t('static.report.approvedRevieweddate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

@@ -213,7 +213,7 @@
     "static.realm.orderFrequency": "Order interval",
     "static.dashboard.inventorydetails": "Inventory Details",
     "static.supplyPlan.erpShipments": "ERP-linked shipments",
-    "static.report.updateStatus": "Update Details",
+    "static.report.updateDetails": "Update Details",
     "static.subfundingsource.subfundingsourceaddttext": "Add sub-funding Source",
     "static.masterDataSync.masterDataSync": "Master Data Sync",
     "static.dashboard.procurementUnit": "Procurement Units",
@@ -371,7 +371,7 @@
     "static.whatIf.validpercentage": "Enter percentage",
     "static.dashboard.supplier": "Manufacturer",
     "static.dashboard.totalRealm": "TOTAL REALMS",
-    "static.report.updatestatus": "Update Program Status",
+    "static.supplyPlan.updateProgramStatus": "Update Program Status",
     "static.supplyPlan.finalInventory": "Final Inventory",
     "static.technicalArea.productcategorynametext": "Enter Planning Unit Category name",
     "static.commitVersion.problemReportId": "Problem Report ID",
@@ -1474,5 +1474,8 @@
     "static.organisation.organisationheader": "Organization",
     "static.report.totconsumption": "Total Consumption",
     "static.report.orderNo1": "ERP Shipment",
-    "static.inventoryDate.inventoryReport": "Inventory Last Reported On"
+    "static.inventoryDate.inventoryReport": "Inventory Last Reported On",
+    "static.common.month":"Month",
+    "static.report.approvedRevieweddate":"Date Approved/Rejected",
+    "static.report.reviewer":"Reviewer"
 }
