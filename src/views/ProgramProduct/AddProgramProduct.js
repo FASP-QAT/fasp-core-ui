@@ -1432,18 +1432,27 @@ class AddprogramPlanningUnit extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                             }

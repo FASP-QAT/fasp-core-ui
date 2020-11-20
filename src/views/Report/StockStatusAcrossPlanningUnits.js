@@ -672,11 +672,11 @@ class StockStatusAcrossPlanningUnits extends Component {
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = data1;
-            data[2] = (dataStockStatus[j].mos);
+            data[2] = this.roundN(dataStockStatus[j].mos);
             data[3] = (dataStockStatus[j].minMos);
             data[4] = (dataStockStatus[j].maxMos);
             data[5] = (dataStockStatus[j].stock);
-            data[6] = (dataStockStatus[j].amc);
+            data[6] = this.round(dataStockStatus[j].amc);
             data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
 
             dataArray[count] = data;

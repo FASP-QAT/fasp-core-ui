@@ -429,6 +429,8 @@ class AddRoleComponent extends Component {
                     }
                   },
                   reviewed: false,
+                  reviewNotes:'',
+                  reviewedDate:'',
                   createdBy: {
                     userId: userId,
                     username: username
