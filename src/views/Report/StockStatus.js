@@ -104,7 +104,7 @@ const options = {
       id: 'B',
       position: 'right',
       scaleLabel: {
-        labelString: i18n.t('static.report.month'),
+        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
         fontColor: 'black',
         display: true,
 
@@ -136,7 +136,7 @@ const options = {
 
       scaleLabel: {
         display: true,
-        labelString: i18n.t('static.report.month'),
+        labelString: i18n.t('static.common.month'),
         fontColor: 'black',
         fontStyle: "normal",
         fontSize: "12"
@@ -303,12 +303,12 @@ class StockStatus extends Component {
     csvRow.push('')
 
 
-    const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month').replaceAll(' ', '%20'),
+    const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
     i18n.t('static.report.actual').replaceAll(' ', '%20'),
     i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20'),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20')+ " | " + (i18n.t('static.report.procurementAgentName')),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.amc').replaceAll(' ', '%20'),
@@ -321,7 +321,7 @@ class StockStatus extends Component {
     this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.actualConsumption ? '' : ele.consumptionQty, ele.actualConsumption ? ele.consumptionQty : '', ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
-        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)
+        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)+ " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
       , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos),this.roundN(ele.minMos),this.roundN(ele.maxMos)])));
@@ -414,12 +414,12 @@ class StockStatus extends Component {
 
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
-    const header = [[i18n.t('static.report.month'),
+    const header = [[i18n.t('static.common.month'),
     i18n.t('static.supplyPlan.openingBalance'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual'),
     i18n.t('static.shipment.qty'),
-    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')+ " | " + (i18n.t('static.report.procurementAgentName'))),
     i18n.t('static.report.adjustmentQty'),
     i18n.t('static.supplyPlan.endingBalance'),
     i18n.t('static.report.amc'),
@@ -431,7 +431,7 @@ class StockStatus extends Component {
       this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption ? '' : this.formatter(ele.consumptionQty), ele.actualConsumption ? this.formatter(ele.consumptionQty) : '', this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
-          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang))
+          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)+ " | " + item.procurementAgent.code)
       }).join(' \n')
         , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)),this.formatter(this.roundN(ele.minMos)),this.formatter(this.roundN(ele.maxMos))]);
 
@@ -1450,12 +1450,12 @@ class StockStatus extends Component {
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
-                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.report.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th> </tr><tr>
+                      <tr><th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>  <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th> <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th> <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th> </tr><tr>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus'))}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')+ " | " + (i18n.t('static.report.procurementAgentName')))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
@@ -1489,7 +1489,7 @@ class StockStatus extends Component {
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}`}</td></tr>)
+                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
