@@ -1150,7 +1150,7 @@ export default class WhatIfReportComponent extends React.Component {
         a.click()
     }
 
-    exportPDF = () => {
+    exportPDF = () => { 
         const addFooters = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
@@ -1247,6 +1247,35 @@ export default class WhatIfReportComponent extends React.Component {
 
         doc.addImage(canvasImg, 'png', 50, 150, 750, 340, 'CANVAS');
         // doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
+
+        const senHeaders=[];
+        senHeaders.push(i18n.t('static.whatIf.scenario'));
+        senHeaders.push(i18n.t('static.common.startdate'));
+        senHeaders.push(i18n.t('static.common.stopdate'));
+        senHeaders.push(i18n.t('static.whatIf.percentage'));
+
+        let senData = this.state.rows.map(ele => [
+            ele.scenarioName,
+            ele.startDate,
+            ele.stopDate,
+            ele.percentage,
+        ]);
+
+        let senContent = {
+            margin: { top: 80, bottom: 70 },
+            startY: height,
+            head: [senHeaders],
+            body: senData,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+            columnStyles: {
+                // 0: { cellWidth: 200 },
+                // 1: { cellWidth: 80 },
+                // 2: { cellWidth: 80 },
+                // 3: { cellWidth: 80 },
+            }
+        };
+        doc.autoTable(senContent);
+
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             item.monthName.concat(" ").concat(item.monthYear)
         ))
