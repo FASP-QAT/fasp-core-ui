@@ -325,7 +325,7 @@ export default class WhatIfReportComponent extends React.Component {
     updateFieldData(value) {
         console.log("Value", value);
         // console.log(event.value)
-        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0 });
+        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0,rows:[] });
 
     }
 
@@ -570,6 +570,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } }, message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
@@ -621,6 +622,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } }, message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
@@ -672,6 +674,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } }, message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
@@ -754,6 +757,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
@@ -837,6 +841,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
@@ -931,6 +936,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
 
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
@@ -1048,7 +1054,7 @@ export default class WhatIfReportComponent extends React.Component {
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
-        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
+        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
 
         csvRow.push('')
@@ -1060,8 +1066,8 @@ export default class WhatIfReportComponent extends React.Component {
         var A = [header]
 
         var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ... this.state.openingBalanceArray]
-        var consumptionArr = [...["\"" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\""], ...this.state.consumptionTotalData]
-        var shipmentArr = [...["\"" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\""], ...this.state.shipmentsTotalData]
+        var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
+        var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
         var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
         var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
 
@@ -1763,7 +1769,6 @@ export default class WhatIfReportComponent extends React.Component {
                         inList: invList,
                         coList: conList,
                         shList: shiList,
-                        rows: []
                     })
 
                     var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
@@ -3671,8 +3676,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         <div className="" >
 
                                             <div className="graphwidth">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                <div className="col-md-12">
+                                                    <div className="chart-wrapper chart-graph-report">
+                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>

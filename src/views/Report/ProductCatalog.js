@@ -105,13 +105,13 @@ class ProductCatalog extends Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
-        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 getLabelText(ele.productCategory.label, this.state.lang).replaceAll(' ', '%20'),
-                getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.tracerCategory.label, this.state.lang)!=null?getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'):'',
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.fUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 ele.genericName.genericName != '' && ele.genericName.genericName != null ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
@@ -1349,7 +1349,8 @@ class ProductCatalog extends Component {
                                                 // onChange={(e) => { this.getPlanningUnit(); }}
                                                 >
 
-                                                    <option value="-1">{i18n.t('static.common.allcategories')}</option>
+                                                    {/* <option value="-1">{i18n.t('static.common.allcategories')}</option> */}
+                                                    <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {productCategoriesOffline.length > 0
                                                         && productCategoriesOffline.map((item, i) => {
                                                             return (

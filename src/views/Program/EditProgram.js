@@ -79,15 +79,15 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedByAirLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .required(i18n.t('static.program.shippedToArrivedByAirtext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         shippedToArrivedBySeaLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .required(i18n.t('static.program.shippedToArrivedBySeatext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         arrivedToDeliveredLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.program.validapprovetoshiptext'))
+            .required(i18n.t('static.program.arrivedToReceivedLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),

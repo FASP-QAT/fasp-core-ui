@@ -1028,7 +1028,7 @@ export default class EditLanguageComponent extends Component {
 
 
                                                     <div className="col-md-12 bg-white pb-1">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateStatus')}</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateDetails')}</b></a></li></ul>
 
                                                         <div className="row">
                                                             <FormGroup className="col-md-3 ">
