@@ -658,7 +658,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             type: 'calendar',
                                                                             options: {
                                                                                 format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
-                                                                                validRange: [moment(Date.now()).format("YYYY-MM-DD"), null]
+                                                                                validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), null]
                                                                             }
                                                                         },
                                                                         {
@@ -728,8 +728,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     items.push({
                                                                                         title: i18n.t("static.common.deleterow"),
                                                                                         onclick: function () {
+                                                                                            this.props.updateState("shipmentBatchInfoChangedFlag", 1);
                                                                                             obj.deleteRow(parseInt(y));
-                                                                                        }
+                                                                                        }.bind(this)
                                                                                     });
                                                                                 }
                                                                             }
@@ -1116,8 +1117,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             items.push({
                                                                 title: i18n.t("static.common.deleterow"),
                                                                 onclick: function () {
+                                                                    this.props.updateState("shipmentChangedFlag", 1);
                                                                     obj.deleteRow(parseInt(y));
-                                                                }
+                                                                }.bind(this)
                                                             });
                                                         }
                                                     }
@@ -1298,7 +1300,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
-                if (rowData[0].toString() == "false") {
+                if (rowData[0].toString() == "false"  || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
@@ -1366,7 +1368,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
-                if (rowData[0].toString() == "false") {
+                if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
@@ -2225,7 +2227,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 moment(c.get("1")).startOf('month').format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
             )
 
-            if ((checkDuplicate.length >= 1 && index != map.get("5")) || checkDuplicateInMap.length > 1) {
+            if (checkDuplicateInMap.length > 1) {
                 var colArr = ['A'];
                 for (var c = 0; c < colArr.length; c++) {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateBatchNumber'), elInstance);

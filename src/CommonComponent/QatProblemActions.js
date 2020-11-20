@@ -258,11 +258,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -278,13 +278,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -293,7 +293,7 @@ export default class QatProblemActions extends Component {
                                                                 filterObj.problemStatus = problemStatusObject;
                                                             } else {
                                                                 // auto open logic for index -1 =====************=========
-                                                                if (filteredConsumptionList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (filteredConsumptionList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -350,11 +350,14 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes: '',
+                                                                    reviewedDate: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
                                                                     },
                                                                     createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                    // createdDate: '2019-11-05 11:00:00',
                                                                     lastModifiedBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -388,7 +391,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index 1************========= problemActionList[index].isFound = 1;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -401,11 +404,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -421,13 +424,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -484,11 +487,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -504,13 +507,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -518,7 +521,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 filterObj.problemStatus = problemStatusObject;
                                                             } else {
-                                                                if (filterInventoryList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (filterInventoryList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -552,7 +555,7 @@ export default class QatProblemActions extends Component {
                                                                     newAdded: false,
 
                                                                     problemActionIndex: problemActionIndex,
-                                                                    
+
                                                                     problemCategory: {
                                                                         id: 1,
                                                                         label: { label_en: 'Data Quality' }
@@ -568,6 +571,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes: '',
+                                                                    reviewedDate: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -608,7 +613,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // problemActionList[index].isFound = 1 ==== auto open logic for problem;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -621,11 +626,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -641,13 +646,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -744,6 +749,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes: '',
+                                                                    reviewedDate: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -783,7 +790,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // make shipmet problem status eual to open========
-                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                     openProblem(indexShipment, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -797,7 +804,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -808,11 +815,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -828,13 +835,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -855,11 +862,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -875,13 +882,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -936,11 +943,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -956,13 +963,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -971,7 +978,7 @@ export default class QatProblemActions extends Component {
                                                                 filterObj.problemStatus = problemStatusObject;
 
                                                             } else {
-                                                                if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -1017,6 +1024,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes: '',
+                                                                    reviewedDate: '',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -1056,7 +1065,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // problemActionList[index].isFound = 1===== auto open logic;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -1070,11 +1079,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1090,13 +1099,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -1158,7 +1167,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                          //  //console.log("submittedDate=====>", submittedDate);
+                                                            //  //console.log("submittedDate=====>", submittedDate);
                                                             if ((moment(submittedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                 if (filteredShipmentList[s].shipmentId != 0) {
                                                                     shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
@@ -1231,6 +1240,8 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1270,7 +1281,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -1284,7 +1295,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
 
@@ -1296,11 +1307,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -1316,13 +1327,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1341,11 +1352,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1361,13 +1372,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -1506,6 +1517,8 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1545,7 +1558,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -1559,7 +1572,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -1570,11 +1583,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -1590,13 +1603,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1615,11 +1628,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1635,13 +1648,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -1706,7 +1719,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                         //   //console.log("shippedDate=====>", shippedDate);
+                                                            //   //console.log("shippedDate=====>", shippedDate);
 
                                                             if ((moment(shippedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
@@ -1781,6 +1794,8 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -1820,7 +1835,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -1834,7 +1849,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -1845,11 +1860,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -1865,13 +1880,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1890,11 +1905,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -1910,13 +1925,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -1934,7 +1949,7 @@ export default class QatProblemActions extends Component {
                                                     var shipmentList = programList[pp].shipmentList;
                                                     var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
                                                     var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
-                                                  //  //console.log("approved status list===>", filteredShipmentList);
+                                                    //  //console.log("approved status list===>", filteredShipmentList);
                                                     if (filteredShipmentList.length > 0) {
                                                         var shipmentIdsFromShipmnetList = [];
 
@@ -1979,7 +1994,7 @@ export default class QatProblemActions extends Component {
                                                                 submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                             }
-                                                           // //console.log("arrivedDate=====>", arrivedDate);
+                                                            // //console.log("arrivedDate=====>", arrivedDate);
                                                             if ((moment(arrivedDate).format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
                                                                 if (filteredShipmentList[s].shipmentId != 0) {
@@ -2053,6 +2068,8 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         },
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
@@ -2092,7 +2109,7 @@ export default class QatProblemActions extends Component {
                                                                     problemActionIndex++;
                                                                 } else {
                                                                     // make shipmet problem status eual to open========
-                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 2) {
+                                                                    if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                     }
                                                                 }
@@ -2106,7 +2123,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 if (shipmentIdsFromShipmnetList.includes(kbShipmentId)) {
                                                                     // make status open 
-                                                                    if (problemActionList[kb].problemStatus.id == 2) {
+                                                                    if (problemActionList[kb].problemStatus.id == 4) {
                                                                         openProblem(kb, username, userId, problemActionList);
                                                                     }
                                                                 } else {
@@ -2117,11 +2134,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -2137,13 +2154,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -2162,11 +2179,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -2182,13 +2199,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -2270,11 +2287,11 @@ export default class QatProblemActions extends Component {
                                                                         let tempProblemTransObj = {
                                                                             problemReportTransId: '',
                                                                             problemStatus: {
-                                                                                id: 2,
+                                                                                id: 4,
                                                                                 label: {
                                                                                     active: true,
-                                                                                    labelId: 462,
-                                                                                    label_en: "Resolved",
+                                                                                    labelId: 27104,
+                                                                                    label_en: "In-Compliance",
                                                                                     label_sp: null,
                                                                                     label_fr: null,
                                                                                     label_pr: null
@@ -2290,13 +2307,13 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false; 
+                                                                        filterObj.reviewed = false;
                                                                         var problemStatusObject = {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -2306,7 +2323,7 @@ export default class QatProblemActions extends Component {
 
                                                                     } else {
                                                                         // auto open problem logic==========>
-                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2380,6 +2397,8 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             reviewed: false,
+                                                                            reviewNotes: '',
+                                                                            reviewedDate: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2418,7 +2437,7 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex++;
                                                                     } else {
                                                                         // auto open problem logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2432,11 +2451,11 @@ export default class QatProblemActions extends Component {
                                                                         let tempProblemTransObj = {
                                                                             problemReportTransId: '',
                                                                             problemStatus: {
-                                                                                id: 2,
+                                                                                id: 4,
                                                                                 label: {
                                                                                     active: true,
-                                                                                    labelId: 462,
-                                                                                    label_en: "Resolved",
+                                                                                    labelId: 27104,
+                                                                                    label_en: "In-Compliance",
                                                                                     label_sp: null,
                                                                                     label_fr: null,
                                                                                     label_pr: null
@@ -2452,13 +2471,13 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false; 
+                                                                        filterObj.reviewed = false;
                                                                         var problemStatusObject = {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -2566,11 +2585,11 @@ export default class QatProblemActions extends Component {
                                                                         let tempProblemTransObj = {
                                                                             problemReportTransId: '',
                                                                             problemStatus: {
-                                                                                id: 2,
+                                                                                id: 4,
                                                                                 label: {
                                                                                     active: true,
-                                                                                    labelId: 462,
-                                                                                    label_en: "Resolved",
+                                                                                    labelId: 27104,
+                                                                                    label_en: "In-Compliance",
                                                                                     label_sp: null,
                                                                                     label_fr: null,
                                                                                     label_pr: null
@@ -2586,13 +2605,13 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false; 
+                                                                        filterObj.reviewed = false;
                                                                         var problemStatusObject = {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -2602,7 +2621,7 @@ export default class QatProblemActions extends Component {
 
                                                                     } else {
                                                                         // auto open logic for index1
-                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2674,6 +2693,8 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             reviewed: false,
+                                                                            reviewNotes: '',
+                                                                            reviewedDate: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2712,7 +2733,7 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex++;
                                                                     } else {
                                                                         // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2726,11 +2747,11 @@ export default class QatProblemActions extends Component {
                                                                         let tempProblemTransObj = {
                                                                             problemReportTransId: '',
                                                                             problemStatus: {
-                                                                                id: 2,
+                                                                                id: 4,
                                                                                 label: {
                                                                                     active: true,
-                                                                                    labelId: 462,
-                                                                                    label_en: "Resolved",
+                                                                                    labelId: 27104,
+                                                                                    label_en: "In-Compliance",
                                                                                     label_sp: null,
                                                                                     label_fr: null,
                                                                                     label_pr: null
@@ -2746,13 +2767,13 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false; 
+                                                                        filterObj.reviewed = false;
                                                                         var problemStatusObject = {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -2844,11 +2865,11 @@ export default class QatProblemActions extends Component {
                                                                         let tempProblemTransObj = {
                                                                             problemReportTransId: '',
                                                                             problemStatus: {
-                                                                                id: 2,
+                                                                                id: 4,
                                                                                 label: {
                                                                                     active: true,
-                                                                                    labelId: 462,
-                                                                                    label_en: "Resolved",
+                                                                                    labelId: 27104,
+                                                                                    label_en: "In-Compliance",
                                                                                     label_sp: null,
                                                                                     label_fr: null,
                                                                                     label_pr: null
@@ -2864,13 +2885,13 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false; 
+                                                                        filterObj.reviewed = false;
                                                                         var problemStatusObject = {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -2880,7 +2901,7 @@ export default class QatProblemActions extends Component {
 
                                                                     } else {
                                                                         // auto open logic for index1
-                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                        if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -2954,6 +2975,8 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             },
                                                                             reviewed: false,
+                                                                            reviewNotes: '',
+                                                                            reviewedDate: '',
                                                                             createdBy: {
                                                                                 userId: userId,
                                                                                 username: username
@@ -2992,7 +3015,7 @@ export default class QatProblemActions extends Component {
                                                                         problemActionIndex++;
                                                                     } else {
                                                                         // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
                                                                     }
@@ -3006,11 +3029,11 @@ export default class QatProblemActions extends Component {
                                                                         let tempProblemTransObj = {
                                                                             problemReportTransId: '',
                                                                             problemStatus: {
-                                                                                id: 2,
+                                                                                id: 4,
                                                                                 label: {
                                                                                     active: true,
-                                                                                    labelId: 462,
-                                                                                    label_en: "Resolved",
+                                                                                    labelId: 27104,
+                                                                                    label_en: "In-Compliance",
                                                                                     label_sp: null,
                                                                                     label_fr: null,
                                                                                     label_pr: null
@@ -3026,13 +3049,13 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                         transList.push(tempProblemTransObj);
                                                                         filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false; 
+                                                                        filterObj.reviewed = false;
                                                                         var problemStatusObject = {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -3190,11 +3213,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -3210,13 +3233,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -3226,7 +3249,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -3285,6 +3308,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -3323,7 +3348,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 //auto open for index=======>
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -3342,11 +3367,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -3362,13 +3387,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -3517,11 +3542,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -3537,13 +3562,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -3552,7 +3577,7 @@ export default class QatProblemActions extends Component {
                                                             filterObj.problemStatus = problemStatusObject;
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -3607,6 +3632,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -3645,7 +3672,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index=======>
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -3661,11 +3688,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -3681,13 +3708,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -3834,11 +3861,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -3854,13 +3881,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -3870,7 +3897,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1=======>
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -3926,6 +3953,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -3964,7 +3993,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -3980,11 +4009,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4000,13 +4029,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -4152,11 +4181,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4172,13 +4201,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -4188,7 +4217,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1 ======>
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -4243,6 +4272,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -4281,7 +4312,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index =======>
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -4297,11 +4328,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4317,13 +4348,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -4470,11 +4501,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4490,13 +4521,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -4506,7 +4537,7 @@ export default class QatProblemActions extends Component {
 
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -4562,6 +4593,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -4600,7 +4633,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -4616,11 +4649,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4636,13 +4669,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -4798,11 +4831,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4818,13 +4851,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -4833,7 +4866,7 @@ export default class QatProblemActions extends Component {
                                                             filterObj.problemStatus = problemStatusObject;
                                                         } else {
                                                             // auto open logic for index1
-                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                            if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                 openProblem(index1, username, userId, problemActionList);
                                                             }
                                                         }
@@ -4891,6 +4924,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -4929,7 +4964,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // auto open logic for index
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -4945,11 +4980,11 @@ export default class QatProblemActions extends Component {
                                                             let tempProblemTransObj = {
                                                                 problemReportTransId: '',
                                                                 problemStatus: {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -4965,13 +5000,13 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             transList.push(tempProblemTransObj);
                                                             filterObj.problemTransList = transList;
-                                                            filterObj.reviewed = false; 
+                                                            filterObj.reviewed = false;
                                                             var problemStatusObject = {
-                                                                id: 2,
+                                                                id: 4,
                                                                 label: {
                                                                     active: true,
-                                                                    labelId: 462,
-                                                                    label_en: "Resolved",
+                                                                    labelId: 27104,
+                                                                    label_en: "In-Compliance",
                                                                     label_sp: null,
                                                                     label_fr: null,
                                                                     label_pr: null
@@ -5036,7 +5071,7 @@ export default class QatProblemActions extends Component {
 
                                                             if (consumptionListFortMinusOneDate1.length > 0 && consumptionListFortMinusThreeDate1.length > 0 && consumptionListFortMinusTwoDate1.length == 0) {
                                                                 // auto open logic for index1
-                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
@@ -5046,11 +5081,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -5066,13 +5101,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -5125,6 +5160,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -5163,7 +5200,7 @@ export default class QatProblemActions extends Component {
                                                                 problemActionIndex++;
                                                             } else {
                                                                 // problemActionList[index].isFound = 1 auot open logic for index;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -5178,11 +5215,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -5198,13 +5235,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null
@@ -5232,7 +5269,7 @@ export default class QatProblemActions extends Component {
                                                         var consumptionListFortDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                         var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                         var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                        
+
                                                         // var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                         // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
                                                         // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
@@ -5258,7 +5295,7 @@ export default class QatProblemActions extends Component {
                                                             // //console.log("tMinusOneDate--->",tMinusOneDate);
                                                             // //console.log("tMinusOneDate--->",tMinusTwoDate);
                                                             // //console.log("tMinusOneDate--->",tMinusThreeDate);
-                                                           
+
                                                             var consumptionListFortDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                             var consumptionListFortMinusOneDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                             var consumptionListFortMinusTwoDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
@@ -5278,7 +5315,7 @@ export default class QatProblemActions extends Component {
                                                             if (consumptionListFortDate1.length > 0 && consumptionListFortMinusTwoDate1.length > 0 && consumptionListFortMinusOneDate1.length == 0) {
                                                                 console.log("1============>");
                                                                 // auto open logic for index1
-                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 2) {
+                                                                if (index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                     openProblem(index1, username, userId, problemActionList);
                                                                 }
                                                             } else {
@@ -5290,11 +5327,11 @@ export default class QatProblemActions extends Component {
                                                                     let tempProblemTransObj = {
                                                                         problemReportTransId: '',
                                                                         problemStatus: {
-                                                                            id: 2,
+                                                                            id: 4,
                                                                             label: {
                                                                                 active: true,
-                                                                                labelId: 462,
-                                                                                label_en: "Resolved",
+                                                                                labelId: 27104,
+                                                                                label_en: "In-Compliance",
                                                                                 label_sp: null,
                                                                                 label_fr: null,
                                                                                 label_pr: null
@@ -5310,13 +5347,13 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                     transList.push(tempProblemTransObj);
                                                                     filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false; 
+                                                                    filterObj.reviewed = false;
                                                                     var problemStatusObject = {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -5370,6 +5407,8 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     },
                                                                     reviewed: false,
+                                                                    reviewNotes:'',
+                                                                    reviewedDate:'',
                                                                     createdBy: {
                                                                         userId: userId,
                                                                         username: username
@@ -5409,7 +5448,7 @@ export default class QatProblemActions extends Component {
                                                             } else {
                                                                 console.log("5============>");
                                                                 // problemActionList[index].isFound = 1 auot open logic for index;
-                                                                if (index != -1 && problemActionList[index].problemStatus.id == 2) {
+                                                                if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                     openProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -5425,11 +5464,11 @@ export default class QatProblemActions extends Component {
                                                                 let tempProblemTransObj = {
                                                                     problemReportTransId: '',
                                                                     problemStatus: {
-                                                                        id: 2,
+                                                                        id: 4,
                                                                         label: {
                                                                             active: true,
-                                                                            labelId: 462,
-                                                                            label_en: "Resolved",
+                                                                            labelId: 27104,
+                                                                            label_en: "In-Compliance",
                                                                             label_sp: null,
                                                                             label_fr: null,
                                                                             label_pr: null
@@ -5445,13 +5484,13 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 transList.push(tempProblemTransObj);
                                                                 filterObj.problemTransList = transList;
-                                                                filterObj.reviewed = false; 
+                                                                filterObj.reviewed = false;
                                                                 var problemStatusObject = {
-                                                                    id: 2,
+                                                                    id: 4,
                                                                     label: {
                                                                         active: true,
-                                                                        labelId: 462,
-                                                                        label_en: "Resolved",
+                                                                        labelId: 27104,
+                                                                        label_en: "In-Compliance",
                                                                         label_sp: null,
                                                                         label_fr: null,
                                                                         label_pr: null

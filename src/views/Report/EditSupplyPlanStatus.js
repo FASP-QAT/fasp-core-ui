@@ -29,6 +29,9 @@ import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationService from '../Common/AuthenticationService';
+import MultiSelect from 'react-multi-select-component';
+import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 
 const entityname = i18n.t('static.program.program');
 
@@ -159,6 +162,7 @@ class EditSupplyPlanStatus extends Component {
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            problemCategoryList: [],
 
             program: {
                 programId: this.props.match.params.programId,
@@ -193,11 +197,15 @@ class EditSupplyPlanStatus extends Component {
                 monthsInPastForAmc: '',
                 monthsInFutureForAmc: '',
                 regionArray: [],
-                regionList: []
+                regionList: [],
+                problemStatusListForEdit: [],
             },
             statuses: [],
             regionList: [],
-            editable: false
+            editable: false,
+            problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            problemCategoryList: [],
+            problemReportChanged: 0
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -209,6 +217,7 @@ class EditSupplyPlanStatus extends Component {
         this.rowChanged = this.rowChanged.bind(this);
         this.toggleTransView = this.toggleTransView.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -219,10 +228,13 @@ class EditSupplyPlanStatus extends Component {
     }
 
     rowChanged = function (instance, cell, x, y, value) {
+        this.setState({
+            problemReportChanged: 1
+        })
         var elInstance = this.state.problemEl;
         var rowData = elInstance.getRowData(y);
-        if (x != 20 && rowData[20] != 1) {
-            elInstance.setValueFromCoords(20, y, 1, true);
+        if (x != 22 && rowData[22] != 1) {
+            elInstance.setValueFromCoords(22, y, 1, true);
         }
     }
     hideFirstComponent() {
@@ -1710,11 +1722,19 @@ class EditSupplyPlanStatus extends Component {
                     regionList[i] = regionJson
 
                 }
+                var hasRole = false;
+                console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
+                AuthenticationService.getLoggedInUserRole().map(c => {
+                    if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                        hasRole = true;
+
+                    }
+                });
                 this.setState({
                     program,
                     regionList: regionList,
                     data: response.data.problemReportList,
-                    editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 ? true : false
+                    editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false
 
                 }, () => {
                     this.getPlanningUnit()
@@ -1830,6 +1850,66 @@ class EditSupplyPlanStatus extends Component {
                 }
             );
 
+        ProgramService.getProblemStatusList().then(response => {
+            console.log('**' + JSON.stringify(response.data))
+            var myResult = (response.data)
+            var proList = []
+            for (var i = 0; i < myResult.length; i++) {
+                var Json = {
+                    name: getLabelText(myResult[i].label, lan),
+                    id: myResult[i].id,
+                    userManaged: myResult[i].userManaged
+                }
+                proList.push(Json);
+            }
+            this.setState({
+                problemStatusListForEdit: proList
+            })
+        })
+            .catch(
+                error => {
+                    this.setState({
+                        statuses: [],
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
         const lan = localStorage.getItem("lang");
         var db1;
         getDatabase();
@@ -1858,6 +1938,32 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     problemStatusList: proList
                 })
+
+                var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
+                var problemCategoryOs = problemCategoryTransaction.objectStore('problemCategory');
+                var problemCategoryRequest = problemCategoryOs.getAll();
+
+                problemCategoryRequest.onerror = function (event) {
+                    // Handle errors!
+                    // this.hideSecondComponent();
+                };
+                problemCategoryRequest.onsuccess = function (e) {
+
+                    var myResultC = [];
+                    myResultC = problemCategoryRequest.result;
+                    var procList = []
+                    for (var i = 0; i < myResultC.length; i++) {
+                        var Json = {
+                            name: getLabelText(myResultC[i].label, lan),
+                            id: myResultC[i].id
+                        }
+                        procList[i] = Json
+                    }
+                    this.setState({
+                        problemCategoryList: procList
+                    })
+
+                }.bind(this)
 
             }.bind(this);
         }.bind(this);
@@ -1957,12 +2063,19 @@ class EditSupplyPlanStatus extends Component {
                 )
             }, this);
 
+        // const { problemStatusList } = this.state;
+        // let problemStatus = problemStatusList.length > 0
+        //     && problemStatusList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
+
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
             && problemStatusList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
+                return ({ label: item.name, value: item.id })
+
             }, this);
 
         let bar = {}
@@ -2110,6 +2223,13 @@ class EditSupplyPlanStatus extends Component {
                 ]
 
             };
+        const { problemCategoryList } = this.state;
+        let problemCategories = problemCategoryList.length > 0
+            && problemCategoryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
         return (
             <>
                 <TabPane tabId="1">
@@ -2547,9 +2667,11 @@ class EditSupplyPlanStatus extends Component {
                                                     <div className="" >
 
                                                         <div className="graphwidth">
+                                                        <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
                                                                 <Bar id="cool-canvas1" data={bar} options={chartOptions} />
                                                             </div>
+                                                        </div>
                                                         </div>
                                                         <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                     </div>}
@@ -2590,18 +2712,50 @@ class EditSupplyPlanStatus extends Component {
                 <TabPane tabId="2">
                     <Col md="9 pl-0 mt-3">
                         <div className="d-md-flex Selectdiv2">
-                            <FormGroup className="mt-md-2 mb-md-0 ">
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                <div className="controls SelectField">
+                                {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                <div className="controls problemListSelectField">
+                                    <MultiSelect
+                                        name="problemStatusId"
+                                        id="problemStatusId"
+                                        options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
+                                        value={this.state.problemStatusValues}
+                                        onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
+                                <div className="controls problemListSelectField">
                                     <InputGroup>
                                         <Input type="select"
                                             bsSize="sm"
-                                            name="problemStatusId" id="problemStatusId"
+                                            // value={this.state.hqStatusId}
+                                            name="problemTypeId" id="problemTypeId"
+                                            onChange={this.fetchData}
+                                        >
+                                            <option value="-1">{i18n.t('static.common.all')}</option>
+                                            <option value="1">{i18n.t('static.report.problemAction.automatic')}</option>
+                                            <option value="2">{i18n.t('static.report.problemAction.manual')}</option>
+                                            {/* <option value="3">Automatic / Manual</option> */}
+                                        </Input>
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.problemActionReport.problemCategory')}</Label>
+                                <div className="controls problemListSelectField">
+                                    <InputGroup>
+                                        <Input type="select"
+                                            bsSize="sm"
+                                            name="problemCategoryId" id="problemCategoryId"
                                             onChange={this.fetchData}
                                         // value={1}
                                         >
-                                            <option value="-1">Open / Addressed</option>
-                                            {problemStatus}
+                                            <option value="-1">{i18n.t("static.common.all")}</option>
+                                            {problemCategories}
                                         </Input>
                                     </InputGroup>
                                 </div>
@@ -2625,8 +2779,16 @@ class EditSupplyPlanStatus extends Component {
                             </FormGroup>
                         </div>
                     </Col>
-                    <div className="table-responsive RemoveStriped">
-                        <div id="problemListDiv" className="jexcelremoveReadonlybackground" />
+                    <br />
+                    <FormGroup className="col-md-6 mt-5 pl-0" >
+                        <ul className="legendcommitversion list-group">
+                            <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
+                            <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
+                            <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
+                        </ul>
+                    </FormGroup>
+                    <div className="table-responsive RemoveStriped qat-problemListSearch">
+                        <div id="problemListDiv" className="" />
                     </div>
                 </TabPane>
 
@@ -2634,98 +2796,177 @@ class EditSupplyPlanStatus extends Component {
         );
     }
 
+    handleProblemStatusChange = (event) => {
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log('***', event)
+            var problemStatusIds = event
+            problemStatusIds = problemStatusIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemStatusValues: problemStatusIds.map(ele => ele),
+                problemStatusLabels: problemStatusIds.map(ele => ele.label),
+                problemReportChanged: 0
+            }, () => {
+                console.log("problemStatusValues===>", this.state.problemStatusValues);
+                this.fetchData()
+            })
+        }
+    }
+
     getNote(row, lang) {
-        var transList = row.problemTransList;
-        var listLength = row.problemTransList.length;
+        var transList = row.problemTransList.filter(c => c.reviewed == false);
+        var listLength = transList.length;
         return transList[listLength - 1].notes;
     }
 
     fetchData() {
-        // alert("hi 2");
-        this.setState({
-            problemList: [],
-            message: '',
-            loading: true
-        },
-            () => {
-                this.el = jexcel(document.getElementById("problemListDiv"), '');
-                this.el.destroy();
-            });
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-        let problemStatusId = document.getElementById('problemStatusId').value;
-        let reviewedStatusId = document.getElementById('reviewedStatusId').value;
-        var problemReportList = this.state.data;
-        var problemReportFilterList = problemReportList;
-        console.log("problemReportList====>", problemReportList);
-        if (problemStatusId != 0) {
-
-            if (problemStatusId == -1 && reviewedStatusId == 0) {
-                problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == false);
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
             }
-            else if (problemStatusId != -1 && reviewedStatusId == 0) {
-                if (problemStatusId == 2) {
-                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                    // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-                    problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == false);
-                } else {
-                    problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == false);
-                }
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            } else if (problemStatusId == -1 && reviewedStatusId == 1) {
-                problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == true);
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            }
-            else if (problemStatusId != -1 && reviewedStatusId == 1) {
-                if (problemStatusId == 2) {
-                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                    // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
-                    problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == true);
-                } else {
-                    problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == true);
-                }
-                this.setState({
-                    problemList: problemReportFilterList,
-                    message: ''
-                },
-                    () => {
-                        this.buildJExcel();
-                    });
-            }
-
-
-
+        } else {
+            cont = true;
         }
-        else if (problemStatusId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
+        if (cont == true) {
+            // alert("hi 2");
+            this.setState({
+                problemList: [],
+                message: '',
+                loading: true,
+                problemReportChanged: 0
+            },
                 () => {
                     this.el = jexcel(document.getElementById("problemListDiv"), '');
                     this.el.destroy();
                 });
-        }
 
+            // let problemStatusId = ;
+            let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
+            console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
+            let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            var problemReportList = this.state.data;
+            var problemReportFilterList = problemReportList;
+            let problemTypeId = document.getElementById('problemTypeId').value;
+            let problemCategoryId = document.getElementById('problemCategoryId').value;
+            console.log("problemReportList====>", problemReportList);
+            if (problemStatusIds != []) {
+                var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
+                if (reviewedStatusId != -1) {
+                    if (reviewedStatusId == 0) {
+                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                    } else {
+                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                    }
+                }
+                if (problemTypeId != -1) {
+                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
+                }
+                if (problemCategoryId != -1) {
+                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
+                }
+                console.log("problemReportFilterList after filter------------->", problemReportFilterList)
+                this.setState({
+                    problemList: problemReportFilterList,
+                    message: ''
+                },
+                    () => {
+                        this.buildJExcel();
+                    });
+
+                // if (problemStatusId == -1 && reviewedStatusId == 0) {
+                //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == false);
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // }
+                // else if (problemStatusId != -1 && reviewedStatusId == 0) {
+                //     if (problemStatusId == 2) {
+                //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == false);
+                //     } else {
+                //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == false);
+                //     }
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // } else if (problemStatusId == -1 && reviewedStatusId == 1) {
+                //     problemReportFilterList = problemReportList.filter(c => (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.reviewed == true);
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // }
+                // else if (problemStatusId != -1 && reviewedStatusId == 1) {
+                //     if (problemStatusId == 2) {
+                //         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                //         // var myEndDate = moment(Date.now()).format("YYYY-MM-DD");
+                //         problemReportFilterList = problemReportList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId && c.reviewed == true);
+                //     } else {
+                //         problemReportFilterList = problemReportList.filter(c => c.problemStatus.id == problemStatusId && c.reviewed == true);
+                //     }
+                //     this.setState({
+                //         problemList: problemReportFilterList,
+                //         message: ''
+                //     },
+                //         () => {
+                //             this.buildJExcel();
+                //         });
+                // }
+
+
+
+            }
+            else if (problemStatusIds == []) {
+                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
+                    () => {
+                        this.el = jexcel(document.getElementById("problemListDiv"), '');
+                        this.el.destroy();
+                    });
+            }
+        }
     }
 
+    filterProblemStatus = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var json = instance.jexcel.getJson(null, false)
+        mylist = this.state.problemStatusListForEdit;
+        mylist = mylist.filter(c => c.userManaged == true);
+        return mylist;
+    }.bind(this)
+
     buildJExcel() {
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
         console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
@@ -2742,20 +2983,30 @@ class EditSupplyPlanStatus extends Component {
             data[7] = moment(problemList[j].createdDate).format('MMM-YY')
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
-            data[10] = getLabelText(problemList[j].problemStatus.label, this.state.lang)
+            data[10] = problemList[j].problemStatus.id
             data[11] = this.getNote(problemList[j], this.state.lang)
             data[12] = problemList[j].problemStatus.id
             data[13] = problemList[j].planningUnit.id
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-            data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
-            data[18] = problemList[j].reviewed
-            data[19] = ''
-            data[20] = 0
-            data[21] = problemList[j].problemTransList
+
+            data[17] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
+            data[18] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
+
+            data[19] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+            data[20] = problemList[j].reviewed
+            data[21] = ''
+
+            data[22] = 0
+            data[23] = problemList[j].problemTransList
             problemArray[count] = data;
             count++;
+
+
+
+
+
         }
         // if (problemList.length == 0) {
         //     data = [];
@@ -2790,7 +3041,7 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'hidden',
                     readOnly: true,
                     width: 70
                 },
@@ -2830,12 +3081,13 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.report.problemStatus'),
-                    type: 'text',
-                    readOnly: true,
-                    width: 80
+                    type: 'dropdown',
+                    source: this.state.problemStatusListForEdit,
+                    width: 80,
+                    filter: this.filterProblemStatus
                 },
                 {
-                    title: i18n.t('static.editSupplyPlan.notes'),
+                    title: i18n.t('static.program.notes'),
                     type: 'text',
                     readOnly: true,
                     width: 120
@@ -2865,6 +3117,22 @@ class EditSupplyPlanStatus extends Component {
                     type: 'hidden',
                     width: 0
                 },
+
+                {
+                    title: i18n.t('static.report.reviewNotes'),
+                    type: 'text',
+                    width: 120,
+                    readOnly: true
+
+                },
+                {
+                    title: i18n.t('static.report.reviewedDate'),
+                    type: 'text',
+                    width: 80,
+                    readOnly: true
+
+                },
+
                 {
                     title: i18n.t('static.problemAction.criticality'),
                     type: 'text',
@@ -2881,6 +3149,7 @@ class EditSupplyPlanStatus extends Component {
                     type: 'text',
                     width: 120
                 },
+
                 {
                     title: 'isChanged',
                     type: 'hidden',
@@ -2894,6 +3163,44 @@ class EditSupplyPlanStatus extends Component {
 
 
             ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (this.state.editable) {
+                    var rowData = elInstance.getRowData(y)[12];
+                    if (rowData == 4) {
+                        var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                }
+
+                // var elInstance = instance.jexcel;
+                // var json = elInstance.getJson();
+                // for (var j = 0; j < json.length; j++) {
+                // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
+                // var colArr = ['U']
+                var rowData = elInstance.getRowData(y);
+                var criticalityId = rowData[16];
+                var problemStatusId = rowData[12];
+                if (criticalityId == 3) {
+                    console.log("In if");
+                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                    console.log("cell classlist------------------>", cell.classList);
+                    cell.classList.add('highCriticality');
+                } else if (criticalityId == 2) {
+                    console.log("In if 1");
+                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                    cell.classList.add('mediumCriticality');
+                } else if (criticalityId == 1) {
+                    console.log("In if 2");
+                    var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
+                    cell.classList.add('lowCriticality');
+                    // }
+                }
+            }.bind(this),
             editable: this.state.editable,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
@@ -3079,6 +3386,15 @@ class EditSupplyPlanStatus extends Component {
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
+                        <ProblemListFormulas ref="formulaeChild" />
+                        <div className="Card-header-addicon">
+                            <div className="card-header-actions">
+                                <a className="">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
+                                    {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                </a>
+                            </div>
+                        </div>
                         {/* <CardHeader>
                             <i className="icon-note"></i><strong>{i18n.t('static.report.updatestatus')}</strong>{' '}
                         </CardHeader> */}
@@ -3610,63 +3926,89 @@ class EditSupplyPlanStatus extends Component {
                                 // console.log("problemList===>", json);
                                 // console.log("program===>", this.state.program);
                                 var reviewedProblemList = [];
+                                var isAllCheckForReviewed = true;
                                 for (var i = 0; i < json.length; i++) {
                                     var map = new Map(Object.entries(json[i]));
-                                    if (map.get("20") == 1) {
+
+                                    if (map.get("22") == 1) {
                                         reviewedProblemList.push({
                                             problemReportId: map.get("0"),
-                                            reviewed: map.get("18"),
-                                            notes: map.get("19")
+                                            problemStatus: {
+                                                id: map.get("10")
+                                            },
+                                            reviewed: map.get("20"),
+                                            notes: map.get("21")
                                         });
                                     }
+                                    if (map.get("20") == false && map.get("12") != 4) {
+                                        isAllCheckForReviewed = false
+                                    }
+                                    // if (map.get("20") == 1) {
+                                    //     reviewedProblemList.push({
+                                    //         problemReportId: map.get("0"),
+                                    //         problemStatus: {
+                                    //             id: map.get("10")
+                                    //         },
+                                    //         reviewed: map.get("18"),
+                                    //         notes: map.get("19")
+                                    //     });
+                                    // }
+                                    // if (map.get("18") == false && map.get("12") != 4) {
+                                    //     isAllCheckForReviewed = false
+                                    // }
                                 }
-                                console.log("reviewedProblemList===>", reviewedProblemList);
-                                ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                    .then(response => {
-                                        console.log("messageCode", response)
-                                        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                    })
-                                    .catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
+                                console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
+                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
+                                    console.log("reviewedProblemList===>", reviewedProblemList);
+                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                        .then(response => {
+                                            console.log("messageCode", response)
+                                            this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                        })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
                                                 }
                                             }
-                                        }
-                                    );
-
+                                        );
+                                } else {
+                                    alert("To approve a supply plan – Reviewed must all be checked.");
+                                }
 
                             }}
                             render={

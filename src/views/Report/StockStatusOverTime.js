@@ -66,7 +66,7 @@ const options = {
         ], xAxes: [{
             scaleLabel: {
                 display: true,
-                labelString: i18n.t('static.report.month'),
+                labelString: i18n.t('static.common.month'),
                 fontColor: 'black',
                 fontStyle: "normal",
                 fontSize: "12"
@@ -1099,7 +1099,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
 
-        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.report.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
+        var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
         this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, this.roundN(elt.mos)])));
@@ -1230,7 +1230,7 @@ class StockStatusOverTime extends Component {
         // doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
         doc.addImage(canvasImg, 'png', 50, startYtable, 750, 230, 'CANVAS');
 
-        const headers = [[i18n.t('static.report.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
+        const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
         this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, this.roundN(elt.mos)]));
@@ -1590,7 +1590,7 @@ class StockStatusOverTime extends Component {
 
                                         <thead>
                                             <tr>
-                                                <th className="text-center" style={{ width: '10%' }}> {i18n.t('static.report.month')} </th>
+                                                <th className="text-center" style={{ width: '10%' }}> {i18n.t('static.common.month')} </th>
                                                 <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.planningunit.planningunit')}</th>
                                                 <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.stock')}</th>
                                                 <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.consupmtionqty')}</th>

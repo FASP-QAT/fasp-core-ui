@@ -1388,7 +1388,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                             source: unitArr
                                                         },
                                                         {
-                                                            title: i18n.t('static.unit.multiplier'),
+                                                            title: i18n.t('static.unit.multiplierFromARUTOPU'),
                                                             type: 'numeric',
                                                             textEditor: true,
                                                             decimal: '.',
@@ -1882,7 +1882,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     this.setState({
-                        realmCountrys: response.data, loading: false
+                        realmCountrys: (response.data).filter(c => c.active == true), loading: false
                     },
                         () => {
                             // this.buildJexcel()

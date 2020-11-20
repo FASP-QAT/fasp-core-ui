@@ -519,7 +519,7 @@ const routes = [
   { path: '/report/annualShipmentCost', name: 'static.report.annualshipmentcost', component: AnnualShipmentCost },
 
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
-  { path: '/report/editStatus/:programId/:versionId', name: 'static.report.updatestatus', component: EditSupplyPlanStatus },
+  { path: '/report/editStatus/:programId/:versionId', name: 'static.supplyPlan.updateProgramStatus', component: EditSupplyPlanStatus },
   { path: '/report/supplyPlanVersionAndReview/:color/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
@@ -2405,12 +2405,12 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-exchange',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                               },
-                              {
-                                name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
-                                url: '/report/shipmentGlobalDemandView',
-                                icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                              //   url: '/report/shipmentGlobalDemandView',
+                              //   icon: 'fa fa-wpforms',
+                              //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
+                              // },
                               {
                                 name: i18n.t('static.report.shipmentCostReport'),
                                 url: '/report/procurementAgentExport',
