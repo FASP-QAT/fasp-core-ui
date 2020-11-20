@@ -331,7 +331,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             var lastY = -1;
                             if (y != null && lastY != y) {
                                 var rowData = elInstance.getRowData(y);
-                                if (rowData[12] != -1 && rowData[12] != "" && rowData[12] != undefined) {
+                                console.log("rowData[12]----------->", rowData[12]!="");
+                                if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                                     console.log("RowData", rowData);
                                     var lastEditableDate = "";
                                     if (rowData[2] == 1) {
@@ -503,13 +504,25 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                                 }.bind(this)
                                                             });
                                                         }
-                                                        if (consumptionBatchEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
+                                                        if (consumptionBatchEditable && obj.options.allowDeleteRow == true) {
                                                             // region id
                                                             if (obj.getRowData(y)[3] == 0) {
                                                                 items.push({
                                                                     title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
                                                                         console.log("y---------->", y);
+                                                                        if(obj.getJson(null, false).length == 1){
+                                                                            var rd=obj.getRowData(0);
+                                                                            var rd1=((this.state.consumptionEl).getValue(`F${parseInt(rd[4]) + 1}`, true)).toString().replaceAll("\,", "");
+                                                                            var data = [];
+                                                                            data[0] = -1; //A
+                                                                            data[1] = "";
+                                                                            data[2] = rd1; //C
+                                                                            data[3] = 0; //E
+                                                                            data[4] = rd[4]; //F
+                                                                            data[5] = rd[5];
+                                                                            obj.insertRow(data);
+                                                                        }
                                                                         this.props.updateState("consumptionBatchInfoChangedFlag", 1);
                                                                         obj.deleteRow(parseInt(y));
                                                                     }.bind(this)
@@ -546,7 +559,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     }
                                 }
 
-                                if (consumptionEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
+                                if (consumptionEditable && obj.options.allowDeleteRow == true) {
                                     // region id
                                     if (obj.getRowData(y)[12] == -1) {
                                         items.push({

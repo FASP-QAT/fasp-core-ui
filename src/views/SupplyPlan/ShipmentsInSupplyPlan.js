@@ -2227,7 +2227,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 moment(c.get("1")).startOf('month').format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
             )
 
-            if ((checkDuplicate.length >= 1 && index != map.get("5")) || checkDuplicateInMap.length > 1) {
+            if (checkDuplicateInMap.length > 1) {
                 var colArr = ['A'];
                 for (var c = 0; c < colArr.length; c++) {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateBatchNumber'), elInstance);
