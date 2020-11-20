@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup,Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -1238,10 +1238,11 @@ export default class ManualTagging extends Component {
                                                         style={{ width: 300 }}
                                                         onChange={(event, value) => {
                                                             // this.getOrderDetails()
+                                                            console.log("demo2 value---", value);
                                                             this.setState({
-                                                                erpPlanningUnitId: value.id,
-                                                                planningUnitIdUpdated: value.id,
-                                                                planningUnitName: value.label.label_en
+                                                                erpPlanningUnitId: value.value,
+                                                                planningUnitIdUpdated: value.value,
+                                                                planningUnitName: value.label
                                                             }, () => { this.getOrderDetails() });
 
                                                         }} // prints the selected value
