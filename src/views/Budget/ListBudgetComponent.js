@@ -693,12 +693,12 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.budget.budgetamount'),
-          type: 'text',
+          mask: '[-]#,##.00', decimal: '.',type:'numeric'
           // readOnly: true
         },
         {
           title: i18n.t('static.budget.availableAmt'),
-          type: 'text',
+          mask: '[-]#,##.00', decimal: '.',type:'numeric'
           // readOnly: true
         },
         {

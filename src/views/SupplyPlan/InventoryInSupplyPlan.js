@@ -304,7 +304,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data: inventoryDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [null, adjustmentType == 1 ? moment(Date.now()).endOf('month').format("YYYY-MM-DD") : null] }, width: 80, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
@@ -355,7 +355,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 var rowData = elInstance.getRowData(y);
                                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-                                if (rowData[14] != -1 && rowData[14] != "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
                                     for (var c = 0; c < colArr.length; c++) {
                                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                                         cell.classList.add('readonly');
@@ -468,24 +468,24 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 json.push(data);
                                             }
                                             // if (parseInt(inventoryQty) != inventoryBatchInfoQty) {
-                                                if ((adjustmentType == 1 && parseInt(inventoryQty) > inventoryBatchInfoQty) || 
-                                                (adjustmentType == 2 && parseInt(inventoryBatchInfoQty) > 0 ? parseInt(inventoryBatchInfoQty) < parseInt(inventoryQty) : parseInt(inventoryBatchInfoQty) > parseInt(inventoryQty)) || parseInt(inventoryBatchInfoQty)==0) {
-                                                    var qty = parseInt(inventoryQty) - parseInt(inventoryBatchInfoQty);
-                                                    var data = [];
-                                                    data[0] = -1; //A
-                                                    data[1] = "";
-                                                    data[2] = adjustmentType; //B
-                                                    if (adjustmentType == 1) {
-                                                        data[3] = ""; //C
-                                                        data[4] = qty; //D
-                                                    } else {
-                                                        data[3] = qty; //C
-                                                        data[4] = ""; //D
-                                                    }
-                                                    data[5] = 0; //E
-                                                    data[6] = y; //F
-                                                    data[7] = date;
-                                                    json.push(data);
+                                            if ((adjustmentType == 1 && parseInt(inventoryQty) > inventoryBatchInfoQty) ||
+                                                (adjustmentType == 2 && parseInt(inventoryBatchInfoQty) > 0 ? parseInt(inventoryBatchInfoQty) < parseInt(inventoryQty) : parseInt(inventoryBatchInfoQty) > parseInt(inventoryQty)) || parseInt(inventoryBatchInfoQty) == 0) {
+                                                var qty = parseInt(inventoryQty) - parseInt(inventoryBatchInfoQty);
+                                                var data = [];
+                                                data[0] = -1; //A
+                                                data[1] = "";
+                                                data[2] = adjustmentType; //B
+                                                if (adjustmentType == 1) {
+                                                    data[3] = ""; //C
+                                                    data[4] = qty; //D
+                                                } else {
+                                                    data[3] = qty; //C
+                                                    data[4] = ""; //D
+                                                }
+                                                data[5] = 0; //E
+                                                data[6] = y; //F
+                                                data[7] = date;
+                                                json.push(data);
                                                 // }
                                             }
                                             // if (batchInfo.length == 0) {
@@ -555,14 +555,44 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                             });
                                                         }
 
-                                                        if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
+                                                        if (inventoryEditable && obj.options.allowDeleteRow == true) {
                                                             // region id
                                                             if (obj.getRowData(y)[5] == 0) {
                                                                 items.push({
                                                                     title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
+                                                                        if (obj.getJson(null, false).length == 1) {
+                                                                            var adjustmentType = this.props.items.inventoryType;
+                                                                            var rowData = obj.getRowData(0);
+                                                                            var inventoryQty = 0;
+                                                                            if (adjustmentType == 1) {
+                                                                                inventoryQty = (this.state.inventoryEl).getValue(`G${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim()
+                                                                            } else {
+                                                                                inventoryQty = (this.state.inventoryEl).getValue(`F${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim();
+                                                                            }
+                                                                            var rd = obj.getRowData(0);
+                                                                            var data = [];
+                                                                            var adjustmentType = this.props.items.inventoryType;
+
+                                                                            var data = [];
+                                                                            data[0] = -1;
+                                                                            data[1] = "";
+                                                                            data[2] = adjustmentType;
+                                                                            if (adjustmentType == 1) {
+                                                                                data[3] = ""; //C
+                                                                                data[4] = inventoryQty; //D
+                                                                            } else {
+                                                                                data[3] = inventoryQty; //C
+                                                                                data[4] = ""; //D
+                                                                            }
+                                                                            data[5] = 0;
+                                                                            data[6] = rowData[6];
+                                                                            data[7] = rowData[7];
+                                                                            obj.insertRow(data);
+                                                                        }
+                                                                        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
                                                                         obj.deleteRow(parseInt(y));
-                                                                    }
+                                                                    }.bind(this)
                                                                 });
                                                             }
                                                         }
@@ -599,8 +629,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             items.push({
                                                 title: i18n.t("static.common.deleterow"),
                                                 onclick: function () {
+                                                    this.props.updateState("inventoryChangedFlag", 1);
                                                     obj.deleteRow(parseInt(y));
-                                                }
+                                                }.bind(this)
                                             });
                                         }
                                     }
@@ -746,11 +777,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (valid == false) {
                 elInstance.setValueFromCoords(16, y, 1, true);
             } else {
-                // if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
-                //     inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
-                // } else {
-                    // positiveValidation("A", y, elInstance);
-                // }
+                if (rowData[4] == 1) {
+                    if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                        inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
+                    } else {
+                        positiveValidation("A", y, elInstance);
+                    }
+                }
             }
         }
         if (x == 1) {
@@ -812,10 +845,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(16, y, 1, true);
                 } else {
                     var batchDetails = rowData[13];
+                    console.log("D-------------------->Batch details=----------------->", batchDetails);
                     var actualBatchQty = 0;
                     for (var b = 0; b < batchDetails.length; b++) {
-                        actualBatchQty += batchDetails[b].actualQty;
+                        actualBatchQty += parseInt(batchDetails[b].actualQty);
                     }
+                    console.log("D-------------------->", actualBatchQty);
+                    console.log("D-------------------->", parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()));
+
                     if (batchDetails.length > 0 && parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) < parseInt(actualBatchQty)) {
                         inValid("G", y, i18n.t('static.consumption.missingBatch'), elInstance);
                         valid = false;
@@ -844,10 +881,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         if (x == 13) {
             if (rowData[4] == 1) {
                 var batchDetails = rowData[13];
+                console.log("D-------------------->Batch details=----------------->", batchDetails);
                 var actualBatchQty = 0;
                 for (var b = 0; b < batchDetails.length; b++) {
-                    actualBatchQty += batchDetails[b].actualQty;
+                    actualBatchQty += parseInt(batchDetails[b].actualQty);
                 }
+                console.log("D-------------------->", actualBatchQty);
+                console.log("D-------------------->", parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()));
                 if (batchDetails.length > 0 && parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) < parseInt(actualBatchQty)) {
                     inValid("G", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
@@ -1322,11 +1362,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     valid = false;
                     elInstance.setValueFromCoords(16, y, 1, true);
                 } else {
-                    if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
-                        inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
-                        valid = false
-                    } else {
-                        positiveValidation("A", y, elInstance);
+                    if (rowData[4] == 1) {
+                        if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                            inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
+                            valid = false
+                        } else {
+                            positiveValidation("A", y, elInstance);
+                        }
                     }
                 }
 

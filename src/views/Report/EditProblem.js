@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroupAddon, InputGroupText, Label, Row, FormFeedback } from 'reactstrap';
 import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME,DATE_FORMAT_CAP } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import moment from "moment";
 // import * as myConst from '../../Labels.js';
@@ -32,9 +32,17 @@ let initialValues = {
 const entityname = i18n.t('static.report.problem');
 const validationSchema = function (values) {
     return Yup.object().shape({
-
         problemStatusInputId: Yup.string()
             .required(i18n.t('static.report.selectProblemStatus')),
+        needNotesValidation: Yup.boolean(),
+        notes: Yup.string()
+            .when("needNotesValidation", {
+                is: val => {
+                    return document.getElementById("needNotesValidation").value === "true";
+                },
+                then: Yup.string().required(i18n.t('static.program.validnotestext')),
+                otherwise: Yup.string().notRequired()
+            }),
 
     })
 }
@@ -65,6 +73,7 @@ export default class EditLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             problemStatusInputId: '',
             problemActionIndex: '',
             problemStatusId: '',
@@ -245,9 +254,15 @@ export default class EditLanguageComponent extends Component {
         this.getProblemStatusById = this.getProblemStatusById.bind(this);
         this.getProblemStatus = this.getProblemStatus.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.getNote = this.getNote.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    getNote(row, lang) {
+        var transList = row.problemTransList;
+        var listLength = row.problemTransList.length;
+        return transList[listLength - 1].notes;
     }
     Capitalize(str) {
         // let { notes } = this.state
@@ -256,13 +271,16 @@ export default class EditLanguageComponent extends Component {
         this.setState({ notes: notes });
     }
     dataChange(event) {
+        let { problemReport } = this.state;
 
         if (event.target.name === "problemStatusInputId") {
             let problemStatusInputId = event.target.value;
-
+            problemReport.problemStatus.id = event.target.value;
             this.setState(
                 {
+                    problemReport: problemReport,
                     problemStatusInputId: problemStatusInputId,
+
                 },
                 () => {
                     this.getProblemStatusById(problemStatusInputId);
@@ -285,6 +303,7 @@ export default class EditLanguageComponent extends Component {
     }
 
     getProblemStatusById(problemStatusInputId) {
+        console.log("hi==========================hi");
         var problemStatusObject = {};
         var db1;
         getDatabase();
@@ -380,6 +399,7 @@ export default class EditLanguageComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             problemStatusInputId: true,
+            notes: true
             // languageCode: true
         }
         )
@@ -405,6 +425,7 @@ export default class EditLanguageComponent extends Component {
 
         // AuthenticationService.setupAxiosInterceptors();
         this.getProblemStatus();
+        this.getProblemStatusById(this.props.match.params.problemStatusId);
         let problemReportId = this.props.match.params.problemReportId;
         let programId = this.props.match.params.programId;
         let problemActionIndex = this.props.match.params.index;
@@ -451,7 +472,9 @@ export default class EditLanguageComponent extends Component {
                         // var outputString = problemReport.realmProblem.problem.label.label_en.replace("<%X", problemReport.realmProblem.data1);
                         this.setState({
                             problemReport: problemReport,
-                            data: problemReport.problemTransList
+                            data: problemReport.problemTransList,
+                            notes: this.getNote(problemReport),
+                            loading: false
                         },
                             () => {
 
@@ -461,7 +484,9 @@ export default class EditLanguageComponent extends Component {
                         console.log("problemReport--->", problemReport);
                         this.setState({
                             problemReport: problemReport,
-                            data: problemReport.problemTransList
+                            data: problemReport.problemTransList,
+                            notes: this.getNote(problemReport),
+                            loading: false
                         },
                             () => {
 
@@ -500,6 +525,13 @@ export default class EditLanguageComponent extends Component {
                         //     }
                         // }
 
+                        var hasRole = false;
+                        AuthenticationService.getLoggedInUserRole().map(c => {
+                            if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                                hasRole = true;
+
+                            }
+                        });
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             var Json = {
@@ -508,8 +540,9 @@ export default class EditLanguageComponent extends Component {
                             }
                             proList[i] = Json
                         }
+
                         this.setState({
-                            problemStatusList: proList
+                            problemStatusList: hasRole == true ? proList : proList.filter(c => c.id != 2)
                         })
 
 
@@ -577,8 +610,8 @@ export default class EditLanguageComponent extends Component {
                 align: 'center',
                 style: { width: '80px' },
                 headerAlign: 'center',
-                formatter: (cell, row) => { 
-                    return cell==true ? i18n.t('static.program.yes') : i18n.t('static.program.no');
+                formatter: (cell, row) => {
+                    return cell == true ? i18n.t('static.program.yes') : i18n.t('static.program.no');
                 }
             },
             {
@@ -596,7 +629,7 @@ export default class EditLanguageComponent extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 style: { width: '80px' },
-                formatter: (cell, row) => { 
+                formatter: (cell, row) => {
                     return new moment(cell).format(DATE_FORMAT_CAP);
                 }
             },
@@ -635,16 +668,16 @@ export default class EditLanguageComponent extends Component {
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                        <Card className="EditproblemCard">
+                        <Card className="EditproblemCard" style={{ display: this.state.loading ? "none" : "block" }}>
                             {/* <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                // enableReinitialize={true}
-                                // initialValues={{
-                                //     languageName: this.state.language.languageName,
-                                //     languageCode: this.state.language.languageCode
-                                // }}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    problemStatusInputId: this.state.problemReport.problemStatus.id,
+                                    notes: this.state.notes
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     // AuthenticationService.setupAxiosInterceptors();
@@ -722,7 +755,7 @@ export default class EditLanguageComponent extends Component {
                                             tempProblemTransList.push(tempProblemTransObj);
 
                                             filterObj.problemTransList = tempProblemTransList;
-
+                                            // console.log("=========>problem status obj",this.state.problemStatusObject);
                                             filterObj.problemStatus = this.state.problemStatusObject;
 
 
@@ -995,7 +1028,7 @@ export default class EditLanguageComponent extends Component {
 
 
                                                     <div className="col-md-12 bg-white pb-1">
-                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateStatus')}</b></a></li></ul>
+                                                        <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateDetails')}</b></a></li></ul>
 
                                                         <div className="row">
                                                             <FormGroup className="col-md-3 ">
@@ -1009,7 +1042,8 @@ export default class EditLanguageComponent extends Component {
                                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                     onBlur={handleBlur}
                                                                     required
-                                                                    value={this.state.problemStatusInputId}
+                                                                    // value={this.state.problemStatusInputId}
+                                                                    value={this.state.problemReport.problemStatus.id}
                                                                 >
                                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                                     {problemStatus}
@@ -1020,23 +1054,30 @@ export default class EditLanguageComponent extends Component {
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="notes">{i18n.t('static.program.notes')}</Label>
                                                                 {/* <Input type="text" */}
-                                                                <textarea
-                                                                    class="form-control" id="exampleFormControlTextarea1" rows="3"
+                                                                <Input
+                                                                    type="textarea"
+                                                                    class="form-control"
+                                                                    rows="3"
                                                                     name="notes"
                                                                     id="notes"
                                                                     bsSize="sm"
                                                                     maxLength={600}
                                                                     autocomplete="off"
-                                                                    valid={!errors.notes && this.state.notes != ''}
-                                                                    invalid={(touched.notes && !!errors.notes)}
+                                                                    valid={!errors.notes}
+                                                                    invalid={touched.notes && !!errors.notes || this.state.problemReport.problemStatus.id == 3 ? this.state.notes == '' : false}
                                                                     onBlur={handleBlur}
                                                                     onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                    onBlur={handleBlur}
                                                                     required
                                                                     value={this.state.notes}
                                                                 />
                                                                 <FormFeedback className="red">{errors.notes}</FormFeedback>
                                                             </FormGroup>
+                                                            <Input
+                                                                type="hidden"
+                                                                name="needNotesValidation"
+                                                                id="needNotesValidation"
+                                                                value={(this.state.problemReport.problemStatus.id == 3 ? true : false)}
+                                                            />
                                                         </div>
                                                     </div>
 
@@ -1044,7 +1085,8 @@ export default class EditLanguageComponent extends Component {
                                                         <FormGroup>
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                             {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                            {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button> */}
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                             &nbsp;
                                                     </FormGroup>
                                                     </div>
@@ -1055,9 +1097,21 @@ export default class EditLanguageComponent extends Component {
                                             </Form>
 
                                         )} />
+
                         </Card>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         );

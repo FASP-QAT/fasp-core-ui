@@ -114,6 +114,17 @@ export default class ProductCategoryTree extends Component {
                         realmList: response.data,
                         loading: false
                     })
+                    let realmId = AuthenticationService.getRealmId();
+                    // console.log("realmId----->",realmId);
+                    if (realmId != -1) {
+                        document.getElementById("realmId").value = realmId
+                        document.getElementById("realmId").disabled = true;
+                        this.setState({
+                            realmId: realmId
+                        }, () => {
+                            this.getProductCategoryListByRealmId()
+                        })
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode,

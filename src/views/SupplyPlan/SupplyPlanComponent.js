@@ -4069,7 +4069,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                                     }
                                     console.log("SupplyPlanData--------------->", supplyPlanData);
-                                    if (supplyPlanData.length > 0) {
+                                    // if (supplyPlanData.length > 0) {
                                         var lastClosingBalance = 0;
                                         // var finalMinMos = supplyPlanData[0].minStockMoS;
                                         // var finalMaxMos = supplyPlanData[0].maxStockMoS;
@@ -4650,11 +4650,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                 report == 1 ? this.exportPDF() : this.exportCSV()
                                             })
                                         }
-                                    } else {
-                                        console.log("In else")
-                                        this.setState({ loading: false })
-                                        // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
-                                    }
+                                    // } else {
+                                    //     console.log("In else")
+                                    //     this.setState({ loading: false })
+                                    //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                                    // }
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)

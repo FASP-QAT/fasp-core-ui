@@ -9,7 +9,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import moment from 'moment';
+// import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import DatePicker from 'react-datepicker';
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
@@ -358,11 +358,16 @@ class EditBudgetComponent extends Component {
                                     // budget.budgetAmt = amount;
                                     budget.budgetAmt = this.state.budget.budgetAmt;
 
-                                    var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
-                                    budget.startDate = startDate;
+                                    // var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
+                                    // budget.startDate = startDate;
 
-                                    var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
-                                    budget.stopDate = stopDate;
+                                    // var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
+                                    // budget.stopDate = stopDate;
+                                    var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
+                                    budget.startDate = new Date(startDateString);
+
+                                    var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
+                                    budget.stopDate = new Date(stopDateString);
                                     console.log("this.state.budget----->", budget);
                                     BudgetService.editBudget(budget)
                                         .then(response => {

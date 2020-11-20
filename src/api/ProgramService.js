@@ -154,5 +154,10 @@ class ProgramService {
         );
     }
 
+    getProblemStatusList() {
+        return axios.get(`${API_URL}/api/problemStatus`, {}
+        );
+    }
+
 }
 export default new ProgramService()
