@@ -393,7 +393,7 @@ export default class ShipmentDetails extends React.Component {
                         this.setState({
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
-                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
                         if ((this.state.shipmentType).value == 1) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
                         } else {

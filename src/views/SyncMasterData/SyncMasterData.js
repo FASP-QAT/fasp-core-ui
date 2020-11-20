@@ -172,7 +172,8 @@ export default class SyncMasterData extends Component {
                         if (response.status == 200) {
                             console.log("Response=========================>", response.data);
                             console.log("i", i);
-                            var prog = programList.filter(c => c.programId == response.data.programId)[0];
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            var prog = programList.filter(c => c.programId == response.data.programId && c.version==response.data.versionId && c.userId==curUser)[0];
                             console.log("Prog=====================>", prog)
                             var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -205,7 +206,7 @@ export default class SyncMasterData extends Component {
                                     if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                         minDate = shipmentDataList[index].expectedDeliveryDate;
                                     }
-                                    if (shipmentDataList[index].receivedDate!=null && shipmentDataList[index].receivedDate!="" && shipmentDataList[index].receivedDate!="" && shipmentDataList[index].receivedDate!=undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                    if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                         minDate = shipmentDataList[index].receivedDate;
                                     }
                                     shipmentDataList[index] = shipArray[j];
@@ -228,12 +229,16 @@ export default class SyncMasterData extends Component {
                             for (var pr = 0; pr < problemReportArray.length; pr++) {
                                 console.log("problemReportArray[pr].problemReportId---------->", problemReportArray[pr].problemReportId);
                                 var index = problemReportList.findIndex(c => c.problemReportId == problemReportArray[pr].problemReportId)
-                                console.log("Index----------->", index);
+                                console.log("D------------->Index----------->", index,"D------------>",problemReportArray[pr].problemStatus.id);
                                 if (index == -1) {
                                     problemReportList.push(problemReportArray[pr]);
                                 } else {
                                     console.log("In else");
                                     problemReportList[index].reviewed = problemReportArray[pr].reviewed;
+                                    problemReportList[index].problemStatus = problemReportArray[pr].problemStatus;
+                                    problemReportList[index].reviewNotes = problemReportArray[pr].reviewNotes;
+                                    problemReportList[index].reviewedDate = (problemReportArray[pr].reviewedDate);
+
                                     console.log("problemReportList[index]", problemReportList[index]);
                                     var problemReportTransList = problemReportList[index].problemTransList;
                                     console.log("Problem report trans list", problemReportTransList)
@@ -255,6 +260,8 @@ export default class SyncMasterData extends Component {
                             programJson.shipmentList = shipmentDataList;
                             programJson.batchInfoList = batchInfoList;
                             programJson.problemReportList = problemReportList;
+                            console.log("D--------------->problemReportList--------------->", problemReportList);
+                            console.log("D--------------->problem json",programJson)
                             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var db1;
                             var storeOS;

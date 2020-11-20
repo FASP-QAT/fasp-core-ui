@@ -336,8 +336,8 @@ export default class SupplyPlanComponent extends React.Component {
         var A = [header]
 
         var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...this.state.openingBalanceArray]
-        var consumptionArr = [...["\"" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\""], ...this.state.consumptionTotalData]
-        var shipmentArr = [...["\"" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\""], ...this.state.shipmentsTotalData]
+        var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
+        var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
         var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
         var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
 
@@ -398,8 +398,8 @@ export default class SupplyPlanComponent extends React.Component {
         list.map(ele => {
 
             var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...ele.data.openingBalanceArray]
-            var consumptionArr = [...["\"" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\""], ...ele.data.consumptionTotalData]
-            var shipmentArr = [...["\"" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\""], ...ele.data.shipmentsTotalData]
+            var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...ele.data.consumptionTotalData]
+            var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...ele.data.shipmentsTotalData]
             var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
             var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.manualShipmentsTotalData]
 
@@ -4069,7 +4069,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                                     }
                                     console.log("SupplyPlanData--------------->", supplyPlanData);
-                                    if (supplyPlanData.length > 0) {
+                                    // if (supplyPlanData.length > 0) {
                                         var lastClosingBalance = 0;
                                         // var finalMinMos = supplyPlanData[0].minStockMoS;
                                         // var finalMaxMos = supplyPlanData[0].maxStockMoS;
@@ -4650,11 +4650,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                 report == 1 ? this.exportPDF() : this.exportCSV()
                                             })
                                         }
-                                    } else {
-                                        console.log("In else")
-                                        this.setState({ loading: false })
-                                        // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
-                                    }
+                                    // } else {
+                                    //     console.log("In else")
+                                    //     this.setState({ loading: false })
+                                    //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
+                                    // }
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
