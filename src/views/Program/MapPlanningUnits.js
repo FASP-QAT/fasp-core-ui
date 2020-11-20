@@ -44,7 +44,7 @@ export default class MapPlanningUnits extends Component {
         );
         // this.el.insertRow();
         console.log("insert row called");
-        var json = this.el.getJson()
+        var json = this.el.getJson(null,false)
     }
 
     checkValidation() {
@@ -52,7 +52,7 @@ export default class MapPlanningUnits extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         for (var y = 0; y < json.length; y++) {
 
             var col = ("A").concat(parseInt(y) + 1);
@@ -257,7 +257,7 @@ export default class MapPlanningUnits extends Component {
             instance.jexcel.setValue(columnName, '');
         }
         if (x == 1) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null,false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -436,7 +436,7 @@ export default class MapPlanningUnits extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 1];
+        var value = (instance.jexcel.getJson(null,false)[r])[c - 1];
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -638,6 +638,7 @@ export default class MapPlanningUnits extends Component {
                                     tableOverflow: true,
                                     wordWrap: true,
                                     parseFormulas: true,
+                                    filters:true,
                                     // paginationOptions: [10, 25, 50, 100],
                                     // position: 'top',
                                     allowInsertColumn: false,
@@ -929,7 +930,7 @@ export default class MapPlanningUnits extends Component {
     }
 
     myFunction() {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         var planningUnitArray = []
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));

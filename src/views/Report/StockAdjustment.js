@@ -663,7 +663,7 @@ class StockAdjustmentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.report.stockAdjustment'),
-                    type: 'numeric', mask: '#,##',
+                    type: 'numeric', mask: '[-]#,##',
                     readOnly: true
                 },
                 {
@@ -1012,7 +1012,7 @@ class StockAdjustmentComponent extends Component {
             },
             {
                 dataField: 'inventoryDate',
-                text: i18n.t('static.report.month'),
+                text: i18n.t('static.inventoryDate.inventoryReport'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
