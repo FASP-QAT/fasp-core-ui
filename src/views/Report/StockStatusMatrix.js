@@ -975,7 +975,7 @@ export default class StockStatusMatrix extends React.Component {
     csvRow.push('')
 
     const headers = [];
-    columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+    columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
     this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));

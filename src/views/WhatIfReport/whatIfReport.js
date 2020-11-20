@@ -1048,7 +1048,7 @@ export default class WhatIfReportComponent extends React.Component {
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
-        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20') + ' : ' + this.state.reorderFrequency + "\"")
+        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
 
         csvRow.push('')
@@ -3671,8 +3671,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         <div className="" >
 
                                             <div className="graphwidth">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                <div className="col-md-12">
+                                                    <div className="chart-wrapper chart-graph-report">
+                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
