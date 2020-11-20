@@ -1388,7 +1388,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                             source: unitArr
                                                         },
                                                         {
-                                                            title: i18n.t('static.unit.multiplier'),
+                                                            title: i18n.t('static.unit.multiplierFromARUTOPU'),
                                                             type: 'numeric',
                                                             textEditor: true,
                                                             decimal: '.',
