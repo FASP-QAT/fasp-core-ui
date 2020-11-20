@@ -166,14 +166,14 @@ export default class SyncMasterData extends Component {
             // this.refs.problemListChild.qatProblemActions(programList[i].id);
             if (navigator.onLine) {
                 //Code to Sync Country list
-                MasterSyncService.syncProgram(programList[i].programId, programList[i].version, date)
+                MasterSyncService.syncProgram(programList[i].programId, programList[i].version,programList[i].userId, date)
                     .then(response => {
                         console.log("Response", response);
                         if (response.status == 200) {
                             console.log("Response=========================>", response.data);
                             console.log("i", i);
                             var curUser = AuthenticationService.getLoggedInUserId();
-                            var prog = programList.filter(c => c.programId == response.data.programId && c.version==response.data.versionId && c.userId==curUser)[0];
+                            var prog = programList.filter(c => c.programId == response.data.programId && c.version==response.data.versionId && c.userId==response.data.userId)[0];
                             console.log("Prog=====================>", prog)
                             var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -260,8 +260,6 @@ export default class SyncMasterData extends Component {
                             programJson.shipmentList = shipmentDataList;
                             programJson.batchInfoList = batchInfoList;
                             programJson.problemReportList = problemReportList;
-                            console.log("D--------------->problemReportList--------------->", problemReportList);
-                            console.log("D--------------->problem json",programJson)
                             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var db1;
                             var storeOS;
@@ -346,7 +344,6 @@ export default class SyncMasterData extends Component {
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
 
         if (valid) {
-            console.log("D------------> in valid for master data")
             this.setState({
                 syncedMasters: this.state.syncedMasters + 1,
                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
