@@ -30,6 +30,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            // changedConversionFactor: '',
             planningUnitIdUpdated: '',
             erpPlanningUnitId: '',
             conversionFactorEntered: false,
@@ -133,14 +134,20 @@ export default class ManualTagging extends Component {
     }
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
+        conversionFactor = conversionFactor.replace("-", "")
+        console.log("changedConversionFactor---",conversionFactor);
+        console.log("conversionFactor---",conversionFactor);
         var erpShipmentQty = document.getElementById("erpShipmentQty").value;
         if (conversionFactor != null && conversionFactor != "" && conversionFactor != 0) {
             var result = erpShipmentQty * conversionFactor;
             document.getElementById("convertedQATShipmentQty").value = result.toFixed(2);
-            this.setState({ conversionFactorEntered: true })
+            this.setState({
+                conversionFactorEntered: true
+            })
         } else {
-            this.setState({ conversionFactorEntered: false })
+            this.setState({ conversionFactorEntered: false})
         }
+        document.getElementById("conversionFactor").value = conversionFactor;
     }
 
 
@@ -1363,6 +1370,7 @@ export default class ManualTagging extends Component {
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
+                                                        // value={this.state.changedConversionFactor}
                                                         type="number"
                                                         min={0.1}
                                                         name="conversionFactor"
