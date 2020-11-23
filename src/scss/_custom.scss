@@ -3734,7 +3734,9 @@ background-color: yellow;
   background-color: #20a8d8!important;
   border-radius: 0px  5px 5px 0px;
 }
-
+.problemListSelectField {
+  width: 165px;
+}
 .greenColor{
   color: #118b70;
 }
@@ -3824,4 +3826,19 @@ background-color: yellow;
   height:34px;
   margin-top:-45px;
   margin-right:-49px;
+}
+
+.highCriticality{
+background-color: #f48282!important;
+color: #000000!important;
+}
+
+.mediumCriticality{
+  background-color: orange!important;
+  color: #000000!important;
+}
+
+.lowCriticality{
+  background-color: yellow!important;
+  color: #000000!important;
 }

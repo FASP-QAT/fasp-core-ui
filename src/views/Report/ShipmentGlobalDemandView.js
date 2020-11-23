@@ -307,8 +307,8 @@ class ShipmentGlobalDemandView extends Component {
 
             let tableHead = this.state.table1Headers;
             let tableHeadTemp = [];
-            tableHeadTemp.push(i18n.t('static.report.qatPID'));
-            tableHeadTemp.push(i18n.t('static.dashboard.product'));
+            tableHeadTemp.push(i18n.t('static.report.qatPID').replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.dashboard.product').replaceAll(' ', '%20'));
             for (var i = 0; i < tableHead.length; i++) {
                 console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));

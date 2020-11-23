@@ -140,8 +140,8 @@ class SupplyPlanVersionAndReview extends Component {
             data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
             data[4] = matricsList[j].createdBy.username
             data[5] = getLabelText(matricsList[j].versionStatus.label, this.state.lang)
-            data[6] = (matricsList[j].versionStatus.id == 2) ? (matricsList[j].lastModifiedBy.username) : ''
-            data[7] = (matricsList[j].versionStatus.id == 2) ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
+            data[6] = (matricsList[j].lastModifiedBy.username)
+            data[7] = (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null)
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
@@ -194,11 +194,11 @@ class SupplyPlanVersionAndReview extends Component {
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.report.approver'),
+                    title: i18n.t('static.report.reviewer'),
                     type: 'text',
                     readOnly: true
                 }, {
-                    title: i18n.t('static.report.approveddate'),
+                    title: i18n.t('static.report.approvedRevieweddate'),
                     type: 'text',
                     readOnly: true
                 }, {
@@ -255,14 +255,14 @@ class SupplyPlanVersionAndReview extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            var hasRole = false;
-            console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
-            AuthenticationService.getLoggedInUserRole().map(c => {
-                if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
-                    hasRole = true;
+            var hasRole = true;
+            // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
+            // AuthenticationService.getLoggedInUserRole().map(c => {
+            //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+            //         hasRole = true;
 
-                }
-            });
+            //     }
+            // });
 
             if (hasRole) {
 
@@ -1042,14 +1042,14 @@ class SupplyPlanVersionAndReview extends Component {
             }
             , {
                 dataField: 'lastModifiedBy.username',
-                text: i18n.t('static.report.approver'),
+                text: i18n.t('static.report.reviewer'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.checkValue
             }, {
                 dataField: 'lastModifiedDate',
-                text: i18n.t('static.report.approveddate'),
+                text: i18n.t('static.report.approvedRevieweddate'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
