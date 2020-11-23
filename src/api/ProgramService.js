@@ -8,6 +8,11 @@ class ProgramService {
         });
     }
 
+    getAllProgramData(json) {
+        return axios.post(`${API_URL}/api/programData`, json, {
+        });
+    }
+
     getProgramList() {
         return axios.get(`${API_URL}/api/program/`, {
         });
