@@ -98,7 +98,7 @@ export default class UserAgreementComponent extends Component {
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>You must agree to all of the terms of this EULA to use this Software.</p></li>
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>If so, you may use the Software for free and for any lawful purpose.</p></li>
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">This Software automatically communicates with QAT servers for three reasons: <br></br>(1) To receive and install updates<br></br> (2) To send error reports and <br></br>(3) To send anonymized usage information. <br></br>You can view sample data to see what information is sent, and you may opt out of sending the anonymized usage data.</p></li>
-                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>This Software is provided "as-is" with no warranties, and you agree that the Owner or Administrator are not liable for anything you do with it.</p></li>
+                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>This Software is provided "as-is" with no warranties, and you agree that the Owner is not liable for anything you do with it.</p></li>
                                             </ul>
                                         </p>
                                         <p>
@@ -227,13 +227,13 @@ export default class UserAgreementComponent extends Component {
                                                 <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Or any other matter relating to the Software.</p></li>
                                             </ul>
                                             <p>The Owner reserves the right at any time and from time to time to modify or discontinue,
-                                                ily or permanently, the Software (or any part thereof) with or without notice.
+                                            temporarily  or permanently, the Software (or any part thereof) with or without notice.
                                                 The Owner shall not be liable to you or to any third-party for any modification,
        price change, suspension or discontinuance of the Software. </p>
                                         </p>
 
                                         <p>
-                                            <h4 className="UserTitle">Miscellaneous </h4>
+                                            <h4 className="UserTitle">Miscellanea  </h4>
                                             <div className="rounded-list list-group">
                                                 <ol className="list-group">
                                                     <li class=""> &nbsp;&nbsp;<p>If you configure the Software to work with one or more accounts
@@ -250,7 +250,7 @@ export default class UserAgreementComponent extends Component {
                                                            Owner from any and all individual and aggregate claims for damages that may be
                                                             brought against Owner with regard to or arising from the aforementioned conditions
                                                             in this clause (Incorporations by Reference: ADS 318 Intellectual Property
-            Rights.</p></li>
+            Rights. c</p></li>
                                                     <li class=" "> &nbsp; &nbsp;<p>You agree that this EULA and your use of the Software
                                                         are governed under District of Columbia law and any dispute related to the
                                                         Software must be brought in a tribunal of competent jurisdiction located in

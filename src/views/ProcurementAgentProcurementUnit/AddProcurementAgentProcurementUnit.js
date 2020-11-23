@@ -86,10 +86,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
-                (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-                z = data[i].y;
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true)
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -640,6 +643,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 type: 'numeric',
                                                 decimal: '.',
                                                 mask: '#,##.00',
+                                                textEditor: true,
                                                 disabledMaskOnEdition: true
 
                                             },
@@ -647,6 +651,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 title: i18n.t('static.program.approvetoshipleadtime'),
                                                 type: 'numeric',
                                                 decimal: '.',
+                                                textEditor: true,
                                                 mask: '#,##.00',
                                                 disabledMaskOnEdition: true
                                             },
@@ -665,14 +670,6 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             },
 
                                         ],
-                                        oncreateeditor: function (a, b, c, d, e) {
-                                            console.log("In create editor")
-                                            e.type = 'text';
-                                            if (e.value) {
-                                                e.selectionStart = e.value.length;
-                                                e.selectionEnd = e.value.length;
-                                            }
-                                        },
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
                                         search: true,

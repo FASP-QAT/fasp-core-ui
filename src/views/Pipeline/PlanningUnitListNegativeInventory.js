@@ -46,7 +46,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                         },
                         {
                             title: i18n.t('static.inventory.totalInvontory'),
-                            type: 'number',
+                            type: 'numeric',
                             readOnly: true
 
                         }

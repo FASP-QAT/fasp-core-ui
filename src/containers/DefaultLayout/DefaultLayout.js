@@ -519,7 +519,7 @@ const routes = [
   { path: '/report/annualShipmentCost', name: 'static.report.annualshipmentcost', component: AnnualShipmentCost },
 
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
-  { path: '/report/editStatus/:programId/:versionId', name: 'static.report.updatestatus', component: EditSupplyPlanStatus },
+  { path: '/report/editStatus/:programId/:versionId', name: 'static.supplyPlan.updateProgramStatus', component: EditSupplyPlanStatus },
   { path: '/report/supplyPlanVersionAndReview/:color/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
@@ -2323,13 +2323,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
                           },
-                          // {
-                          //   name: i18n.t('static.dashboard.productcatalog'),
-                          //   url: '/report/productCatalog',
-                          //   icon: 'fa fa-th',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
-
-                          // },
+                          {
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') ? false : true) }
+                          },
                           // {
                           //   name: i18n.t('static.dashboard.supplierLeadTimes'),
                           //   url: '/report/supplierLeadTimes',
@@ -2341,7 +2340,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatusmain'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) ? false : true) },
                             children: [
                               // {
                               //   name: i18n.t('static.dashboard.stockstatus'),
@@ -2350,6 +2349,12 @@ class DefaultLayout extends Component {
                               //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
 
                               // },
+                              {
+                                name: i18n.t('static.dashboard.stockstatusovertime'),
+                                url: '/report/stockStatusOverTime',
+                                icon: 'fa fa-line-chart',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') ? false : true) }
+                              },
                               {
                                 name: i18n.t('static.dashboard.stockstatusmatrix'),
                                 url: '/report/stockStatusMatrix',
@@ -2400,12 +2405,12 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-exchange',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
                               },
-                              {
-                                name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
-                                url: '/report/shipmentGlobalDemandView',
-                                icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                              //   url: '/report/shipmentGlobalDemandView',
+                              //   icon: 'fa fa-wpforms',
+                              //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
+                              // },
                               {
                                 name: i18n.t('static.report.shipmentCostReport'),
                                 url: '/report/procurementAgentExport',
@@ -2418,6 +2423,18 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-file-text',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') ? false : true) }
                               },
+                              {
+                                name: i18n.t('static.budgetHead.budget'),
+                                url: '/report/budgets',
+                                icon: 'fa fa-exchange',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                              },
+                              {
+                                name: i18n.t('static.dashboard.supplierLeadTimes'),
+                                url: '/report/supplierLeadTimes',
+                                icon: 'fa fa-wpforms',
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                              }
 
                             ]
                           },

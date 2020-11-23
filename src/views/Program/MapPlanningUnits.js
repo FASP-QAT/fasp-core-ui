@@ -44,7 +44,7 @@ export default class MapPlanningUnits extends Component {
         );
         // this.el.insertRow();
         console.log("insert row called");
-        var json = this.el.getJson()
+        var json = this.el.getJson(null,false)
     }
 
     checkValidation() {
@@ -52,7 +52,7 @@ export default class MapPlanningUnits extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         for (var y = 0; y < json.length; y++) {
 
             var col = ("A").concat(parseInt(y) + 1);
@@ -257,7 +257,7 @@ export default class MapPlanningUnits extends Component {
             instance.jexcel.setValue(columnName, '');
         }
         if (x == 1) {
-            var json = this.el.getJson();
+            var json = this.el.getJson(null,false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -436,7 +436,7 @@ export default class MapPlanningUnits extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[c - 1];
+        var value = (instance.jexcel.getJson(null,false)[r])[c - 1];
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -572,6 +572,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.report.reorderFrequencyInMonths'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -580,6 +581,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.supplyPlan.minMonthsOfStock'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -587,6 +589,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.program.monthfutureamc'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -594,6 +597,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.program.monthpastamc'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -601,6 +605,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -608,6 +613,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.supplyPlan.shelfLife'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -615,6 +621,7 @@ export default class MapPlanningUnits extends Component {
                                         {
                                             title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                             type: 'numeric',
+                                            textEditor: true,
                                             decimal: '.',
                                             mask: '#,##.00',
                                             disabledMaskOnEdition: true
@@ -625,20 +632,13 @@ export default class MapPlanningUnits extends Component {
                                         // }
 
                                     ],
-                                    oncreateeditor: function (a, b, c, d, e) {
-                                        console.log("In create editor")
-                                        e.type = 'text';
-                                        if (e.value) {
-                                            e.selectionStart = e.value.length;
-                                            e.selectionEnd = e.value.length;
-                                        }
-                                    },
                                     pagination: false,
                                     search: true,
                                     columnSorting: true,
                                     tableOverflow: true,
                                     wordWrap: true,
                                     parseFormulas: true,
+                                    filters:true,
                                     // paginationOptions: [10, 25, 50, 100],
                                     // position: 'top',
                                     allowInsertColumn: false,
@@ -930,7 +930,7 @@ export default class MapPlanningUnits extends Component {
     }
 
     myFunction() {
-        var json = this.el.getJson();
+        var json = this.el.getJson(null,false);
         var planningUnitArray = []
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));

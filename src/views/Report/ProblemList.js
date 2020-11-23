@@ -31,10 +31,10 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import actualIcon from '../../assets/img/actual.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-
+import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import MultiSelect from 'react-multi-select-component';
 const entityname = i18n.t('static.report.problem');
-
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -56,7 +56,8 @@ export default class ConsumptionDetails extends React.Component {
             planningUnitId: '',
             lang: localStorage.getItem('lang'),
             loading: false,
-            problemCategoryList: []
+            problemCategoryList: [],
+            problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]
         }
 
         this.fetchData = this.fetchData.bind(this);
@@ -69,6 +70,7 @@ export default class ConsumptionDetails extends React.Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.updateState = this.updateState.bind(this);
         this.getProblemListAfterCalculation = this.getProblemListAfterCalculation.bind(this);
+        this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
@@ -92,8 +94,8 @@ export default class ConsumptionDetails extends React.Component {
     componentDidMount = function () {
         // qatProblemActions();
         this.hideFirstComponent();
-        let problemStatusId = document.getElementById('problemStatusId').value;
-        console.log("problemStatusId ---------> ", problemStatusId);
+        // let problemStatusId = document.getElementById('problemStatusId').value;
+        // console.log("problemStatusId ---------> ", problemStatusId);
         const lan = localStorage.getItem("lang");
         var db1;
         getDatabase();
@@ -210,8 +212,11 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     buildJExcel() {
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.data;
-        console.log("problemList---->", problemList);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
+        // console.log("problemListDate---->",problemListDate);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
 
@@ -234,10 +239,14 @@ export default class ConsumptionDetails extends React.Component {
             data[14] = problemList[j].realmProblem.problem.problemId
             data[15] = problemList[j].realmProblem.problem.actionUrl
             data[16] = problemList[j].realmProblem.criticality.id
-            data[17] = problemList[j].problemType.id
-            data[18] = problemList[j].reviewed
 
-            // data[17] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+            data[17] = problemList[j].reviewed
+            data[20] = getLabelText(problemList[j].realmProblem.criticality.label, this.state.lang)
+            // data[20] = problemList[j].problemType.id
+            data[18] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
+            data[19] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
+
+
             problemArray[count] = data;
             count++;
         }
@@ -254,7 +263,7 @@ export default class ConsumptionDetails extends React.Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [0, 0, 0, 50, 0, 100, 0, 50, 180, 180, 50, 100],
+            colWidths: [10, 10, 10, 10, 10, 100, 10, 50, 180, 180, 50, 100, 10, 10, 10, 10, 10, 50, 100, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -271,7 +280,7 @@ export default class ConsumptionDetails extends React.Component {
                 },
                 {
                     title: i18n.t('static.program.versionId'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.region.region'),
@@ -322,10 +331,7 @@ export default class ConsumptionDetails extends React.Component {
                     title: 'actionUrl',
                     type: 'hidden',
                 },
-                {
-                    title: 'criticalitiId',
-                    type: 'hidden',
-                },
+
                 {
                     title: 'Problem Type',
                     type: 'hidden',
@@ -333,8 +339,25 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-                    width: 70
+
                 },
+                {
+                    title: i18n.t('static.report.reviewNotes'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.reviewedDate'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.Criticality'),
+                    type: 'text',
+                },
+
+
+
             ],
             editable: false,
             text: {
@@ -368,11 +391,11 @@ export default class ConsumptionDetails extends React.Component {
                 var items = [];
                 if (y != null) {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
-                    if (obj.options.allowInsertRow == true && this.el.getValueFromCoords(12, y) != 2) {
+                    if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
                         items.push({
                             title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
-                                let problemStatusId = document.getElementById('problemStatusId').value;
+                                // let problemStatusId = document.getElementById('problemStatusId').value;
                                 let problemTypeId = document.getElementById('problemTypeId').value;
                                 var index = 0;
                                 if (this.el.getValueFromCoords(1, y) == "") {
@@ -417,7 +440,9 @@ export default class ConsumptionDetails extends React.Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('"' + (i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        this.state.problemStatusValues.map(ele =>
+            csvRow.push('"' + (i18n.t('static.report.problemStatus') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -427,7 +452,7 @@ export default class ConsumptionDetails extends React.Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
-        headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
         // headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'));
         // headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
@@ -435,19 +460,27 @@ export default class ConsumptionDetails extends React.Component {
         headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
+
+        headers.push(i18n.t('static.supplyPlanReview.review').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.reviewNotes').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.report.reviewedDate').replaceAll(' ', '%20'));
+
         headers.push(i18n.t('static.problemAction.criticality').replaceAll(' ', '%20'));
         // columns.map((item, idx) => { item.hidden == true ? '' : headers[idx] = ((item.text).replaceAll(' ', '%20'))});
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.data.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 // (ele.program.code).replaceAll(' ', '%20'),
-                ele.versionId,
+                // ele.versionId,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 // moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
                 this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
+                ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
+                (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
                 getLabelText(ele.realmProblem.criticality.label, this.state.lang).replaceAll(' ', '%20')
             ])));
         for (var i = 0; i < A.length; i++) {
@@ -500,9 +533,12 @@ export default class ConsumptionDetails extends React.Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
+                    // doc.text(i18n.t('static.report.problemStatus') + ' : ' + document.getElementById("problemStatusId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    //     align: 'left'
+                    // })
+                    var statusText = doc.splitTextToSize((i18n.t('static.report.problemStatus') + ' : ' + (this.state.problemStatusValues.map(ele => ele.label)).join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 130, statusText)
+
                     doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
@@ -529,24 +565,34 @@ export default class ConsumptionDetails extends React.Component {
 
         const headers = [];
         // headers.push(i18n.t('static.program.programCode'));
-        headers.push(i18n.t('static.program.versionId'));
+        // headers.push(i18n.t('static.program.versionId'));
         headers.push(i18n.t('static.planningunit.planningunit'));
         // headers.push(i18n.t('static.report.createdDate'));
         headers.push(i18n.t('static.report.problemDescription'));
         headers.push(i18n.t('static.report.suggession'));
         headers.push(i18n.t('static.report.problemStatus'));
         headers.push(i18n.t('static.program.notes'));
+
+        headers.push(i18n.t('static.supplyPlanReview.review'));
+        headers.push(i18n.t('static.report.reviewNotes'));
+        headers.push(i18n.t('static.report.reviewedDate'));
+
         headers.push(i18n.t('static.problemAction.criticality'));
         // columns.map((item, idx) => { headers[idx] = (item.text) });
         let data = this.state.data.map(ele => [
             // (ele.program.code),
-            ele.versionId,
+            // ele.versionId,
             getLabelText(ele.planningUnit.label, this.state.lang),
             // moment(ele.createdDate).format('MMM-YY'),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
             this.getNote(ele, this.state.lang),
+
+            ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
+            ele.reviewNotes,
+            (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`),
+
             getLabelText(ele.realmProblem.criticality.label, this.state.lang)
         ]);
 
@@ -557,11 +603,15 @@ export default class ConsumptionDetails extends React.Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 50 },
+                0: { cellWidth: 70 },
                 1: { cellWidth: 100 },
-                2: { cellWidth: 170 },
-                3: { cellWidth: 180 },
-                5: { cellWidth: 150 },
+                2: { cellWidth: 150 },
+                3: { cellWidth: 40 },
+                4: { cellWidth: 150 },
+                5: { cellWidth: 40 },
+                6: { cellWidth: 150 },
+                7: { cellWidth: 50 },
+                8: { cellWidth: 40 },
 
             }
         };
@@ -580,7 +630,7 @@ export default class ConsumptionDetails extends React.Component {
             if (this.state.data.length != 0) {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
                     // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
-                    if (this.el.getValueFromCoords(12, x) != 2) {
+                    if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
                         console.log("onclick------>", this.el.getValueFromCoords(12, x));
                         var planningunitId = this.el.getValueFromCoords(13, x);
                         var programId = document.getElementById('programId').value;
@@ -616,25 +666,26 @@ export default class ConsumptionDetails extends React.Component {
         var elInstance = instance.jexcel;
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
+            // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S']
+            var colArr = ['U']
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
             var problemStatusId = rowData[12];
-            if (criticalityId == 3 && problemStatusId != 2) {
+            if (criticalityId == 3) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
                     let textColor = contrast('#f48282');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (criticalityId == 2 && problemStatusId != 2) {
+            } else if (criticalityId == 2) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
                     let textColor = contrast('orange');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (criticalityId == 1 && problemStatusId != 2) {
+            } else if (criticalityId == 1) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
@@ -678,12 +729,15 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.destroy();
             });
         let programId = document.getElementById('programId').value;
-        let problemStatusId = document.getElementById('problemStatusId').value;
+        // let problemStatusId = document.getElementById('problemStatusId').value;
+        let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
+        // let problemStatusId =-1;
         let problemTypeId = document.getElementById('problemTypeId').value;
         let problemCategoryId = document.getElementById('problemCategoryId').value;
+        let reviewedCheck = document.getElementById('reviewedStatusId').value;
 
         this.setState({ programId: programId });
-        if (parseInt(programId) != 0 && problemStatusId != 0 && problemTypeId != 0 && problemCategoryId != 0) {
+        if (parseInt(programId) != 0 && problemStatusIds != [] && problemTypeId != 0 && problemCategoryId != 0) {
 
             var db1;
             getDatabase();
@@ -717,21 +771,17 @@ export default class ConsumptionDetails extends React.Component {
 
                     console.log("problemList===========>", problemReportList);
 
-                    if (problemStatusId == -1) {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == 1 || c.problemStatus.id == 3);
-                    } else {
-                        if (problemStatusId == 2) {
-                            var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                            problemReportFilterList = problemReportFilterList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate && c.problemStatus.id == problemStatusId);
-                        } else {
-                            problemReportFilterList = problemReportFilterList.filter(c => c.problemStatus.id == problemStatusId);
-                        }
-                    }
+                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
+
                     if (problemTypeId != -1) {
                         problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
                     }
                     if (problemCategoryId != -1) {
                         problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
+                    }
+                    if (reviewedCheck != -1) {
+                        problemReportFilterList = problemReportFilterList.filter(c => (c.reviewed == reviewedCheck));
                     }
 
                     this.setState({
@@ -752,7 +802,7 @@ export default class ConsumptionDetails extends React.Component {
                     this.el.destroy();
                 });
         }
-        else if (problemStatusId == 0) {
+        else if (problemStatusIds != []) {
             this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -768,17 +818,17 @@ export default class ConsumptionDetails extends React.Component {
         }
     }
 
-    editProblem(problem, index) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
-            let problemStatusId = document.getElementById('problemStatusId').value;
-            let problemTypeId = document.getElementById('problemTypeId').value;
-            this.props.history.push({
-                pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
-                // state: { language }
-            });
-        }
+    // editProblem(problem, index) {
+    //     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+    //         let problemStatusId = document.getElementById('problemStatusId').value;
+    //         let problemTypeId = document.getElementById('problemTypeId').value;
+    //         this.props.history.push({
+    //             pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
+    //             // state: { language }
+    //         });
+    //     }
 
-    }
+    // }
 
     addMannualProblem() {
         console.log("-------------------addNewProblem--------------------");
@@ -818,9 +868,24 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     getNote(row, lang) {
-        var transList = row.problemTransList;
-        var listLength = row.problemTransList.length;
+        var transList = row.problemTransList.filter(c => c.reviewed == false);
+        var listLength = transList.length;
         return transList[listLength - 1].notes;
+    }
+    handleProblemStatusChange = (event) => {
+        console.log('***', event)
+        var problemStatusIds = event
+        problemStatusIds = problemStatusIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            problemStatusValues: problemStatusIds.map(ele => ele),
+            problemStatusLabels: problemStatusIds.map(ele => ele.label)
+        }, () => {
+            console.log("problemStatusValues===>", this.state.problemStatusValues);
+            this.fetchData()
+        })
+
     }
 
     render() {
@@ -841,12 +906,19 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
 
+        // const { problemStatusList } = this.state;
+        // let problemStatus = problemStatusList.length > 0
+        //     && problemStatusList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
+
         const { problemStatusList } = this.state;
         let problemStatus = problemStatusList.length > 0
             && problemStatusList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
+                return ({ label: item.name, value: item.id })
+
             }, this);
 
         const { problemCategoryList } = this.state;
@@ -1029,9 +1101,16 @@ export default class ConsumptionDetails extends React.Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
+                    <ProblemListFormulas ref="formulaeChild" />
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
+                                <a className="card-header-action">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
+                                    {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                </a>
+                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />} &nbsp;
+                                {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
                                 {this.state.programId != 0 && <a href="javascript:void();" title="Recalculate" onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
                                 &nbsp;&nbsp;
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
@@ -1039,18 +1118,18 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     </div>
-                    {this.state.data.length > 0 && <div className="Card-header-reporticon">
+                    {/* {this.state.data.length > 0 && <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
                         </div>
-                    </div>}
+                    </div>} */}
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1066,9 +1145,9 @@ export default class ConsumptionDetails extends React.Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1081,10 +1160,25 @@ export default class ConsumptionDetails extends React.Component {
                                             </Input>
                                         </InputGroup>
                                     </div>
+                                </FormGroup> */}
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls problemListSelectField">
+
+                                        <MultiSelect
+                                            name="problemStatusId"
+                                            id="problemStatusId"
+                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
+                                            value={this.state.problemStatusValues}
+                                            onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                            labelledBy={i18n.t('static.common.select')}
+                                        />
+                                    </div>
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemType')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1103,7 +1197,7 @@ export default class ConsumptionDetails extends React.Component {
 
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.problemActionReport.problemCategory')}</Label>
-                                    <div className="controls SelectField">
+                                    <div className="controls problemListSelectField">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -1113,6 +1207,24 @@ export default class ConsumptionDetails extends React.Component {
                                             >
                                                 <option value="-1">{i18n.t("static.common.all")}</option>
                                                 {problemCategories}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlanReview.review')}</Label>
+                                    <div className="controls problemListSelectField">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                name="reviewedStatusId" id="reviewedStatusId"
+                                                onChange={this.fetchData}
+                                            // value={1}
+                                            >
+                                                <option value="-1">{i18n.t("static.common.all")}</option>
+                                                <option value="1">{i18n.t("static.program.yes")}</option>
+                                                <option value="0">{i18n.t("static.program.no")}</option>
+
                                             </Input>
                                         </InputGroup>
                                     </div>

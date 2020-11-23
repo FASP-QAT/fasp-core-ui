@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
@@ -8,7 +8,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -174,8 +174,8 @@ export default class syncPage extends Component {
       },
       pagination: false,
       search: false,
-      // filters: false,
-      // license: JEXCEL_PRO_KEY,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
@@ -237,6 +237,7 @@ export default class syncPage extends Component {
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
     console.log("D------------>Index----------->", index)
+    consumptionInstance.options.editable = true;
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -268,6 +269,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     })
     consumptionInstance.orderBy(18, 0);
+    consumptionInstance.options.editable = false;
     this.toggleLarge('', '', 0, '');
     this.setState({ loading: false })
   }
@@ -277,6 +279,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
+    consumptionInstance.options.editable = true;
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
@@ -302,6 +305,7 @@ export default class syncPage extends Component {
       consumptionInstance.setValueFromCoords(18, (index), 3, true);
     }
     consumptionInstance.orderBy(18, 0);
+    consumptionInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -353,8 +357,8 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      // filters: false,
-      // license: JEXCEL_PRO_KEY,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
@@ -407,6 +411,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
+    inventoryInstance.options.editable = true;
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -432,6 +437,7 @@ export default class syncPage extends Component {
       inventoryInstance.setValueFromCoords(19, index, 2, true);
     }
     inventoryInstance.orderBy(19, 0);
+    inventoryInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -444,6 +450,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictInventory;
     var inventoryInstance = this.state.mergedInventoryJexcel;
     var index = document.getElementById("indexInventory").value;
+    inventoryInstance.options.editable = true;
     inventoryInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -469,6 +476,7 @@ export default class syncPage extends Component {
       inventoryInstance.setValueFromCoords(19, (index), 3, true);
     }
     inventoryInstance.orderBy(19, 0);
+    inventoryInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -534,8 +542,8 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      // filters: false,
-      // license: JEXCEL_PRO_KEY,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
@@ -649,8 +657,8 @@ export default class syncPage extends Component {
       allowDeleteRow: false,
       tableOverflow: false,
       editable: false,
-      // filters: false,
-      // license: JEXCEL_PRO_KEY,
+      filters: false,
+      license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),
@@ -703,6 +711,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
+    shipmentInstance.options.editable = true;
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -728,6 +737,7 @@ export default class syncPage extends Component {
       shipmentInstance.setValueFromCoords(33, index, 2, true);
     }
     shipmentInstance.orderBy(33, 0);
+    shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -740,6 +750,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictShipment;
     var shipmentInstance = this.state.mergedShipmentJexcel;
     var index = document.getElementById("indexShipment").value;
+    shipmentInstance.options.editable = true;
     shipmentInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
@@ -765,6 +776,7 @@ export default class syncPage extends Component {
       shipmentInstance.setValueFromCoords(33, (index), 3, true);
     }
     shipmentInstance.orderBy(33, 0);
+    shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -798,6 +810,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictProblem;
     var problemInstance = this.state.mergedProblemListJexcel;
     var index = document.getElementById("indexProblem").value;
+    problemInstance.options.editable = true;
     problemInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -814,6 +827,7 @@ export default class syncPage extends Component {
     }
 
     problemInstance.orderBy(20, 0);
+    problemInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -826,6 +840,7 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflictProblem;
     var problemInstance = this.state.mergedProblemListJexcel;
     var index = document.getElementById("indexProblem").value;
+    problemInstance.options.editable = true;
     problemInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -841,6 +856,7 @@ export default class syncPage extends Component {
       }
     }
     problemInstance.orderBy(20, 0);
+    problemInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
     })
@@ -1358,8 +1374,8 @@ export default class syncPage extends Component {
                                       show: '',
                                       entries: '',
                                     },
-                                    // filters: true,
-                                    // license: JEXCEL_PRO_KEY,
+                                    filters: true,
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                       var items = [];
                                       //Resolve conflicts
@@ -1526,8 +1542,8 @@ export default class syncPage extends Component {
                                       show: '',
                                       entries: '',
                                     },
-                                    // filters: true,
-                                    // license: JEXCEL_PRO_KEY,
+                                    filters: true,
+                                    license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                       var items = [];
                                       //Resolve conflicts
@@ -1689,8 +1705,8 @@ export default class syncPage extends Component {
                                     allowDeleteRow: false,
                                     editable: false,
                                     onload: this.loadedFunctionForMergeShipment,
-                                    // filters: true,
-                                    // license: JEXCEL_PRO_KEY,
+                                    filters: true,
+                                    license: JEXCEL_PRO_KEY,
                                     text: {
                                       showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                       show: '',
@@ -1816,6 +1832,7 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[16] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -1913,6 +1930,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(18, 0);
+    elInstance.options.editable = false;
   }
 
 
@@ -1924,6 +1942,7 @@ export default class syncPage extends Component {
     console.log("El instanmce", elInstance);
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -2024,6 +2043,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(19, 0);
+    elInstance.options.editable = false;
   }
 
   loadedFunctionForMergeShipment = function (instance) {
@@ -2031,6 +2051,7 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[31] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -2129,11 +2150,12 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(33, 0);
+    elInstance.options.editable = false;
   }
 
   getNote(row, lang) {
-    var transList = row.problemTransList;
-    var listLength = row.problemTransList.length;
+    var transList = row.problemTransList.filter(c => c.reviewed == false);
+    var listLength = transList.length;
     return transList[listLength - 1].notes;
   }
 
@@ -2142,6 +2164,7 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+    elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
       console.log("jsonData[c])[18]=====>", (jsonData[c])[18]);
       if ((jsonData[c])[18] == "") {
@@ -2212,6 +2235,7 @@ export default class syncPage extends Component {
       }
     }
     elInstance.orderBy(20, 0);
+    elInstance.options.editable = false;
   }
 
   tabPane() {
@@ -2561,210 +2585,231 @@ export default class syncPage extends Component {
     this.setState({ loading: true });
     var checkValidations = true;
     if (checkValidations) {
-      var db1;
-      var storeOS;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function (event) {
-        this.setState({
-          supplyPlanError: i18n.t('static.program.errortext')
-        })
-      }.bind(this);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-        var programDataOs = programDataTransaction.objectStore('programData');
-        var programRequest = programDataOs.get((this.state.programId).value);
-        programRequest.onerror = function (event) {
+      var problemReportList = [];
+      var problemJson = (this.state.mergedProblemListJexcel).getJson();
+      var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+      var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+      for (var c = 0; c < problemJson.length; c++) {
+        if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+          problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+        } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+          problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+        }
+      }
+      problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+      var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+      if (problemReportList.filter(c =>
+        c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
+        moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
+        alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
+        this.setState({ loading: false });
+      } else {
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
           this.setState({
             supplyPlanError: i18n.t('static.program.errortext')
           })
         }.bind(this);
-        programRequest.onsuccess = function (e) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          var planningUnitList = [];
-          var consumptionData = [];
-          var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
-          var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
-          var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
-          for (var c = 0; c < consumptionJson.length; c++) {
-            if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-              consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
-              consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+          var programDataOs = programDataTransaction.objectStore('programData');
+          var programRequest = programDataOs.get((this.state.programId).value);
+          programRequest.onerror = function (event) {
+            this.setState({
+              supplyPlanError: i18n.t('static.program.errortext')
+            })
+          }.bind(this);
+          programRequest.onsuccess = function (e) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            var planningUnitList = [];
+            var consumptionData = [];
+            var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+            var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+            var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+            for (var c = 0; c < consumptionJson.length; c++) {
+              if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+                consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+                consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              }
             }
-          }
-          consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+            consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-          var inventoryData = [];
-          var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
-          var oldProgramDataInventory = this.state.oldProgramDataInventory;
-          var latestProgramDataInventory = this.state.latestProgramDataInventory;
-          for (var c = 0; c < inventoryJson.length; c++) {
-            if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-              inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
-              inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+            var inventoryData = [];
+            var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+            var oldProgramDataInventory = this.state.oldProgramDataInventory;
+            var latestProgramDataInventory = this.state.latestProgramDataInventory;
+            for (var c = 0; c < inventoryJson.length; c++) {
+              if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+                inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+                inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              }
             }
-          }
-          inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+            inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-          var shipmentData = [];
-          var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-          var oldProgramDataShipment = this.state.oldProgramDataShipment;
-          var latestProgramDataShipment = this.state.latestProgramDataShipment;
-          for (var c = 0; c < shipmentJson.length; c++) {
-            if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
-              shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
-              shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+            var shipmentData = [];
+            var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+            var oldProgramDataShipment = this.state.oldProgramDataShipment;
+            var latestProgramDataShipment = this.state.latestProgramDataShipment;
+            for (var c = 0; c < shipmentJson.length; c++) {
+              if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+                shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+                shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              }
             }
-          }
-          shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
+            shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
 
-          var problemReportList = [];
-          var problemJson = (this.state.mergedProblemListJexcel).getJson();
-          var oldProgramDataProblem = this.state.oldProgramDataProblemList;
-          var latestProgramDataProblem = this.state.latestProgramDataProblemList;
-          for (var c = 0; c < problemJson.length; c++) {
-            if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
-              problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
-            } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
-              problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+            var problemReportList = [];
+            var problemJson = (this.state.mergedProblemListJexcel).getJson();
+            var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+            var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+            for (var c = 0; c < problemJson.length; c++) {
+              if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+                problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+                problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              }
             }
-          }
-          problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-          console.log("Planning unit list", planningUnitList);
-          console.log("Consumption data", consumptionData);
-          console.log("InventoryData", inventoryData);
-          console.log("ShipmentData", shipmentData);
-          console.log("Program Report Data", problemReportList);
-          console.log("ProgramId", (this.state.programId).value);
-          console.log("VersionType", document.getElementById("versionType").value);
-          console.log("notes", document.getElementById("notes").value);
-          programJson.consumptionList = consumptionData;
-          programJson.inventoryList = inventoryData;
-          programJson.shipmentList = shipmentData;
-          programJson.problemReportList = problemReportList;
-          // programJson.problemReportList = [];
-          programJson.versionType = { id: document.getElementById("versionType").value };
-          programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
-          programJson.notes = document.getElementById("notes").value;
-          console.log("Program json", programJson);
-          ProgramService.saveProgramData(programJson).then(response => {
-            console.log("Response", response);
-            if (response.status == 200) {
-              var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-              var programDataOs1 = programDataTransaction1.objectStore('programData');
-              var programRequest1 = programDataOs1.delete((this.state.programId).value);
+            problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+            console.log("Planning unit list", planningUnitList);
+            console.log("Consumption data", consumptionData);
+            console.log("InventoryData", inventoryData);
+            console.log("ShipmentData", shipmentData);
+            console.log("Program Report Data", problemReportList);
+            console.log("ProgramId", (this.state.programId).value);
+            console.log("VersionType", document.getElementById("versionType").value);
+            console.log("notes", document.getElementById("notes").value);
+            programJson.consumptionList = consumptionData;
+            programJson.inventoryList = inventoryData;
+            programJson.shipmentList = shipmentData;
+            programJson.problemReportList = problemReportList;
+            // programJson.problemReportList = [];
+            programJson.versionType = { id: document.getElementById("versionType").value };
+            programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+            programJson.notes = document.getElementById("notes").value;
+            console.log("Program json", programJson);
+            ProgramService.saveProgramData(programJson).then(response => {
+              console.log("Response", response);
+              if (response.status == 200) {
+                var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                var programDataOs1 = programDataTransaction1.objectStore('programData');
+                var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
-              var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-              var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-              var programRequest2 = programDataOs2.delete((this.state.programId).value);
+                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                var programRequest2 = programDataOs2.delete((this.state.programId).value);
 
-              programRequest1.onerror = function (event) {
-                this.setState({
-                  supplyPlanError: i18n.t('static.program.errortext')
-                })
-              }.bind(this);
-              programRequest2.onsuccess = function (e) {
-
-                var json = response.data;
-                console.log("JSON-------------------->", json);
-                var version = json.requestedProgramVersion;
-                if (version == -1) {
-                  version = json.currentVersion.versionId
-                }
-
-                var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                var programSaveData = transactionForSavingData.objectStore('programData');
-
-                var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
-                // for (var i = 0; i < json.length; i++) {
-                var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                var item = {
-                  id: json.programId + "_v" + version + "_uId_" + userId,
-                  programId: json.programId,
-                  version: version,
-                  programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                  programData: encryptedText.toString(),
-                  userId: userId
-                };
-                console.log("Item------------>", item);
-                var putRequest = programSaveData.put(item);
-                var putRequest1 = downloadedProgramSaveData.put(item);
-
-                this.redirectToDashbaord();
-              }.bind(this)
-            } else {
-              this.setState({
-                message: response.data.messageCode,
-                color: "red",
-                loading: false
-              })
-              this.hideFirstComponent();
-            }
-          })
-            .catch(
-              error => {
-                console.log("Error--->", error);
-                if (error.message === "Network Error") {
+                programRequest1.onerror = function (event) {
                   this.setState({
-                    message: 'static.unkownError',
-                    color: "red",
-                    loading: false
-                  }, () => {
-                    this.hideFirstComponent();
-                  });
-                } else {
-                  switch (error.response ? error.response.status : "") {
+                    supplyPlanError: i18n.t('static.program.errortext')
+                  })
+                }.bind(this);
+                programRequest2.onsuccess = function (e) {
 
-                    case 401:
-                      this.props.history.push(`/login/static.message.sessionExpired`)
-                      break;
-                    case 403:
-                      this.props.history.push(`/accessDenied`)
-                      break;
-                    case 500:
-                    case 404:
-                    case 406:
-                      this.setState({
-                        message: error.response.data.messageCode,
-                        color: "red",
-                        loading: false
-                      }, () => {
-                        this.hideFirstComponent()
-                      });
-                      break;
-                    case 412:
-                      this.setState({
-                        message: error.response.data.messageCode,
-                        loading: false,
-                        color: "red"
-                      }, () => {
-                        this.hideFirstComponent()
-                      });
-                      break;
-                    default:
-                      this.setState({
-                        message: 'static.unkownError',
-                        loading: false,
-                        color: "red"
-                      }, () => {
-                        this.hideFirstComponent()
-                      });
-                      break;
+                  var json = response.data;
+                  console.log("JSON-------------------->", json);
+                  var version = json.requestedProgramVersion;
+                  if (version == -1) {
+                    version = json.currentVersion.versionId
+                  }
+
+                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  var programSaveData = transactionForSavingData.objectStore('programData');
+
+                  var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                  // for (var i = 0; i < json.length; i++) {
+                  var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                  var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                  var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  var item = {
+                    id: json.programId + "_v" + version + "_uId_" + userId,
+                    programId: json.programId,
+                    version: version,
+                    programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                    programData: encryptedText.toString(),
+                    userId: userId
+                  };
+                  console.log("Item------------>", item);
+                  var putRequest = programSaveData.put(item);
+                  var putRequest1 = downloadedProgramSaveData.put(item);
+
+                  this.redirectToDashbaord();
+                }.bind(this)
+              } else {
+                this.setState({
+                  message: response.data.messageCode,
+                  color: "red",
+                  loading: false
+                })
+                this.hideFirstComponent();
+              }
+            })
+              .catch(
+                error => {
+                  console.log("Error--->", error);
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      message: 'static.unkownError',
+                      color: "red",
+                      loading: false
+                    }, () => {
+                      this.hideFirstComponent();
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: error.response.data.messageCode,
+                          color: "red",
+                          loading: false
+                        }, () => {
+                          this.hideFirstComponent()
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: error.response.data.messageCode,
+                          loading: false,
+                          color: "red"
+                        }, () => {
+                          this.hideFirstComponent()
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false,
+                          color: "red"
+                        }, () => {
+                          this.hideFirstComponent()
+                        });
+                        break;
+                    }
                   }
                 }
-              }
-            );
+              );
+          }.bind(this)
         }.bind(this)
-      }.bind(this)
+      }
     } else {
       console.log("in else");
       this.setState({ "noFundsBudgetError": i18n.t('static.label.noFundsAvailable'), loading: false });
@@ -3005,8 +3050,8 @@ export default class syncPage extends Component {
           allowDeleteRow: false,
           editable: false,
           onload: this.loadedFunctionForMergeProblemList,
-          // filters: true,
-          // license: JEXCEL_PRO_KEY,
+          filters: true,
+          license: JEXCEL_PRO_KEY,
           text: {
             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
             show: '',

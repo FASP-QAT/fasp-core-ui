@@ -3761,7 +3761,9 @@ background-color: yellow;
   background-color: #20a8d8!important;
   border-radius: 0px  5px 5px 0px;
 }
-
+.problemListSelectField {
+  width: 165px;
+}
 .greenColor{
   color: #118b70;
 }
@@ -3780,6 +3782,7 @@ background-color: yellow;
 
 .jtabs{
   position: inherit!important;
+  max-width: none!important;
 }
 
 /* Global CSS, you probably don't need that */
@@ -3850,4 +3853,33 @@ background-color: yellow;
   height:34px;
   margin-top:-45px;
   margin-right:-49px;
+}
+.MuiFormControl-root{
+  height: 28px !important;
+}
+.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon .MuiAutocomplete-inputRoot[class*="MuiOutlinedInput-root"] {
+  height: 28px!important;
+}
+.MuiAutocomplete-inputRoot[class*="MuiOutlinedInput-root"] .MuiAutocomplete-input:first-child {
+ 
+  margin-top: -14px;
+}
+.height-auto input {
+  height: auto !important;
+}
+.FortablewidthMannualtaggingtable2 .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
+
+.highCriticality{
+background-color: #f48282!important;
+color: #000000!important;
+}
+
+.mediumCriticality{
+  background-color: orange!important;
+  color: #000000!important;
+}
+
+.lowCriticality{
+  background-color: yellow!important;
+  color: #000000!important;
 }
