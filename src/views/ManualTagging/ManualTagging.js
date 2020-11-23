@@ -136,7 +136,7 @@ export default class ManualTagging extends Component {
         var erpShipmentQty = document.getElementById("erpShipmentQty").value;
         if (conversionFactor != null && conversionFactor != "" && conversionFactor != 0) {
             var result = erpShipmentQty * conversionFactor;
-            document.getElementById("convertedQATShipmentQty").value = result;
+            document.getElementById("convertedQATShipmentQty").value = result.toFixed(2);
             this.setState({ conversionFactorEntered: true })
         } else {
             this.setState({ conversionFactorEntered: false })
