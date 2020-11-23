@@ -105,7 +105,7 @@ export default class SyncMasterData extends Component {
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
+                <h6 className="mt-success" style={{ color: this.props.match.params.color }}>{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col xs="12" sm="12">
@@ -287,7 +287,12 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, date);
+                                    var dt = date;
+                                    if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
+                                        dt = "2020-01-01 00:00:00";
+                                    }
+                                    console.log("M------------------------>", dt);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt);
                                 }.bind(this)
                             }.bind(this)
                         } else {
