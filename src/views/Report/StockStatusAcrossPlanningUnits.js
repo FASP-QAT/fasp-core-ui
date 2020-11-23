@@ -231,7 +231,7 @@ class StockStatusAcrossPlanningUnits extends Component {
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -298,7 +298,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.common.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -672,11 +672,11 @@ class StockStatusAcrossPlanningUnits extends Component {
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = data1;
-            data[2] = (dataStockStatus[j].mos);
+            data[2] = this.roundN(dataStockStatus[j].mos);
             data[3] = (dataStockStatus[j].minMos);
             data[4] = (dataStockStatus[j].maxMos);
             data[5] = (dataStockStatus[j].stock);
-            data[6] = (dataStockStatus[j].amc);
+            data[6] = this.round(dataStockStatus[j].amc);
             data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
 
             dataArray[count] = data;
@@ -730,7 +730,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
-                    width:120
+                    width: 120
                 },
             ],
             editable: false,
@@ -1416,7 +1416,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         <div className="row">
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
                                                         ref="pickAMonth2"
