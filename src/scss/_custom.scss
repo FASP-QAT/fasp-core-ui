@@ -3517,10 +3517,10 @@ margin-left: -45px;
 }
 //supply plan graph align with table 
 .graphwidth{
-  width: 1407px!important;
-  max-width: 1407px!important;
+  width: 1384px!important;
+  max-width: 1384px!important;
   // margin-right: -597px;
-  margin-left: 212px;
+  margin-left: 229px;
 
 }
 @media (min-width: 1920px){
@@ -3531,6 +3531,33 @@ margin-left: -45px;
   
   }
 }
+@media (min-width:2052px) and (max-width:2732px)
+ {
+  .graphwidth{
+    width: 2074px!important;
+    max-width: 2074px!important;
+    margin-left: 376px;
+  
+  }
+ }
+ @media (min-width:2733px) and (max-width:4102px) 
+  {
+    .graphwidth{
+      width: 3237px!important;
+      max-width: 3237px!important;
+      margin-left: 610px;
+    
+    }
+ }
+ @media (min-width:4103px) and (max-width:5464px)
+ {
+  .graphwidth{
+    width: 4317px!important;
+    max-width: 4317px!important;
+    margin-left: 751px;
+  
+  }
+ }
 
 .localProcurementEmergencyComment{
     background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurement.png');
