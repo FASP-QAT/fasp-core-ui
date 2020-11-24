@@ -129,7 +129,7 @@ class SupplyPlanVersionAndReview extends Component {
     buildJexcel() {
 
         let matricsList = this.state.matricsList;
-        // console.log("matricsList---->", matricsList);
+        console.log("matricsList---->", matricsList);
         let matricsArray = [];
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
@@ -145,6 +145,7 @@ class SupplyPlanVersionAndReview extends Component {
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
+            data[11] = matricsList[j].program.id
             matricsArray[count] = data;
             count++;
         }
@@ -215,6 +216,11 @@ class SupplyPlanVersionAndReview extends Component {
                     title: 'versionStatusId',
                     type: 'hidden',
                     readOnly: true
+                },
+                {
+                    title: 'programId',
+                    type: 'hidden',
+                    
                 }
             ],
             text: {
@@ -266,7 +272,7 @@ class SupplyPlanVersionAndReview extends Component {
 
             if (hasRole) {
 
-                let programId = document.getElementById("programId").value;
+                
                 // let countryId = document.getElementById("countryId").value;
                 // let versionStatusId = this.el.getValueFromCoords(5, x);
                 // let versionTypeId =this.el.getValueFromCoords(2, x);
@@ -275,9 +281,10 @@ class SupplyPlanVersionAndReview extends Component {
                 var elInstance = instance.jexcel;
                 var rowData = elInstance.getRowData(x);
                 console.log("rowData==>", rowData);
+                let programId = rowData[11];
                 let versionStatusId = rowData[10];
                 let versionTypeId = rowData[9];
-                console.log("====>", versionStatusId, "====>", versionTypeId);
+                // console.log("====>", versionStatusId, "====>", versionTypeId);
 
                 // if (versionStatusId == 1 && versionTypeId == 2) {
                 this.props.history.push({
