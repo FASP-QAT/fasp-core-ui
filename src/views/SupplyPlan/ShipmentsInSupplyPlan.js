@@ -56,6 +56,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`X${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
+                (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                     (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
@@ -69,7 +70,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
                     (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                     z = data[i].y;
                 }
