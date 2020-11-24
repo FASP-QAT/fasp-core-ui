@@ -207,6 +207,7 @@ export default class ProductCategoryTree extends Component {
                     if (response.status == 200) {
                         this.setState({
                             productCategoryList: response.data,
+                            loading: false,
                         });
 
                         console.log("this.state.productCategoryList====>", this.state.productCategoryList);
@@ -871,6 +872,17 @@ export default class ProductCategoryTree extends Component {
                         </div>
                     </Col>
                 </Row>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

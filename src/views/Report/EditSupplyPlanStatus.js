@@ -3240,7 +3240,8 @@ class EditSupplyPlanStatus extends Component {
                         title: i18n.t('static.problemContext.viewTrans'),
                         onclick: function () {
                             var myObj = obj.getRowData(y);
-                            this.toggleTransView(myObj[21]);
+                            console.log("my obj===>",myObj);
+                            this.toggleTransView(myObj[23]);
                         }.bind(this)
                     });
 
