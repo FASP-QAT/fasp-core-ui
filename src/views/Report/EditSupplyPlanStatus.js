@@ -3142,7 +3142,8 @@ class EditSupplyPlanStatus extends Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-                    width: 80
+                    width: 80,
+                    readOnly:!this.state.editable
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),

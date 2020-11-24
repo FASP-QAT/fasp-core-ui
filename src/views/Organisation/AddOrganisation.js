@@ -389,7 +389,7 @@ export default class AddOrganisationComponent extends Component {
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
-                        var json = response.data;
+                        var json = (response.data).filter(c => c.active == true);
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
                             regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
