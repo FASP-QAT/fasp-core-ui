@@ -11,7 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import getLabelText from '../../CommonComponent/getLabelText';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     label: ''
 }
@@ -168,6 +168,21 @@ export default class AddDataSourceTypeComponent extends Component {
                     }
                 }
             );
+
+        let realmId = AuthenticationService.getRealmId();
+        if (realmId != -1) {
+            // document.getElementById('realmId').value = realmId;
+            initialValues = {
+                realmId: realmId
+            }
+
+            let { dataSourceType } = this.state;
+            dataSourceType.realm.id = realmId;
+            document.getElementById("realmId").disabled = true;
+            this.setState({
+                dataSourceType
+            });
+        }
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -200,6 +215,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
