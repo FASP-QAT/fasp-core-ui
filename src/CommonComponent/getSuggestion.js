@@ -331,12 +331,14 @@ export default function getSuggestion(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 14) {
+        // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
         // var label = row.realmProblem.problem.label;
-        // label.label_en = "Please fill proper notes in shipments for " + row.planningUnit.label.label_en;
-        // // + monthString.replace(/,\s*$/, "");
+        // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
         // return getLabelText(label, lang);
+        var myStartDate = moment(row.dt).add(1, 'months').startOf('month').format("MMM-YY");
+        var myEndDate = moment(row.dt).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
         // var desc = row.realmProblem.problem.actionLabel.label_en;
-        // const result = desc.split('<%PLANNING_UNIT%>').join(row.planningUnit.label.label_en);
+        // const result = desc.split('<%PLANNING_UNIT%>').join(row.planningUnit.label.label_en).split('<%REGION%>').join(row.region.label.label_en).split('<%DT%>').join(myStartDate + " to " + myEndDate);
         // var label = row.realmProblem.problem.actionLabel;
         // label.label_en = result;
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
@@ -344,22 +346,61 @@ export default function getSuggestion(row, lang) {
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
         var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
 
+        // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
             label.label_pr = result_pr;
         }
-
         return getLabelText(label, lang);
+        // var label = row.realmProblem.problem.actionLabel;
+        // // label.label_en = label.label_en;
+        // return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 15) {
+        // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
+        // var label = row.realmProblem.problem.label;
+        // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
+        // return getLabelText(label, lang);
+        var myStartDate = moment(row.dt).add(1, 'months').startOf('month').format("MMM-YY");
+        var myEndDate = moment(row.dt).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
+        // var desc = row.realmProblem.problem.actionLabel.label_en;
+        // const result = desc.split('<%PLANNING_UNIT%>').join(row.planningUnit.label.label_en).split('<%REGION%>').join(row.region.label.label_en).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+        // var label = row.realmProblem.problem.actionLabel;
+        // label.label_en = result;
+        var desc_en = row.realmProblem.problem.actionLabel.label_en;
+        var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
+        var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
+        var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
+
+        // console.log("desc_sp====",desc_sp);
+        var label = row.realmProblem.problem.actionLabel;
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            label.label_pr = result_pr;
+        }
+        return getLabelText(label, lang);
+        // var label = row.realmProblem.problem.actionLabel;
+        // // label.label_en = label.label_en;
+        // return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 16) {
         // var desc = row.realmProblem.problem.actionLabel.label_en;
