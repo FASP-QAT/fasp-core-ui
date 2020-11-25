@@ -1107,6 +1107,7 @@
     "static.loading.loading": "Chargement...",
     "static.report.amc": "CMM",
     "static.message.alphaspespacetext": "Seuls les lettres, les chiffres et / sont autorisés",
+    "static.tracercategory.tracercategoryText": "Sélectionnez la catégorie de traceur",
     "static.dashboard.addproduct": "Ajouter une unité de planification",
     "static.report.excess": "Stock excessif",
     "static.user.forgotpassword": "Mot de passe oublié",

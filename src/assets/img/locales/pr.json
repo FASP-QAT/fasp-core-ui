@@ -1107,6 +1107,7 @@
     "static.loading.loading": "Carregando...",
     "static.report.amc": "AMC",
     "static.message.alphaspespacetext": "Apenas letras, números e / permitidos",
+    "static.tracercategory.tracercategoryText": "Selecione a categoria Tracer",
     "static.dashboard.addproduct": "Adicionar Unidade de Planejamento",
     "static.report.excess": "Excesso de estoque",
     "static.user.forgotpassword": "Esqueceu a senha",
