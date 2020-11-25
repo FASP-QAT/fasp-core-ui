@@ -9,7 +9,7 @@ import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
-const initialValues = {
+let initialValues = {
   realmId: [],
   supplier: ""
 }
@@ -165,6 +165,24 @@ class AddSupplierComponent extends Component {
           }
         }
       );
+
+    let realmId = AuthenticationService.getRealmId();
+    if (realmId != -1) {
+      // document.getElementById('realmId').value = realmId;
+      initialValues = {
+        realmId: realmId
+      }
+
+      let { supplier } = this.state;
+      supplier.realm.id = realmId;
+      document.getElementById("realmId").disabled = true;
+      this.setState({
+        supplier
+      },
+        () => {
+
+        })
+    }
   }
 
   render() {
@@ -188,6 +206,7 @@ class AddSupplierComponent extends Component {
                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader> */}
               <Formik
+                enableReinitialize={true}
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {

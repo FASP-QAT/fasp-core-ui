@@ -571,7 +571,7 @@ export default class syncPage extends Component {
       columns: [
         {
           title: 'problemReportId',
-          type: 'text',
+          type: 'hidden',
         },
         {
           title: 'problemActionIndex',
@@ -1338,7 +1338,7 @@ export default class syncPage extends Component {
                                     data: mergedConsumptionJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.consumptionId'), type: 'text', width: 100 },
+                                      { title: i18n.t('static.commit.consumptionId'), type: 'hidden', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1505,7 +1505,7 @@ export default class syncPage extends Component {
                                     data: mergedInventoryJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.inventoryId'), type: 'text', width: 100 },
+                                      { title: i18n.t('static.commit.inventoryId'), type: 'hidden', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { title: i18n.t('static.inventory.inventoryDate'), type: 'text', width: 85 },
                                       { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
@@ -1659,7 +1659,7 @@ export default class syncPage extends Component {
                                     data: mergedShipmentJexcel,
                                     columnDrag: true,
                                     columns: [
-                                      { title: i18n.t('static.commit.shipmentId'), type: 'text', width: 100 },
+                                      { title: i18n.t('static.commit.shipmentId'), type: 'hidden', width: 100 },
                                       { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                       { type: 'dropdown', title: i18n.t('static.supplyPlan.shipmentStatus'), source: shipmentStatusList, width: 100 },
                                       { type: 'text', title: i18n.t('static.supplyPlan.expectedDeliveryDate'), width: 100, },
@@ -2367,7 +2367,7 @@ export default class syncPage extends Component {
                         </FormGroup>
                         <FormGroup className="tab-ml-1 mt-4">
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {this.state.isChanged == 1 && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                          {this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                           &nbsp;
                 </FormGroup>
                       </div>
@@ -2968,7 +2968,7 @@ export default class syncPage extends Component {
           columns: [
             {
               title: i18n.t('static.commitVersion.problemReportId'),
-              type: 'text',
+              type: 'hidden',
             },
             {
               title: 'problemActionIndex',

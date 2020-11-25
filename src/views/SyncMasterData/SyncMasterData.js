@@ -266,6 +266,7 @@ export default class SyncMasterData extends Component {
                             getDatabase();
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
+                                console.log("D--------------------------->in 1")
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 },
@@ -295,6 +296,7 @@ export default class SyncMasterData extends Component {
                                 }.bind(this)
                             }.bind(this)
                         } else {
+                            console.log("D--------------------------->in 2")
                             this.setState({
                                 message: response.data.messageCode
                             },
@@ -305,7 +307,9 @@ export default class SyncMasterData extends Component {
                             valid = false;
                         }
                     }).catch(error => {
+                        console.log("D------------------------> 3 error", error);
                         if (error.message === "Network Error") {
+                            console.log("D--------------------------->in 3")
                             this.setState({ message: error.message },
                                 () => {
                                     this.hideSecondComponent();
@@ -317,12 +321,14 @@ export default class SyncMasterData extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
+                                    console.log("D--------------------------->in 4")
                                     this.setState({ message: error.response.data.messageCode },
                                         () => {
                                             this.hideSecondComponent();
                                         });
                                     break;
                                 default:
+                                    console.log("D--------------------------->in 5")
                                     this.setState({ message: 'static.unkownError' },
                                         () => {
                                             this.hideSecondComponent();
@@ -334,6 +340,7 @@ export default class SyncMasterData extends Component {
                         valid = false;
                     });
             } else {
+                console.log("D--------------------------->in 6")
                 document.getElementById("retryButtonDiv").style.display = "block";
                 this.setState({
                     message: 'static.common.onlinealerttext'
@@ -354,6 +361,7 @@ export default class SyncMasterData extends Component {
                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
             })
         } else {
+            console.log("D--------------------------->in 7")
             document.getElementById("retryButtonDiv").style.display = "block";
             this.setState({
                 message: 'static.common.onlinealerttext'

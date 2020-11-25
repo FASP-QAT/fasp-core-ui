@@ -17,7 +17,7 @@ import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '
 
 const entityname = i18n.t('static.organisation.organisation');
 
-const initialValues = {
+let initialValues = {
     realmId: '',
     realmCountryId: [],
     organisationCode: '',
@@ -363,6 +363,24 @@ export default class AddOrganisationComponent extends Component {
                     }
                 }
             );
+
+        let realmId = AuthenticationService.getRealmId();
+        if (realmId != -1) {
+            // document.getElementById('realmId').value = realmId;
+            // initialValues = {
+            //     realmId: realmId
+            // }
+
+            let { organisation } = this.state
+            organisation.realm.id = realmId;
+            document.getElementById("realmId").disabled = true;
+            this.setState({
+                organisation
+            },
+                () => {
+                    this.getRealmCountryList()
+                })
+        }
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -384,12 +402,12 @@ export default class AddOrganisationComponent extends Component {
 
     getRealmCountryList(e) {
         // AuthenticationService.setupAxiosInterceptors();
-        if (e.target.value != "") {
-            OrganisationService.getRealmCountryList(e.target.value)
+        if (this.state.organisation.realm.id != "") {
+            OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
-                        var json = response.data;
+                        var json = (response.data).filter(c => c.active == true);
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
                             regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }

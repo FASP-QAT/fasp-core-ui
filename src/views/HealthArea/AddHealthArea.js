@@ -382,6 +382,23 @@ export default class AddHealthAreaComponent extends Component {
         }
       );
 
+    let realmId = AuthenticationService.getRealmId();
+    if (realmId != -1) {
+      // document.getElementById('realmId').value = realmId;
+      // initialValues = {
+      //   realmId: realmId
+      // }
+
+      let { healthArea } = this.state
+      healthArea.realm.id = realmId;
+      document.getElementById("realmId").disabled = true;
+      this.setState({
+        healthArea
+      },
+        () => {
+          this.getRealmCountryList()
+        })
+    }
   }
 
   hideSecondComponent() {
@@ -403,7 +420,7 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   getRealmCountryList(e) {
-    let realmId = e.target.value;
+    let realmId = this.state.healthArea.realm.id;
     if (realmId != "") {
       HealthAreaService.getRealmCountryList(realmId)
         .then(response => {

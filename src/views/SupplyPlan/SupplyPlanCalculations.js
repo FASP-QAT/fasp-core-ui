@@ -148,14 +148,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var expiredBatchDetailsOfPrevMonth = batchDetails.filter(c => c.expiryDate >= startDate && c.expiryDate <= endDate);
                         console.log("D----------------->expiredBatchDetailsOfPrevMonth-------------->", expiredBatchDetailsOfPrevMonth);
                         for (var e = 0; e < expiredBatchDetailsOfPrevMonth.length; e++) {
-                            console.log("D-----------> In for loop", expiredBatchDetailsOfPrevMonth[e].qty);
+                            console.log("D------------------> In for loop", expiredBatchDetailsOfPrevMonth[e].qty);
                             expiredStock += parseInt(expiredBatchDetailsOfPrevMonth[e].qty);
                             expiredStockWps += parseInt(expiredBatchDetailsOfPrevMonth[e].qtyWps);
-                            var index = batchDetails.findIndex(c => c.batchNo == expiredBatchDetailsOfPrevMonth[e].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiredBatchDetailsOfPrevMonth[e].expiryDate).format("YYYY-MM"));
-                            batchDetails[index].expiredQty = expiredBatchDetailsOfPrevMonth[e].qty;
-                            batchDetails[index].qty = 0;
-                            batchDetails[index].expiredQtyWps = expiredBatchDetailsOfPrevMonth[e].qtyWps;
-                            batchDetails[index].qtyWps = 0;
+                            // var index = batchDetails.findIndex(c => c.batchNo == expiredBatchDetailsOfPrevMonth[e].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiredBatchDetailsOfPrevMonth[e].expiryDate).format("YYYY-MM"));
+                            // batchDetails[index].expiredQty = expiredBatchDetailsOfPrevMonth[e].qty;
+                            // batchDetails[index].qty = 0;
+                            // batchDetails[index].expiredQtyWps = expiredBatchDetailsOfPrevMonth[e].qtyWps;
+                            // batchDetails[index].qtyWps = 0;
                         }
 
                         // Formatting batchDetails
@@ -527,6 +527,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         // Calculating expected stock
                         var expectedStock = 0;
+                        console.log("D----------------->expiredStock-------------------->",expiredStock)
                         expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty != "" ? parseInt(consumptionQty) : 0) + (adjustmentQty != "" ? parseInt(adjustmentQty) : 0);
                         console.log("D--------------->Expected stock------------>", expectedStock);
                         console.log("D------------>openingBalance------------ -->", openingBalance, "---Expired stock-->", expiredStock, "--shipmentTotalQty-->", shipmentTotalQty, "--consumptionQty--->", consumptionQty, "---adjustmentQty--->", adjustmentQty);
@@ -570,8 +571,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
                         myArray = myArray.filter(c => (c.openingBalance != 0 || c.consumption != 0 || c.shipment != 0 || c.stock != 0 || c.adjustment != 0) || moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
                         for (var a = 0; a < myArray.length; a++) {
-                            var expectedB = parseInt(myArray[a].openingBalance) + parseInt(myArray[a].shipment) + parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
-                            var expectedBWps = parseInt(myArray[a].openingBalanceWps) + parseInt(myArray[a].shipmentWps) + parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
+                            var expectedB = parseInt(myArray[a].openingBalance) + parseInt(myArray[a].shipment) - parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
+                            var expectedBWps = parseInt(myArray[a].openingBalanceWps) + parseInt(myArray[a].shipmentWps) - parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
                             myArray[a].expectedB = parseInt(expectedB) < 0 ? 0 : parseInt(expectedB);
                             myArray[a].expectedBWps = parseInt(expectedBWps) < 0 ? 0 : parseInt(expectedBWps);
                             if (a == 0) {

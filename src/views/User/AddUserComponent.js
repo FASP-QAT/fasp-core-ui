@@ -16,7 +16,7 @@ import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 
-const initialValues = {
+let initialValues = {
     username: "",
     realmId: [],
     emailId: "",
@@ -468,6 +468,20 @@ class AddUserComponent extends Component {
                     }
                 }
             );
+
+        let realmId = AuthenticationService.getRealmId();        
+        if (realmId != -1) {
+            // document.getElementById('realmId').value = realmId;
+            initialValues = {
+                realmId: realmId
+            }
+            let { user } = this.state;
+            user.realm.realmId = realmId;
+            document.getElementById("realmId").disabled = true;
+            this.setState({
+                user
+            });
+        }
     }
 
     render() {
@@ -505,6 +519,7 @@ class AddUserComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
