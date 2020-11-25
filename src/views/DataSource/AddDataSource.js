@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     label: '',
     dataSourceTypeId: '',
@@ -196,6 +196,25 @@ export default class AddDataSource extends Component {
                     }
                 }
             );
+
+        let realmId = AuthenticationService.getRealmId();
+        if (realmId != -1) {
+            // document.getElementById('realmId').value = realmId;
+            initialValues = {
+                realmId: realmId
+            }
+
+            this.state.realm.id = realmId;
+            let { dataSource } = this.state;
+            document.getElementById("realmId").disabled = true;
+            this.setState({
+                dataSource
+            },
+                () => {
+                    this.getDataSourceTypeByRealmId()
+                    this.getProgramByRealmId()
+                })
+        }
     }
     hideSecondComponent() {
         setTimeout(function () {
@@ -206,8 +225,8 @@ export default class AddDataSource extends Component {
 
     getDataSourceTypeByRealmId(e) {
         // AuthenticationService.setupAxiosInterceptors();        
-        if (e.target.value != 0) {
-            DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
+        if (this.state.realm.id != 0) {
+            DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
                 .then(response => {
                     console.log("getDataSourceTypeByRealmId---", response.data);
                     this.setState({
@@ -264,10 +283,10 @@ export default class AddDataSource extends Component {
 
     getProgramByRealmId(e) {
         // AuthenticationService.setupAxiosInterceptors();
-        console.log("e.target.value---", e.target.value);
+        console.log("e.target.value---", this.state.realm.id);
         let realmId = this.state.realm.id;
-        if (e.target.value != 0) {
-            ProgramService.getProgramList(e.target.value)
+        if (this.state.realm.id != 0) {
+            ProgramService.getProgramList(this.state.realm.id)
                 .then(response => {
                     console.log("getProgramByRealmId---", response.data);
                     this.setState({
@@ -372,6 +391,7 @@ export default class AddDataSource extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
