@@ -1107,6 +1107,7 @@
     "static.loading.loading": "Cargando...",
     "static.report.amc": "CMM",
     "static.message.alphaspespacetext": "Solo letras, números y, / permitido",
+    "static.tracercategory.tracercategoryText": "Seleccionar la categoría de seguimiento",
     "static.dashboard.addproduct": "Agregar producto",
     "static.report.excess": "Exceso de existencias",
     "static.user.forgotpassword": "Contraseña olvidada",
