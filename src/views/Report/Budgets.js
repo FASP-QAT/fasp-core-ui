@@ -459,7 +459,7 @@ class Budgets extends Component {
                             console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
                             console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
                             // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
-                            if (budgetResult[k].program.id == programId && (budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
+                            if (budgetResult[k].program.id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
                                 budgetList[j++] = budgetResult[k]
                         }
                         console.log("budgetList---", budgetList);

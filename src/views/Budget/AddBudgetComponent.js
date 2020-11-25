@@ -1,6 +1,5 @@
 import { Date } from 'core-js';
 import { Formik } from 'formik';
-import moment from 'moment';
 import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
@@ -494,11 +493,11 @@ class AddBudgetComponent extends Component {
                                     // this.setState({ budget: budget });
 
 
-                                    var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
-                                    budget.startDate = startDate;
+                                    var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
+                                    budget.startDate = new Date(startDateString);
 
-                                    var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
-                                    budget.stopDate = stopDate;
+                                    var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
+                                    budget.stopDate = new Date(stopDateString);
 
                                     // this.setState({
                                     //     loading: true

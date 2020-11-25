@@ -135,8 +135,8 @@ export default class ManualTagging extends Component {
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
         conversionFactor = conversionFactor.replace("-", "")
-        console.log("changedConversionFactor---",conversionFactor);
-        console.log("conversionFactor---",conversionFactor);
+        console.log("changedConversionFactor---", conversionFactor);
+        console.log("conversionFactor---", conversionFactor);
         var erpShipmentQty = document.getElementById("erpShipmentQty").value;
         if (conversionFactor != null && conversionFactor != "" && conversionFactor != 0) {
             var result = erpShipmentQty * conversionFactor;
@@ -145,7 +145,7 @@ export default class ManualTagging extends Component {
                 conversionFactorEntered: true
             })
         } else {
-            this.setState({ conversionFactorEntered: false})
+            this.setState({ conversionFactorEntered: false })
         }
         document.getElementById("conversionFactor").value = conversionFactor;
     }
@@ -347,7 +347,7 @@ export default class ManualTagging extends Component {
     getPlanningUnitListByTracerCategory = (term) => {
         console.log("planning unit term---", term)
         this.setState({ planningUnitName: term });
-        PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term)
+        PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term.toUpperCase())
             .then(response => {
                 console.log("tracercategoryPlanningUnit response===", response);
                 var tracercategoryPlanningUnit = [];
@@ -818,6 +818,7 @@ export default class ManualTagging extends Component {
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,
+            // headerColumnStyle: { backgroundColor: 'blue' },
             onSelect: (row, isSelect, rowIndex, e) => {
                 document.getElementById("erpShipmentQty").value = row.quantity;
                 this.getConvertedQATShipmentQty();
@@ -1246,14 +1247,19 @@ export default class ManualTagging extends Component {
                                                         onChange={(event, value) => {
                                                             // this.getOrderDetails()
                                                             console.log("demo2 value---", value);
-                                                            this.setState({
-                                                                erpPlanningUnitId: value.value,
-                                                                planningUnitIdUpdated: value.value,
-                                                                planningUnitName: value.label
-                                                            }, () => { this.getOrderDetails() });
+                                                            if (value != null) {
+                                                                this.setState({
+                                                                    erpPlanningUnitId: value.value,
+                                                                    planningUnitIdUpdated: value.value,
+                                                                    planningUnitName: value.label
+                                                                }, () => { this.getOrderDetails() });
+                                                            }
 
                                                         }} // prints the selected value
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                        renderInput={(params) => <TextField
+                                                            {...params}
+                                                            // InputProps={{ style: { fontSize: 12.24992 } }}
+                                                            variant="outlined"
                                                             onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
                                                     />
                                                     {/* <InputGroup>
