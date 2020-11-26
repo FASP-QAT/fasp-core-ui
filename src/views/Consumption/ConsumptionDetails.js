@@ -261,7 +261,8 @@ export default class ConsumptionDetails extends React.Component {
                         for (var i = 0; i < programJson.regionList.length; i++) {
                             var regionJson = {
                                 name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                                id: programJson.regionList[i].regionId
+                                id: programJson.regionList[i].regionId,
+                                label:programJson.regionList[i].label
                             }
                             regionList.push(regionJson)
 

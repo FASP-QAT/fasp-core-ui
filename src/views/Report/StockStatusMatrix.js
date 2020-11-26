@@ -978,7 +978,7 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.roundN(ele.jan), this.roundN(ele.feb), this.roundN(ele.mar), this.roundN(ele.apr), this.roundN(ele.may), this.roundN(ele.jun), this.roundN(ele.jul), this.roundN(ele.aug), this.roundN(ele.sep), this.roundN(ele.oct), this.roundN(ele.nov), this.roundN(ele.dec)])));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan)?'':this.roundN(ele.jan), isNaN(ele.feb)?'':this.roundN(ele.feb), isNaN(ele.mar)?'':this.roundN(ele.mar), isNaN(ele.apr)?'':this.roundN(ele.apr), isNaN(ele.may)?'':this.roundN(ele.may), isNaN(ele.jun)?'':this.roundN(ele.jun), isNaN(ele.jul)?'':this.roundN(ele.jul), isNaN(ele.aug)?'':this.roundN(ele.aug), isNaN(ele.sep)?'':this.roundN(ele.sep), isNaN(ele.oct)?'':this.roundN(ele.oct), isNaN(ele.nov)?'':this.roundN(ele.nov), isNaN(ele.dec)?'':this.roundN(ele.dec)])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -1087,7 +1087,7 @@ export default class StockStatusMatrix extends React.Component {
       { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
     ]
     let data;
-    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, this.formatter(ele.jan), this.formatter(ele.feb), this.formatter(ele.mar), this.formatter(ele.apr), this.formatter(ele.may), this.formatter(ele.jun), this.formatter(ele.jul), this.formatter(ele.aug), this.formatter(ele.sep), this.formatter(ele.oct), this.formatter(ele.nov), this.formatter(ele.dec)]);
+    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan)?'':this.formatter(ele.jan), isNaN(ele.feb)?'':this.formatter(ele.feb), isNaN(ele.mar)?'':this.formatter(ele.mar), isNaN(ele.apr)?'':this.formatter(ele.apr), isNaN(ele.may)?'':this.formatter(ele.may), isNaN(ele.jun)?'':this.formatter(ele.jun), isNaN(ele.jul)?'':this.formatter(ele.jul), isNaN(ele.aug)?'':this.formatter(ele.aug), isNaN(ele.sep)?'':this.formatter(ele.sep), isNaN(ele.oct)?'':this.formatter(ele.oct), isNaN(ele.nov)?'':this.formatter(ele.nov), isNaN(ele.dec)?'':this.formatter(ele.dec)]);
 
     var startY = 180 + (this.state.planningUnitValues.length * 3)
     let content = {
@@ -1560,18 +1560,18 @@ export default class StockStatusMatrix extends React.Component {
                         <td className="text-center">{ele.minMonthsOfStock}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{this.formatter(ele.jan)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {this.formatter(ele.feb)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {this.formatter(ele.mar)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {this.formatter(ele.apr)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {this.formatter(ele.may)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {this.formatter(ele.jun)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {this.formatter(ele.jul)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {this.formatter(ele.aug)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {this.formatter(ele.sep)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {this.formatter(ele.oct)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {this.formatter(ele.nov)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {this.formatter(ele.dec)}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan)?'':this.formatter(ele.jan)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb)?'':this.formatter(ele.feb)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar)?'':this.formatter(ele.mar)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr)?'':this.formatter(ele.apr)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may)?'':this.formatter(ele.may)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun)?'':this.formatter(ele.jun)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul)?'':this.formatter(ele.jul)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug)?'':this.formatter(ele.aug)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep)?'':this.formatter(ele.sep)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct)?'':this.formatter(ele.oct)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov)?'':this.formatter(ele.nov)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec)?'':this.formatter(ele.dec)}</td></tr>)
                     })}
 
                   </tbody>
