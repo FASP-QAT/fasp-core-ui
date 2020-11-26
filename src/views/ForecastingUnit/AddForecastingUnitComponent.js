@@ -15,7 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SPACE_REGEX } from '../../Constants.js';
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     productCategoryId: [],
     tracerCategoryId: [],
@@ -312,6 +312,24 @@ export default class AddForecastingUnitComponent extends Component {
         //         })
         //     })
 
+
+        let realmId = AuthenticationService.getRealmId();
+        if (realmId != -1) {
+            // document.getElementById('realmId').value = realmId;
+            initialValues = {
+                realmId: realmId
+            }
+
+            let { forecastingUnit } = this.state
+            forecastingUnit.realm.id = realmId;
+            document.getElementById("realmId").disabled = true;
+            this.setState({
+                forecastingUnit
+            },
+                () => {
+                    this.getProductCategoryByRealmId()
+                })
+        }
     }
 
     Capitalize(str) {
@@ -320,7 +338,8 @@ export default class AddForecastingUnitComponent extends Component {
     }
 
     getProductCategoryByRealmId() {
-        let realmId = document.getElementById("realmId").value;
+        // let realmId = document.getElementById("realmId").value;
+        let realmId = this.state.forecastingUnit.realm.id;
         if (realmId != "") {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
@@ -423,6 +442,7 @@ export default class AddForecastingUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
