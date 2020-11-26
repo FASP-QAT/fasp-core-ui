@@ -631,8 +631,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
                             var amcFilter = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(amcDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
                             if (amcFilter.length > 0) {
-                                amcTotal += (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty != "" ? parseInt(amcFilter[0].consumptionQty) : 0);
-                                if (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty != "") {
+                                amcTotal += (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty !== "" ? parseInt(amcFilter[0].consumptionQty) : 0);
+                                if (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty !== "") {
                                     totalMonths += 1;
                                 }
                             }
@@ -667,8 +667,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 consumptionQtyAmc = forecastedConsumptionQtyAmc;
                             }
                             if (amcFilter.length > 0) {
-                                amcTotal += (consumptionQtyAmc != "" ? parseInt(consumptionQtyAmc) : 0);
-                                if (consumptionQtyAmc != "") {
+                                amcTotal += (consumptionQtyAmc !== "" ? parseInt(consumptionQtyAmc) : 0);
+                                if (consumptionQtyAmc !== "") {
                                     totalMonths += 1;
                                 }
                             }
