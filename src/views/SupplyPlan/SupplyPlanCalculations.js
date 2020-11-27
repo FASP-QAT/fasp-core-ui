@@ -93,7 +93,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
                     var maxDate = invmax.isAfter(shipmax) && invmax.isAfter(conmax) ? invmax : shipmax.isAfter(invmax) && shipmax.isAfter(conmax) ? shipmax : conmax
                     // Getting min data entry date
-                    var minDate = moment(minimumDate).format("YYYY-MM-DD");
+                    var minDate = moment(minimumDate).subtract(programPlanningUnitList[ppL].monthsInPastForAmc + 1, 'months').format("YYYY-MM-DD");
                     console.log("Min Date", minDate);
                     if (minDate == undefined) {
                         let invmin = moment.min(inventoryListForMax.map(d => moment(d.inventoryDate)))

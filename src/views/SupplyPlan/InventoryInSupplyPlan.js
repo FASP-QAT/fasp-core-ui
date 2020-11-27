@@ -689,7 +689,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             console.log("showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
                 obj.page(pageNo);
             }
         }

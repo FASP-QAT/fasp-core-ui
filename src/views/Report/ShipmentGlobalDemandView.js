@@ -313,7 +313,7 @@ class ShipmentGlobalDemandView extends Component {
                 console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            tableHeadTemp.push(i18n.t('static.supplyPlan.total'));
+            tableHeadTemp.push(i18n.t('static.report.totalUnit'));
 
             A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.procurementAgentSplit;

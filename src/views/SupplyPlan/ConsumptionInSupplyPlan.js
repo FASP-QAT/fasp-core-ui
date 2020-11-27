@@ -619,9 +619,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         console.log("Data", data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-            console.log("showOption", showOption);
+            console.log("D---------------->showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
+                console.log("D---------------->pageNo", pageNo);
+                console.log("D---------------->json length", json.length);
                 obj.page(pageNo);
             }
         }
@@ -1319,7 +1321,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 active: map.get("10"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("4"),
-                                    label:(this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label
+                                    label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label
                                 },
                                 multiplier: map.get("6"),
                                 planningUnit: {
