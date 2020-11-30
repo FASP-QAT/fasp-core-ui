@@ -1508,5 +1508,6 @@
     "static.jexcel.of": "of",
     "static.budget.budgetCode": "Budget Code",
     "static.organisation.organisationheader": "Organization",
-    "static.report.totconsumption": "Total Consumption"
+    "static.report.totconsumption": "Total Consumption",
+    "static.tracercategory.tracercategoryText": "Select Tracer Category"
 }
