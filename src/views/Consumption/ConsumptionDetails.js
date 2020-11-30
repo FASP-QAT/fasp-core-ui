@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, API_URL } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -19,6 +19,7 @@ import AuthenticationService from "../Common/AuthenticationService.js";
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
+import { Online } from "react-detect-offline";
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -262,7 +263,7 @@ export default class ConsumptionDetails extends React.Component {
                             var regionJson = {
                                 name: getLabelText(programJson.regionList[i].label, this.state.lang),
                                 id: programJson.regionList[i].regionId,
-                                label:programJson.regionList[i].label
+                                label: programJson.regionList[i].label
                             }
                             regionList.push(regionJson)
 
@@ -522,6 +523,18 @@ export default class ConsumptionDetails extends React.Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Online>
+                        <div className="Card-header-addicon problemListMarginTop">
+                            <div className="card-header-actions">
+                                <div className="card-header-action">
+                                    <a className="card-header-action">
+                                        <a href={`${API_URL}/file/consumptionDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </Online>
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={

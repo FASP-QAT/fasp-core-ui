@@ -396,7 +396,8 @@ class ShipmentGlobalView extends Component {
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programLst:[]
 
 
         };
@@ -410,6 +411,7 @@ class ShipmentGlobalView extends Component {
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.getProductCategories = this.getProductCategories.bind(this)
+        this.filterProgram=this.filterProgram.bind(this);
     }
 
     makeText = m => {
@@ -426,8 +428,8 @@ class ShipmentGlobalView extends Component {
         csvRow.push('')
         this.state.countryLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-            csvRow.push('')
-            this.state.programLabels.map(ele =>
+        csvRow.push('')
+        this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
 
         csvRow.push('')
@@ -705,19 +707,19 @@ class ShipmentGlobalView extends Component {
     }
 
 
-    handleChange(countrysId) {
-        console.log('==>', countrysId)
-        countrysId = countrysId.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-            countryValues: countrysId.map(ele => ele),
-            countryLabels: countrysId.map(ele => ele.label)
-        }, () => {
+    // handleChange(countrysId) {
+    //     console.log('==>', countrysId)
+    //     countrysId = countrysId.sort(function (a, b) {
+    //         return parseInt(a.value) - parseInt(b.value);
+    //     })
+    //     this.setState({
+    //         countryValues: countrysId.map(ele => ele),
+    //         countryLabels: countrysId.map(ele => ele.label)
+    //     }, () => {
 
-            this.fetchData()
-        })
-    }
+    //         this.fetchData()
+    //     })
+    // }
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -726,7 +728,7 @@ class ShipmentGlobalView extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
-
+            
             this.fetchData()
         })
 
@@ -1622,8 +1624,48 @@ class ShipmentGlobalView extends Component {
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
+            this.filterProgram();
+            // this.fetchData()
+        })
+    }
 
-            this.fetchData()
+    filterProgram = () => {
+        let countryIds = this.state.countryValues.map(ele => ele.value);
+        console.log('countryIds', countryIds, 'programs', this.state.programs)
+        this.setState({
+            programLst: [],
+            programValues: [],
+            programLabels: []
+        }, () => {
+            if (countryIds.length != 0) {
+                let programLst = [];
+                for (var i = 0; i < countryIds.length; i++) {
+                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                }
+
+                console.log('programLst', programLst)
+                if (programLst.length > 0) {
+
+                    this.setState({
+                        programLst: programLst
+                    }, () => {
+                        this.fetchData()
+                    });
+                } else {
+                    this.setState({
+                        programLst: []
+                    }, () => {
+                        this.fetchData()
+                    });
+                }
+            } else {
+                this.setState({
+                    programLst: []
+                }, () => {
+                    this.fetchData()
+                });
+            }
+
         })
     }
 
@@ -1680,10 +1722,10 @@ class ShipmentGlobalView extends Component {
         //     }, this);
 
 
-        const { programs } = this.state;
+        const { programLst } = this.state;
         let programList = [];
-        programList = programs.length > 0
-            && programs.map((item, i) => {
+        programList = programLst.length > 0
+            && programLst.map((item, i) => {
                 return (
 
                     { label: getLabelText(item.label, this.state.lang), value: item.programId }
@@ -1851,8 +1893,8 @@ class ShipmentGlobalView extends Component {
                                             <MultiSelect
 
                                                 bsSize="sm"
-                                                name="programIds"
-                                                id="programIds"
+                                                name="countryIds"
+                                                id="countryIds"
                                                 value={this.state.countryValues}
                                                 onChange={(e) => { this.handleChange(e) }}
                                                 options={countryList && countryList.length > 0 ? countryList : []}
