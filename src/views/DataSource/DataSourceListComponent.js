@@ -610,7 +610,8 @@ export default class DataSourceListComponent extends Component {
             const selSource = this.state.dataSourceList.filter(c => c.program.id == programId && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
-            });
+            },
+                () => { this.buildJexcel() });
         } else if (realmId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId)
             this.setState({
