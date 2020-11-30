@@ -311,8 +311,8 @@ class SupplyPlanVersionAndReview extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
         this.getPrograms()
-        this.getStatusList()
         this.getVersionTypeList()
+        this.getStatusList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -654,6 +654,7 @@ class SupplyPlanVersionAndReview extends Component {
         let countryId = document.getElementById("countryId").value;
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
+        console.log("D------------->VersionTypeId",versionTypeId);
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         console.log('endDate', endDate)

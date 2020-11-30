@@ -57,8 +57,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var index = (instance.jexcel).getValue(`X${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
                 (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
+                (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
+                (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(20, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                     (instance.jexcel).setValueFromCoords(21, data[i].y, false, true);
                     (instance.jexcel).setValueFromCoords(22, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(23, data[i].y, -1, true);
@@ -70,7 +71,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(29, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(30, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                     z = data[i].y;
                 }
             }
@@ -136,7 +136,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var shipmentStatusJson = {
                         name: getLabelText(shipmentStatusResult[k].label, this.props.items.lang),
                         id: shipmentStatusResult[k].shipmentStatusId,
-                        active: shipmentStatusResult[k].active
+                        active: shipmentStatusResult[k].active,
+                        label: shipmentStatusResult[k].label
                     }
                     shipmentStatusList.push(shipmentStatusJson);
                 }
@@ -156,7 +157,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var paJson = {
                             name: paResult[k].procurementAgentCode,
                             id: paResult[k].procurementAgentId,
-                            active: paResult[k].active
+                            active: paResult[k].active,
+                            label: paResult[k].label
                         }
                         procurementAgentList.push(paJson);
                     }
@@ -192,7 +194,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var fsJson = {
                                         name: fsResult[k].fundingSourceCode,
                                         id: fsResult[k].fundingSourceId,
-                                        active: fsResult[k].active
+                                        active: fsResult[k].active,
+                                        label: fsResult[k].label
                                     }
                                     fundingSourceList.push(fsJson);
                                 }
@@ -216,7 +219,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var bJson = {
                                             name: bResult[k].budgetCode,
                                             id: bResult[k].budgetId,
-                                            active: bResult[k].active
+                                            active: bResult[k].active,
+                                            label: bResult[k].label
                                         }
                                         budgetList.push(bJson);
                                     }
@@ -227,7 +231,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         currency: bResult[k].currency,
                                         budgetAmt: bResult[k].budgetAmt,
                                         active: bResult[k].active,
-                                        programId: bResult[k].program.id
+                                        programId: bResult[k].program.id,
+                                        label: bResult[k].label
                                     })
                                 }
                                 console.log("Budhet list", budgetList);
@@ -257,7 +262,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 var dataSourceJson = {
                                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                                     id: dataSourceResult[k].dataSourceId,
-                                                    active: dataSourceResult[k].active
+                                                    active: dataSourceResult[k].active,
+                                                    label: dataSourceResult[k].label
                                                 }
                                                 dataSourceList.push(dataSourceJson);
                                             }
@@ -280,7 +286,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             var currencyJson = {
                                                 name: getLabelText(currencyResult[k].label, this.props.items.lang),
                                                 id: currencyResult[k].currencyId,
-                                                active: currencyResult[k].active
+                                                active: currencyResult[k].active,
+                                                label: currencyResult[k].label
                                             }
                                             currencyList.push(currencyJson);
                                         }
@@ -1207,7 +1214,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             console.log("showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
                 obj.page(pageNo);
             }
         }
@@ -1300,7 +1307,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
-                if (rowData[0].toString() == "false"  || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
+                if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
                     shipmentInstance.setStyle(col, "background-color", "transparent");
                     shipmentInstance.setStyle(col, "background-color", "#D3D3D3");
                     var cell = shipmentInstance.getCell(`Q${parseInt(i) + 1}`)
@@ -3015,6 +3022,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
+                    var username=AuthenticationService.getLoggedInUsername();
                     for (var j = 0; j < json.length; j++) {
                         var map = new Map(Object.entries(json[j]));
                         if (map.get("28") == 1) {
@@ -3075,10 +3083,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("23"))].expectedDeliveryDate = moment(shipmentDatesJson.expectedDeliveryDate).format("YYYY-MM-DD");
 
                             shipmentDataList[parseInt(map.get("23"))].shipmentStatus.id = shipmentStatusId;
+                            shipmentDataList[parseInt(map.get("23"))].shipmentStatus.label = (this.state.shipmentStatusList).filter(c => c.id == shipmentStatusId)[0].label;
                             shipmentDataList[parseInt(map.get("23"))].dataSource.id = map.get("18");
+                            shipmentDataList[parseInt(map.get("23"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("18"))[0].label;
                             shipmentDataList[parseInt(map.get("23"))].procurementAgent.id = map.get("6");
+
+                            var pa = this.state.procurementAgentList.filter(c => c.id == map.get("6"))[0];
+                            shipmentDataList[parseInt(map.get("23"))].procurementAgent.code = pa.name;
+                            shipmentDataList[parseInt(map.get("23"))].procurementAgent.label = pa.label;
+
+                            var fs = this.state.fundingSourceList.filter(c => c.id == map.get("12"))[0];
                             shipmentDataList[parseInt(map.get("23"))].fundingSource.id = map.get("12");
+                            shipmentDataList[parseInt(map.get("23"))].fundingSource.code = fs.name;
+                            shipmentDataList[parseInt(map.get("23"))].fundingSource.label = fs.label;
+
+                            var b = this.state.budgetList.filter(c => c.id == map.get("13"))[0];
                             shipmentDataList[parseInt(map.get("23"))].budget.id = map.get("13");
+                            shipmentDataList[parseInt(map.get("23"))].budget.code = b.name;
+                            shipmentDataList[parseInt(map.get("23"))].budget.label = b.label;
+
                             shipmentDataList[parseInt(map.get("23"))].shipmentQty = shipmentQty.toString().replaceAll("\,", "");
                             shipmentDataList[parseInt(map.get("23"))].rate = rate.toString().replaceAll("\,", "");
                             shipmentDataList[parseInt(map.get("23"))].shipmentMode = shipmentMode;
@@ -3092,13 +3115,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("23"))].orderNo = map.get("8");
 
                             shipmentDataList[parseInt(map.get("23"))].emergencyOrder = map.get("11");
-                            shipmentDataList[parseInt(map.get("23"))].currency.currencyId = map.get("14");
-                            shipmentDataList[parseInt(map.get("23"))].currency.conversionRateToUsd = (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0]).conversionRateToUsd));
+                            var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0])
+                            shipmentDataList[parseInt(map.get("23"))].currency = c;
                             if (map.get("28") == 1) {
                                 if (shipmentDataList[parseInt(map.get("23"))].lastModifiedBy != null) {
                                     shipmentDataList[parseInt(map.get("23"))].lastModifiedBy.userId = curUser;
+                                    shipmentDataList[parseInt(map.get("23"))].lastModifiedBy.username=username;
                                 } else {
-                                    shipmentDataList[parseInt(map.get("23"))].lastModifiedBy = { userId: curUser };
+                                    shipmentDataList[parseInt(map.get("23"))].lastModifiedBy = { userId: curUser,username:username };
                                 }
                                 shipmentDataList[parseInt(map.get("23"))].lastModifiedDate = curDate;
                             }
@@ -3219,11 +3243,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         } else {
                             console.log("In else---------->", expectedDeliveryDate);
                             console.log("In else---------->", receivedDate);
+                            var pa = this.state.procurementAgentList.filter(c => c.id == map.get("6"))[0];
+                            var b = this.state.budgetList.filter(c => c.id == map.get("13"))[0];
+                            var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0]);
+                            var fs = this.state.fundingSourceList.filter(c => c.id == map.get("12"))[0];
                             var shipmentJson = {
                                 accountFlag: map.get("0"),
                                 active: map.get("29"),
                                 dataSource: {
-                                    id: map.get("18")
+                                    id: map.get("18"),
+                                    label:(this.state.dataSourceList).filter(c => c.id == map.get("18"))[0].label
                                 },
                                 erpFlag: false,
                                 localProcurement: map.get("7"),
@@ -3233,8 +3262,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     id: map.get("2"),
                                     label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("2"))[0]).planningUnit.label
                                 },
+                                
                                 procurementAgent: {
-                                    id: map.get("6")
+                                    id: map.get("6"),
+                                    code:pa.name,
+                                    label:pa.label
                                 },
                                 productCost: productCost.toString().replaceAll("\,", ""),
                                 shipmentQty: shipmentQty.toString().replaceAll("\,", ""),
@@ -3242,19 +3274,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 shipmentId: 0,
                                 shipmentMode: shipmentMode,
                                 shipmentStatus: {
-                                    id: map.get("3")
+                                    id: map.get("3"),
+                                    label:(this.state.shipmentStatusList).filter(c => c.id == map.get("3"))[0].label
                                 },
                                 suggestedQty: map.get("27"),
                                 budget: {
-                                    id: map.get("13")
+                                    id: map.get("13"),
+                                    code:b.name,
+                                    label:b.label,
                                 },
                                 emergencyOrder: map.get("11"),
-                                currency: {
-                                    currencyId: map.get("14"),
-                                    conversionRateToUsd: parseFloat((this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0]).conversionRateToUsd)
-                                },
+                                currency: c,
                                 fundingSource: {
-                                    id: map.get("12")
+                                    id: map.get("12"),
+                                    code:fs.name,
+                                    label:fs.label
                                 },
                                 plannedDate: plannedDate,
                                 submittedDate: submittedDate,
@@ -3267,11 +3301,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 batchInfoList: [],
                                 orderNo: map.get("8"),
                                 createdBy: {
-                                    userId: curUser
+                                    userId: curUser,
+                                    username:username
                                 },
                                 createdDate: curDate,
                                 lastModifiedBy: {
-                                    userId: curUser
+                                    userId: curUser,
+                                    username:username
                                 },
                                 lastModifiedDate: curDate
                             }
