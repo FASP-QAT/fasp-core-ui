@@ -232,7 +232,8 @@ class ShipmentGlobalDemandView extends Component {
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programLst:[]
         };
 
 
@@ -243,6 +244,8 @@ class ShipmentGlobalDemandView extends Component {
         this.getRandomColor = this.getRandomColor.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.getProductCategories = this.getProductCategories.bind(this)
+        this.handleChange=this.handleChange.bind(this)
+        this.filterProgram=this.filterProgram.bind(this)
     }
 
     makeText = m => {
@@ -313,7 +316,7 @@ class ShipmentGlobalDemandView extends Component {
                 console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            tableHeadTemp.push(i18n.t('static.supplyPlan.total'));
+            tableHeadTemp.push(i18n.t('static.report.totalUnit'));
 
             A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.procurementAgentSplit;
@@ -1107,10 +1110,50 @@ class ShipmentGlobalDemandView extends Component {
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
-
-            this.fetchData()
+            this.filterProgram();
+            // this.fetchData()
         })
     }
+    filterProgram = () => {
+        let countryIds = this.state.countryValues.map(ele => ele.value);
+        console.log('countryIds', countryIds, 'programs', this.state.programs)
+        this.setState({
+            programLst: [],
+            programValues: [],
+            programLabels: []
+        }, () => {
+            if (countryIds.length != 0) {
+                let programLst = [];
+                for (var i = 0; i < countryIds.length; i++) {
+                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                }
+    
+                console.log('programLst', programLst)
+                if (programLst.length > 0) {
+    
+                    this.setState({
+                        programLst: programLst
+                    }, () => {
+                        this.fetchData()
+                    });
+                } else {
+                    this.setState({
+                        programLst: []
+                    }, () => {
+                        this.fetchData()
+                    });
+                }
+            } else {
+                this.setState({
+                    programLst: []
+                }, () => {
+                    this.fetchData()
+                });
+            }
+    
+        })
+    }
+
     handleChangeProgram = (programIds) => {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1917,10 +1960,10 @@ class ShipmentGlobalDemandView extends Component {
                 )
             }, this);
 
-        const { programs } = this.state;
+        const { programLst } = this.state;
         let programList = [];
-        programList = programs.length > 0
-            && programs.map((item, i) => {
+        programList = programLst.length > 0
+            && programLst.map((item, i) => {
                 return (
 
                     { label: getLabelText(item.label, this.state.lang), value: item.programId }
@@ -2203,8 +2246,8 @@ class ShipmentGlobalDemandView extends Component {
                                                         onChange={this.filterVersion}
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {programs.length > 0
-                                                            && programs.map((item, i) => {
+                                                        {programLst.length > 0
+                                                            && programLst.map((item, i) => {
                                                                 return (
                                                                     <option key={i} value={item.programId}>
                                                                         {getLabelText(item.label, this.state.lang)}

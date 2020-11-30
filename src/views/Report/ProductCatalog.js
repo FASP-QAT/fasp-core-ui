@@ -111,10 +111,10 @@ class ProductCatalog extends Component {
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 getLabelText(ele.productCategory.label, this.state.lang).replaceAll(' ', '%20'),
-                getLabelText(ele.tracerCategory.label, this.state.lang)!=null?getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20'):'',
+                getLabelText(ele.tracerCategory.label, this.state.lang) != null ? getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20') : '',
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.fUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                ele.genericName.genericName != '' && ele.genericName.genericName != null ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
+                getLabelText(ele.genericName, this.state.lang)!=null ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
                 ele.forecastingtoPlanningUnitMultiplier,
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),

@@ -44,12 +44,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
+                (instance.jexcel).setValueFromCoords(7, data[i].y, `=F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, `=F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1}`, true);
                     z = data[i].y;
                 }
             }
@@ -144,7 +144,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
                             multiplier: rcpuResult[k].multiplier,
-                            active: rcpuResult[k].active
+                            active: rcpuResult[k].active,
+                            label: rcpuResult[k].label
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -171,7 +172,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
                                     dataSourceTypeId: dataSourceResult[k].dataSourceType.id,
-                                    active: dataSourceResult[k].active
+                                    active: dataSourceResult[k].active,
+                                    label: dataSourceResult[k].label
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
@@ -331,7 +333,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             var lastY = -1;
                             if (y != null && lastY != y) {
                                 var rowData = elInstance.getRowData(y);
-                                console.log("rowData[12]----------->", rowData[12]!="");
+                                console.log("rowData[12]----------->", rowData[12] != "");
                                 if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                                     console.log("RowData", rowData);
                                     var lastEditableDate = "";
@@ -511,9 +513,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                                     title: i18n.t("static.common.deleterow"),
                                                                     onclick: function () {
                                                                         console.log("y---------->", y);
-                                                                        if(obj.getJson(null, false).length == 1){
-                                                                            var rd=obj.getRowData(0);
-                                                                            var rd1=((this.state.consumptionEl).getValue(`F${parseInt(rd[4]) + 1}`, true)).toString().replaceAll("\,", "");
+                                                                        if (obj.getJson(null, false).length == 1) {
+                                                                            var rd = obj.getRowData(0);
+                                                                            var rd1 = ((this.state.consumptionEl).getValue(`F${parseInt(rd[4]) + 1}`, true)).toString().replaceAll("\,", "");
                                                                             var data = [];
                                                                             data[0] = -1; //A
                                                                             data[1] = "";
@@ -617,9 +619,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         console.log("Data", data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-            console.log("showOption", showOption);
+            console.log("D---------------->showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
+                console.log("D---------------->pageNo", pageNo);
+                console.log("D---------------->json length", json.length);
                 obj.page(pageNo);
             }
         }
@@ -1274,8 +1278,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         if (parseInt(map.get("12")) != -1) {
                             consumptionDataList[parseInt(map.get("12"))].consumptionDate = moment(map.get("0")).startOf('month').format("YYYY-MM-DD");
                             consumptionDataList[parseInt(map.get("12"))].region.id = map.get("1");
+                            consumptionDataList[parseInt(map.get("12"))].region.label = (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label;
                             consumptionDataList[parseInt(map.get("12"))].dataSource.id = map.get("3");
+                            consumptionDataList[parseInt(map.get("12"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label;
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.id = map.get("4");
+                            consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label;
                             consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("6");
                             consumptionDataList[parseInt(map.get("12"))].consumptionRcpuQty = (elInstance.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("12"))].consumptionQty = (elInstance.getValue(`H${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
@@ -1300,10 +1307,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             var consumptionJson = {
                                 consumptionId: 0,
                                 dataSource: {
-                                    id: map.get("3")
+                                    id: map.get("3"),
+                                    label: (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
                                 },
                                 region: {
-                                    id: map.get("1")
+                                    id: map.get("1"),
+                                    label: (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label
                                 },
                                 consumptionDate: moment(map.get("0")).startOf('month').format("YYYY-MM-DD"),
                                 consumptionRcpuQty: elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
@@ -1312,10 +1321,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 active: map.get("10"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("4"),
+                                    label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label
                                 },
                                 multiplier: map.get("6"),
                                 planningUnit: {
-                                    id: planningUnitId
+                                    id: planningUnitId,
+                                    label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == planningUnitId)[0]).planningUnit.label
                                 },
                                 notes: map.get("9"),
                                 batchInfoList: batchInfoList,

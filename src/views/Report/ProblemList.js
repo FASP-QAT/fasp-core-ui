@@ -339,7 +339,7 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-
+                    readOnly:true
                 },
                 {
                     title: i18n.t('static.report.reviewNotes'),
@@ -1102,7 +1102,7 @@ export default class ConsumptionDetails extends React.Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
                     <ProblemListFormulas ref="formulaeChild" />
-                    <div className="Card-header-addicon">
+                    <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">
