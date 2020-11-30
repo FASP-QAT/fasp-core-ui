@@ -159,7 +159,8 @@ export default class ManualTagging extends Component {
         var searchId = document.getElementById("searchId").value;
         var programId = document.getElementById("programId").value;
         var erpPlanningUnitId = this.state.planningUnitIdUpdated;
-        if (roNoOrderNo != "") {
+        console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
+        if (roNoOrderNo != "" && erpPlanningUnitId != null && erpPlanningUnitId != "") {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, searchId, programId, erpPlanningUnitId)
                 .then(response => {
                     console.log("artmis response===", response.data);
@@ -210,6 +211,11 @@ export default class ManualTagging extends Component {
                         }
                     }
                 );
+        } else {
+            this.setState({
+                artmisList: [],
+                displayButton: false
+            })
         }
         // else if (orderNo == "" && primeLineNo == "") {
         //     this.setState({
@@ -258,6 +264,8 @@ export default class ManualTagging extends Component {
 
         var planningUnitSelect = document.getElementById("planningUnitId");
         var planningUnitName = planningUnitSelect.options[planningUnitSelect.selectedIndex].text;
+
+        // document.getElementsByClassName('selection-cell-header').html = "Link?";
 
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
@@ -782,8 +790,10 @@ export default class ManualTagging extends Component {
 
     toggleLarge() {
         console.log("procurementAgentId---", this.state.procurementAgentId)
+        console.log("planning unit in modal---", document.getElementById("planningUnitId").value);
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
+            planningUnitIdUpdated: document.getElementById("planningUnitId").value,
             artmisList: [],
             reason: "1",
             result: '',
@@ -1253,6 +1263,12 @@ export default class ManualTagging extends Component {
                                                                     planningUnitIdUpdated: value.value,
                                                                     planningUnitName: value.label
                                                                 }, () => { this.getOrderDetails() });
+                                                            } else {
+                                                                this.setState({
+                                                                    erpPlanningUnitId: '',
+                                                                    planningUnitIdUpdated: '',
+                                                                    planningUnitName: ''
+                                                                }, () => { this.getOrderDetails() });
                                                             }
 
                                                         }} // prints the selected value
@@ -1307,7 +1323,12 @@ export default class ManualTagging extends Component {
                                                         getOptionLabel={(option) => option.label}
                                                         style={{ width: 300 }}
                                                         onChange={(event, value) => {
-                                                            this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+                                                            console.log("ro combo box---", value)
+                                                            if (value != null) {
+                                                                this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+                                                            } else {
+                                                                this.setState({ searchedValue: '' }, () => { this.getOrderDetails() });
+                                                            }
 
                                                         }} // prints the selected value
                                                         renderInput={(params) => <TextField {...params} variant="outlined"
