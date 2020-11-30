@@ -1191,11 +1191,11 @@ class ProcurementAgentExport extends Component {
                                     var freightCost = 0;
                                     var totalCost = 0;
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
+                                        qty = parseInt(qty) + parseInt(planningUnitFilterdata[pf].qty);
+                                        productCost = parseFloat(productCost) + parseFloat(planningUnitFilterdata[pf].productCost);
                                         freightPerc = parseFloat(freightPerc) + isNaN(parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        freightCost = parseFloat(freightCost) + parseFloat(planningUnitFilterdata[pf].freightCost) * parseFloat(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = parseFloat(totalCost) + (parseFloat(planningUnitFilterdata[pf].productCost) * parseFloat(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (parseFloat(planningUnitFilterdata[pf].freightCost) * parseFloat(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,

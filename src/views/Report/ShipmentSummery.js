@@ -295,7 +295,7 @@ class ShipmentSummery extends Component {
 
         var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'),(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'), i18n.t('static.report.erpOrder').replaceAll(' ', '%20'), 
-        i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo1').replaceAll(' ', '%20'), 
+        i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo').replaceAll(' ', '%20'), 
         (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
         (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
         (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
