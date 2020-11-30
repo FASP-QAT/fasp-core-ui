@@ -1359,7 +1359,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.lengthUnit')}</Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            valid={!errors.lengthUnitId}
+                                                            valid={!errors.lengthUnitId && this.state.procurementUnit.lengthUnit.id != ''}
                                                             // invalid={touched.lengthUnitId && !!errors.lengthUnitId || this.state.procurementUnit.lengthUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -1377,7 +1377,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="lengthQty"
                                                             bsSize="sm"
                                                             valid={!errors.lengthQty && this.state.procurementUnit.lengthQty >= 0}
-                                                            invalid={(touched.lengthQty && !!errors.lengthQty) || (this.state.procurementUnit.lengthQty < 0 || (this.state.procurementUnit.lengthQty).toString() == '')}
+                                                            // invalid={(touched.lengthQty && !!errors.lengthQty) || (this.state.procurementUnit.lengthQty < 0 || (this.state.procurementUnit.lengthQty).toString() == '')}
+                                                            invalid={(touched.lengthQty && !!errors.lengthQty) || !!errors.lengthQty}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.lengthQty}
@@ -1407,7 +1408,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="heightQty"
                                                             bsSize="sm"
                                                             valid={!errors.heightQty && this.state.procurementUnit.heightQty >= 0}
-                                                            invalid={(touched.heightQty && !!errors.heightQty) || (this.state.procurementUnit.heightQty < 0 || (this.state.procurementUnit.heightQty).toString() == '')}
+                                                            // invalid={(touched.heightQty && !!errors.heightQty) || (this.state.procurementUnit.heightQty < 0 || (this.state.procurementUnit.heightQty).toString() == '')}
+                                                            invalid={(touched.heightQty && !!errors.heightQty) || !!errors.heightQty}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.heightQty}
@@ -1436,7 +1438,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="widthQty"
                                                             bsSize="sm"
                                                             valid={!errors.widthQty && this.state.procurementUnit.widthQty >= 0}
-                                                            invalid={(touched.widthQty && !!errors.widthQty) || (this.state.procurementUnit.widthQty < 0 || (this.state.procurementUnit.widthQty).toString() == '')}
+                                                            // invalid={(touched.widthQty && !!errors.widthQty) || (this.state.procurementUnit.widthQty < 0 || (this.state.procurementUnit.widthQty).toString() == '')}
+                                                            invalid={(touched.widthQty && !!errors.widthQty) || !!errors.widthQty}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.widthQty}
@@ -1447,7 +1450,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.weightUnit')}</Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            valid={!errors.weightUnitId}
+                                                            valid={!errors.weightUnitId && this.state.procurementUnit.weightUnit.id != ''}
                                                             // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -1464,7 +1467,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="weightQty"
                                                             bsSize="sm"
                                                             valid={!errors.weightQty && this.state.procurementUnit.weightQty >= 0}
-                                                            invalid={(touched.weightQty && !!errors.weightQty) || (this.state.procurementUnit.weightQty < 0 || (this.state.procurementUnit.weightQty).toString() == '')}
+                                                            // invalid={(touched.weightQty && !!errors.weightQty) || (this.state.procurementUnit.weightQty < 0 || (this.state.procurementUnit.weightQty).toString() == '')}
+                                                            invalid={(touched.weightQty && !!errors.weightQty) || !!errors.weightQty}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.weightQty}
@@ -1475,7 +1479,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.volumeUnit')}</Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            valid={!errors.volumeUnitId}
+                                                            valid={!errors.volumeUnitId && this.state.procurementUnit.volumeUnit.id != ''}
                                                             // invalid={touched.weightUnitId && !!errors.weightUnitId || this.state.procurementUnit.weightUnit.id == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -1492,7 +1496,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="volumeQty"
                                                             bsSize="sm"
                                                             valid={!errors.volumeQty && this.state.procurementUnit.volumeQty >= 0}
-                                                            invalid={(touched.volumeQty && !!errors.volumeQty) || (this.state.procurementUnit.volumeQty < 0 || (this.state.procurementUnit.volumeQty).toString() == '')}
+                                                            // invalid={(touched.volumeQty && !!errors.volumeQty) || (this.state.procurementUnit.volumeQty < 0 || (this.state.procurementUnit.volumeQty).toString() == '')}
+                                                            invalid={(touched.volumeQty && !!errors.volumeQty) || !!errors.volumeQty}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.volumeQty}
@@ -1503,9 +1508,9 @@ export default class EditProcurementUnit extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="labeling">{i18n.t('static.procurementUnit.labeling')}</Label>
                                                         <Input
-                                                            type="text" name="labeling" valid={!errors.labeling}
+                                                            type="text" name="labeling" valid={!errors.labeling && this.state.procurementUnit.labeling != ''}
                                                             bsSize="sm"
-                                                            invalid={touched.labeling && !!errors.labeling || this.state.procurementUnit.labeling == ''}
+                                                            // invalid={touched.labeling && !!errors.labeling || this.state.procurementUnit.labeling == ''}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.labeling}
@@ -1518,7 +1523,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="unitsPerCase" valid={!errors.unitsPerCase}
                                                             bsSize="sm"
                                                             valid={!errors.unitsPerCase && this.state.procurementUnit.unitsPerCase >= 0}
-                                                            invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || (this.state.procurementUnit.unitsPerCase < 0 || (this.state.procurementUnit.unitsPerCase).toString() == '')}
+                                                            // invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || (this.state.procurementUnit.unitsPerCase < 0 || (this.state.procurementUnit.unitsPerCase).toString() == '')}
+                                                            invalid={(touched.unitsPerCase && !!errors.unitsPerCase) || !!errors.unitsPerCase}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerCase}
@@ -1531,7 +1537,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="unitsPerPalletEuro1" valid={!errors.unitsPerPalletEuro1}
                                                             bsSize="sm"
                                                             valid={!errors.unitsPerPalletEuro1 && this.state.procurementUnit.unitsPerPalletEuro1 >= 0}
-                                                            invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || (this.state.procurementUnit.unitsPerPalletEuro1 < 0 || (this.state.procurementUnit.unitsPerPalletEuro1).toString() == '')}
+                                                            // invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || (this.state.procurementUnit.unitsPerPalletEuro1 < 0 || (this.state.procurementUnit.unitsPerPalletEuro1).toString() == '')}
+                                                            invalid={(touched.unitsPerPalletEuro1 && !!errors.unitsPerPalletEuro1) || !!errors.unitsPerPalletEuro1}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerPalletEuro1}
@@ -1544,7 +1551,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="unitsPerPalletEuro2" valid={!errors.unitsPerPalletEuro1}
                                                             bsSize="sm"
                                                             valid={!errors.unitsPerPalletEuro2 && this.state.procurementUnit.unitsPerPalletEuro2 >= 0}
-                                                            invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || (this.state.procurementUnit.unitsPerPalletEuro2 < 0 || (this.state.procurementUnit.unitsPerPalletEuro2).toString() == '')}
+                                                            // invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || (this.state.procurementUnit.unitsPerPalletEuro2 < 0 || (this.state.procurementUnit.unitsPerPalletEuro2).toString() == '')}
+                                                            invalid={(touched.unitsPerPalletEuro2 && !!errors.unitsPerPalletEuro2) || !!errors.unitsPerPalletEuro2}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerPalletEuro2}
@@ -1557,7 +1565,8 @@ export default class EditProcurementUnit extends Component {
                                                             type="number" name="unitsPerContainer" valid={!errors.unitsPerContainer}
                                                             bsSize="sm"
                                                             valid={!errors.unitsPerContainer && this.state.procurementUnit.unitsPerContainer >= 0}
-                                                            invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || (this.state.procurementUnit.unitsPerContainer < 0 || (this.state.procurementUnit.unitsPerContainer).toString() == '')}
+                                                            // invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || (this.state.procurementUnit.unitsPerContainer < 0 || (this.state.procurementUnit.unitsPerContainer).toString() == '')}
+                                                            invalid={(touched.unitsPerContainer && !!errors.unitsPerContainer) || !!errors.unitsPerContainer}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.procurementUnit.unitsPerContainer}
