@@ -265,7 +265,11 @@ export default class ManualTagging extends Component {
         var planningUnitSelect = document.getElementById("planningUnitId");
         var planningUnitName = planningUnitSelect.options[planningUnitSelect.selectedIndex].text;
 
-        // document.getElementsByClassName('selection-cell-header').html = "Link?";
+        // var head = document.getElementsByClassName('selection-cell-header')
+        // var ned = document.createTextNode('Link');
+        // head.innerHTML = "Link";
+        // console.log("head---", head);
+        // .innerHtml = "Link?";
 
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
@@ -828,7 +832,13 @@ export default class ManualTagging extends Component {
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,
-            // headerColumnStyle: { backgroundColor: 'blue' },
+            selectionHeaderRenderer: () => 'Link?',
+            headerColumnStyle: {
+                headerAlign: 'center'
+                // align:  function callback(cell, row, rowIndex, colIndex) { 
+                //     console.log("my row----------------------")
+                //     return "center" }
+            },
             onSelect: (row, isSelect, rowIndex, e) => {
                 document.getElementById("erpShipmentQty").value = row.quantity;
                 this.getConvertedQATShipmentQty();
