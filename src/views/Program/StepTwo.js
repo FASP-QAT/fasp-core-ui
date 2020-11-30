@@ -90,8 +90,9 @@ export default class Steptwo extends Component {
         ProgramService.getRealmCountryList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
+                    var realmCountries = response.data.filter(c => c.active == true );
                     this.setState({
-                        realmCountryList: response.data
+                        realmCountryList: realmCountries
                     })
                 } else {
                     this.setState({
