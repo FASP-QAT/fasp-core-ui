@@ -156,7 +156,8 @@ class ForecastMetrics extends Component {
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-      loading: true
+      loading: true,
+      programLst:[]
 
 
 
@@ -179,6 +180,7 @@ class ForecastMetrics extends Component {
     this.pickAMonth2 = React.createRef();
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
+    this.filterProgram=this.filterProgram.bind(this)
   }
 
   makeText = m => {
@@ -435,10 +437,50 @@ class ForecastMetrics extends Component {
       countryValues: countrysId.map(ele => ele),
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
-
-      this.filterData()
+      this.filterProgram();
+      // this.filterData()
     })
   }
+
+  filterProgram = () => {
+    let countryIds = this.state.countryValues.map(ele => ele.value);
+    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    this.setState({
+        programLst: [],
+        programValues: [],
+        programLabels: []
+    }, () => {
+        if (countryIds.length != 0) {
+            let programLst = [];
+            for (var i = 0; i < countryIds.length; i++) {
+                programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+            }
+
+            console.log('programLst', programLst)
+            if (programLst.length > 0) {
+
+                this.setState({
+                    programLst: programLst
+                }, () => {
+                    this.filterData()
+                });
+            } else {
+                this.setState({
+                    programLst: []
+                }, () => {
+                    this.filterData()
+                });
+            }
+        } else {
+            this.setState({
+                programLst: []
+            }, () => {
+                this.filterData()
+            });
+        }
+
+    })
+}
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -1105,10 +1147,10 @@ class ForecastMetrics extends Component {
 
         )
       }, this);
-    const { programs } = this.state;
+    const { programLst } = this.state;
     let programList = [];
-    programList = programs.length > 0
-      && programs.map((item, i) => {
+    programList = programLst.length > 0
+      && programLst.map((item, i) => {
         return (
 
           { label: getLabelText(item.label, this.state.lang), value: item.programId }
