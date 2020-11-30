@@ -1510,5 +1510,12 @@
     "static.budget.budgetCode": "Budget Code",
     "static.organisation.organisationheader": "Organization",
     "static.report.totconsumption": "Total Consumption",
-    "static.dataentry.downloadTemplate":"Download template"
+    "static.dataentry.downloadTemplate":"Download template",
+    "static.report.forecastErrorMonthlyFormula1":"A month labeled `No months in period contain both forecast and actual consumption` means that there are no months in the last X months that have both actual AND forecast records in the same month.",
+    "static.report.forecastErrorMonthlyFormula2":"A month labeled `Total actual consumption for last 6 months = 0` means that the summation of the actual consumption for the usable months was 0.",
+    "static.report.forecastErrorMonthlyFormula3":"A month with no actual and/or forecast should be labeled `Current month does not contain both forecast and actual consumption`.",
+    "static.report.forecastErrorMonthlyFormula4":"If there is a number greater than 0 in the `number of months included in calculation`, it MUST show either a real forecast error or `Actual consumption is 0 in the last 6 months`. It should not show `No data points` which it currently does for some.",
+    "static.report.forecastErrorMonthlyFormula5":"If there is missing data in any of the last 6 months, the calculation should only include those months in the last 6 months that had both actual and forecasted consumption",
+    "static.report.forecastErrorMonthlyFormula6":"If the formula is dividing by 0 (meaning total actual consumption = 0 for the last 6 months), the forecast error should read `Actual consumption is 0 in the last 6 months`",
+    "static.report.forecastErrorMonthlyFormula7":"Keep the `no data points containing…`"
 }
