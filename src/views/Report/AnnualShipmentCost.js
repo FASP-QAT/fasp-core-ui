@@ -842,7 +842,8 @@ var ystart= 160+doc.splitTextToSize((i18n.t('static.planningunit.planningunit') 
                         versions: [],
 
                         planningUnits: [],
-                        outPutList: []
+                        outPutList: [],
+                        planningUnitValues:[]
 
                     }, () => {
                         this.setState({
