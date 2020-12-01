@@ -141,173 +141,171 @@ class SupplyPlanFormulas extends Component {
               <Button onClick={this.toggle} className="mr-1">Launch demo modal</Button> */}
         {/*Supply plan formuale */}
         <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >{i18n.t('static.common.formulae')}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Opening Balance</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.openingBalance')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img src={openingbalance} className="formula-img-mr img-fluid" />
 
-                  <p><span className="formulastext-p">Example :</span><br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
 
-                    Ending balance for last month = 10,653<br></br>
+                    {i18n.t("static.supplyPlanFormula.openingBalanceEx1") + " = 10,653"}<br></br>
                     <br></br>
-                    Opening Balance for current month = Ending balance of last month<br></br>
-                    Opening Balance for current month = 10,653</p>
-                  {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    {i18n.t("static.supplyPlanFormula.openingBalanceEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.openingBalanceEx3") + " = 10,653"}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={endingbalance} /><br></br>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Opening balance = 10,653<br></br>
-                    Adjustments = -100<br></br>
-                    Shipments = 19,176<br></br>
-                    Consumption =7,087<br></br>
-                    Expired stock = 642<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 10,653"}<br></br>
+                    {i18n.t("static.supplyPlan.adjustments") + " = -100"}<br></br>
+                    {i18n.t("static.dashboard.shipments") + " = 19,176"}<br></br>
+                    {i18n.t("static.supplyPlan.consumption") + " =7,087"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStock") + " = 642"}<br></br>
                     <br></br>
-                    Ending balance = Opening balance + Adjustments + Shipments in account - Consumptions - Expired stock<br></br>
-                    Ending balance = 10,653 + (-100) + 19,176 - 7,087 - 642<br></br>
-                    Ending balance = 22,000</p><br></br>
+                    {i18n.t("static.supplyPlanFormula.endingBalance1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 10,653 + (-100) + 19,176 - 7,087 - 642"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 22,000"}</p><br></br>
                   {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
-                  <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Months in past = 3(Based on program planning unit)<br></br>
-                    Months in future = 3(Based on program planning unit)<br></br>
-                    Current month = May 2020<br></br>
-                    Consumption in Feb 2020 = 5,000<br></br>
-                    Consumption in March 2020 = 6,890<br></br>
-                    Consumption in April 2020 = 6,907<br></br>
-                    Consumption in May 2020 = 7,087<br></br>
-                    Consumption in Jun 2020 = 5,678<br></br>
-                    Consumption in July 2020 = 6,789<br></br>
+                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
 
                     <br></br>
-                    AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-                    AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
-                    AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
-                    AMC = 6,392</p>
-                  {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.minStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={minstock} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    AMC = 6,392<br></br>
-                    Min MoS Guardrail = 3(Based on realm)<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx4")}<br></br>
                     <br></br>
-                    Min= AMC * MAX (MIN MONTH OF STOCK,Min MoS Guardrail)<br></br>
-                    Min = 6,392 * MAX (4,3)<br></br>
-                    Min = 6,392 * 4<br></br>
-                    Min = 25,568</p>
+                    {i18n.t("static.supplyPlanFormula.minStockEx5")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx6")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx7")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minStockEx8")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.maxStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
                   <img className="formula-img-mr img-fluid" src={maxstock} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    AMC = 6,392<br></br>
-                    Max MoS Guardrail = 18(Based on realm)<br></br>
-                    Min MoS Guardrail = 3(Based on realm)<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx4")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx5")}<br></br>
                     <br></br>
-                    Max = AMC * MIN ([ MAX(MIN MONTH OF STOCK ,Min MoS Guardrail) + REORDER FREQUENCY ] ,Max MoS Guardrail)<br></br>
-                    Max = 6,392 * MIN ([ MAX(4,3)+3 ] ,18) <br></br>
-                    Max = 6,392 * MIN ([ 4+3 ] ,18)<br></br>
-                    Max = 6,392 * MIN (7,18 )<br></br>
-                    Max = 6,392 * 7<br></br>
-                    Max = 44,744</p>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx6")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx7")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx8")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx9")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx10")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx11")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Min Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.minMonthsOfStock')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={minmonthstock} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    Min MoS Guardrail = 3(Based on realm)<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx3")}<br></br>
                     <br></br>
-                    Min= MAX (MIN MONTH OF STOCK,Min MoS Guardrail)<br></br>
-                    Min = MAX (4,3)<br></br>
-                    Min = 4</p>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx4")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx5")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx6")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
 
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Max Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.maxMonthOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={maxmonthstock} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    Max MoS Guardrail = 18(Based on realm)<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.minMonthOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx4")}<br></br>
                     <br></br>
-                    Max = MIN ( [ MAX(MIN MONTH OF STOCK ,3) + REORDER FREQUENCY ] ,Min MoS Guardrail )<br></br>
-                    Max = MIN ([ MAX(4,3)+3 ] ,18 ) <br></br>
-                    Max = MIN ( [ 4+3 ] ,18 )<br></br>
-                    Max = MIN (7,18 )<br></br>
-                    Max = 7</p>
+                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx2")} <br></br>
+                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx4")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxMonthOfStockEx5")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
 
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">When to suggest order</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.whenToSuggest")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={suggestorder} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Inventory of current month = 24,890<br></br>
-                    Min = 25,568<br></br>
-                    Suggest Order = True</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx3")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
 
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Suggested Order Qty</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.suggestedOrderQty")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={suggestorderqty} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Max Stock = 44,744<br></br>
-                    Ending balance = 25,568<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
                     <br></br>
-                    Suggested Order Qty = (Max Stock - Ending balance) <br></br>
-                    Suggested Order Qty = 44,744 - 25,568<br></br>
-                    Suggested Order Qty = 19,176</p>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
 
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={mos} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Ending Balance = 22,642<br></br>
-                    AMC = 6,392<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
                     <br></br>
-                    Months Of Stock = Ending Balance / AMC<br></br>
-                    Months Of Stock = 22,642 / 6,392<br></br>
-                    Months Of Stock = 3.54</p>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
 
@@ -318,15 +316,15 @@ class SupplyPlanFormulas extends Component {
         </Modal>
         {/*Cost Of Inventory formuale */}
         <Modal isOpen={this.state.costofinventory} className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={this.togglecostOfInventory} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.togglecostOfInventory} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Cost Of Inventory</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.dashboard.costOfInventory")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={costOfinventory} />
-                  <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                  <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
@@ -334,17 +332,16 @@ class SupplyPlanFormulas extends Component {
         </Modal>
         {/*Inventory Turns formuale */}
         <Modal isOpen={this.state.inventoryturns} className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={this.toggleInventoryTurns} className="ModalHead modal-info-Headher"><strong>Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleInventoryTurns} className="ModalHead modal-info-Headher"><strong>{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Inventory Turns</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.dashboard.inventoryTurns")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
-
                   <img className="formula-img-mr img-fluid" src={Inventoryturns} />
-                  <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                  <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
 
-                  <p>Note: Actual consumption precedes forecasted consumption in calculation if available</p>
+                  <p>{i18n.t("static.supplyPlanFormula.inventoryTurnsNote")}</p>
 
                 </ListGroupItemText>
               </ListGroupItem>
@@ -353,17 +350,18 @@ class SupplyPlanFormulas extends Component {
         </Modal>
         {/*Forcast Matrix formuale */}
         <Modal isOpen={this.state.forecastmatrix} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleForecastMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleForecastMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.wapeFormula")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
-                  <p>{i18n.t('static.report.forecastErrorMonthlyFormula1')}</p>
-                  <p>{i18n.t('static.report.forecastErrorMonthlyFormula2')}</p>
-                  <p>{i18n.t('static.report.forecastErrorMonthlyFormula3')}</p>
-                  <p>Note : We have used Weighted Absolute Percentage Error (WAPE) Formulae here</p>
+                  <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormula1')}</p>
+                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula2')}</p>
+                  <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula3')}</p>
+                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
+                  <p>{i18n.t("static.report.wapeFormulaNote")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
@@ -371,18 +369,19 @@ class SupplyPlanFormulas extends Component {
         </Modal>
         {/*Forcast Matrix formuale 1*/}
         <Modal isOpen={this.state.forecastmatrix1} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleForecastMatrix1} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleForecastMatrix1} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.wapeFormula")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
-                    <p>{i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
-                    <p>{i18n.t('static.report.forecastErrorMonthlyFormula5')}</p>
-                    <p>{i18n.t('static.report.forecastErrorMonthlyFormula6')}</p>
-                    <p>{i18n.t('static.report.forecastErrorMonthlyFormula7')}</p>
-                  <p>Note : We have used Weighted Absolute Percentage Error (WAPE) Formulae here</p>
+                  <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormula1')}</p>
+                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula5')}</p>
+                  <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula6')}</p>
+                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula7')}</p>
+                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
+                  <p>{i18n.t("static.report.wapeFormulaNote")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
@@ -390,94 +389,92 @@ class SupplyPlanFormulas extends Component {
         </Modal>
         {/*Stock Status matrix*/}
         <Modal isOpen={this.state.stockstatusmatrix} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleStockStatusMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleStockStatusMatrix} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
-                  <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Months in past = 3(Based on program planning unit)<br></br>
-                    Months in future = 3(Based on program planning unit)<br></br>
-                    Current month = May 2020<br></br>
-                    Consumption in Feb 2020 = 5,000<br></br>
-                    Consumption in March 2020 = 6,890<br></br>
-                    Consumption in April 2020 = 6,907<br></br>
-                    Consumption in May 2020 = 7,087<br></br>
-                    Consumption in Jun 2020 = 5,678<br></br>
-                    Consumption in July 2020 = 6,789<br></br>
+                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
 
                     <br></br>
-                    AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-                    AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
-                    AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
-                    AMC = 6,392</p>
-                  {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={mos} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Ending Balance = 22,642<br></br>
-                    AMC = 6,392<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
                     <br></br>
-                    Months Of Stock = Ending Balance / AMC<br></br>
-                    Months Of Stock = 22,642 / 6,392<br></br>
-                    Months Of Stock = 3.54</p>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <div className="mt-2" >
-                <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
               </div>
             </ListGroup>
           </ModalBody>
         </Modal>
         {/*Stock Status Over Time formuale */}
         <Modal isOpen={this.state.stockstatusovertime} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleStockStatusOverTime} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleStockStatusOverTime} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
-                  <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Months in past = 3(Based on program planning unit)<br></br>
-                    Months in future = 3(Based on program planning unit)<br></br>
-                    Current month = May 2020<br></br>
-                    Consumption in Feb 2020 = 5,000<br></br>
-                    Consumption in March 2020 = 6,890<br></br>
-                    Consumption in April 2020 = 6,907<br></br>
-                    Consumption in May 2020 = 7,087<br></br>
-                    Consumption in Jun 2020 = 5,678<br></br>
-                    Consumption in July 2020 = 6,789<br></br>
+                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
 
                     <br></br>
-                    AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-                    AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
-                    AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
-                    AMC = 6,392</p>
-                  {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={mos} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Ending Balance = 22,642<br></br>
-                    AMC = 6,392<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
                     <br></br>
-                    Months Of Stock = Ending Balance / AMC<br></br>
-                    Months Of Stock = 22,642 / 6,392<br></br>
-                    Months Of Stock = 3.54</p>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
@@ -485,65 +482,64 @@ class SupplyPlanFormulas extends Component {
         </Modal>
         {/*Stock Status formuale */}
         <Modal isOpen={this.state.stockstatus} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleStockStatus} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleStockStatus} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
-                  <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Months in past = 3(Based on program planning unit)<br></br>
-                    Months in future = 3(Based on program planning unit)<br></br>
-                    Current month = May 2020<br></br>
-                    Consumption in Feb 2020 = 5,000<br></br>
-                    Consumption in March 2020 = 6,890<br></br>
-                    Consumption in April 2020 = 6,907<br></br>
-                    Consumption in May 2020 = 7,087<br></br>
-                    Consumption in Jun 2020 = 5,678<br></br>
-                    Consumption in July 2020 = 6,789<br></br>
+                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
 
                     <br></br>
-                    AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-                    AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
-                    AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
-                    AMC = 6,392</p>
-                  {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={mos} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Ending Balance = 22,642<br></br>
-                    AMC = 6,392<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
                     <br></br>
-                    Months Of Stock = Ending Balance / AMC<br></br>
-                    Months Of Stock = 22,642 / 6,392<br></br>
-                    Months Of Stock = 3.54</p>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.maxStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
                   <img className="formula-img-mr img-fluid" src={maxstock} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    AMC = 6,392<br></br>
-                    Max MoS Guardrail = 18(Based on realm)<br></br>
-                    Min MoS Guardrail = 3(Based on realm)<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx4")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx5")}<br></br>
                     <br></br>
-                    Max = AMC * MIN ([ MAX(MIN MONTH OF STOCK ,Min MoS Guardrail) + REORDER FREQUENCY ] ,Max MoS Guardrail)<br></br>
-                    Max = 6,392 * MIN ([ MAX(4,3)+3 ] ,18) <br></br>
-                    Max = 6,392 * MIN ([ 4+3 ] ,18)<br></br>
-                    Max = 6,392 * MIN (7,18 )<br></br>
-                    Max = 6,392 * 7<br></br>
-                    Max = 44,744</p>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx6")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx7")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx8")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx9")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx10")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.maxStockEx11")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
@@ -553,66 +549,65 @@ class SupplyPlanFormulas extends Component {
 
         {/*Stock Status Across Planning Units formuale */}
         <Modal isOpen={this.state.stockstatusacrossplaningunit} className={'modal-xl ' + this.props.className} >
-          <ModalHeader toggle={this.toggleStockStatusAcrossPlaningUnit} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleStockStatusAcrossPlaningUnit} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
-                  <p>* Consider only non zero values. Also current month is included in the months in future for AMC</p>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Months in past = 3(Based on program planning unit)<br></br>
-                    Months in future = 3(Based on program planning unit)<br></br>
-                    Current month = May 2020<br></br>
-                    Consumption in Feb 2020 = 5,000<br></br>
-                    Consumption in March 2020 = 6,890<br></br>
-                    Consumption in April 2020 = 6,907<br></br>
-                    Consumption in May 2020 = 7,087<br></br>
-                    Consumption in Jun 2020 = 5,678<br></br>
-                    Consumption in July 2020 = 6,789<br></br>
+                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
 
                     <br></br>
-                    AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-                    AMC = (Consumption for Feb,March,April,May 2020 + June & July 2020) / 6<br></br>
-                    AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
-                    AMC = 6,392</p>
-                  {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
+                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={mos} />
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Ending Balance = 22,642<br></br>
-                    AMC = 6,392<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
                     <br></br>
-                    Months Of Stock = Ending Balance / AMC<br></br>
-                    Months Of Stock = 22,642 / 6,392<br></br>
-                    Months Of Stock = 3.54</p>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={endingbalance} /><br></br>
-                  <p><span className="formulastext-p">Example :</span><br></br>
-                    Opening balance = 10,653<br></br>
-                    Adjustments = -100<br></br>
-                    Shipments = 19,176<br></br>
-                    Consumption =7,087<br></br>
-                    Expired stock = 642<br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 10,653"}<br></br>
+                    {i18n.t("static.supplyPlan.adjustments") + " = -100"}<br></br>
+                    {i18n.t("static.dashboard.shipments") + " = 19,176"}<br></br>
+                    {i18n.t("static.supplyPlan.consumption") + " =7,087"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStock") + " = 642"}<br></br>
                     <br></br>
-                    Ending balance = Opening balance + Adjustments + Shipments in account - Consumptions - Expired stock<br></br>
-                    Ending balance = 10,653 + (-100) + 19,176 - 7,087 - 642<br></br>
-                    Ending balance = 22,000</p><br></br>
+                    {i18n.t("static.supplyPlanFormula.endingBalance1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 10,653 + (-100) + 19,176 - 7,087 - 642"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 22,000"}</p><br></br>
                   {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                 </ListGroupItemText>
               </ListGroupItem>
               <div className="mt-2">
-                <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
               </div>
             </ListGroup>
           </ModalBody>
@@ -620,224 +615,20 @@ class SupplyPlanFormulas extends Component {
 
         {/*Shipment Cost formuale */}
         <Modal isOpen={this.state.shipmentcost} className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={this.toggleShippmentCost} className="ModalHead modal-info-Headher"><strong className="TextWhite">Formulae</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleShippmentCost} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">Shipment Cost</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.shipmentCost")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
                   <img className="formula-img-mr img-fluid" src={shipmentcost} />
-                  <p>Note: If "Include planned shipment" is "yes" - Planned, Submitted, Approved, Shipped, Arrived, Received, On Hold statuses are all included in the projected inventory. If "no", all above statuses are included except Planned.</p>
+                  <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
           </ModalBody>
         </Modal>
-        {/* <ListGroup>
-                <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Opening Balance</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Opening-balance-formula.png"/>
-                    
-                    <p><span className="formulastext-p">Example :</span><br></br>
-                    
-Ending balance for last month = 10,653<br></br>
-<br></br>
-Opening Balance for current month = Ending balance of last month<br></br>
-Opening Balance for current month = 10,653</p>
-                   
-                    </ListGroupItemText>
-                  </ListGroupItem>
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Ending Balance</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Ending balance-formula.png"/><br></br>
-                    <p><span className="formulastext-p">Example :</span><br></br>
-                    Opening balance = 10,653<br></br>
-Adjustments = -100<br></br>
-Shipments = 19,176<br></br>
-Consumption =7,087<br></br>
-Expired stock = 642<br></br>
-<br></br>
-Ending balance = Opening balance + Adjustments + Shipments in account - Consumptions - Expired stock<br></br>
-Ending balance = 10,653 + (-100) + 19,176 - 7,087 - 642<br></br>
-Ending balance = 22,000</p><br></br>
-                   
-                    </ListGroupItemText>
-                  </ListGroupItem>
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Average Monthly Consumption (AMC)</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/AMC-Formula.png"/><br></br>
-                    <p>* Consider only non zero values. Also future months include current month</p>
-                    <p><span className="formulastext-p">Example :</span><br></br>
-                    Months in past = 3(Based on program planning unit)<br></br>
-                    Months in future = 3(Based on program planning unit)<br></br>
-                    Current month = May 2020<br></br>
-Consumption in Feb 2020 = 5,000<br></br>
-Consumption in Mar 2020 = 6,890<br></br>
-Consumption in Apr 2020 = 6,907<br></br>
-Consumption in May 2020 = 7,087<br></br>
-Consumption in Jun 2020 = 5,678<br></br>
-Consumption in Jul 2020 = 6,789<br></br>
-
-<br></br>
-AMC =  Consumption in No. of MONTHS_IN_PAST + Consumption in No. of MONTHS_IN_FUTURE/ number of months<br></br>
-AMC = (Consumption for Feb,Mar,Apr,May 2020 + June & Jul 2020) / 6<br></br>
-AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br></br>
-AMC = 6,392</p>
-                   
-                    </ListGroupItemText>
-                  </ListGroupItem>
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Min-Formula.png"/>
-                    <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    AMC = 6,392<br></br>
-                    Min MoS Guardrail = 3(Based on realm)<br></br>
-<br></br>
-Min= AMC * MAX (MIN MONTH OF STOCK,Min MoS Guardrail)<br></br>
-Min = 6,392 * MAX (4,3)<br></br>
-Min = 6,392 * 4<br></br>
-Min = 25,568</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                   
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Formula.png"/>
-                    <p><span className="formulastext-p">Example :</span><br></br>
-                    MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    AMC = 6,392<br></br>
-                    Max MoS Guardrail = 18(Based on realm)<br></br>
-                    Min MoS Guardrail = 3(Based on realm)<br></br>
-<br></br>
-Max = AMC * MIN ([ MAX(MIN MONTH OF STOCK ,Min MoS Guardrail) + REORDER FREQUENCY ] ,Max MoS Guardrail)<br></br>
-Max = 6,392 * MIN ([ MAX(4,3)+3 ] ,18) <br></br>
-Max = 6,392 * MIN ([ 4+3 ] ,18)<br></br>
-Max = 6,392 * MIN (7,18 )<br></br>
-Max = 6,392 * 7<br></br>
-Max = 44,744</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Min Months Of Stock</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Min-Months-Of-Stock-formula.png"/>
-                     <p><span className="formulastext-p">Example :</span><br></br>
-                     MIN MONTH OF STOCK = 4<br></br>
-                      REORDER FREQUENCY = 3<br></br>
-                     Min MoS Guardrail = 3(Based on realm)<br></br>
-                    <br></br>
-                      Min= MAX (MIN MONTH OF STOCK,Min MoS Guardrail)<br></br>
-                      Min = MAX (4,3)<br></br>
-                      Min = 4</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Max Months Of Stock</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Max-Months-Of-Stock-formula.png"/>
-                     <p><span className="formulastext-p">Example :</span><br></br>
-                     MIN MONTH OF STOCK = 4<br></br>
-                    REORDER FREQUENCY = 3<br></br>
-                    Max MoS Guardrail = 18(Based on realm)<br></br>
-<br></br>
-Max = MIN ( [ MAX(MIN MONTH OF STOCK ,3) + REORDER FREQUENCY ] ,Min MoS Guardrail )<br></br>
-Max = MIN ([ MAX(4,3)+3 ] ,18 ) <br></br>
-Max = MIN ( [ 4+3 ] ,18 )<br></br>
-Max = MIN (7,18 )<br></br>
-Max = 7</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">When to suggest order</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/suggest order-Formula.png"/>
-                     <p><span className="formulastext-p">Example :</span><br></br>
-Inventory of current month = 24,890<br></br>
-Min = 25,568<br></br>
-Suggest Order = True</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Suggested Order Qty</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/suggest order qty-Formula.png"/>
-                     <p><span className="formulastext-p">Example :</span><br></br>
-                     Max = 44,744<br></br>
-                    Min = 25,568<br></br>
-<br></br>
-Suggested Order Qty = Max - Min<br></br>
-Suggested Order Qty = 44,744 - 25,568<br></br>
-Suggested Order Qty = 19,176</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Months Of Stock</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Month0fstock-Formula.png"/>
-                     <p><span className="formulastext-p">Example :</span><br></br>
-                     Ending Balance = 22,642<br></br>
-AMC = 6,392<br></br>
-<br></br>
-Months Of Stock = Ending Balance / AMC<br></br>
-Months Of Stock = 22,642 / 6,392<br></br>
-Months Of Stock = 3.54</p>
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Cost Of Inventory</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Cost-Of-Inventory.png"/>
-                    
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Inventory Turns</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    
-                     <img className="formula-img-mr img-fluid" src="../src/assets/img/Inventory Turns.png"/>
-                    
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  
-                </ListGroup>
-                <ListGroup>
-                <ListGroupItem action>
-                    <ListGroupItemHeading className="formulasheading">Weighted Absolute Percentage Error (WAPE)</ListGroupItemHeading>
-                    <ListGroupItemText className="formulastext">
-                    <img className="formula-img-mr img-fluid" src="../src/assets/img/WAPE-Formula.png"/><br></br>
-                    <p>* N is number of months</p>
-                   
-                    </ListGroupItemText>
-                  </ListGroupItem>
-
-                  
-                </ListGroup> */}
-        {/* </CardBody>
-            </Card>
-          </Col>
-        </Row> */}
       </div>
     );
   }
