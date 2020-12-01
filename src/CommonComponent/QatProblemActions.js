@@ -3156,7 +3156,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -3486,7 +3486,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -3807,7 +3807,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -4127,7 +4127,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -4412,13 +4412,13 @@ export default class QatProblemActions extends Component {
                                                     }
                                                     if (problemList[prob].problem.problemId == 19) {
                                                         // Inventory is above max with shipment(s) in the next 7-18 months. Critical = High============
-                                                        // //console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
+                                                        console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
                                                         var mosArray = [];
                                                         // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                         // problemList[prob].data1=0
                                                         // problemList[prob].data2=6
                                                         for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
-                                                            // //console.log("mosCounter====>", mosCounter);
+                                                            console.log("mosCounter====>", mosCounter);
                                                             var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                             var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                             var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -4444,7 +4444,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -4453,13 +4453,13 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // //console.log("planningUnitId====>", planningUnitId);
-                                                        // //console.log("mosArray============>$@##", mosArray);
+                                                        console.log("D------------------->planningUnitId====>", planningUnitId);
+                                                        console.log("D------------------->mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         // var monthWithMosLessThenMin = '';
                                                         var monthWithMosGreaterThenMax = '';
                                                         for (var element = 0; element < mosArray.length; element++) {
-                                                            // //console.log("mos element===>", mosArray[element]);
+                                                            console.log("mos element===>", mosArray[element]);
                                                             if (mosArray[element].mos > mosArray[element].maxForMonths) {
                                                                 monthWithMosGreaterThenMax = mosArray[element].month;
                                                                 break;
@@ -4588,17 +4588,17 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         }
-
+                                                        console.log("D------------------->monthWithMosGreaterThenMax", monthWithMosGreaterThenMax)
                                                         if (monthWithMosGreaterThenMax != '') {
-                                                            // //console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                            console.log("D------------------->min mos month from array ======>", monthWithMosGreaterThenMax);
                                                             var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
                                                             var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
-                                                            // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                            console.log("D------------------->startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                             var shipmentListForMonths = programList[pp].shipmentList;
                                                             var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                            // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                            console.log("D------------------->filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                             if (filteredShipmentListForMonths.length > 0) {
-                                                                // //console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                                console.log("D------------------->flag a problem mos is greater then max and have shipment withing lead times");
                                                                 if (index == -1) {
                                                                     var json = {
                                                                         problemReportId: 0,
@@ -4771,7 +4771,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
