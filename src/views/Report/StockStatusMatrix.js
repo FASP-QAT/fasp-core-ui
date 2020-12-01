@@ -44,6 +44,8 @@ const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
   constructor(props) {
     super(props);
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 10);
     this.state = {
       realms: [],
       productCategories: [],
@@ -58,7 +60,7 @@ export default class StockStatusMatrix extends React.Component {
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true
@@ -147,21 +149,29 @@ export default class StockStatusMatrix extends React.Component {
         console.log(ele)
         var min = ele.minMonthsOfStock
         var reorderFrequency = ele.reorderFrequency
-        if (stockStatusId == 0){ if((ele.jan!= null && ele.feb!= null && ele.mar!= null && ele.apr!= null && ele.may!= null && ele.jun!= null && ele.jul!= null && ele.aug!= null && ele.sep!= null && ele.oct!= null && ele.nov!= null && ele.dec!= null) && ((this.roundN(ele.jan) == 0 )||( this.roundN(ele.feb) == 0 )||( this.roundN(ele.mar) == 0 )||( this.roundN(ele.apr) == 0 )||( this.roundN(ele.may) == 0 )||( this.roundN(ele.jun) == 0 )||( this.roundN(ele.jul) == 0 )||( this.roundN(ele.aug) == 0 )||( this.roundN(ele.sep) == 0 )||( this.roundN(ele.oct) == 0 )||( this.roundN(ele.nov) == 0 )||( this.roundN(ele.dec) == 0))) {
-          console.log('in 0')
-          filteredData.push(ele)
-        }} else if (stockStatusId == 1 ){if((ele.jan!= null && ele.feb!= null && ele.mar!= null && ele.apr!= null && ele.may!= null && ele.jun!= null && ele.jul!= null && ele.aug!= null && ele.sep!= null && ele.oct!= null && ele.nov!= null && ele.dec!= null)&&((this.roundN(ele.jan)!= 0 && this.roundN(ele.feb)!= 0 && this.roundN(ele.mar)!= 0 && this.roundN(ele.apr)!= 0 && this.roundN(ele.may)!= 0 && this.roundN(ele.jun)!= 0 && this.roundN(ele.jul)!= 0 && this.roundN(ele.aug)!= 0 && this.roundN(ele.sep)!= 0 && this.roundN(ele.oct)!= 0 && this.roundN(ele.nov)!= 0 && this.roundN(ele.dec)!= 0))&&((this.roundN(ele.jan) < min )||( this.roundN(ele.feb) < min )||( this.roundN(ele.mar) < min )||( this.roundN(ele.apr) < min )||( this.roundN(ele.may) < min )||( this.roundN(ele.jun) < min )||( this.roundN(ele.jul) < min )||( this.roundN(ele.aug) < min )||( this.roundN(ele.sep) < min )||( this.roundN(ele.oct) < min )||( this.roundN(ele.nov) < min )||( this.roundN(ele.dec) <min))) {
-          console.log('in 1')
-          filteredData.push(ele)
-        }} else if (stockStatusId == 3){ if((this.roundN(ele.jan) > (min + reorderFrequency) )||( this.roundN(ele.feb) > (min + reorderFrequency) )||( this.roundN(ele.mar) > (min + reorderFrequency) )||( this.roundN(ele.apr) > (min + reorderFrequency) )||( this.roundN(ele.may) > (min + reorderFrequency) )||( this.roundN(ele.jun) > (min + reorderFrequency) )||( this.roundN(ele.jul) > (min + reorderFrequency) )||( this.roundN(ele.aug) > (min + reorderFrequency) )||( this.roundN(ele.sep) > (min + reorderFrequency) )||( this.roundN(ele.oct) > (min + reorderFrequency) )||( this.roundN(ele.nov) > (min + reorderFrequency) )||( this.roundN(ele.dec) > (min + reorderFrequency))) {
-          console.log('in 2')
-          filteredData.push(ele)
-        }} else if (stockStatusId == 2){if((this.roundN(ele.jan) < (min + reorderFrequency) && this.roundN(ele.jan) > min )||( this.roundN(ele.feb) < (min + reorderFrequency) && this.roundN(ele.feb) > min)||( this.roundN(ele.mar) < (min + reorderFrequency)&& this.roundN(ele.mar) > min )||( this.roundN(ele.apr) < (min + reorderFrequency)&& this.roundN(ele.apr) > min)||( this.roundN(ele.may) < (min + reorderFrequency) && this.roundN(ele.may) > min)||( this.roundN(ele.jun) < (min + reorderFrequency)&& this.roundN(ele.jun) > min )||( this.roundN(ele.jul) < (min + reorderFrequency) && this.roundN(ele.jul) > min)||( this.roundN(ele.aug) < (min + reorderFrequency)&& this.roundN(ele.aug) > min )||( this.roundN(ele.sep) < (min + reorderFrequency)&& this.roundN(ele.sep) > min )||( this.roundN(ele.oct) < (min + reorderFrequency) && this.roundN(ele.act) > min)||( this.roundN(ele.nov) < (min + reorderFrequency)&& this.roundN(ele.nov) > min )||( this.roundN(ele.dec) < (min + reorderFrequency)&& this.roundN(ele.dec) > min)) {
-          console.log('in 3')
-          filteredData.push(ele)
-        }}
+        if (stockStatusId == 0) {
+          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) == 0) || (this.roundN(ele.feb) == 0) || (this.roundN(ele.mar) == 0) || (this.roundN(ele.apr) == 0) || (this.roundN(ele.may) == 0) || (this.roundN(ele.jun) == 0) || (this.roundN(ele.jul) == 0) || (this.roundN(ele.aug) == 0) || (this.roundN(ele.sep) == 0) || (this.roundN(ele.oct) == 0) || (this.roundN(ele.nov) == 0) || (this.roundN(ele.dec) == 0))) {
+            console.log('in 0')
+            filteredData.push(ele)
+          }
+        } else if (stockStatusId == 1) {
+          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) != 0 && this.roundN(ele.feb) != 0 && this.roundN(ele.mar) != 0 && this.roundN(ele.apr) != 0 && this.roundN(ele.may) != 0 && this.roundN(ele.jun) != 0 && this.roundN(ele.jul) != 0 && this.roundN(ele.aug) != 0 && this.roundN(ele.sep) != 0 && this.roundN(ele.oct) != 0 && this.roundN(ele.nov) != 0 && this.roundN(ele.dec) != 0)) && ((this.roundN(ele.jan) < min) || (this.roundN(ele.feb) < min) || (this.roundN(ele.mar) < min) || (this.roundN(ele.apr) < min) || (this.roundN(ele.may) < min) || (this.roundN(ele.jun) < min) || (this.roundN(ele.jul) < min) || (this.roundN(ele.aug) < min) || (this.roundN(ele.sep) < min) || (this.roundN(ele.oct) < min) || (this.roundN(ele.nov) < min) || (this.roundN(ele.dec) < min))) {
+            console.log('in 1')
+            filteredData.push(ele)
+          }
+        } else if (stockStatusId == 3) {
+          if ((this.roundN(ele.jan) > (min + reorderFrequency)) || (this.roundN(ele.feb) > (min + reorderFrequency)) || (this.roundN(ele.mar) > (min + reorderFrequency)) || (this.roundN(ele.apr) > (min + reorderFrequency)) || (this.roundN(ele.may) > (min + reorderFrequency)) || (this.roundN(ele.jun) > (min + reorderFrequency)) || (this.roundN(ele.jul) > (min + reorderFrequency)) || (this.roundN(ele.aug) > (min + reorderFrequency)) || (this.roundN(ele.sep) > (min + reorderFrequency)) || (this.roundN(ele.oct) > (min + reorderFrequency)) || (this.roundN(ele.nov) > (min + reorderFrequency)) || (this.roundN(ele.dec) > (min + reorderFrequency))) {
+            console.log('in 2')
+            filteredData.push(ele)
+          }
+        } else if (stockStatusId == 2) {
+          if ((this.roundN(ele.jan) < (min + reorderFrequency) && this.roundN(ele.jan) > min) || (this.roundN(ele.feb) < (min + reorderFrequency) && this.roundN(ele.feb) > min) || (this.roundN(ele.mar) < (min + reorderFrequency) && this.roundN(ele.mar) > min) || (this.roundN(ele.apr) < (min + reorderFrequency) && this.roundN(ele.apr) > min) || (this.roundN(ele.may) < (min + reorderFrequency) && this.roundN(ele.may) > min) || (this.roundN(ele.jun) < (min + reorderFrequency) && this.roundN(ele.jun) > min) || (this.roundN(ele.jul) < (min + reorderFrequency) && this.roundN(ele.jul) > min) || (this.roundN(ele.aug) < (min + reorderFrequency) && this.roundN(ele.aug) > min) || (this.roundN(ele.sep) < (min + reorderFrequency) && this.roundN(ele.sep) > min) || (this.roundN(ele.oct) < (min + reorderFrequency) && this.roundN(ele.act) > min) || (this.roundN(ele.nov) < (min + reorderFrequency) && this.roundN(ele.nov) > min) || (this.roundN(ele.dec) < (min + reorderFrequency) && this.roundN(ele.dec) > min)) {
+            console.log('in 3')
+            filteredData.push(ele)
+          }
+        }
       });
-    } else{
+    } else {
       filteredData = this.state.selData
     }
     console.log(filteredData)
@@ -957,28 +967,28 @@ export default class StockStatusMatrix extends React.Component {
   exportCSV(columns) {
 
     var csvRow = [];
-    csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + (this.state.startYear + ' ~ ' + this.state.endYear)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + (this.state.startYear + ' ~ ' + this.state.endYear)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-        csvRow.push('')
-        this.state.planningUnitLabels.map(ele =>
-      csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
-      csvRow.push('')
-      csvRow.push('"'+(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
-      csvRow.push('')
-      csvRow.push('"'+(i18n.t('static.dashboard.stockstatusmain') + ' : ' + document.getElementById("stockStatusId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    this.state.planningUnitLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.dashboard.stockstatusmain') + ' : ' + document.getElementById("stockStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
 
     csvRow.push('')
     csvRow.push('')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
 
     const headers = [];
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan)?'':this.roundN(ele.jan), isNaN(ele.feb)?'':this.roundN(ele.feb), isNaN(ele.mar)?'':this.roundN(ele.mar), isNaN(ele.apr)?'':this.roundN(ele.apr), isNaN(ele.may)?'':this.roundN(ele.may), isNaN(ele.jun)?'':this.roundN(ele.jun), isNaN(ele.jul)?'':this.roundN(ele.jul), isNaN(ele.aug)?'':this.roundN(ele.aug), isNaN(ele.sep)?'':this.roundN(ele.sep), isNaN(ele.oct)?'':this.roundN(ele.oct), isNaN(ele.nov)?'':this.roundN(ele.nov), isNaN(ele.dec)?'':this.roundN(ele.dec)])));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan) ? '' : this.roundN(ele.jan), isNaN(ele.feb) ? '' : this.roundN(ele.feb), isNaN(ele.mar) ? '' : this.roundN(ele.mar), isNaN(ele.apr) ? '' : this.roundN(ele.apr), isNaN(ele.may) ? '' : this.roundN(ele.may), isNaN(ele.jun) ? '' : this.roundN(ele.jun), isNaN(ele.jul) ? '' : this.roundN(ele.jul), isNaN(ele.aug) ? '' : this.roundN(ele.aug), isNaN(ele.sep) ? '' : this.roundN(ele.sep), isNaN(ele.oct) ? '' : this.roundN(ele.oct), isNaN(ele.nov) ? '' : this.roundN(ele.nov), isNaN(ele.dec) ? '' : this.roundN(ele.dec)])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -1009,7 +1019,7 @@ export default class StockStatusMatrix extends React.Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -1087,7 +1097,7 @@ export default class StockStatusMatrix extends React.Component {
       { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
     ]
     let data;
-    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan)?'':this.formatter(ele.jan), isNaN(ele.feb)?'':this.formatter(ele.feb), isNaN(ele.mar)?'':this.formatter(ele.mar), isNaN(ele.apr)?'':this.formatter(ele.apr), isNaN(ele.may)?'':this.formatter(ele.may), isNaN(ele.jun)?'':this.formatter(ele.jun), isNaN(ele.jul)?'':this.formatter(ele.jul), isNaN(ele.aug)?'':this.formatter(ele.aug), isNaN(ele.sep)?'':this.formatter(ele.sep), isNaN(ele.oct)?'':this.formatter(ele.oct), isNaN(ele.nov)?'':this.formatter(ele.nov), isNaN(ele.dec)?'':this.formatter(ele.dec)]);
+    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan) ? '' : this.formatter(ele.jan), isNaN(ele.feb) ? '' : this.formatter(ele.feb), isNaN(ele.mar) ? '' : this.formatter(ele.mar), isNaN(ele.apr) ? '' : this.formatter(ele.apr), isNaN(ele.may) ? '' : this.formatter(ele.may), isNaN(ele.jun) ? '' : this.formatter(ele.jun), isNaN(ele.jul) ? '' : this.formatter(ele.jul), isNaN(ele.aug) ? '' : this.formatter(ele.aug), isNaN(ele.sep) ? '' : this.formatter(ele.sep), isNaN(ele.oct) ? '' : this.formatter(ele.oct), isNaN(ele.nov) ? '' : this.formatter(ele.nov), isNaN(ele.dec) ? '' : this.formatter(ele.dec)]);
 
     var startY = 180 + (this.state.planningUnitValues.length * 3)
     let content = {
@@ -1560,18 +1570,18 @@ export default class StockStatusMatrix extends React.Component {
                         <td className="text-center">{ele.minMonthsOfStock}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan)?'':this.formatter(ele.jan)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb)?'':this.formatter(ele.feb)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar)?'':this.formatter(ele.mar)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr)?'':this.formatter(ele.apr)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may)?'':this.formatter(ele.may)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun)?'':this.formatter(ele.jun)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul)?'':this.formatter(ele.jul)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug)?'':this.formatter(ele.aug)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep)?'':this.formatter(ele.sep)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct)?'':this.formatter(ele.oct)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov)?'':this.formatter(ele.nov)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec)?'':this.formatter(ele.dec)}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan) ? '' : this.formatter(ele.jan)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb) ? '' : this.formatter(ele.feb)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar) ? '' : this.formatter(ele.mar)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr) ? '' : this.formatter(ele.apr)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may) ? '' : this.formatter(ele.may)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun) ? '' : this.formatter(ele.jun)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul) ? '' : this.formatter(ele.jul)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug) ? '' : this.formatter(ele.aug)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep) ? '' : this.formatter(ele.sep)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct) ? '' : this.formatter(ele.oct)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov) ? '' : this.formatter(ele.nov)}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec) ? '' : this.formatter(ele.dec)}</td></tr>)
                     })}
 
                   </tbody>
