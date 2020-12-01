@@ -675,7 +675,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
                         console.log("D--------------------->AmcTotal", amcTotal);
                         console.log("D--------------------->totalMonths", totalMonths);
-                        var amc = ((parseInt(amcTotal) / parseInt(totalMonths))).toFixed(4);
+                        var amc = Math.round((parseInt(amcTotal) / parseInt(totalMonths)));
+
                         console.log("D--------------------->AMC", amc);
 
                         // Calculations for Min stock
