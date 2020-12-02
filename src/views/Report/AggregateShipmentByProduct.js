@@ -142,7 +142,8 @@ class AggregateShipmentByProduct extends Component {
 
         this.toggle = this.toggle.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             sortType: 'asc',
             dropdownOpen: false,
@@ -162,7 +163,7 @@ class AggregateShipmentByProduct extends Component {
             show: false,
             message: '',
             outPutList: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 

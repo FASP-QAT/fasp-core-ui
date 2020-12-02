@@ -73,7 +73,8 @@ class SupplyPlanVersionAndReview extends Component {
 
     constructor(props) {
         super(props);
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             loading: true,
             matricsList: [],
@@ -85,7 +86,7 @@ class SupplyPlanVersionAndReview extends Component {
             countries: [],
             message: '',
             programLst: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
@@ -140,8 +141,8 @@ class SupplyPlanVersionAndReview extends Component {
             data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
             data[4] = matricsList[j].createdBy.username
             data[5] = getLabelText(matricsList[j].versionStatus.label, this.state.lang)
-            data[6] = matricsList[j].versionStatus.id==2 || matricsList[j].versionStatus.id==3?(matricsList[j].lastModifiedBy.username):''
-            data[7] = matricsList[j].versionStatus.id==2 || matricsList[j].versionStatus.id==3?(matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null):null
+            data[6] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedBy.username) : ''
+            data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
@@ -220,7 +221,7 @@ class SupplyPlanVersionAndReview extends Component {
                 {
                     title: 'programId',
                     type: 'hidden',
-                    
+
                 }
             ],
             text: {
@@ -272,7 +273,7 @@ class SupplyPlanVersionAndReview extends Component {
 
             if (hasRole) {
 
-                
+
                 // let countryId = document.getElementById("countryId").value;
                 // let versionStatusId = this.el.getValueFromCoords(5, x);
                 // let versionTypeId =this.el.getValueFromCoords(2, x);
@@ -577,7 +578,7 @@ class SupplyPlanVersionAndReview extends Component {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
                 statuses: response.data, loading: false
-            },()=>{
+            }, () => {
                 this.fetchData()
             })
         }).catch(
@@ -654,7 +655,7 @@ class SupplyPlanVersionAndReview extends Component {
         let countryId = document.getElementById("countryId").value;
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
-        console.log("D------------->VersionTypeId",versionTypeId);
+        console.log("D------------->VersionTypeId", versionTypeId);
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         console.log('endDate', endDate)
