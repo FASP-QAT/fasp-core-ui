@@ -182,7 +182,8 @@ class GlobalConsumption extends Component {
 
     this.toggledata = this.toggledata.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 10);
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
@@ -200,11 +201,11 @@ class GlobalConsumption extends Component {
       programs: [],
       realmList: [],
       message: '',
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true,
-      programLst:[]
+      programLst: []
 
 
     };
@@ -222,7 +223,7 @@ class GlobalConsumption extends Component {
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
     this.hideDiv = this.hideDiv.bind(this)
     this.handleDisplayChange = this.handleDisplayChange.bind(this)
-    this.filterProgram=this.filterProgram.bind(this)
+    this.filterProgram = this.filterProgram.bind(this)
 
   }
 
@@ -484,41 +485,41 @@ class GlobalConsumption extends Component {
     let countryIds = this.state.countryValues.map(ele => ele.value);
     console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
-        programLst: [],
-        programValues: [],
-        programLabels: []
+      programLst: [],
+      programValues: [],
+      programLabels: []
     }, () => {
-        if (countryIds.length != 0) {
-            let programLst = [];
-            for (var i = 0; i < countryIds.length; i++) {
-                programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-            }
-
-            console.log('programLst', programLst)
-            if (programLst.length > 0) {
-
-                this.setState({
-                    programLst: programLst
-                }, () => {
-                    this.filterData(this.state.rangeValue)
-                });
-            } else {
-                this.setState({
-                    programLst: []
-                }, () => {
-                    this.filterData(this.state.rangeValue)
-                });
-            }
-        } else {
-            this.setState({
-                programLst: []
-            }, () => {
-                this.filterData(this.state.rangeValue)
-            });
+      if (countryIds.length != 0) {
+        let programLst = [];
+        for (var i = 0; i < countryIds.length; i++) {
+          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
         }
 
+        console.log('programLst', programLst)
+        if (programLst.length > 0) {
+
+          this.setState({
+            programLst: programLst
+          }, () => {
+            this.filterData(this.state.rangeValue)
+          });
+        } else {
+          this.setState({
+            programLst: []
+          }, () => {
+            this.filterData(this.state.rangeValue)
+          });
+        }
+      } else {
+        this.setState({
+          programLst: []
+        }, () => {
+          this.filterData(this.state.rangeValue)
+        });
+      }
+
     })
-}
+  }
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -679,8 +680,8 @@ class GlobalConsumption extends Component {
   getCountrys() {
     if (navigator.onLine) {
 
-       let realmId = AuthenticationService.getRealmId();
-     // let realmId = document.getElementById('realmId').value
+      let realmId = AuthenticationService.getRealmId();
+      // let realmId = document.getElementById('realmId').value
       RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
           this.setState({
@@ -934,7 +935,7 @@ class GlobalConsumption extends Component {
   componentDidMount() {
 
     this.getPrograms()
-     this.getCountrys();
+    this.getCountrys();
     this.getRelamList();
     // this.getProductCategories()
   }

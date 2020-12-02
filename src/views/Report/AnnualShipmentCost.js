@@ -38,7 +38,8 @@ const pickerLang = {
 class AnnualShipmentCost extends Component {
     constructor(props) {
         super(props);
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             matricsList: [],
             dropdownOpen: false,
@@ -62,7 +63,7 @@ class AnnualShipmentCost extends Component {
             fundingSourceValues: [],
             fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             outPutList: [],
@@ -843,7 +844,8 @@ class AnnualShipmentCost extends Component {
                         versions: [],
 
                         planningUnits: [],
-                        outPutList: []
+                        outPutList: [],
+                        planningUnitValues: []
 
                     }, () => {
                         this.setState({
