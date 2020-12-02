@@ -11,8 +11,8 @@ class ManualTaggingSerice {
         return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${searchId}/${programId}/${erpPlanningUnitId}`, {
         });
     }
-    linkShipmentWithARTMIS(orderNo, primeLineNo, shipmentId, conversionFactor) {
-        return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, { orderNo, primeLineNo, shipmentId, conversionFactor }, {}
+    linkShipmentWithARTMIS(orderNo, primeLineNo, shipmentId, conversionFactor, programId) {
+        return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, { orderNo, primeLineNo, shipmentId, conversionFactor, programId }, {}
         );
     }
     delinkShipment(shipmentId, notes) {
