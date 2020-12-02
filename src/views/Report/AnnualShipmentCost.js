@@ -545,19 +545,19 @@ class AnnualShipmentCost extends Component {
                     //     align: 'left'
                     // })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 120, fundingSourceText)
+                    doc.text(doc.internal.pageSize.width / 8, 130, fundingSourceText)
 
                     var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10), procurementAgentText)
+                    doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceText.length * 10), procurementAgentText)
 
                     // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), {
                     //     align: 'left'
                     // })
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), planningText)
+                    doc.text(doc.internal.pageSize.width / 8, 150 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), planningText)
 
                     var statustext = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.statusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10) + (planningText.length * 10), statustext)
+                    doc.text(doc.internal.pageSize.width / 8, 160 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10) + (planningText.length * 10), statustext)
 
 
                 }
@@ -654,7 +654,8 @@ class AnnualShipmentCost extends Component {
                 doc.text(60, yindex, splittext[i]);
 
             }
-            splittext = doc.splitTextToSize(record.planningUnit + '\n', index);
+            // splittext = doc.splitTextToSize(record.planningUnit + '\n', index);
+            splittext = doc.splitTextToSize(record.planningUnit, index);
 
             //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
             //  yindex = yindex + 10;
@@ -690,7 +691,10 @@ class AnnualShipmentCost extends Component {
                             })
 
                         } else {
-                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 20, {
+                            // doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 20, {
+                            //     align: 'left'
+                            // })
+                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 0, {
                                 align: 'left'
                             })
                         }
@@ -709,7 +713,11 @@ class AnnualShipmentCost extends Component {
                 });
 
             } else {
-                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 20, {
+                // doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 20, {
+                //     align: 'left',
+
+                // });
+                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 0, {
                     align: 'left',
 
                 });
