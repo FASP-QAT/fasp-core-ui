@@ -58,12 +58,14 @@ export default class ExpiredInventory extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.makeText = this.makeText.bind(this);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             outPutList: [],
             programs: [],
             versions: [],
             planningUnits: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
@@ -543,7 +545,7 @@ export default class ExpiredInventory extends Component {
                                 // ele1.createdDate=ele.transDate
                                 var json = {
                                     planningUnit: pu.planningUnit,
-                                    shelfLife:pu.shelfLife,
+                                    shelfLife: pu.shelfLife,
                                     batchInfo: ele1,
                                     expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
                                     program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
