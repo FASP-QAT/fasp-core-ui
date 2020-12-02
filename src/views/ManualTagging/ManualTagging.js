@@ -70,8 +70,10 @@ export default class ManualTagging extends Component {
     }
     link() {
         var conversionFactor = document.getElementById("conversionFactor").value;
+        var programId = document.getElementById("programId").value;
+        console.log("my conversionFactor--------",conversionFactor);
         this.setState({ loading: true })
-        ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor)
+        ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor,programId)
             .then(response => {
                 console.log("response m tagging---", response)
                 this.setState({
@@ -134,7 +136,22 @@ export default class ManualTagging extends Component {
     }
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
+        // conversionFactor = conversionFactor.slice(0,13)
         conversionFactor = conversionFactor.replace("-", "")
+        // var regex = "/^\d{0,6}(\.\d{1,2})?$/";
+        // var regResult = regex.test(conversionFactor);
+
+        // Reg start
+        var beforeDecimal = 10;
+        var afterDecimal = 4;
+        conversionFactor = conversionFactor.replace(/[^\d.]/g, '')
+            .replace(new RegExp("(^[\\d]{" + beforeDecimal + "})[\\d]", "g"), '$1')
+            .replace(/(\..*)\./g, '$1')
+            .replace(new RegExp("(\\.[\\d]{" + afterDecimal + "}).", "g"), '$1');
+        // Reg end
+
+        console.log("reg result---", conversionFactor);
+
         console.log("changedConversionFactor---", conversionFactor);
         console.log("conversionFactor---", conversionFactor);
         var erpShipmentQty = document.getElementById("erpShipmentQty").value;
@@ -1408,11 +1425,14 @@ export default class ManualTagging extends Component {
                                                 <InputGroup>
                                                     <Input
                                                         // value={this.state.changedConversionFactor}
-                                                        type="number"
-                                                        min={0.1}
+                                                        type="text"
+                                                        pattern="/^\d+(\.\d{1,4})?$/"
+                                                        // min={0.1}
                                                         name="conversionFactor"
                                                         id="conversionFactor"
                                                         bsSize="sm"
+                                                        // maxLength="14"
+                                                        // step={.0001}
                                                         autocomplete="off"
                                                         onChange={this.getConvertedQATShipmentQty}
                                                     >
