@@ -654,7 +654,8 @@ class AnnualShipmentCost extends Component {
                 doc.text(60, yindex, splittext[i]);
 
             }
-            splittext = doc.splitTextToSize(record.planningUnit + '\n', index);
+            // splittext = doc.splitTextToSize(record.planningUnit + '\n', index);
+            splittext = doc.splitTextToSize(record.planningUnit, index);
 
             //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
             //  yindex = yindex + 10;
@@ -690,7 +691,10 @@ class AnnualShipmentCost extends Component {
                             })
 
                         } else {
-                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 20, {
+                            // doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 20, {
+                            //     align: 'left'
+                            // })
+                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 0, {
                                 align: 'left'
                             })
                         }
@@ -709,7 +713,11 @@ class AnnualShipmentCost extends Component {
                 });
 
             } else {
-                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 20, {
+                // doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 20, {
+                //     align: 'left',
+
+                // });
+                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 0, {
                     align: 'left',
 
                 });
