@@ -1292,7 +1292,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
-                            icon: 'fa fa-code-fork',
+                            icon: 'fa fa-upload',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
                           },
                           {

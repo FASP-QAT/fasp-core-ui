@@ -649,13 +649,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
                             for (var c = 0; c < amcFilter.length; c++) {
                                 if (amcFilter[c].actualFlag.toString() == "true") {
-                                    actualConsumptionQtyAmc += Math.round(amcFilter[c].consumptionQty);
+                                    actualConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty)*parseFloat(amcFilter[c].multiplier));
                                     var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                     if (index == -1) {
                                         regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                     }
                                 } else {
-                                    forecastedConsumptionQtyAmc += Math.round(amcFilter[c].consumptionQty);
+                                    forecastedConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty)*parseFloat(amcFilter[c].multiplier));
                                 }
                             }
                             noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
