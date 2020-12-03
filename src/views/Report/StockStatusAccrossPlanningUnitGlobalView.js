@@ -35,6 +35,7 @@ import i18n from '../../i18n'
 import Pdf from "react-to-pdf"
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
+// import TracerCategoryService from '../../api/TracerCategoryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductService from '../../api/ProductService';
@@ -158,6 +159,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
     this.toggledata = this.toggledata.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
+    this.filterTracerCategory = this.filterTracerCategory.bind(this);
+    this.filterProgram = this.filterProgram.bind(this);
+    this.handleChange = this.handleChange.bind(this);
 
     this.state = {
       dropdownOpen: false,
@@ -181,7 +185,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-      loading: true
+      loading: true,
+      programLstFiltered: []
 
 
 
@@ -422,7 +427,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var len = 140 + (planningText.length * 10)
           planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-          var len = len+10 + (planningText.length * 10)
+          var len = len + 10 + (planningText.length * 10)
           var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, len, planningText)
 
@@ -493,13 +498,89 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       programLabels: programIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData()
+      // this.filterData()
+      this.filterTracerCategory(programIds);
 
     })
 
   }
 
+  filterTracerCategory(programIds) {
 
+    var programIdsValue = [];
+    for (var i = 0; i < programIds.length; i++) {
+      programIdsValue.push(programIds[i].value);
+    }
+    // console.log("programids=====>", programIdsValue);
+    let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
+    TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
+      .then(response => {
+        console.log("tc respons==>", response.data);
+        this.setState({
+          tracerCategories: response.data
+        }, () => {
+          this.filterData()
+        });
+      }).catch(
+        error => {
+          this.setState({
+            tracerCategories: []
+          }, () => {
+            this.filterData()
+          });
+          if (error.message === "Network Error") {
+            this.setState({
+              message: 'static.unkownError',
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  tracerCategories: [],
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                  loading: false
+                }, () => {
+                  this.filterData()
+                });
+                break;
+              case 412:
+                this.setState({
+                  tracerCategories: [],
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                  loading: false
+                }, () => {
+                  this.filterData()
+                });
+                break;
+              default:
+                this.setState({
+                  tracerCategories: [],
+                  message: 'static.unkownError',
+                  loading: false
+                }, () => {
+                  this.filterData()
+                });
+                break;
+            }
+          }
+        }
+      );
+    if (programIdsValue.length == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] });
+    } else {
+      this.setState({ message: '' });
+    }
+  }
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -509,8 +590,52 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
 
-      this.filterData()
+      // this.filterData()
+      this.filterProgram()
     })
+  }
+
+
+  filterProgram = () => {
+    let countryIds = this.state.countryValues.map(ele => ele.value);
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());
+    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    this.setState({
+      programLstFiltered: [],
+      programValues: [],
+      programLabels: []
+    }, () => {
+      if (countryIds.length != 0) {
+        let programLstFiltered = [];
+        for (var i = 0; i < countryIds.length; i++) {
+          programLstFiltered = [...programLstFiltered, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+        }
+
+        console.log('programLstFiltered', programLstFiltered)
+        if (programLstFiltered.length > 0) {
+
+          this.setState({
+            programLstFiltered: programLstFiltered
+          }, () => {
+            this.filterData()
+          });
+        } else {
+          this.setState({
+            programLstFiltered: []
+          }, () => {
+            this.filterData()
+          });
+        }
+      } else {
+        this.setState({
+          programLstFiltered: []
+        }, () => {
+          this.filterData()
+        });
+      }
+
+    })
+
   }
 
   hideDiv() {
@@ -648,7 +773,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       this.setState({ message: i18n.t('static.program.validcountrytext'), data: [], selData: [] });
 
     } else if (this.state.programValues.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), data:[],selData: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] });
 
     } else {
       this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [], selData: [] });
@@ -986,10 +1111,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     //     )
     //   }, this);
 
-    const { programs } = this.state;
+    const { programLstFiltered } = this.state;
     let programList = [];
-    programList = programs.length > 0
-      && programs.map((item, i) => {
+    programList = programLstFiltered.length > 0
+      && programLstFiltered.map((item, i) => {
         return (
 
           { label: getLabelText(item.label, this.state.lang), value: item.programId }

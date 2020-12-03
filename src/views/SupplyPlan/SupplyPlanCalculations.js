@@ -382,7 +382,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     openingBalanceWps: 0,
                                                     consumption: 0,
                                                     adjustment: 0,
-                                                    stock: parseInt(parseInt(batchListForInventory[b].actualQty) * parseInt(inventoryListForRegion[inv].multiplier)),
+                                                    stock: Math.round(parseInt(batchListForInventory[b].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier)),
                                                     shipment: 0,
                                                     shipmentWps: shipmentQtyWps,
                                                     expiredQty: 0,
@@ -391,10 +391,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 myArray.push(json);
                                             }
                                         } else {
-                                            myArray[index].stock = parseInt(myArray[index].stock) + parseInt(parseInt(batchListForInventory[b].actualQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                            myArray[index].stock = parseInt(myArray[index].stock) + Math.round(parseInt(batchListForInventory[b].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                         }
                                         var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                        actualBatchQtyTotal += parseInt(parseInt(batchListForInventory[b].actualQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                        actualBatchQtyTotal += Math.round(parseInt(batchListForInventory[b].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
@@ -419,7 +419,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     openingBalance: 0,
                                                     openingBalanceWps: 0,
                                                     consumption: 0,
-                                                    adjustment: parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier)),
+                                                    adjustment: Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier)),
                                                     stock: 0,
                                                     shipment: 0,
                                                     shipmentWps: shipmentQtyWps,
@@ -427,12 +427,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     expiredQtyWps: 0
                                                 }
                                                 myArray.push(json);
-                                                adjustmentBatchQtyTotal += parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                                adjustmentBatchQtyTotal += Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                             }
                                         } else {
-                                            myArray[index].adjustment = parseInt(myArray[index].adjustment) + parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                            myArray[index].adjustment = parseInt(myArray[index].adjustment) + Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                             if (myArray[index].stock == 0) {
-                                                adjustmentBatchQtyTotal += parseInt(parseInt(batchListForInventory[b].adjustmentQty) * parseInt(inventoryListForRegion[inv].multiplier));
+                                                adjustmentBatchQtyTotal += Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                             }
                                         }
 
@@ -455,7 +455,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             console.log("consumptionList[c].actualFlag", consumptionList[c].actualFlag.toString())
                             if (consumptionList[c].actualFlag.toString() == "true") {
                                 console.log("In if for actual true");
-                                actualConsumptionQty += Math.round(consumptionList[c].consumptionQty);
+                                actualConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty)*parseFloat(consumptionList[c].multiplier));
                                 // Adding regions reporting actual consumption
                                 var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                                 if (index == -1) {
@@ -463,7 +463,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Calculating forecated consumption qty
-                                forecastedConsumptionQty += Math.round(consumptionList[c].consumptionQty);
+                                forecastedConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty)*parseFloat(consumptionList[c].multiplier))
                             }
                         }
                         console.log("regionsReportingActualConsumption", regionsReportingActualConsumption);
@@ -502,7 +502,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 autoGenerated: bd.autoGenerated,
                                                 openingBalance: 0,
                                                 openingBalanceWps: 0,
-                                                consumption: parseInt(parseInt(batchListForConsumption[b].consumptionQty) * parseInt(consumptionListForActualConsumption[ac].multiplier)),
+                                                consumption: Math.round(parseInt(batchListForConsumption[b].consumptionQty) * parseFloat(consumptionListForActualConsumption[ac].multiplier)),
                                                 adjustment: 0,
                                                 stock: 0,
                                                 shipment: 0,
@@ -513,10 +513,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             myArray.push(json);
                                         }
                                     } else {
-                                        myArray[index].consumption = parseInt(myArray[index].consumption) + parseInt(parseInt(batchListForConsumption[b].consumptionQty) * parseInt(consumptionListForActualConsumption[ac].multiplier));
+                                        myArray[index].consumption = parseInt(myArray[index].consumption) + Math.round(parseInt(batchListForConsumption[b].consumptionQty) * parseFloat(consumptionListForActualConsumption[ac].multiplier));
                                     }
                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                    consumptionBatchQtyTotal += parseInt(parseInt(batchListForConsumption[b].consumptionQty) * parseInt(consumptionListForActualConsumption[ac].multiplier));
+                                    consumptionBatchQtyTotal += Math.round(parseInt(batchListForConsumption[b].consumptionQty) * parseFloat(consumptionListForActualConsumption[ac].multiplier));
                                 }
                             }
                         } else {

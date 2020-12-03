@@ -101,3 +101,4 @@ export const APPROVED_TO_SHIPPED = 1
 export const SHIPPED_TO_ARRIVED_AIR = 1
 export const SHIPPED_TO_ARRIVED_SEA = 1
 export const ARRIVED_TO_RECEIVED = 1
+export const JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER = /^\d{0,10}(\.\d{1,6})?$/

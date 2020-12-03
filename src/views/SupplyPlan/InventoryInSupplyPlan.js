@@ -46,8 +46,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 console.log("D---------------->", index);
                 var adjustmentType = this.props.items.inventoryType;
                 console.log("Adjutsment type", adjustmentType);
-                (instance.jexcel).setValueFromCoords(8, data[i].y, `=F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
-                (instance.jexcel).setValueFromCoords(9, data[i].y, `=G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
+                (instance.jexcel).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
+                (instance.jexcel).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
                 (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(12, data[i].y, "", true);
@@ -241,8 +241,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[5] = Math.round(inventoryList[j].adjustmentQty); //F
                         data[6] = Math.round(inventoryList[j].actualQty); //G
                         data[7] = inventoryList[j].multiplier; //H
-                        data[8] = `=F${parseInt(j) + 1}*H${parseInt(j) + 1}`; //I
-                        data[9] = `=G${parseInt(j) + 1}*H${parseInt(j) + 1}`; //J
+                        data[8] = `=ROUND(F${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //I
+                        data[9] = `=ROUND(G${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //J
                         if (inventoryList[j].notes === null || ((inventoryList[j].notes).trim() == "NULL")) {
                             data[10] = "";
                         } else {
@@ -282,8 +282,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[5] = ""; //F
                         data[6] = ""; //G
                         data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //H
-                        data[8] = `=F${parseInt(0) + 1}*H${parseInt(0) + 1}`; //I
-                        data[9] = `=G${parseInt(0) + 1}*H${parseInt(0) + 1}`; //J
+                        data[8] = `=ROUND(F${parseInt(0) + 1}*H${parseInt(0) + 1},0)`; //I
+                        data[9] = `=ROUND(G${parseInt(0) + 1}*H${parseInt(0) + 1},0)`; //J
                         data[10] = "";
                         data[11] = true;
                         if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -311,7 +311,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 80 },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
@@ -671,8 +671,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[5] = ""; //F
         data[6] = ""; //G
         data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; //H
-        data[8] = `=F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //I
-        data[9] = `=G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //J
+        data[8] = `=ROUND(F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1},0)`; //I
+        data[9] = `=ROUND(G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1},0)`; //J
         data[10] = "";
         data[11] = true;
         if (this.props.inventoryPage != "inventoryDataEntry") {

@@ -1144,7 +1144,7 @@ class AuthenticationService {
                     break;
                 case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                     break;
-                case "/report/problemList/:programId/:color/:message":
+                case "/report/problemList/:programId/:calculate/:color/:message":
                 case "/report/problemList/:color/:message":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
