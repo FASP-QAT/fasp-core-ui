@@ -158,9 +158,16 @@ export default class ConsumptionDetails extends React.Component {
                     })
 
                     var programIdd = this.props.match.params.programId;
+                    var needToCalculate = this.props.match.params.calculate;
                     if (programIdd != '' && programIdd != undefined) {
                         document.getElementById("programId").value = programIdd;
-                        this.getProblemListAfterCalculation();
+                        // console.log("value==================>", needToCalculate);
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
                     }
 
                     var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
@@ -339,7 +346,7 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-                    readOnly:true
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.reviewNotes'),

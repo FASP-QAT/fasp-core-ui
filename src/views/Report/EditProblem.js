@@ -780,9 +780,9 @@ export default class EditLanguageComponent extends Component {
 
                                                 // this.props.history.push(`/report/problemList/` + i18n.t('static.message.consumptionSuccess'));
                                                 let programId = this.props.match.params.programId;
-                                                console.log("Program Id", programId)
-                                                console.log("URL------->", `/report/problemList/` + programId + '/green/' + i18n.t('static.problem.updatedSuccessFully'));
-                                                this.props.history.push(`/report/problemList/` + programId + '/green/' + i18n.t('static.problem.updatedSuccessFully'));
+                                                // console.log("Program Id", programId)
+                                                // console.log("URL------->", `/report/problemList/` + programId + '/green/' + i18n.t('static.problem.updatedSuccessFully'));
+                                                this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.updatedSuccessFully'));
                                             }.bind(this)
 
                                             // }.bind(this);
@@ -1118,9 +1118,9 @@ export default class EditLanguageComponent extends Component {
     }
     cancelClicked() {
         let programId = this.props.match.params.programId;
-        console.log("Program Id", programId)
-        console.log("URL------->", `/report/problemList/` + programId + '/red/' + i18n.t('static.message.cancelled', { entityname }));
-        this.props.history.push(`/report/problemList/` + programId + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        // console.log("Program Id", programId)
+        // console.log("URL------->", `/report/problemList/` + programId + '/red/' + i18n.t('static.message.cancelled', { entityname }));
+        this.props.history.push(`/report/problemList/` + programId + '/' + false + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
