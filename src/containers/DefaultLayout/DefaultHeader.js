@@ -101,9 +101,12 @@ class DefaultHeader extends Component {
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
-                  <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />}
-                {localStorage.getItem("sesLatestProgram") == "false" &&
-                  <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />}
+                  // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
+                  <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: 'red' }} ></i>
+                  }
+                {/* {localStorage.getItem("sesLatestProgram") == "false" &&
+                  <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
+                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#20a8d8' }} ></i>}
               </NavLink>
             </NavItem>
           </Online>
@@ -113,9 +116,15 @@ class DefaultHeader extends Component {
               {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
 
               {this.props.changeIcon &&
-                <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
+                // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
+                <i class="nav-icon fa fa-code-fork" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px',paddingLeft:'5px', color: 'red' }}></i>
+                
+                }
               {!this.props.changeIcon &&
-                <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />}
+                // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
+                <i class="nav-icon fa fa-code-fork" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px',paddingLeft:'5px', color: '#20a8d8' }}></i>
+                
+                }
             </NavLink>
           </NavItem>
           {/* </Online> */}
