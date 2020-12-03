@@ -1331,13 +1331,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                             if (noOfActualEntries > 0) {
                                                 if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                    consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                    consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
+                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 }
                                                 actualFlagForRegion = true;
                                             } else {
-                                                consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 actualFlagForRegion = false;
                                             }
                                         }
@@ -1354,8 +1354,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
                                             if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
                                                 actualCount += 1;
-                                                actualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                totalActualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                                actualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                totalActualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                 var index = regionsReportingActualInventory.findIndex(c => c == regionListFiltered[r].id);
                                                 if (index == -1) {
                                                     regionsReportingActualInventory.push(regionListFiltered[r].id)
@@ -1363,8 +1363,8 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                             if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
                                                 adjustmentsCount += 1;
-                                                adjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                totalAdjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                                adjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                totalAdjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                             }
                                         }
                                         if (actualCount == 0) {

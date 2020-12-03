@@ -44,7 +44,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
-                (instance.jexcel).setValueFromCoords(7, data[i].y, `=F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1}`, true);
+                (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
@@ -238,7 +238,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[4] = consumptionList[j].realmCountryPlanningUnit.id; //E
                         data[5] = Math.round(consumptionList[j].consumptionRcpuQty); //F
                         data[6] = consumptionList[j].multiplier; //G
-                        data[7] = `=F${parseInt(j) + 1}*G${parseInt(j) + 1}`; //H
+                        data[7] = `=ROUND(F${parseInt(j) + 1}*G${parseInt(j) + 1},0)`; //H
                         data[8] = consumptionList[j].dayOfStockOut;
                         if (consumptionList[j].notes === null || ((consumptionList[j].notes).trim() == "NULL")) {
                             data[9] = "";
@@ -273,7 +273,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; //D
                         data[5] = ""; //E
                         data[6] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //F
-                        data[7] = `=F${parseInt(0) + 1}*G${parseInt(0) + 1}`; //I
+                        data[7] = `=ROUND(F${parseInt(0) + 1}*G${parseInt(0) + 1},0)`; //I
                         data[8] = "";
                         data[9] = "";
                         data[10] = true;
@@ -293,7 +293,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 80, },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
@@ -607,7 +607,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; //D
         data[5] = ""; //E
         data[6] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //F
-        data[7] = `=F${parseInt(json.length) + 1}*G${parseInt(json.length) + 1}`; //I
+        data[7] = `=ROUND(F${parseInt(json.length) + 1}*G${parseInt(json.length) + 1},0)`; //I
         data[8] = "";
         data[9] = "";
         data[10] = true;
