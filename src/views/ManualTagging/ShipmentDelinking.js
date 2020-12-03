@@ -448,9 +448,10 @@ export default class ShipmentDelinking extends Component {
     }
     delinkShipment() {
         let notes = document.getElementById("notesTxt").value;
+        let programId = document.getElementById("programId").value;
         if (notes != "") {
             this.setState({ loading: true })
-            ManualTaggingService.delinkShipment(this.state.shipmentId, notes)
+            ManualTaggingService.delinkShipment(this.state.shipmentId, notes, programId)
                 .then(response => {
                     console.log("link response===", response);
                     this.setState({

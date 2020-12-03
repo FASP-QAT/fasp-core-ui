@@ -490,8 +490,8 @@ export default class AddInventory extends Component {
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
-                                    <a className="card-header-action">      
-                                        <a href={this.state.inventoryDataType==1?`${API_URL}/file/inventoryDataEntryTemplate`:`${API_URL}/file/adjustmentsDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                    <a className="card-header-action">
+                                        <a href={this.state.inventoryDataType.value == 1 ? `${API_URL}/file/inventoryDataEntryTemplate` : `${API_URL}/file/adjustmentsDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
                                         {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                     </a>
                                 </div>
