@@ -117,12 +117,12 @@ class DefaultHeader extends Component {
 
               {this.props.changeIcon &&
                 // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                <i class="nav-icon fa fa-code-fork" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px',paddingLeft:'5px', color: 'red' }}></i>
+                <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px',paddingLeft:'5px', color: 'red' }}></i>
                 
                 }
               {!this.props.changeIcon &&
                 // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                <i class="nav-icon fa fa-code-fork" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px',paddingLeft:'5px', color: '#20a8d8' }}></i>
+                <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px',paddingLeft:'5px', color: '#20a8d8' }}></i>
                 
                 }
             </NavLink>
