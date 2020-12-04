@@ -1238,7 +1238,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
 
         //Active
-        if (x == 6) {
+        if (x != 9) {
             this.el.setValueFromCoords(9, y, 1, true);
         }
 
