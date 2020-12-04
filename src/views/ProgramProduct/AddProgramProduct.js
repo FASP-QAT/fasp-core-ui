@@ -1345,7 +1345,7 @@ class AddprogramPlanningUnit extends Component {
             }
         }
 
-        if (x == 10) {
+        if (x != 11) {
             this.el.setValueFromCoords(11, y, 1, true);
         }
         this.setState({ isValidData: valid });

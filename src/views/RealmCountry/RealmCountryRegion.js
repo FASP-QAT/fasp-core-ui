@@ -735,7 +735,7 @@ class RealmCountryRegion extends Component {
             }
         }
         //Active
-        if (x == 4) {
+        if (x != 7) {
             this.el.setValueFromCoords(7, y, 1, true);
         }
 
