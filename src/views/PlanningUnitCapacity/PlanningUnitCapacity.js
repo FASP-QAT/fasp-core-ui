@@ -1519,7 +1519,7 @@ class PlanningUnitCapacity extends Component {
         }
 
         //Active
-        if (x == 5) {
+        if (x != 7) {
             this.el.setValueFromCoords(7, y, 1, true);
         }
 
