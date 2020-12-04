@@ -769,7 +769,7 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span className="red Reqasterisk">*</span></Label>
                                                         <DatePicker
                                                             id="startDate"
                                                             name="startDate"
@@ -786,7 +786,7 @@ class AddBudgetComponent extends Component {
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
 
                                                         <DatePicker
                                                             id="stopDate"
