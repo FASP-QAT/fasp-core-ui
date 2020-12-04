@@ -469,8 +469,10 @@ export default class PipelineProgramConsumption extends Component {
 
                                             },
                                             {
-                                                title: i18n.t('static.unit.multiplier'),
-                                                type: 'text',
+                                                title: i18n.t('static.unit.multiplier'), 
+                                                type: 'numeric', 
+                                                mask: '#,##.000000', 
+                                                decimal: '.',
                                                 readOnly: true
                                             },
                                             {
