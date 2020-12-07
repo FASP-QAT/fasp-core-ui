@@ -854,7 +854,7 @@ class RealmCountry extends Component {
             }
         }
         //Active
-        if (x == 3) {
+        if (x != 6) {
             this.el.setValueFromCoords(6, y, 1, true);
         }
 
