@@ -1492,7 +1492,11 @@ export default class WhatIfReportComponent extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList,
+                    programList: proList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                     loading: false
                 })
             }.bind(this);
@@ -1644,10 +1648,18 @@ export default class WhatIfReportComponent extends React.Component {
                                         }
                                     }
                                     this.setState({
-                                        planningUnitList: proList,
+                                        planningUnitList: proList.sort(function (a, b) {
+                                            a = a.label.toLowerCase();
+                                            b = b.label.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
                                         programPlanningUnitList: myResult,
                                         planningUnitListAll: myResult,
-                                        regionList: regionList,
+                                        regionList: regionList.sort(function (a, b) {
+                                            a = a.name.toLowerCase();
+                                            b = b.name.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
                                         programJson: programJson,
                                         dataSourceListAll: dataSourceListAll,
                                         planningUnitListForConsumption: planningUnitListForConsumption,

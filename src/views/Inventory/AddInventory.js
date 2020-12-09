@@ -175,7 +175,11 @@ export default class AddInventory extends Component {
                     }
                 }
                 this.setState({
-                    programList: proList, loading: false
+                    programList: proList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }), loading: false
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -293,9 +297,17 @@ export default class AddInventory extends Component {
                             }
                             console.log("proList---" + proList);
                             this.setState({
-                                planningUnitList: proList,
+                                planningUnitList: proList.sort(function (a, b) {
+                                    a = a.label.toLowerCase();
+                                    b = b.label.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 planningUnitListAll: myResult,
-                                regionList: regionList,
+                                regionList: regionList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 loading: false
                             })
 

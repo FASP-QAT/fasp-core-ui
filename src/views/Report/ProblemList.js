@@ -130,7 +130,11 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                      })
                 })
 
 

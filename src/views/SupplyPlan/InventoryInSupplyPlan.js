@@ -713,11 +713,19 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     filterDataSource = function (instance, cell, c, r, source) {
-        return this.state.dataSourceList.filter(c => c.active.toString() == "true");
+        return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
-        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true");
+        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
 

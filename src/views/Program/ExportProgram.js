@@ -96,14 +96,18 @@ export default class ExportProgram extends Component {
                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     console.log("ProgramNameLabel", programNameLabel);
                     if (json[i].userId == userId) {
-                        prgList[i] = { value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version }
+                        prgList.push({ value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version })
                     }
                 }
             }.bind(this)
             transaction.oncomplete = function (event) {
                 console.log("ProgramList", prgList)
                 this.setState({
-                    programList: prgList,
+                    programList: prgList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                     loading: false
                 })
                 console.log("ProgramList", this.state.programList);

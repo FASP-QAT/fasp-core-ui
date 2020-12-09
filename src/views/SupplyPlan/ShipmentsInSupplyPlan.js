@@ -233,8 +233,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         active: bResult[k].active,
                                         programId: bResult[k].program.id,
                                         label: bResult[k].label,
-                                        startDate:bResult[k].startDate,
-                                        stopDate:bResult[k].stopDate
+                                        startDate: bResult[k].startDate,
+                                        stopDate: bResult[k].stopDate
                                     })
                                 }
                                 console.log("Budhet list", budgetList);
@@ -1244,19 +1244,35 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     filterCurrency = function (instance, cell, c, r, source) {
-        return this.state.currencyList.filter(c => c.active.toString() == "true");
+        return this.state.currencyList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterDataSourceList = function (instance, cell, c, r, source) {
-        return this.state.dataSourceList.filter(c => c.active.toString() == "true");
+        return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterFundingSource = function (instance, cell, c, r, source) {
-        return this.state.fundingSourceList.filter(c => c.active.toString() == "true");
+        return this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterProcurementAgent = function (instance, cell, c, r, source) {
-        return this.state.procurementAgentList.filter(c => c.active.toString() == "true");
+        return this.state.procurementAgentList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterShipmentStatus = function (instance, cell, c, r, source) {
@@ -1456,7 +1472,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             mylist.push({ id: 0, name: i18n.t('static.common.select') })
         }
         console.log("My list", mylist);
-        return mylist;
+        return mylist.sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }
 
     calculateEmergencyOrder(y) {
