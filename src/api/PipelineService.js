@@ -115,8 +115,9 @@ class PipelineService {
         return axios.put(`${API_URL}/api/pipeline/procurementagent/${pipelineId}`, json, {}
         );
     }
-    createRealmCountryPlanningUnits(pipelineId) {
-        return axios.put(`${API_URL}/api/pipeline/realmCountryPlanningUnit/${pipelineId}`, {}
+    createRealmCountryPlanningUnits(pipelineId,realmCountryId) {
+        // console.log("new code console ]]]]]]]===>",realmCountryId);
+        return axios.put(`${API_URL}/api/pipeline/realmCountryPlanningUnit/${pipelineId}/${realmCountryId}`, {}
         );
     }
 }
