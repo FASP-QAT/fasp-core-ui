@@ -2851,7 +2851,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                     } else {
                         positiveValidation("N", y, elInstance);
-                        if (map.get("13") != "" && map.get("14") != "" && map.get("29").toString() != "false") {
+
+                        if (map.get("13") != "" && map.get("13") != undefined && map.get("13") != "undefined" && map.get("14") != "") {
+
                             var budget = this.state.budgetListAll.filter(c => c.id == map.get("13"))[0]
                             var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                             var shipmentList = this.props.items.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("13"));
@@ -3159,10 +3161,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("23"))].fundingSource.code = fs.name;
                             shipmentDataList[parseInt(map.get("23"))].fundingSource.label = fs.label;
 
-                            var b = this.state.budgetList.filter(c => c.id == map.get("13"))[0];
-                            shipmentDataList[parseInt(map.get("23"))].budget.id = map.get("13");
-                            shipmentDataList[parseInt(map.get("23"))].budget.code = b.name;
-                            shipmentDataList[parseInt(map.get("23"))].budget.label = b.label;
+                            if (map.get("13") != undefined && map.get("13") != "undefined" && map.get("13") != "") {
+                                var b = this.state.budgetList.filter(c => c.id == map.get("13"))[0];
+                                shipmentDataList[parseInt(map.get("23"))].budget.id = map.get("13");
+                                shipmentDataList[parseInt(map.get("23"))].budget.code = b.name;
+                                shipmentDataList[parseInt(map.get("23"))].budget.label = b.label;
+                            } else {
+                                shipmentDataList[parseInt(map.get("23"))].budget.id = "";
+                                shipmentDataList[parseInt(map.get("23"))].budget.code = "";
+                                shipmentDataList[parseInt(map.get("23"))].budget.label = {};
+                            }
 
                             shipmentDataList[parseInt(map.get("23"))].shipmentQty = shipmentQty.toString().replaceAll("\,", "");
                             shipmentDataList[parseInt(map.get("23"))].rate = rate.toString().replaceAll("\,", "");
@@ -3341,9 +3349,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 },
                                 suggestedQty: map.get("27"),
                                 budget: {
-                                    id: map.get("13"),
-                                    code: b.name,
-                                    label: b.label,
+                                    id: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? '' : map.get("13"),
+                                    code: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? '' : b.name,
+                                    label: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? {} : b.label,
                                 },
                                 emergencyOrder: map.get("11"),
                                 currency: c,
