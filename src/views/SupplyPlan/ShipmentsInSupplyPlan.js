@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -370,11 +370,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             console.log("show Shipment dates", shipmentDatesJson);
                                             var isEmergencyOrder = shipmentList[i].emergencyOrder;
                                             if (shipmentList[i].shipmentStatus.id == "" && shipmentList[i].expectedDeliveryDate != "") {
-                                                var expectedArrivedDate = moment(shipmentList[i].expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedArrivedDate = moment(shipmentList[i].expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                 if (moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                                     isEmergencyOrder = true;
                                                 } else {
@@ -399,9 +399,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[12] = shipmentList[i].fundingSource.id;//M
                                             data[13] = shipmentList[i].budget.id;//N
                                             data[14] = shipmentList[i].currency.currencyId;//O
-                                            data[15] = parseFloat(shipmentList[i].rate).toFixed(2);//P
+                                            data[15] = Number(shipmentList[i].rate).toFixed(2);//P
                                             data[16] = `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
-                                            data[17] = parseFloat(shipmentList[i].freightCost).toFixed(2);//R
+                                            data[17] = Number(shipmentList[i].freightCost).toFixed(2);//R
                                             data[18] = shipmentList[i].dataSource.id;//S
                                             data[19] = shipmentList[i].notes;//T
                                             data[20] = shipmentList[i].createdDate;//U
@@ -831,11 +831,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         if (rowData[7].toString() == "true") {
                                                                             addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                                                                             var leadTimesPerStatus = addLeadTimes / 5;
-                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                         } else {
                                                                             var shipmentMode = rowData[5];
                                                                             var ppUnit = papuResult;
@@ -851,15 +851,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                                                             var shippedToArrivedLeadTime = ""
                                                                             if (shipmentMode == 2) {
-                                                                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                                                                shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
                                                                             } else {
-                                                                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                                                                shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
                                                                             }
-                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                         }
 
                                                                         var tableEditable = shipmentEditable;
@@ -1451,9 +1451,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = instance.jexcel;
         console.log("Y", y, "x", x)
         var y = 0;
-        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         console.log("Validation", validation);
-        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
 
     }
 
@@ -1522,11 +1522,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             console.log("In if");
                             addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
-                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
                             console.log("In else");
                             var ppUnit = papuResult;
@@ -1542,15 +1542,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                             var shippedToArrivedLeadTime = ""
                             if (shipmentMode == 2) {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
                             } else {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
                             }
-                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         var expectedDate = expectedPlannedDate;
                         if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
@@ -1572,15 +1572,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }.bind(this)
                 }.bind(this)
             } else {
-                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                 if (shipmentMode == 2) {
-                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(programJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
                 } else {
-                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
                 }
-                expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 var expectedDate = expectedPlannedDate;
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
                     expectedDate = expectedSubmittedDate;
@@ -1778,13 +1778,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     console.log("Price per unit", pricePerUnit);
                     if (procurementAgentPlanningUnit.length > 0) {
                         console.log("in length greater than 0")
-                        pricePerUnit = parseFloat(procurementAgentPlanningUnit[0].catalogPrice);
+                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
                     } else {
                         pricePerUnit = this.props.items.catalogPrice
                     }
                     if (rowData[14] != "") {
-                        var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
-                        pricePerUnit = parseFloat(pricePerUnit / conversionRateToUsd).toFixed(2);
+                        var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
+                        pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
                         elInstance.setValueFromCoords(15, y, pricePerUnit, true);
                     }
                 }
@@ -1803,8 +1803,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var pricePerUnit = elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 var freightCost = elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 var lastConversionRate = rowData[31];
-                var conversionRateToUsd = parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
-                pricePerUnit = parseFloat((pricePerUnit * lastConversionRate) / conversionRateToUsd).toFixed(2);
+                var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
+                pricePerUnit = Number((pricePerUnit * lastConversionRate) / conversionRateToUsd).toFixed(2);
                 elInstance.setValueFromCoords(15, y, pricePerUnit, true);
                 elInstance.setValueFromCoords(31, y, conversionRateToUsd, true);
                 // if (rowData[23] == -1 && rowData[14] != "") {
@@ -1875,11 +1875,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var freightCost = 0;
                     if (rowData[5] == 1) {
                         var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
-                        freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
+                        freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
                         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     } else {
                         var airFreightPercentage = this.props.items.programJson.airFreightPerc;
-                        freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
+                        freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     }
                 }
@@ -1899,11 +1899,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var freightCost = 0;
                 if (rowData[5] == 1) {
                     var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
-                    freightCost = parseFloat(rate) * (parseFloat(parseFloat(seaFreightPercentage) / 100));
+                    freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
                     elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                 } else {
                     var airFreightPercentage = this.props.items.programJson.airFreightPerc;
-                    freightCost = parseFloat(rate) * (parseFloat(parseFloat(airFreightPercentage) / 100));
+                    freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                     elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                 }
             }
@@ -1933,7 +1933,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 10) {
-            var valid = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            var valid = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
             console.log("Valida", valid);
             if (valid == false) {
                 elInstance.setValueFromCoords(30, y, 1, true);
@@ -1950,14 +1950,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 15) {
-            var valid = checkValidtion("number", "P", y, elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+            var valid = checkValidtion("number", "P", y, elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == false) {
                 elInstance.setValueFromCoords(30, y, 1, true);
             }
         }
 
         if (x == 17) {
-            var valid = checkValidtion("number", "R", y, elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+            var valid = checkValidtion("number", "R", y, elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == false) {
                 elInstance.setValueFromCoords(30, y, 1, true);
             }
@@ -2115,7 +2115,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (elInstance1 != undefined && elInstance1 != "") {
                 elInstance1.setValueFromCoords(9, 0, value, true);
             }
-            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         }
 
         if (x == 4) {
@@ -2126,7 +2126,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 5) {
             console.log("In x==5")
-            var valid = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            var valid = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
             if (valid == true) {
                 if (elInstance1 != undefined && elInstance1 != "") {
                     console.log("In instance is not defined");
@@ -2189,11 +2189,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = this.state.qtyCalculatorTableEl;
         var y = 0;
         var valid = true;
-        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+        var validation = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         if (validation == false) {
             valid = false;
         }
-        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+        validation = checkValidtion("number", "C", y, elInstance.getRowData(0)[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         if (validation == false) {
             valid = false;
         }
@@ -2250,7 +2250,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkValidtion("text", "B", y, rowData[1], elInstance);
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+            checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
@@ -2315,7 +2315,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation.toString() == "false") {
                     valid = false;
                 }
-                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 }
@@ -2368,7 +2368,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     shipmentQty: map.get("2").toString().replaceAll("\,", ""),
                 }
                 batchInfoArray.push(batchInfoJson);
-                totalShipmentQty += parseInt(map.get("2").toString().replaceAll("\,", ""))
+                totalShipmentQty += Number(map.get("2").toString().replaceAll("\,", ""))
             }
             shipmentInstance.setValueFromCoords(24, rowNumber, batchInfoArray, true);
             shipmentInstance.setValueFromCoords(25, rowNumber, totalShipmentQty, true);
@@ -2465,17 +2465,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                         var shippedToArrivedLeadTime = ""
                         if (shipmentMode == 2) {
-                            shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                            shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
                         } else {
-                            shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                            shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
                         }
 
                         plannedDate = moment(Date.now()).format("YYYY-MM-DD");
-                        submittedDate = moment(plannedDate).add(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        approvedDate = moment(submittedDate).add(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        shippedDate = moment(approvedDate).add(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        arrivedDate = moment(shippedDate).add(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        expectedDeliveryDate = moment(arrivedDate).add(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        submittedDate = moment(plannedDate).add(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        approvedDate = moment(submittedDate).add(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        shippedDate = moment(approvedDate).add(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        arrivedDate = moment(shippedDate).add(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        expectedDeliveryDate = moment(arrivedDate).add(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                     }
                     if (moment(elInstance.getValueFromCoords(4, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                         console.log("In if for calculate lead times", expectedDeliveryDate);
@@ -2557,11 +2557,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 console.log("In if");
                                 addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
                                 var leadTimesPerStatus = addLeadTimes / 5;
-                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 console.log("In else");
                                 var shipmentMode = rowData[5];
@@ -2578,15 +2578,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentMode == 2) {
-                                    shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
                                 } else {
-                                    shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
                                 }
-                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedShippedDate = moment(expectedArrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedApprovedDate = moment(expectedShippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             var expectedDate = expectedPlannedDate;
                             if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
@@ -2866,11 +2866,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     index = shipmentList[s].index;
                                 }
                                 if (map.get("23") != index) {
-                                    usedBudgetTotalAmount += parseFloat((parseFloat(shipmentList[s].productCost) + parseFloat(shipmentList[s].freightCost)) * parseFloat(shipmentList[s].currency.conversionRateToUsd));
+                                    usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
                                 }
                             }
-                            var totalCost = parseFloat(elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) + parseFloat(elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
-                            var enteredBudgetAmt = (totalCost * (parseFloat((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd)));
+                            var totalCost = Number(elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) + Number(elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                            var enteredBudgetAmt = (totalCost * (Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd)));
                             usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                             enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
                             var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
@@ -2973,7 +2973,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
 
-                var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+                var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(30, y, 1, true);
@@ -2985,13 +2985,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(30, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "P", y, elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+                var validation = checkValidtion("number", "P", y, elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(30, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "R", y, elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX, 1, 1);
+                var validation = checkValidtion("number", "R", y, elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(30, y, 1, true);
@@ -3176,7 +3176,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("23"))].rate = rate.toString().replaceAll("\,", "");
                             shipmentDataList[parseInt(map.get("23"))].shipmentMode = shipmentMode;
                             shipmentDataList[parseInt(map.get("23"))].productCost = productCost.toString().replaceAll("\,", "");
-                            shipmentDataList[parseInt(map.get("23"))].freightCost = parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2);
+                            shipmentDataList[parseInt(map.get("23"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
                             shipmentDataList[parseInt(map.get("23"))].notes = map.get("19");
                             shipmentDataList[parseInt(map.get("23"))].accountFlag = map.get("0");
                             shipmentDataList[parseInt(map.get("23"))].localProcurement = map.get("7");
@@ -3206,12 +3206,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 console.log("Adjutsed order QTy", adjustedOrderQty);
                                 console.log("TotalSHipment qty", totalShipmentQty);
-                                var remainingBatchQty = parseInt(adjustedOrderQty) - parseInt(totalShipmentQty);
+                                var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
                                 console.log("Remaining qty", remainingBatchQty);
                                 if (totalShipmentQty < adjustedOrderQty) {
                                     var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
                                     if (indexBatchNo != -1) {
-                                        eBatchInfoList[indexBatchNo].shipmentQty = parseInt(eBatchInfoList[indexBatchNo].shipmentQty) + parseInt(remainingBatchQty);
+                                        eBatchInfoList[indexBatchNo].shipmentQty = Number(eBatchInfoList[indexBatchNo].shipmentQty) + Number(remainingBatchQty);
                                     } else {
                                         console.log("In if")
                                         var programId = (document.getElementById("programId").value).split("_")[0];
@@ -3326,7 +3326,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 },
                                 erpFlag: false,
                                 localProcurement: map.get("7"),
-                                freightCost: parseFloat(freightCost.toString().replaceAll("\,", "")).toFixed(2),
+                                freightCost: Number(freightCost.toString().replaceAll("\,", "")).toFixed(2),
                                 notes: map.get("19"),
                                 planningUnit: {
                                     id: map.get("2"),
@@ -3386,7 +3386,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var totalShipmentQty = (map.get("25"));
                                 var adjustedOrderQty = elInstance.getValue(`K${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                 var eBatchInfoList = map.get("24")
-                                var remainingBatchQty = parseInt(adjustedOrderQty) - parseInt(totalShipmentQty);
+                                var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
                                 if (totalShipmentQty < adjustedOrderQty) {
                                     var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
                                     if (indexBatchNo != -1) {

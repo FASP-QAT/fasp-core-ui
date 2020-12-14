@@ -252,11 +252,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            console.log("isNaN(Number.parseInt(value))", isNaN(Number.parseInt(value)));
-            console.log("!(reg.test(value))", !(reg.test(value)));
-            console.log("!(reg.test(value)) Value", value);
-            console.log("Regex------------>", reg)
-            if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? value != 0 : value == 0))) {
+            if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? value != 0 : value == 0))) {
                 console.log("!(reg.test(value)) in if")
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -290,7 +286,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
         var col = (colName).concat(parseInt(rowNo) + 1);
         value = value.toString().replaceAll("\,", "");
         if (value != "") {
-            if (isNaN(Number.parseInt(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0))) {
+            if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invalidnumber'));

@@ -281,15 +281,15 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     roundN = num => {
-        if (num != '') {
-            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        if (num != null && num != '') {
+            return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
         } else {
             return ''
         }
     }
 
     formatter = value => {
-        if (value != '' && !isNaN(Number.parseInt(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -300,7 +300,7 @@ export default class WhatIfReportComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (isNaN(Number.parseInt(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -308,7 +308,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     formatterDouble = value => {
-        if (value != '' && !isNaN(Number.parseInt(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = this.roundN(value)
             cell1 += '';
             var x = cell1.split('.');
@@ -319,7 +319,7 @@ export default class WhatIfReportComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (isNaN(Number.parseInt(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -605,8 +605,8 @@ export default class WhatIfReportComponent extends React.Component {
                                 c.actualFlag == consumptionFiltered[i].actualFlag
                             );
                         }
-                        consumptionList[index].consumptionQty = parseInt(parseInt(consumptionFiltered[i].consumptionQty) + parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionQty)));
-                        consumptionList[index].consumptionRcpuQty = parseInt(parseInt(consumptionFiltered[i].consumptionRcpuQty) + parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionRcpuQty)));
+                        consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                        consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
                     }
                     programJson.consumptionList = consumptionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -663,8 +663,8 @@ export default class WhatIfReportComponent extends React.Component {
                                 c.actualFlag == consumptionFiltered[i].actualFlag
                             );
                         }
-                        consumptionList[index].consumptionQty = parseInt(parseInt(consumptionFiltered[i].consumptionQty) - parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionQty)));
-                        consumptionList[index].consumptionRcpuQty = parseInt(parseInt(consumptionFiltered[i].consumptionRcpuQty) - parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionRcpuQty)));
+                        consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                        consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
                     }
                     programJson.consumptionList = consumptionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -710,11 +710,11 @@ export default class WhatIfReportComponent extends React.Component {
                         if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
                             var ppUnit = papuResult;
                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
@@ -734,11 +734,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                             }
 
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                             var index = 0;
@@ -793,11 +793,11 @@ export default class WhatIfReportComponent extends React.Component {
                         if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
                             var ppUnit = papuResult;
                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
@@ -817,11 +817,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                             }
 
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                             var index = 0;
@@ -878,11 +878,11 @@ export default class WhatIfReportComponent extends React.Component {
                         if (shipmentUnFundedList[i].localProcurement) {
                             var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseInt(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                         } else {
                             var ppUnit = papuResult;
                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
@@ -902,11 +902,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                             }
 
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseInt(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseInt(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseInt(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseInt(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(shippedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD") && ((shipmentUnFundedList[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS))) {
                             var index = 0;
@@ -2059,7 +2059,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                        plannedShipmentsTotalData.push({ qty: Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         plannedShipmentsTotalData.push("")
                                     }
@@ -2232,7 +2232,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
+                                        plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].submittedErpShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder, isLocalProcurementAgent: isLocalProcurementAgent });
                                     } else {
                                         plannedErpShipmentsTotalData.push("")
                                     }
@@ -2240,7 +2240,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
                                     monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
-                                    amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                    amcTotalData.push(Math.round(Number(jsonList[0].amc)))
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -2256,14 +2256,14 @@ export default class WhatIfReportComponent extends React.Component {
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     var stockInHand = jsonList[0].closingBalance;
-                                    var amc = Math.round(parseFloat(jsonList[0].amc));
-                                    if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
-                                        var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
+                                    var amc = Math.round(Number(jsonList[0].amc));
+                                    if (compare && Number(stockInHand) <= Number(amc * Number(minStockMoSQty))) {
+                                        var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                 parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                             var isEmergencyOrder = 0;
                                             if (expectedDeliveryDate >= currentMonth) {
                                                 isEmergencyOrder = 0;
@@ -2275,7 +2275,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                 parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                             var isEmergencyOrder = 0;
                                             if (expectedDeliveryDate >= currentMonth) {
                                                 isEmergencyOrder = 0;
@@ -2288,7 +2288,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                             parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                         var isEmergencyOrder = 0;
                                         if (expectedDeliveryDate >= currentMonth) {
                                             isEmergencyOrder = 0;
@@ -2375,11 +2375,11 @@ export default class WhatIfReportComponent extends React.Component {
                                         month: m[n].month,
                                         consumption: jsonList[0].consumptionQty,
                                         stock: jsonList[0].closingBalance,
-                                        planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
-                                        delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
-                                        shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
-                                        ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
-                                        mos: parseFloat(jsonList[0].mos).toFixed(2),
+                                        planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
+                                        delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
+                                        shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
+                                        ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
+                                        mos: parseFloat(jsonList[0].mos).toFixed(1),
                                         minMos: minStockMoSQty,
                                         maxMos: maxStockMoSQty
                                     }

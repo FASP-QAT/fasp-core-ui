@@ -269,14 +269,14 @@ class ForcastMatrixOverTime extends Component {
   }
   roundN = num => {
     if (num != '' && num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+      return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     } else {
       return NaN
     }
   }
   round = num => {
     if (num != '' && num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+      return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
     } else {
       return NaN
     }
@@ -884,9 +884,9 @@ class ForcastMatrixOverTime extends Component {
                   }
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + parseInt(conlist[l].consumptionQty)
+                      actconsumption = actconsumption + Math.round(Number(conlist[l].consumptionQty))
                     } else {
-                      forConsumption = forConsumption + parseInt(conlist[l].consumptionQty)
+                      forConsumption = forConsumption + Math.round(Number(conlist[l].consumptionQty))
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption

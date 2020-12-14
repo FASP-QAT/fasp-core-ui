@@ -595,7 +595,7 @@ class Consumption extends Component {
 
   roundN = num => {
     if (num != '' || num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+      return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     } else {
       return ''
     }
@@ -604,7 +604,7 @@ class Consumption extends Component {
     if (num == '' || num == null) {
       return null
     } else {
-      return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+      return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
 
     }
   }
@@ -735,6 +735,8 @@ class Consumption extends Component {
                 }
                 finalOfflineConsumption.push(json);
               } else {
+                console.log("D----------->", actualValue);
+                console.log("D----------->", forecastValue);
                 let json = {
                   "transDate": transDate,
                   "actualConsumption": this.round(actualValue),
