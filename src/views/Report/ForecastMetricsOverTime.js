@@ -886,8 +886,7 @@ class ForcastMatrixOverTime extends Component {
                     console.log(currentActualconsumption, ' ', actconsumption)
                     if (currentActualconsumption == null && actconsumption > 0) {
                       currentActualconsumption = actconsumption
-                    }
-                    if (currentActualconsumption != null) {
+                    } else if (currentActualconsumption != null) {
                       currentActualconsumption = currentActualconsumption + actconsumption
                     }
                     currentForcastConsumption = currentForcastConsumption + forConsumption
@@ -909,7 +908,7 @@ class ForcastMatrixOverTime extends Component {
                   message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null || actualconsumption == 0) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
-
+                console.log("Json------------->", json);
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     matricsList: data,
