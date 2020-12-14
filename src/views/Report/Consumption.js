@@ -601,7 +601,7 @@ class Consumption extends Component {
     }
   }
   round = num => {
-    if (num == '' || num == null) {
+    if (num === '' || num == null) {
       return null
     } else {
       return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
@@ -713,7 +713,6 @@ class Consumption extends Component {
             for (var j = 0; j < dateArray.length; j++) {
               let objActual = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == true);
               let objForecast = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == false);
-
               let actualValue = null;
               let forecastValue = null;
               let transDate = '';
@@ -725,7 +724,6 @@ class Consumption extends Component {
                 forecastValue = this.round(objForecast[0].consumptionQty);
                 transDate = objForecast[0].consumptionDate;
               }
-
               if (viewById == 2) {
                 //  this.toggleView();
                 let json = {
@@ -735,8 +733,6 @@ class Consumption extends Component {
                 }
                 finalOfflineConsumption.push(json);
               } else {
-                console.log("D----------->", actualValue);
-                console.log("D----------->", forecastValue);
                 let json = {
                   "transDate": transDate,
                   "actualConsumption": this.round(actualValue),
