@@ -46,7 +46,7 @@ const validationSchema = function (values, t) {
             // .transform((o, v) => parseFloat(v.replace(/,/g, '')))
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
-            .matches(/^\d{0,10}(\.\d{1,4})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,20}(\.\d{1,4})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),

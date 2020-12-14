@@ -245,13 +245,13 @@ class StockStatus extends Component {
 
   roundN = num => {
     if (num != '') {
-      return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+      return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
     }
   }
   formatAmc = value => {
-    return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
   }
 
   formatter = value => {
@@ -517,7 +517,7 @@ class StockStatus extends Component {
                   var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                   var totalShipmentQty = 0;
                   shiplist.map(elt => {
-                    totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
+                    totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
                   })
                   var json = {
                     dt: new Date(from, month - 1),

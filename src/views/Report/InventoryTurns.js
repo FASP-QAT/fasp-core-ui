@@ -74,10 +74,10 @@ export default class InventoryTurns extends Component {
         return '?'
     }
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
     round = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+        return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
     }
 
     getPrograms = () => {
@@ -706,8 +706,8 @@ export default class InventoryTurns extends Component {
                                     if (list.length > 0) {
                                         if (document.getElementById("includePlanningShipments").value.toString() == 'true') {
                                             endingBalanceArray[n] = list[0].closingBalance
-                                            totalConsumption = totalConsumption + parseInt(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
-                                            totalClosingBalance = totalClosingBalance + parseInt(list[0].closingBalance)
+                                            totalConsumption = totalConsumption + Number(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
+                                            totalClosingBalance = totalClosingBalance + Number(list[0].closingBalance)
                                             monthcnt++
                                             // if(list[0].consumptionQty>0|| list[0].closingBalance>0){
                                             //     monthcnt++
@@ -715,7 +715,7 @@ export default class InventoryTurns extends Component {
                                             // }
                                         } else {
                                             endingBalanceArray[n] = list[0].closingBalanceWps
-                                            totalConsumption = totalConsumption + parseInt(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
+                                            totalConsumption = totalConsumption + Number(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
                                             monthcnt++
                                             // totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
                                             // if(list[0].consumptionQty>0|| list[0].closingBalanceWps>0){

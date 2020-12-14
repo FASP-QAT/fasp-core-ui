@@ -312,10 +312,10 @@ class ShipmentSummery extends Component {
             re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
             re[item].localProcurement == true ? i18n.t('static.supplyPlan.localprocurement').replaceAll(' ', '%20') : '',
             re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-            viewById == 1 ? re[item].shipmentQty : (parseFloat(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
-            parseFloat(re[item].productCost).toFixed(2),
-            parseFloat(re[item].freightCost).toFixed(2),
-            parseFloat(re[item].totalCost).toFixed(2),
+            viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            Number(re[item].productCost).toFixed(2),
+            Number(re[item].freightCost).toFixed(2),
+            Number(re[item].totalCost).toFixed(2),
             ((re[item].notes).replaceAll(',', ' ')).replaceAll(' ', '%20')
             ]))
         }
@@ -1001,8 +1001,8 @@ class ShipmentSummery extends Component {
                                 var quantity = 0;
                                 console.log('fundingSourceList', fundingSourceList)
                                 fundingSourceList.map(c => {
-                                    cost = cost + parseFloat(c.productCost) + parseFloat(c.freightCost)
-                                    quantity = quantity + (viewById == 1 ? parseInt(c.shipmentQty) : (parseInt(c.shipmentQty) * c.multiplier))
+                                    cost = cost + Number(c.productCost) + Number(c.freightCost)
+                                    quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
                                 })
                                 var json = {
                                     "fundingSource": fundingSourceList[0].fundingSource,
@@ -1725,7 +1725,7 @@ class ShipmentSummery extends Component {
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
                                                                     <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(parseFloat(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>
                                                             )}
                                                     </tbody>
@@ -1820,12 +1820,12 @@ class ShipmentSummery extends Component {
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (this.state.shipmentDetailsList[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat(this.state.shipmentDetailsList[idx].shipmentQty) * this.state.shipmentDetailsList[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (this.state.shipmentDetailsList[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (Number(this.state.shipmentDetailsList[idx].shipmentQty) * this.state.shipmentDetailsList[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{moment(this.state.shipmentDetailsList[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(parseFloat(this.state.shipmentDetailsList[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(parseFloat(this.state.shipmentDetailsList[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsList[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsList[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     {/* <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].productCost+this.state.data[idx].freightCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> */}
-                                                                    <td style={{ 'text-align': 'center' }}>{(parseFloat(this.state.shipmentDetailsList[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsList[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                     <td style={{ 'text-align': 'left' }}>{this.state.shipmentDetailsList[idx].notes}</td>
                                                                 </tr>
                                                             )}

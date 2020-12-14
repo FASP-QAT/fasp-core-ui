@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, INVENTORY_MONTHS_IN_PAST, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, INVENTORY_MONTHS_IN_PAST, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -455,22 +455,22 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                                 data[0] = batchInfo[sb].batch.batchNo + "~" + moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"); //A
                                                 data[1] = moment(batchInfo[sb].batch.expiryDate).format(DATE_FORMAT_CAP);
                                                 data[2] = adjustmentType; //B
-                                                data[3] = parseInt(batchInfo[sb].adjustmentQty); //C
-                                                data[4] = parseInt(batchInfo[sb].actualQty); //D
+                                                data[3] = Number(batchInfo[sb].adjustmentQty); //C
+                                                data[4] = Number(batchInfo[sb].actualQty); //D
                                                 data[5] = batchInfo[sb].inventoryTransBatchInfoId; //E
                                                 data[6] = y; //F
                                                 data[7] = date;
                                                 if (adjustmentType == 1) {
-                                                    inventoryBatchInfoQty += parseInt(batchInfo[sb].actualQty);
+                                                    inventoryBatchInfoQty += Number(batchInfo[sb].actualQty);
                                                 } else {
-                                                    inventoryBatchInfoQty += parseInt(batchInfo[sb].adjustmentQty);
+                                                    inventoryBatchInfoQty += Number(batchInfo[sb].adjustmentQty);
                                                 }
                                                 json.push(data);
                                             }
                                             // if (parseInt(inventoryQty) != inventoryBatchInfoQty) {
-                                            if ((adjustmentType == 1 && parseInt(inventoryQty) > inventoryBatchInfoQty) ||
-                                                (adjustmentType == 2 && parseInt(inventoryBatchInfoQty) > 0 ? parseInt(inventoryBatchInfoQty) < parseInt(inventoryQty) : parseInt(inventoryBatchInfoQty) > parseInt(inventoryQty)) || parseInt(inventoryBatchInfoQty) == 0) {
-                                                var qty = parseInt(inventoryQty) - parseInt(inventoryBatchInfoQty);
+                                            if ((adjustmentType == 1 && Number(inventoryQty) > inventoryBatchInfoQty) ||
+                                                (adjustmentType == 2 && Number(inventoryBatchInfoQty) > 0 ? Number(inventoryBatchInfoQty) < Number(inventoryQty) : Number(inventoryBatchInfoQty) > Number(inventoryQty)) || Number(inventoryBatchInfoQty) == 0) {
+                                                var qty = Number(inventoryQty) - Number(inventoryBatchInfoQty);
                                                 var data = [];
                                                 data[0] = -1; //A
                                                 data[1] = "";
@@ -811,23 +811,23 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 5) {
             if (rowData[4] == 2) {
-                var valid = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                var valid = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                 if (valid == false) {
                     elInstance.setValueFromCoords(16, y, 1, true);
                 } else {
-                    if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 10) {
-                        inValid("F", y, i18n.t('static.common.max10digittext'), elInstance);
+                    if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
+                        inValid("F", y, i18n.t('static.common.max20digittext'), elInstance);
                     } else {
                         positiveValidation("F", y, elInstance);
                         var batchDetails = rowData[13];
                         var adjustmentBatchQty = 0;
                         for (var b = 0; b < batchDetails.length; b++) {
-                            adjustmentBatchQty += parseInt(batchDetails[b].adjustmentQty);
+                            adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
                         }
-                        console.log("Adjutsment batch qty", adjustmentBatchQty);
-                        console.log("RowData5", elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
-                        console.log("(parseInt(rowData[])) > 0", (parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())) > 0);
-                        if (batchDetails.length > 0 && (parseInt(adjustmentBatchQty) > 0 ? parseInt(adjustmentBatchQty) > parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : parseInt(adjustmentBatchQty) < parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
+                        // console.log("Adjutsment batch qty", adjustmentBatchQty);
+                        // console.log("RowData5", elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
+                        // console.log("(parseInt(rowData[])) > 0", (parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())) > 0);
+                        if (batchDetails.length > 0 && (Number(adjustmentBatchQty) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
                             inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                             valid = false;
                         } else {
@@ -840,7 +840,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
         if (x == 6) {
             if (rowData[4] == 1) {
-                var valid = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                var valid = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (valid == false) {
                     elInstance.setValueFromCoords(16, y, 1, true);
                 } else {
@@ -848,12 +848,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     console.log("D-------------------->Batch details=----------------->", batchDetails);
                     var actualBatchQty = 0;
                     for (var b = 0; b < batchDetails.length; b++) {
-                        actualBatchQty += parseInt(batchDetails[b].actualQty);
+                        actualBatchQty += Number(batchDetails[b].actualQty);
                     }
-                    console.log("D-------------------->", actualBatchQty);
-                    console.log("D-------------------->", parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()));
+                    // console.log("D-------------------->", actualBatchQty);
+                    // console.log("D-------------------->", parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()));
 
-                    if (batchDetails.length > 0 && parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) < parseInt(actualBatchQty)) {
+                    if (batchDetails.length > 0 && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) < Number(actualBatchQty)) {
                         inValid("G", y, i18n.t('static.consumption.missingBatch'), elInstance);
                         valid = false;
                     } else {
@@ -864,12 +864,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var batchDetails = rowData[13];
                 var adjustmentBatchQty = 0;
                 for (var b = 0; b < batchDetails.length; b++) {
-                    adjustmentBatchQty += parseInt(batchDetails[b].adjustmentQty);
+                    adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
                 }
-                console.log("Adjutsment batch qty", adjustmentBatchQty);
-                console.log("RowData5", elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
-                console.log("(parseInt(rowData[])) > 0", (parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())) > 0);
-                if (batchDetails.length > 0 && (parseInt(adjustmentBatchQty) > 0 ? parseInt(adjustmentBatchQty) > parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : parseInt(adjustmentBatchQty) < parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
+                // console.log("Adjutsment batch qty", adjustmentBatchQty);
+                // console.log("RowData5", elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
+                // console.log("(parseInt(rowData[])) > 0", (parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())) > 0);
+                if (batchDetails.length > 0 && (Number(adjustmentBatchQty) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -884,11 +884,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 console.log("D-------------------->Batch details=----------------->", batchDetails);
                 var actualBatchQty = 0;
                 for (var b = 0; b < batchDetails.length; b++) {
-                    actualBatchQty += parseInt(batchDetails[b].actualQty);
+                    actualBatchQty += Number(batchDetails[b].actualQty);
                 }
-                console.log("D-------------------->", actualBatchQty);
-                console.log("D-------------------->", parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()));
-                if (batchDetails.length > 0 && parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) < parseInt(actualBatchQty)) {
+                // console.log("D-------------------->", actualBatchQty);
+                // console.log("D-------------------->", parseInt(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()));
+                if (batchDetails.length > 0 && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) < Number(actualBatchQty)) {
                     inValid("G", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -967,10 +967,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 3) {
             if (rowData[2] == 2) {
-                var valid = checkValidtion("number", "D", y, elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                var valid = checkValidtion("number", "D", y, elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                 if (valid == true) {
-                    if (elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 10) {
-                        inValid("D", y, i18n.t('static.common.max10digittext'), elInstance);
+                    if (elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
+                        inValid("D", y, i18n.t('static.common.max20digittext'), elInstance);
                     } else {
                         positiveValidation("D", y, elInstance);
                     }
@@ -980,7 +980,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
         if (x == 4) {
             if (rowData[2] == 1) {
-                checkValidtion("number", "E", y, elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+                checkValidtion("number", "E", y, elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
             }
         }
 
@@ -1112,12 +1112,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[2] == 2) {
-                    validation = checkValidtion("number", "D", y, elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                    validation = checkValidtion("number", "D", y, elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                     if (validation == false) {
                         valid = false;
                     } else {
-                        if (elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 10) {
-                            inValid("D", y, i18n.t('static.common.max10digittext'), elInstance);
+                        if (elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
+                            inValid("D", y, i18n.t('static.common.max20digittext'), elInstance);
                             valid = false;
                         } else {
                             positiveValidation("D", y, elInstance);
@@ -1126,14 +1126,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[2] == 1) {
-                    validation = checkValidtion("number", "E", y, elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                    validation = checkValidtion("number", "E", y, elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                     if (validation == false) {
                         valid = false;
                     }
                 }
 
-                totalAdjustments += parseInt(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
-                totalActualStock += parseInt(elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
+                totalAdjustments += Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
+                totalActualStock += Number(elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim());
 
             }
         }
@@ -1187,8 +1187,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
-                totalAdjustments += parseInt(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
-                totalActualStock += parseInt(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
+                totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
+                totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
             }
             var inventoryInstance = this.state.inventoryEl;
             var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
@@ -1392,13 +1392,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
 
                 if (rowData[4] == 2) {
-                    var validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                    var validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     } else {
-                        if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 10) {
-                            inValid("F", y, i18n.t('static.common.max10digittext'), elInstance);
+                        if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
+                            inValid("F", y, i18n.t('static.common.max20digittext'), elInstance);
                             valid = false;
                         } else {
                             positiveValidation("F", y, elInstance);
@@ -1427,7 +1427,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
 
                 if (rowData[4] == 1) {
-                    var validation = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                    var validation = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);

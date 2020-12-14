@@ -165,10 +165,10 @@ class StockStatusOverTime extends Component {
     }
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+        return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
-        return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+        return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
     }
     dateFormatter = value => {
         return moment(value).format('MMM YY')
@@ -734,7 +734,7 @@ class StockStatusOverTime extends Component {
     }
 
     componentDidMount() {
-
+        console.log("D----------------->Calculated", (4896 + 20000000000000000000 + 5152 + 5246 + 0) / 9);
         this.getPrograms();
 
 
@@ -800,6 +800,8 @@ class StockStatusOverTime extends Component {
                                         for (var c = 0; c < monthsInPastForAmc; c++) {
 
                                             var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
+                                            console.log("D------------------>For Dt", dt);
+                                            console.log("D------------------>Months1MONTHSBefore", month1MonthsBefore);
                                             var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
                                             if (consumptionListForAMC.length > 0) {
                                                 var consumptionQty = 0;
@@ -814,10 +816,10 @@ class StockStatusOverTime extends Component {
                                                     }
 
                                                     if (count == 0) {
-                                                        consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                        consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
                                                     } else {
                                                         if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
                                                         }
                                                     }
                                                 }
@@ -826,6 +828,7 @@ class StockStatusOverTime extends Component {
 
                                             }
                                         }
+                                        console.log("D------------------>CalculatedamcBeforeArray", amcBeforeArray);
                                         for (var c = 0; c < monthsInFutureForAmc; c++) {
                                             var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                             var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
@@ -842,10 +845,10 @@ class StockStatusOverTime extends Component {
                                                     }
 
                                                     if (count == 0) {
-                                                        consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                        consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
                                                     } else {
                                                         if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                            consumptionQty += parseInt((consumptionListForAMC[j].consumptionQty));
+                                                            consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
                                                         }
                                                     }
                                                 }
@@ -855,7 +858,7 @@ class StockStatusOverTime extends Component {
                                             }
 
                                         }
-
+                                        console.log("D------------------>AMCAFTERARRAY", amcAfterArray);
                                         var amcArray = amcBeforeArray.concat(amcAfterArray);
                                         var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
                                         var countAMC = amcArrayFilteredForMonth.length;
