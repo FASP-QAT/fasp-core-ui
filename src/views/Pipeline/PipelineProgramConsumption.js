@@ -9,7 +9,7 @@ import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions';
-import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants';
+import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_INTEGER_REGEX_LONG } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
@@ -19,7 +19,7 @@ export default class PipelineProgramConsumption extends Component {
         super(props);
         this.state = {
             loading: true,
-            abc:true
+            abc: true
         }
         this.startLoading = this.startLoading.bind(this);
         this.stopLoading = this.stopLoading.bind(this);
@@ -30,10 +30,10 @@ export default class PipelineProgramConsumption extends Component {
     }
 
     startLoading() {
-        this.setState({ abc:true,loading: true });
+        this.setState({ abc: true, loading: true });
     }
     stopLoading() {
-        this.setState({ abc:false,loading: false });
+        this.setState({ abc: false, loading: false });
     }
 
     checkValidation() {
@@ -43,7 +43,7 @@ export default class PipelineProgramConsumption extends Component {
 
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -55,7 +55,7 @@ export default class PipelineProgramConsumption extends Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -67,7 +67,7 @@ export default class PipelineProgramConsumption extends Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -78,7 +78,7 @@ export default class PipelineProgramConsumption extends Component {
             }
 
 
-            var reg = JEXCEL_INTEGER_REGEX;
+            var reg = JEXCEL_INTEGER_REGEX_LONG;
             var col = ("G").concat(parseInt(y) + 1);
             var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             // value = value.toString().replaceAll("\,", "");
@@ -90,7 +90,7 @@ export default class PipelineProgramConsumption extends Component {
                 valid = false;
             } else {
                 // alert("in else");
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(Number(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -183,7 +183,7 @@ export default class PipelineProgramConsumption extends Component {
             }
         }
         if (x == 6) {
-            var reg = JEXCEL_INTEGER_REGEX;
+            var reg = JEXCEL_INTEGER_REGEX_LONG;
             var col = ("G").concat(parseInt(y) + 1);
             value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             if (value == "") {
@@ -191,7 +191,7 @@ export default class PipelineProgramConsumption extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(Number(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -278,14 +278,14 @@ export default class PipelineProgramConsumption extends Component {
 
             var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var col = ("G").concat(parseInt(y) + 1);
-            var reg = JEXCEL_INTEGER_REGEX;
+            var reg = JEXCEL_INTEGER_REGEX_LONG;
 
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(Number(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -302,8 +302,8 @@ export default class PipelineProgramConsumption extends Component {
     }
     saveConsumption() {
         var json = this.el.getJson(null, false);
-        this.setState({abc:true});
-        var json = this.el.getJson(null,false);
+        this.setState({ abc: true });
+        var json = this.el.getJson(null, false);
         var list = this.state.consumptionList;
         console.log("consumption json------->", json);
         var consumptionArray = []
@@ -333,6 +333,7 @@ export default class PipelineProgramConsumption extends Component {
             }
             consumptionArray.push(consumptionJson);
         }
+        console.log("consumptionArray======>", consumptionArray);
         return consumptionArray;
     }
     componentDidMount() {
@@ -469,9 +470,9 @@ export default class PipelineProgramConsumption extends Component {
 
                                             },
                                             {
-                                                title: i18n.t('static.unit.multiplier'), 
-                                                type: 'numeric', 
-                                                mask: '#,##.000000', 
+                                                title: i18n.t('static.unit.multiplier'),
+                                                type: 'numeric',
+                                                mask: '#,##.000000',
                                                 decimal: '.',
                                                 readOnly: true
                                             },
@@ -543,7 +544,7 @@ export default class PipelineProgramConsumption extends Component {
                                     this.loaded();
                                     this.setState({
                                         loading: false,
-                                        abc:false
+                                        abc: false
                                     })
 
                                 }
