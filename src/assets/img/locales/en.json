@@ -1591,5 +1591,5 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.common.max20digittext": "Maximum of 20 characters"
+    "static.common.max15digittext": "Maximum of 15 characters"
 }

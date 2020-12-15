@@ -816,7 +816,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(16, y, 1, true);
                 } else {
                     if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
-                        inValid("F", y, i18n.t('static.common.max20digittext'), elInstance);
+                        inValid("F", y, i18n.t('static.common.max15digittext'), elInstance);
                     } else {
                         positiveValidation("F", y, elInstance);
                         var batchDetails = rowData[13];
@@ -970,7 +970,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var valid = checkValidtion("number", "D", y, elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                 if (valid == true) {
                     if (elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
-                        inValid("D", y, i18n.t('static.common.max20digittext'), elInstance);
+                        inValid("D", y, i18n.t('static.common.max15digittext'), elInstance);
                     } else {
                         positiveValidation("D", y, elInstance);
                     }
@@ -1117,7 +1117,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         valid = false;
                     } else {
                         if (elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
-                            inValid("D", y, i18n.t('static.common.max20digittext'), elInstance);
+                            inValid("D", y, i18n.t('static.common.max15digittext'), elInstance);
                             valid = false;
                         } else {
                             positiveValidation("D", y, elInstance);
@@ -1398,7 +1398,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(16, y, 1, true);
                     } else {
                         if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 20) {
-                            inValid("F", y, i18n.t('static.common.max20digittext'), elInstance);
+                            inValid("F", y, i18n.t('static.common.max15digittext'), elInstance);
                             valid = false;
                         } else {
                             positiveValidation("F", y, elInstance);
