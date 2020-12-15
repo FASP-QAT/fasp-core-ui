@@ -1617,6 +1617,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 26) {
             console.log("Changed", value.expectedDeliveryDate);
         }
+        if (x == 8) {
+            if (rowData[8].length > 25) {
+                inValid("I", y, i18n.t('static.common.max25digittext'), elInstance);
+            } else {
+                positiveValidation("I", y, elInstance)
+            }
+        }
         if (x == 4) {
             console.log("In 4")
             var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
@@ -2878,6 +2885,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
+                if (rowData[8].length > 25) {
+                    inValid("I", y, i18n.t('static.common.max25digittext'), elInstance);
+                    valid = false;
+                } else {
+                    positiveValidation("I", y, elInstance)
+                }
                 var validation = checkValidtion("text", "G", y, rowData[6], elInstance);
                 if (validation == true) {
                     var shipmentStatus = rowData[3];

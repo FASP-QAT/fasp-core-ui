@@ -604,6 +604,7 @@ export default class WhatIfReportComponent extends React.Component {
                             );
                         }
                         consumptionList[index].consumptionQty = parseInt(parseInt(consumptionFiltered[i].consumptionQty) + parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionQty)));
+                        consumptionList[index].consumptionRcpuQty = parseInt(parseInt(consumptionFiltered[i].consumptionRcpuQty) + parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionRcpuQty)));
                     }
                     programJson.consumptionList = consumptionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -656,6 +657,7 @@ export default class WhatIfReportComponent extends React.Component {
                             );
                         }
                         consumptionList[index].consumptionQty = parseInt(parseInt(consumptionFiltered[i].consumptionQty) - parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionQty)));
+                        consumptionList[index].consumptionRcpuQty = parseInt(parseInt(consumptionFiltered[i].consumptionRcpuQty) - parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionRcpuQty)));
                     }
                     programJson.consumptionList = consumptionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();

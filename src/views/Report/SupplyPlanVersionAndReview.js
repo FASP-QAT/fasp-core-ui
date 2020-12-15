@@ -140,7 +140,7 @@ class SupplyPlanVersionAndReview extends Component {
             data[2] = getLabelText(matricsList[j].versionType.label, this.state.lang)
             data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
             data[4] = matricsList[j].createdBy.username
-            data[5] = getLabelText(matricsList[j].versionStatus.label, this.state.lang)
+            data[5] = matricsList[j].versionStatus.id == 1 ? "" : getLabelText(matricsList[j].versionStatus.label, this.state.lang);
             data[6] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedBy.username) : ''
             data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
             data[8] = matricsList[j].notes
@@ -665,8 +665,12 @@ class SupplyPlanVersionAndReview extends Component {
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
+                    var result = response.data;
+                    if (versionStatusId == 1) {
+                        result = result.filter(c => c.versionType.id != 1);
+                    }
                     this.setState({
-                        matricsList: response.data,
+                        matricsList: result,
                         message: ''
                     }, () => { this.buildJexcel() })
                 }).catch(
