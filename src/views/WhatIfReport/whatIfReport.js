@@ -3739,7 +3739,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                                <div className="" >
+              
+                            </div>
+                            <div className="row" >
                                     {
                                         this.state.jsonArrForGraph.length > 0
                                         &&
@@ -3752,12 +3754,11 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
 
                                 </div>
-                            </div>
                         </div>
                     </div>
                     {/* <div className="row" >

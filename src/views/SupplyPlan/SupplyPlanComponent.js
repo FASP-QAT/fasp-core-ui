@@ -1478,9 +1478,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tbody>
 
                                 </Table>
-                                <Table>
-                                    <tbody>
-                                        <div className="" >
+                                
+                            </div>
+                            {/* <Table>
+                                    <tbody> */}
+                                        <div className="row" >
                                             {
                                                 this.state.jsonArrForGraph.length > 0
                                                 &&
@@ -1493,14 +1495,13 @@ export default class SupplyPlanComponent extends React.Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                 </div>
                                             }
 
                                         </div>
-                                    </tbody>
-                                </Table>
-                            </div>
+                                    {/* </tbody>
+                                </Table> */}
 
                         </div>
                     </div>

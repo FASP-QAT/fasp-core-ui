@@ -16,6 +16,7 @@ import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
 import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, JEXCEL_PRO_KEY } from "../../Constants";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 
@@ -1494,6 +1495,7 @@ class AddprogramPlanningUnit extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
