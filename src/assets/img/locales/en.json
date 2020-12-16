@@ -1592,5 +1592,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.common.max25digittext": "Maximum 25 characters only",
-    "static.budget.usedUSDAmount": "Used Amount"
+    "static.budget.usedUSDAmount": "Used Amount",
+    "static.ticket.changeRequest":"Change Request"
 }
