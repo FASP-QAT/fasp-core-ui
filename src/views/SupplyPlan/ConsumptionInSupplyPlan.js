@@ -696,10 +696,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         if (x != 13 && rowData[13] != 1) {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
-        if (x == 0) {
+        if (x == 0 || x == 10) {
             var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
             if (valid == true) {
-                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && rowData[10].toString() == "true" && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
@@ -789,7 +789,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(11, y, "", true);
             var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
             if (valid == true) {
-                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
@@ -1142,7 +1142,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                     elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
                         inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                         valid = false;
                     } else {
@@ -1212,7 +1212,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                     elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
                         inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                         valid = false;
                     } else {
