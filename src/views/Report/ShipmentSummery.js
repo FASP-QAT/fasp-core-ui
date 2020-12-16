@@ -305,8 +305,9 @@ class ShipmentSummery extends Component {
 
         re = this.state.shipmentDetailsList
 
-
+console.log('shipment detail length',re.length)
         for (var item = 0; item < re.length; item++) {
+            //console.log(item,'===>',re[item])
             B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
             re[item].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20') : '',
             re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
@@ -316,14 +317,16 @@ class ShipmentSummery extends Component {
             parseFloat(re[item].productCost).toFixed(2),
             parseFloat(re[item].freightCost).toFixed(2),
             parseFloat(re[item].totalCost).toFixed(2),
-            ((re[item].notes).replaceAll(',', ' ')).replaceAll(' ', '%20')
+            ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
             ]))
         }
         for (var i = 0; i < B.length; i++) {
+            console.log(B[i])
             csvRow.push(B[i].join(","))
         }
 
         var csvString = csvRow.join("%0A")
+        console.log(csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -914,8 +917,8 @@ class ShipmentSummery extends Component {
                         // const activeFilter = shipmentList;
                         console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate == "") ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate))
-
+                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate === '') ? (c.expectedDeliveryDate >=  moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <=  moment(endDate).format('YYYY-MM-DD')) : (c.receivedDate >=  moment(startDate).format('YYYY-MM-DD') && c.receivedDate <=  moment(endDate).format('YYYY-MM-DD')))
+console.log('dateFilter',dateFilter)
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -925,7 +928,7 @@ class ShipmentSummery extends Component {
                                 }
                             }
                         }
-
+console.log('planningUnitFilter',planningUnitFilter)
                         var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('planningUnit');
                         var planningunitRequest = planningunitOs.getAll();
