@@ -287,8 +287,8 @@ export default class PipelineProgramSetup extends Component {
                     //     if (response.status == "200") {
                     this.refs.child.stopLoading();
                     if (checkValidation == true) {
-
-                        PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId).
+                        var realmCountryId=document.getElementById("realmCountryId").value;
+                        PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId,realmCountryId).
                             then(response => {
                                 console.log("createdRealmCountryPlanningUnit Response===>", response)
                             });

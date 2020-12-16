@@ -49,7 +49,7 @@ const validationSchema = function (values) {
         currency: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetAmount: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,15}(?:\.\d{1,2})?\s*$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
