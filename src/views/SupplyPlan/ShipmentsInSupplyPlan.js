@@ -2852,6 +2852,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("N", y, elInstance);
 
+
                         if (map.get("13") != "" && map.get("13") != undefined && map.get("13") != "undefined" && map.get("14") != "") {
 
                             var budget = this.state.budgetListAll.filter(c => c.id == map.get("13"))[0]
