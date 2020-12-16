@@ -3202,6 +3202,12 @@ class EditSupplyPlanStatus extends Component {
                     // }
                 }
             }.bind(this),
+            onsearch: function (el) {
+                el.jexcel.updateTable();
+            },
+            onfilter: function (el) {
+                el.jexcel.updateTable();
+            },
             editable: this.state.editable,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,

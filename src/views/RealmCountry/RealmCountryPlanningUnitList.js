@@ -1428,6 +1428,12 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                         }
 
                                                     },
+                                                    onsearch: function (el) {
+                                                        el.jexcel.updateTable();
+                                                    },
+                                                    onfilter: function (el) {
+                                                        el.jexcel.updateTable();
+                                                    },
                                                     pagination: localStorage.getItem("sesRecordCount"),
                                                     filters: true,
                                                     search: true,

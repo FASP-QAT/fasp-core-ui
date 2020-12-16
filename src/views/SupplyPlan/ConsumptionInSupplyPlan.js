@@ -358,6 +358,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 }
                             }
                         }.bind(this),
+                        onsearch: function (el) {
+                            el.jexcel.updateTable();
+                        },
+                        onfilter: function (el) {
+                            el.jexcel.updateTable();
+                        },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             //Add consumption batch info

@@ -2849,7 +2849,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                     } else {
                         positiveValidation("N", y, elInstance);
-                        if (map.get("13") != "" && map.get("14") != "") {
+                        if (map.get("13") != "" && map.get("14") != "" && map.get("29").toString() != "false") {
                             var budget = this.state.budgetListAll.filter(c => c.id == map.get("13"))[0]
                             var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                             var shipmentList = this.props.items.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("13"));
