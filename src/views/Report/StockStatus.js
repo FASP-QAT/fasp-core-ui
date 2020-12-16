@@ -284,7 +284,7 @@ class StockStatus extends Component {
   }
 
   rowtextFormatClassName = (row) => {
-    return (!row.actualConsumption) ? 'textcolor-purple' : '';
+    return  'textcolor-purple' ;
   }
 
   exportCSV() {
@@ -319,7 +319,7 @@ class StockStatus extends Component {
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.actualConsumption ? '' : ele.consumptionQty, ele.actualConsumption ? ele.consumptionQty : '', ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty , ele.actualConsumptionQty , ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
@@ -429,7 +429,7 @@ class StockStatus extends Component {
     i18n.t('static.report.maxmonth')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption ? '' : this.formatter(ele.consumptionQty), ele.actualConsumption ? this.formatter(ele.consumptionQty) : '', this.formatter(ele.shipmentQty),
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty),  this.formatter(ele.actualConsumptionQty) , this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
@@ -501,7 +501,7 @@ class StockStatus extends Component {
 
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
             var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-
+            var consumptionList=(programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId );
             var monthstartfrom = this.state.rangeValue.from.month
             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
               var monthlydata = [];
@@ -519,9 +519,17 @@ class StockStatus extends Component {
                   shiplist.map(elt => {
                     totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
                   })
-                  var json = {
+                var conList= consumptionList.filter(c =>c.actualFlag == false &&  (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+              var totalforecastConsumption=null;
+                conList.map(elt=>{
+                  totalforecastConsumption=(totalforecastConsumption==null)?elt.consumptionQty:totalforecastConsumption+elt.consumptionQty
+                 } ) 
+                 console.log(conList)
+                 console.log(totalforecastConsumption)
+                var json = {
                     dt: new Date(from, month - 1),
-                    consumptionQty: list[0].consumptionQty,
+                    forecastedConsumptionQty: totalforecastConsumption,
+                    actualConsumptionQty:list[0].actualFlag==true?list[0].consumptionQty:null,
                     actualConsumption: list[0].actualFlag,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
@@ -1489,10 +1497,10 @@ class StockStatus extends Component {
                             </td>
 
                             <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                              {this.state.stockStatusList[idx].actualConsumption ? '' : this.formatter(this.state.stockStatusList[idx].consumptionQty)}
+                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty) }
                             </td> <td>
 
-                              {this.state.stockStatusList[idx].actualConsumption ? this.formatter(this.state.stockStatusList[idx].consumptionQty) : ''}
+                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty) }
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}
