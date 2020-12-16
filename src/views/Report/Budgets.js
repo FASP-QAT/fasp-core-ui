@@ -58,6 +58,13 @@ const chartoptions =
 
         }],
         xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString:  i18n.t('static.supplyPlan.amountInUSD')+''+i18n.t('static.report.inmillions'),
+                fontColor: 'black',
+                fontStyle: "normal",
+                fontSize: "12"
+            },
             ticks: {
                 fontColor: 'black',
                 callback: function (value) {

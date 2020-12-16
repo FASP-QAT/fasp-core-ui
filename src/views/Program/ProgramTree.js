@@ -919,7 +919,7 @@ class Program extends Component {
                                                             // this.refs.programListChild.checkNewerVersions();
                                                             this.getPrograms();
                                                             this.getLocalPrograms();
-                                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
+                                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
                                                         }.bind(this)
                                                     }.bind(this)
                                                 }
@@ -998,7 +998,7 @@ class Program extends Component {
                                             // this.refs.programListChild.checkNewerVersions();
                                             this.getPrograms();
                                             this.getLocalPrograms();
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
+                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this)
                                     }.bind(this)
                                 }
