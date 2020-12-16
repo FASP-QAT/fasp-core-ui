@@ -32,7 +32,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d{0,15}(\.\d{1,4})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         // startDate: Yup.string()
@@ -614,7 +614,7 @@ class EditBudgetComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span className="red Reqasterisk">*</span></Label>
                                                         <DatePicker
                                                             id="startDate"
                                                             name="startDate"
@@ -630,7 +630,7 @@ class EditBudgetComponent extends Component {
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
                                                         <DatePicker
                                                             id="stopDate"
                                                             name="stopDate"

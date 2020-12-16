@@ -442,9 +442,13 @@ class AnnualShipmentCost extends Component {
                         }
                     }
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -973,8 +977,13 @@ class AnnualShipmentCost extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            var lang = this.state.lang;
                             this.setState({
-                                planningUnits: proList, message: ''
+                                planningUnits: proList.sort(function (a, b) {
+                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }), message: ''
                             }, () => {
                                 this.fetchData();
                             })
@@ -1108,7 +1117,13 @@ class AnnualShipmentCost extends Component {
 
                     fSourceResult = fSourceRequest.result;
                     console.log("funding source list offline--->", fSourceResult);
-                    this.setState({ fundingSources: fSourceResult });
+                    this.setState({
+                        fundingSources: fSourceResult.sort(function (a, b) {
+                            a = a.fundingSourceCode.toLowerCase();
+                            b = b.fundingSourceCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
 
                 }.bind(this)
 
@@ -1168,7 +1183,13 @@ class AnnualShipmentCost extends Component {
 
                     papuResult = papuRequest.result;
                     console.log("procurement agent list offline--->", papuResult);
-                    this.setState({ procurementAgents: papuResult });
+                    this.setState({
+                        procurementAgents: papuResult.sort(function (a, b) {
+                            a = a.procurementAgentCode.toLowerCase();
+                            b = b.procurementAgentCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
                 }.bind(this)
 
             }.bind(this)

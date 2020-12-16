@@ -219,9 +219,13 @@ export default class ExpiredInventory extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -567,8 +571,12 @@ export default class ExpiredInventory extends Component {
                 ReportService.getExpiredStock(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));
+                        var data=[]
+                        data=response.data.map(ele=>({...ele,...{shelfLife:(this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnit.id))[0].shelfLife
+                        }}))
+                        console.log(data)
                         this.setState({
-                            outPutList: response.data
+                            outPutList: data
                         }, () => {
                             this.buildJExcel();
                         });
@@ -579,6 +587,7 @@ export default class ExpiredInventory extends Component {
                             }, () => {
                                 this.buildJExcel();
                             });
+                            console.log(error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',

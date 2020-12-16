@@ -1,9 +1,9 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
-// export const API_URL='http://localhost:8080/FASP'
+export const API_URL='http://localhost:8084'
 //export const API_URL = 'http://localhost:8081'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
-export const API_URL = 'http://localhost:8084'
+// export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL='http://192.168.43.70:8080/FASP'
 export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
@@ -105,3 +105,7 @@ export const JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER = /^\d{0,10}(\.\d{1,6})?$/
 export const JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY = /^[0-9]{0,15}$/
 export const JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY = /^[-+]?\d{0,15}$/
 export const JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY = /^\d{0,15}(\.\d{1,2})?$/
+export const ASSIGNEE_ID_FOR_BUG_ISSUE = "5f1af96c4be9da001d844be3"
+export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = "5e95b3262b755a0c091b38a1"
+export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = "5f1af96c4be9da001d844be3"
+export const JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST = "Change Request"

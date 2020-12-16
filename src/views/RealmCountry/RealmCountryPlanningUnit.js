@@ -292,6 +292,12 @@ class PlanningUnitCountry extends Component {
                                                     }
 
                                                 },
+                                                onsearch: function (el) {
+                                                    el.jexcel.updateTable();
+                                                },
+                                                onfilter: function (el) {
+                                                    el.jexcel.updateTable();
+                                                },
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
                                                 search: true,
@@ -946,7 +952,7 @@ class PlanningUnitCountry extends Component {
 
 
         //Active
-        if (x == 6) {
+        if (x != 9) {
             this.el.setValueFromCoords(9, y, 1, true);
         }
 

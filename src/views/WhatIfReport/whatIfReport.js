@@ -1494,7 +1494,11 @@ export default class WhatIfReportComponent extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList,
+                    programList: proList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                     loading: false
                 })
             }.bind(this);
@@ -1646,10 +1650,18 @@ export default class WhatIfReportComponent extends React.Component {
                                         }
                                     }
                                     this.setState({
-                                        planningUnitList: proList,
+                                        planningUnitList: proList.sort(function (a, b) {
+                                            a = a.label.toLowerCase();
+                                            b = b.label.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
                                         programPlanningUnitList: myResult,
                                         planningUnitListAll: myResult,
-                                        regionList: regionList,
+                                        regionList: regionList.sort(function (a, b) {
+                                            a = a.name.toLowerCase();
+                                            b = b.name.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
                                         programJson: programJson,
                                         dataSourceListAll: dataSourceListAll,
                                         planningUnitListForConsumption: planningUnitListForConsumption,
@@ -3727,7 +3739,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                                <div className="" >
+              
+                            </div>
+                            <div className="row" >
                                     {
                                         this.state.jsonArrForGraph.length > 0
                                         &&
@@ -3740,12 +3754,11 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
 
                                 </div>
-                            </div>
                         </div>
                     </div>
                     {/* <div className="row" >

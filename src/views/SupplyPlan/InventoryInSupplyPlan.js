@@ -143,7 +143,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
+                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId!=0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -367,6 +367,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             }
 
                         }.bind(this),
+                        onsearch: function (el) {
+                            el.jexcel.updateTable();
+                        },
+                        onfilter: function (el) {
+                            el.jexcel.updateTable();
+                        },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y == null) {
@@ -713,11 +719,19 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     filterDataSource = function (instance, cell, c, r, source) {
-        return this.state.dataSourceList.filter(c => c.active.toString() == "true");
+        return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
-        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true");
+        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
 

@@ -165,7 +165,7 @@ export function jExcelLoadedFunctionOnlyHideRow(instance) {
 }
 
 export function jExcelLoadedFunctionQuantimed(instance) {
-    
+
     var obj = {};
     obj.options = {};
     var elInstance = instance.jexcel;
@@ -231,7 +231,8 @@ export function jExcelLoadedFunctionQuantimed(instance) {
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0) {
     if (type == "text") {
         var col = (colName).concat(parseInt(rowNo) + 1);
-        if (value == "") {
+        console.log("D--------------------->", value,"value == undefined",value == undefined,"value == undefined",value == "undefined");
+        if (value == "" || value == undefined || value == "undefined") {
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
