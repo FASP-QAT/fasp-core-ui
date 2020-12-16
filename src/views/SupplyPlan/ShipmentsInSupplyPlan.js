@@ -213,7 +213,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             bRequest.onsuccess = function (event) {
                                 var bResult = [];
                                 bResult = bRequest.result;
-                                budgetList.push({ id: 0, name: i18n.t('static.common.select') });
+                                budgetList.push({ id: '', name: i18n.t('static.common.select') });
                                 for (var k = 0; k < bResult.length; k++) {
                                     if (bResult[k].program.id == programJson.programId) {
                                         var bJson = {
@@ -233,8 +233,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         active: bResult[k].active,
                                         programId: bResult[k].program.id,
                                         label: bResult[k].label,
-                                        startDate:bResult[k].startDate,
-                                        stopDate:bResult[k].stopDate
+                                        startDate: bResult[k].startDate,
+                                        stopDate: bResult[k].stopDate
                                     })
                                 }
                                 console.log("Budhet list", budgetList);
@@ -1453,7 +1453,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (value != "") {
             var budgetList = this.state.budgetListAll;
             mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true" && moment(b.startDate).format("YYYY-MM-DD") <= moment(receiveDate).format("YYYY-MM-DD") && moment(b.stopDate).format("YYYY-MM-DD") >= moment(receiveDate).format("YYYY-MM-DD"));
-            mylist.push({ id: 0, name: i18n.t('static.common.select') })
+            mylist.push({ id: '', name: i18n.t('static.common.select') })
         }
         console.log("My list", mylist);
         return mylist;
@@ -1717,6 +1717,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var value = rowData[3];
             if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
                 var budget = rowData[13];
+                console.log("D------------->Value", budget)
                 var valid = checkValidtion("text", "N", y, budget, elInstance);
                 if (valid == false) {
                     elInstance.setValueFromCoords(30, y, 1, true);
@@ -1891,16 +1892,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(24, y, batchDetails, true);
                 }
             }
-            var budgetList = this.state.budgetListAll;
-            var receiveDate = rowData[4]
-            var fundingSourceId = rowData[12];
-            var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == fundingSourceId && b.programId == this.state.programIdForBudget && b.active.toString() == "true" && moment(b.startDate).format("YYYY-MM-DD") <= moment(receiveDate).format("YYYY-MM-DD") && moment(b.stopDate).format("YYYY-MM-DD") >= moment(receiveDate).format("YYYY-MM-DD"));
-            console.log("MyList---------->", mylist);
-            if (mylist.length == 1) {
-                elInstance.setValueFromCoords(13, y, mylist[0].id, true);
-            } else if (mylist.length == 0) {
-                elInstance.setValueFromCoords(13, y, '', true);
-            }
+            // console.log("D------------------>In x==4")
+            // var budgetList = this.state.budgetListAll;
+            // var receiveDate = rowData[4]
+            // var fundingSourceId = rowData[12];
+            // var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == fundingSourceId && b.programId == this.state.programIdForBudget && b.active.toString() == "true" && moment(b.startDate).format("YYYY-MM-DD") <= moment(receiveDate).format("YYYY-MM-DD") && moment(b.stopDate).format("YYYY-MM-DD") >= moment(receiveDate).format("YYYY-MM-DD"));
+            // console.log("MyList---------->", mylist);
+            // if (mylist.length == 1) {
+            //     // elInstance.setValueFromCoords(13, y, mylist[0].id, true);
+            // } else if (mylist.length == 0) {
+            //     // elInstance.setValueFromCoords(13, y, '', true);
+            // }
         }
 
         if (x == 10) {
@@ -2822,7 +2824,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                     } else {
                         positiveValidation("N", y, elInstance);
-                        if (map.get("13") != "" && map.get("14") != "") {
+                        if (map.get("13") != "" && map.get("13") != undefined && map.get("13") != "undefined" && map.get("14") != "") {
                             var budget = this.state.budgetListAll.filter(c => c.id == map.get("13"))[0]
                             var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                             var shipmentList = this.props.items.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active == true && c.budget.id == map.get("13"));
@@ -2923,6 +2925,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(30, y, 1, true);
+                }
+
+                var value = rowData[3];
+                if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
+                    var budget = rowData[13];
+                    console.log("D------------->Value1", budget)
+                    var validation = checkValidtion("text", "N", y, budget, elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(30, y, 1, true);
+                    }
                 }
 
                 var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
@@ -3113,10 +3126,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("23"))].fundingSource.code = fs.name;
                             shipmentDataList[parseInt(map.get("23"))].fundingSource.label = fs.label;
 
-                            var b = this.state.budgetList.filter(c => c.id == map.get("13"))[0];
-                            shipmentDataList[parseInt(map.get("23"))].budget.id = map.get("13");
-                            shipmentDataList[parseInt(map.get("23"))].budget.code = b.name;
-                            shipmentDataList[parseInt(map.get("23"))].budget.label = b.label;
+                            if (map.get("13") != undefined && map.get("13") != "undefined" && map.get("13") != "") {
+                                var b = this.state.budgetList.filter(c => c.id == map.get("13"))[0];
+                                shipmentDataList[parseInt(map.get("23"))].budget.id = map.get("13");
+                                shipmentDataList[parseInt(map.get("23"))].budget.code = b.name;
+                                shipmentDataList[parseInt(map.get("23"))].budget.label = b.label;
+                            } else {
+                                shipmentDataList[parseInt(map.get("23"))].budget.id = "";
+                                shipmentDataList[parseInt(map.get("23"))].budget.code = "";
+                                shipmentDataList[parseInt(map.get("23"))].budget.label = {};
+                            }
 
                             shipmentDataList[parseInt(map.get("23"))].shipmentQty = shipmentQty.toString().replaceAll("\,", "");
                             shipmentDataList[parseInt(map.get("23"))].rate = rate.toString().replaceAll("\,", "");
@@ -3295,9 +3314,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 },
                                 suggestedQty: map.get("27"),
                                 budget: {
-                                    id: map.get("13"),
-                                    code: b.name,
-                                    label: b.label,
+                                    id: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? '' : map.get("13"),
+                                    code: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? '' : b.name,
+                                    label: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? {} : b.label,
                                 },
                                 emergencyOrder: map.get("11"),
                                 currency: c,
