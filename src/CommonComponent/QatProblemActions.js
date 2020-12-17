@@ -229,7 +229,7 @@ export default class QatProblemActions extends Component {
                                             // //console.log("problemActionList=====>", problemActionList);
                                             problemActionIndex = programList[pp].problemReportList.length;
                                             var regionList = programList[pp].regionList;
-                                            problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
+                                            problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId && c.active == true);
                                             // //console.log("test=====>problem List===>", problemList);
                                             planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                             // for (var r = 0; r < regionList.length; r++) {
@@ -2262,14 +2262,23 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     }
 
-                                                    // Dynamic forecasting for ARV tracer category  tc for ARV 17,3*****************
+                                                    // Dynamic forecasting for ARV tracer category  tc for ARV 18,3*****************
                                                     if (problemList[prob].problem.problemId == 10) {
 
                                                         for (var r = 0; r < regionList.length; r++) {
                                                             // //console.log("planning unit====>********", planningUnitId);
                                                             var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                             var numberOfMonthsInFuture = problemList[prob].data1;
-                                                            if (planningUnitObj.forecastingUnit.tracerCategory.id == 17 || planningUnitObj.forecastingUnit.tracerCategory.id == 3) {
+                                                            var tracerCategories = problemList[prob].data3;
+                                                            var tracerArray = [];
+                                                            if (tracerCategories != null && tracerCategories != "") {
+                                                                var tracerSplit = tracerCategories.split(',');
+                                                                for (var t = 0; t < tracerSplit.length; t++) {
+                                                                    tracerArray.push(tracerSplit[t]);
+                                                                }
+                                                            }
+                                                            if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
+                                                            // if (planningUnitObj.forecastingUnit.tracerCategory.id == 17 || planningUnitObj.forecastingUnit.tracerCategory.id == 3) {
                                                                 var consumptionList = programList[pp].consumptionList;
                                                                 consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
 
@@ -2560,14 +2569,23 @@ export default class QatProblemActions extends Component {
                                                             }// //console.log(check);
                                                         }
                                                     }
-                                                    // Dynamic forecasting for  tracer category  tc for 12, MALARIA*****************
+                                                    // Dynamic forecasting for  tracer category  tc for 23, MALARIA*****************
                                                     if (problemList[prob].problem.problemId == 14) {
                                                         for (var r = 0; r < regionList.length; r++) {
                                                             // //console.log("planning unit====>********", planningUnitId);
                                                             var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                             // //console.log("planningUnitObj====>", planningUnitObj);
                                                             var numberOfMonthsInFuture = problemList[prob].data1;
-                                                            if (planningUnitObj.forecastingUnit.tracerCategory.id == 12) {
+                                                            var tracerCategories = problemList[prob].data3;
+                                                            var tracerArray = [];
+                                                            if (tracerCategories != null && tracerCategories != "") {
+                                                                var tracerSplit = tracerCategories.split(',');
+                                                                for (var t = 0; t < tracerSplit.length; t++) {
+                                                                    tracerArray.push(tracerSplit[t]);
+                                                                }
+                                                            }
+                                                            if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
+                                                                // if (planningUnitObj.forecastingUnit.tracerCategory.id == 12) {
                                                                 var consumptionList = programList[pp].consumptionList;
                                                                 consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                 var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2838,14 +2856,24 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     }
 
-                                                    // Dynamic forecasting for  tracer category  tc for 25, VMMC*****************
+                                                    // Dynamic forecasting for  tracer category  tc for 26, VMMC*****************
                                                     if (problemList[prob].problem.problemId == 15) {
                                                         for (var r = 0; r < regionList.length; r++) {
                                                             // //console.log("planning unit====>********", planningUnitId);
                                                             var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                             // //console.log("planningUnitObj====>", planningUnitObj);
                                                             var numberOfMonthsInFuture = problemList[prob].data1;
-                                                            if (planningUnitObj.forecastingUnit.tracerCategory.id == 25) {
+                                                            var tracerCategories = problemList[prob].data3;
+                                                            var tracerArray = [];
+                                                            if (tracerCategories != null && tracerCategories != "") {
+                                                                var tracerSplit = tracerCategories.split(',');
+                                                                for (var t = 0; t < tracerSplit.length; t++) {
+                                                                    tracerArray.push(tracerSplit[t]);
+                                                                }
+
+                                                            }
+                                                            if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
+                                                                // if (planningUnitObj.forecastingUnit.tracerCategory.id == 25) {
                                                                 var consumptionList = programList[pp].consumptionList;
                                                                 consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                 // //console.log("consumptionList===>", consumptionList);
