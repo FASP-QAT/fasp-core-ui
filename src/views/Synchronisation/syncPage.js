@@ -1588,11 +1588,16 @@ export default class syncPage extends Component {
                                   var existingShipmentId = [];
                                   for (var c = 0; c < oldProgramDataShipment.length; c++) {
                                     if (oldProgramDataShipment[c].shipmentId != 0) {
+                                      if ((oldProgramDataShipment[c].budget.id == "undefined" || oldProgramDataShipment[c].budget.id == undefined) && oldProgramDataShipment[c].active.toString() == "false") {
+                                        oldProgramDataShipment[c].budget.id = '';
+                                      }
                                       mergedShipmentData.push(oldProgramDataShipment[c]);
                                       existingShipmentId.push(oldProgramDataShipment[c].shipmentId);
                                     } else {
                                       // If 0 check whether that exists in latest version or not
-                                      mergedShipmentData.push(oldProgramDataShipment[c]);
+                                      if (oldProgramDataShipment[c].active.toString() == "true") {
+                                        mergedShipmentData.push(oldProgramDataShipment[c]);
+                                      }
                                     }
                                   }
                                   // Getting other entries of latest shipment data
@@ -2666,7 +2671,7 @@ export default class syncPage extends Component {
                 shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
               }
             }
-            shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0));
+            shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
 
             var problemReportList = [];
             var problemJson = (this.state.mergedProblemListJexcel).getJson();
