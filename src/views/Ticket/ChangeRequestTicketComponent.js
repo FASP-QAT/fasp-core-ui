@@ -1,0 +1,302 @@
+import React, { Component } from 'react';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
+import AuthenticationService from '../Common/AuthenticationService';
+import imageHelp from '../../assets/img/help-icon.png';
+import InitialTicketPageComponent from './InitialTicketPageComponent';
+import { Formik } from 'formik';
+import i18n from '../../i18n';
+import * as Yup from 'yup';
+import JiraTikcetService from '../../api/JiraTikcetService';
+import { SPACE_REGEX } from '../../Constants';
+
+let summaryText_1 = (i18n.t('static.ticket.changeRequest'))
+let summaryText_2 = "Change Request"
+const initialValues = {
+    summary: summaryText_1,
+    description: ""
+}
+const entityname = i18n.t('static.program.realmcountry');
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        summary: Yup.string()
+            .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
+            .required(i18n.t('static.common.summarytext')),
+        description: Yup.string()
+            .required(i18n.t('static.common.descriptiontext')),
+        attachFile: Yup.string()
+            .required(i18n.t('static.program.selectfile'))
+    })
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
+export default class ChangeRequestTicketComponent extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            changeRequest: {
+                summary: summaryText_1,
+                description: '',
+                file: '',
+                attachFile: ''
+            },
+            message: '',
+            loading: false
+        }
+        this.dataChange = this.dataChange.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+
+    dataChange(event) {
+        let { changeRequest } = this.state
+        if (event.target.name == "summary") {
+            changeRequest.summary = event.target.value;
+        }
+        if (event.target.name == "description") {
+            changeRequest.description = event.target.value;
+        }
+        if (event.target.name == "attachFile") {
+            changeRequest.file = event.target.files[0];
+            changeRequest.attachFile = event.target.files[0].name;
+        }
+        this.setState({
+            changeRequest
+        }, () => { })
+    };
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            summary: true,
+            description: true
+        })
+        this.validateForm(errors)
+    }
+    validateForm(errors) {
+        this.findFirstError('simpleForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+    componentDidMount() {
+        // AuthenticationService.setupAxiosInterceptors();
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
+    submitHandler = event => {
+        event.preventDefault();
+        event.target.className += " was-validated";
+    }
+
+    resetClicked() {
+        let { changeRequest } = this.state;
+        // changeRequest.summary = '';
+        changeRequest.description = '';
+        changeRequest.file = '';
+        changeRequest.attachFile = '';
+        this.setState({
+            changeRequest
+        },
+            () => { });
+    }
+
+    render() {
+
+        return (
+            <div className="col-md-12">
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h4>{i18n.t('static.ticket.changeRequest')}</h4>
+                <br></br>
+                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Formik
+                        initialValues={initialValues}
+                        validate={validate(validationSchema)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            this.setState({
+                                loading: true
+                            })
+                            this.state.changeRequest.summary = summaryText_2;
+                            JiraTikcetService.addChangeRequest(this.state.changeRequest).then(response => {
+                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                if (response.status == 200 || response.status == 201) {
+                                    var msg = response.data.key;
+                                    JiraTikcetService.addIssueAttachment(this.state.changeRequest, response.data.id).then(response => {
+
+                                    });
+
+                                    this.setState({
+                                        message: msg, loading: false
+                                    },
+                                        () => {
+                                            this.resetClicked();
+                                            this.hideSecondComponent();
+                                        })
+                                } else {
+                                    this.setState({
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
+                                this.props.togglehelp();
+                                this.props.toggleSmall(this.state.message);
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset
+                            }) => (
+                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
+                                        < FormGroup >
+                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text" name="summary" id="summary" readOnly={true}
+                                                bsSize="sm"
+                                                valid={!errors.summary && this.state.changeRequest.summary != ''}
+                                                invalid={touched.summary && !!errors.summary}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                value={this.state.changeRequest.summary}
+                                                required />
+                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="description">{i18n.t('static.common.description')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="textarea" name="description" id="description"
+                                                bsSize="sm"
+                                                valid={!errors.description && this.state.changeRequest.description != ''}
+                                                invalid={touched.description && !!errors.description}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                                maxLength={600}
+                                                value={this.state.changeRequest.description}
+                                                required />
+                                            <FormFeedback className="red">{errors.description}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup >
+                                            <Col>
+                                                <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
+                                            </Col>
+                                            <div className="custom-file">
+                                                <Input type="file" className="custom-file-input" id="attachFile" name="attachFile"  accept=".zip,.png,.jpg,.jpeg"
+                                                    valid={!errors.attachFile && this.state.changeRequest.attachFile != ''}
+                                                    invalid={touched.attachFile && !!errors.attachFile}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                    onBlur={handleBlur}
+                                                />
+                                    
+                                                <label className="custom-file-label" id="attachFile" data-browse={i18n.t('static.uploadfile.Browse')} >{this.state.changeRequest.attachFile}</label>
+                                                <FormFeedback className="red">{errors.attachFile}</FormFeedback>
+                                            </div>
+                                            <br></br><br></br>
+                                            <div>
+                                                <p>{i18n.t('static.ticket.filesuploadnote')}</p>
+                                            </div>
+                                        </FormGroup>
+                                       
+                                        <ModalFooter className="pr-0 pb-0">
+
+                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMain}><i className="fa fa-angle-double-left "></i> {i18n.t('static.common.back')}</Button>
+                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+
+                                        </ModalFooter>
+                                    </Form>
+                                )} />
+                </div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+}

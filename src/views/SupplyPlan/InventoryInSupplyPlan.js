@@ -44,17 +44,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`O${parseInt(data[i].y) + 1}`, true)
                 console.log("D---------------->", index);
+                var adjustmentType = this.props.items.inventoryType;
+                console.log("Adjutsment type", adjustmentType);
+                (instance.jexcel).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
+                (instance.jexcel).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
+                (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
                 if (index == "" || index == null || index == undefined) {
-                    var adjustmentType = this.props.items.inventoryType;
-                    console.log("Adjutsment type", adjustmentType);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, -1, true);
                     (instance.jexcel).setValueFromCoords(15, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(16, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, `=F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, `=G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1}`, true);
-                    (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
                     z = data[i].y;
                 }
             }
@@ -143,7 +143,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
+                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId!=0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -241,8 +241,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[5] = Math.round(inventoryList[j].adjustmentQty); //F
                         data[6] = Math.round(inventoryList[j].actualQty); //G
                         data[7] = inventoryList[j].multiplier; //H
-                        data[8] = `=F${parseInt(j) + 1}*H${parseInt(j) + 1}`; //I
-                        data[9] = `=G${parseInt(j) + 1}*H${parseInt(j) + 1}`; //J
+                        data[8] = `=ROUND(F${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //I
+                        data[9] = `=ROUND(G${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //J
                         if (inventoryList[j].notes === null || ((inventoryList[j].notes).trim() == "NULL")) {
                             data[10] = "";
                         } else {
@@ -282,8 +282,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[5] = ""; //F
                         data[6] = ""; //G
                         data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; //H
-                        data[8] = `=F${parseInt(0) + 1}*H${parseInt(0) + 1}`; //I
-                        data[9] = `=G${parseInt(0) + 1}*H${parseInt(0) + 1}`; //J
+                        data[8] = `=ROUND(F${parseInt(0) + 1}*H${parseInt(0) + 1},0)`; //I
+                        data[9] = `=ROUND(G${parseInt(0) + 1}*H${parseInt(0) + 1},0)`; //J
                         data[10] = "";
                         data[11] = true;
                         if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -311,7 +311,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##.00', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 80 },
-                            { title: i18n.t('static.unit.multiplier'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
@@ -367,6 +367,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             }
 
                         }.bind(this),
+                        onsearch: function (el) {
+                            el.jexcel.updateTable();
+                        },
+                        onfilter: function (el) {
+                            el.jexcel.updateTable();
+                        },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y == null) {
@@ -671,8 +677,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[5] = ""; //F
         data[6] = ""; //G
         data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; //H
-        data[8] = `=F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //I
-        data[9] = `=G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1}`; //J
+        data[8] = `=ROUND(F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1},0)`; //I
+        data[9] = `=ROUND(G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1},0)`; //J
         data[10] = "";
         data[11] = true;
         if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -689,7 +695,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             console.log("showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
                 obj.page(pageNo);
             }
         }
@@ -713,11 +719,19 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     filterDataSource = function (instance, cell, c, r, source) {
-        return this.state.dataSourceList.filter(c => c.active.toString() == "true");
+        return this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
-        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true");
+        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
 
@@ -1492,6 +1506,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
+                    var username=AuthenticationService.getLoggedInUsername();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
                         if (map.get("15") == 1) {
@@ -1505,8 +1520,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             console.log("Adjustment qty", (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null);
                             inventoryDataList[parseInt(map.get("14"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
                             inventoryDataList[parseInt(map.get("14"))].region.id = map.get("1");
+                            inventoryDataList[parseInt(map.get("14"))].region.label=(this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].dataSource.id = map.get("2");
+                            inventoryDataList[parseInt(map.get("14"))].dataSource.label=(this.state.dataSourceList).filter(c => c.id == map.get("2"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
+                            inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.label=(this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].multiplier = map.get("7");
                             inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                             inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
@@ -1519,6 +1537,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             }
                             if (map.get("15") == 1) {
                                 inventoryDataList[parseInt(map.get("14"))].lastModifiedBy.userId = curUser;
+                                inventoryDataList[parseInt(map.get("14"))].lastModifiedBy.username = username;
                                 inventoryDataList[parseInt(map.get("14"))].lastModifiedDate = curDate;
                             }
                         } else {
@@ -1529,10 +1548,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             var inventoryJson = {
                                 inventoryId: 0,
                                 dataSource: {
-                                    id: map.get("2")
+                                    id: map.get("2"),
+                                    label: (this.state.dataSourceList).filter(c => c.id == map.get("2"))[0].label
                                 },
                                 region: {
-                                    id: map.get("1")
+                                    id: map.get("1"),
+                                    label: (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label
                                 },
                                 inventoryDate: moment(map.get("0")).endOf('month').format("YYYY-MM-DD"),
                                 adjustmentQty: (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
@@ -1540,20 +1561,24 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 active: map.get("11"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("3"),
+                                    label:(this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
                                 },
                                 multiplier: map.get("7"),
                                 planningUnit: {
-                                    id: planningUnitId
+                                    id: planningUnitId,
+                                    label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == planningUnitId)[0]).planningUnit.label
                                 },
                                 notes: map.get("10"),
                                 batchInfoList: batchInfoList,
                                 index: inventoryDataList.length,
                                 createdBy: {
-                                    userId: curUser
+                                    userId: curUser,
+                                    username:username
                                 },
                                 createdDate: curDate,
                                 lastModifiedBy: {
-                                    userId: curUser
+                                    userId: curUser,
+                                    username:username
                                 },
                                 lastModifiedDate: curDate
                             }

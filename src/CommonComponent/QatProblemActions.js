@@ -229,7 +229,7 @@ export default class QatProblemActions extends Component {
                                             // //console.log("problemActionList=====>", problemActionList);
                                             problemActionIndex = programList[pp].problemReportList.length;
                                             var regionList = programList[pp].regionList;
-                                            problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId);
+                                            problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId && c.active == true);
                                             // //console.log("test=====>problem List===>", problemList);
                                             planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                             // for (var r = 0; r < regionList.length; r++) {
@@ -2262,14 +2262,23 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     }
 
-                                                    // Dynamic forecasting for ARV tracer category  tc for ARV 17,3*****************
+                                                    // Dynamic forecasting for ARV tracer category  tc for ARV 18,3*****************
                                                     if (problemList[prob].problem.problemId == 10) {
 
                                                         for (var r = 0; r < regionList.length; r++) {
                                                             // //console.log("planning unit====>********", planningUnitId);
                                                             var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                             var numberOfMonthsInFuture = problemList[prob].data1;
-                                                            if (planningUnitObj.forecastingUnit.tracerCategory.id == 17 || planningUnitObj.forecastingUnit.tracerCategory.id == 3) {
+                                                            var tracerCategories = problemList[prob].data3;
+                                                            var tracerArray = [];
+                                                            if (tracerCategories != null && tracerCategories != "") {
+                                                                var tracerSplit = tracerCategories.split(',');
+                                                                for (var t = 0; t < tracerSplit.length; t++) {
+                                                                    tracerArray.push(tracerSplit[t]);
+                                                                }
+                                                            }
+                                                            if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
+                                                            // if (planningUnitObj.forecastingUnit.tracerCategory.id == 17 || planningUnitObj.forecastingUnit.tracerCategory.id == 3) {
                                                                 var consumptionList = programList[pp].consumptionList;
                                                                 consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
 
@@ -2560,14 +2569,23 @@ export default class QatProblemActions extends Component {
                                                             }// //console.log(check);
                                                         }
                                                     }
-                                                    // Dynamic forecasting for  tracer category  tc for 12, MALARIA*****************
+                                                    // Dynamic forecasting for  tracer category  tc for 23, MALARIA*****************
                                                     if (problemList[prob].problem.problemId == 14) {
                                                         for (var r = 0; r < regionList.length; r++) {
                                                             // //console.log("planning unit====>********", planningUnitId);
                                                             var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                             // //console.log("planningUnitObj====>", planningUnitObj);
                                                             var numberOfMonthsInFuture = problemList[prob].data1;
-                                                            if (planningUnitObj.forecastingUnit.tracerCategory.id == 12) {
+                                                            var tracerCategories = problemList[prob].data3;
+                                                            var tracerArray = [];
+                                                            if (tracerCategories != null && tracerCategories != "") {
+                                                                var tracerSplit = tracerCategories.split(',');
+                                                                for (var t = 0; t < tracerSplit.length; t++) {
+                                                                    tracerArray.push(tracerSplit[t]);
+                                                                }
+                                                            }
+                                                            if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
+                                                                // if (planningUnitObj.forecastingUnit.tracerCategory.id == 12) {
                                                                 var consumptionList = programList[pp].consumptionList;
                                                                 consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                 var myStartDate = moment(Date.now()).add(1, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2838,14 +2856,24 @@ export default class QatProblemActions extends Component {
                                                         }
                                                     }
 
-                                                    // Dynamic forecasting for  tracer category  tc for 25, VMMC*****************
+                                                    // Dynamic forecasting for  tracer category  tc for 26, VMMC*****************
                                                     if (problemList[prob].problem.problemId == 15) {
                                                         for (var r = 0; r < regionList.length; r++) {
                                                             // //console.log("planning unit====>********", planningUnitId);
                                                             var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitId)[0];
                                                             // //console.log("planningUnitObj====>", planningUnitObj);
                                                             var numberOfMonthsInFuture = problemList[prob].data1;
-                                                            if (planningUnitObj.forecastingUnit.tracerCategory.id == 25) {
+                                                            var tracerCategories = problemList[prob].data3;
+                                                            var tracerArray = [];
+                                                            if (tracerCategories != null && tracerCategories != "") {
+                                                                var tracerSplit = tracerCategories.split(',');
+                                                                for (var t = 0; t < tracerSplit.length; t++) {
+                                                                    tracerArray.push(tracerSplit[t]);
+                                                                }
+
+                                                            }
+                                                            if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
+                                                                // if (planningUnitObj.forecastingUnit.tracerCategory.id == 25) {
                                                                 var consumptionList = programList[pp].consumptionList;
                                                                 consumptionList = consumptionList.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                 // //console.log("consumptionList===>", consumptionList);
@@ -3156,7 +3184,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -3486,7 +3514,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -3807,7 +3835,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -4127,7 +4155,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -4412,13 +4440,13 @@ export default class QatProblemActions extends Component {
                                                     }
                                                     if (problemList[prob].problem.problemId == 19) {
                                                         // Inventory is above max with shipment(s) in the next 7-18 months. Critical = High============
-                                                        // //console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
+                                                        console.log("in problem id======>19", problemList[prob].data1, "====", problemList[prob].data2);
                                                         var mosArray = [];
                                                         // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                         // problemList[prob].data1=0
                                                         // problemList[prob].data2=6
                                                         for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
-                                                            // //console.log("mosCounter====>", mosCounter);
+                                                            console.log("mosCounter====>", mosCounter);
                                                             var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                             var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                             var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -4444,7 +4472,7 @@ export default class QatProblemActions extends Component {
                                                             }
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,
@@ -4453,13 +4481,13 @@ export default class QatProblemActions extends Component {
                                                                 });
 
                                                         }
-                                                        // //console.log("planningUnitId====>", planningUnitId);
-                                                        // //console.log("mosArray============>$@##", mosArray);
+                                                        console.log("D------------------->planningUnitId====>", planningUnitId);
+                                                        console.log("D------------------->mosArray============>$@##", mosArray);
                                                         // for loop on array mosArray
                                                         // var monthWithMosLessThenMin = '';
                                                         var monthWithMosGreaterThenMax = '';
                                                         for (var element = 0; element < mosArray.length; element++) {
-                                                            // //console.log("mos element===>", mosArray[element]);
+                                                            console.log("mos element===>", mosArray[element]);
                                                             if (mosArray[element].mos > mosArray[element].maxForMonths) {
                                                                 monthWithMosGreaterThenMax = mosArray[element].month;
                                                                 break;
@@ -4588,17 +4616,17 @@ export default class QatProblemActions extends Component {
                                                             }
 
                                                         }
-
+                                                        console.log("D------------------->monthWithMosGreaterThenMax", monthWithMosGreaterThenMax)
                                                         if (monthWithMosGreaterThenMax != '') {
-                                                            // //console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                            console.log("D------------------->min mos month from array ======>", monthWithMosGreaterThenMax);
                                                             var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
                                                             var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
-                                                            // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                            console.log("D------------------->startDate=====>", getStartDate, "endDate=====>", getEndDate);
                                                             var shipmentListForMonths = programList[pp].shipmentList;
                                                             var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                            // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                            console.log("D------------------->filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
                                                             if (filteredShipmentListForMonths.length > 0) {
-                                                                // //console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                                console.log("D------------------->flag a problem mos is greater then max and have shipment withing lead times");
                                                                 if (index == -1) {
                                                                     var json = {
                                                                         problemReportId: 0,
@@ -4771,7 +4799,7 @@ export default class QatProblemActions extends Component {
 
                                                             mosArray.push(
                                                                 {
-                                                                    mos: parseFloat(mos).toFixed(1),
+                                                                    mos: mos != "" ? parseFloat(mos).toFixed(1) : "",
                                                                     maxForMonths: maxForMonths,
                                                                     minForMonths: minForMonths,
                                                                     month: m,

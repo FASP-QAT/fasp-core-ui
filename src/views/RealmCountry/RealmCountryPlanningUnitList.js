@@ -752,7 +752,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER } from '../../Constants';
 const entityname = i18n.t('static.dashboad.planningunitcountry');
 export default class RealmCountryPlanningUnitList extends Component {
 
@@ -1101,7 +1101,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 var col = ("F").concat(parseInt(y) + 1);
                 // var value = this.el.getValueFromCoords(5, y);
                 var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1219,7 +1219,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             var col = ("F").concat(parseInt(y) + 1);
             value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER;
             if (this.el.getValueFromCoords(x, y) != "") {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1238,7 +1238,7 @@ export default class RealmCountryPlanningUnitList extends Component {
 
 
         //Active
-        if (x == 6) {
+        if (x != 9) {
             this.el.setValueFromCoords(9, y, 1, true);
         }
 
@@ -1392,7 +1392,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                             type: 'numeric',
                                                             textEditor: true,
                                                             decimal: '.',
-                                                            mask: '#,##.00',
+                                                            mask: '#,##.000000',
                                                             disabledMaskOnEdition: true
 
                                                         },
@@ -1427,6 +1427,12 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                             cell.classList.add('readonly');
                                                         }
 
+                                                    },
+                                                    onsearch: function (el) {
+                                                        el.jexcel.updateTable();
+                                                    },
+                                                    onfilter: function (el) {
+                                                        el.jexcel.updateTable();
                                                     },
                                                     pagination: localStorage.getItem("sesRecordCount"),
                                                     filters: true,

@@ -58,12 +58,14 @@ export default class ExpiredInventory extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.makeText = this.makeText.bind(this);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             outPutList: [],
             programs: [],
             versions: [],
             planningUnits: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
@@ -217,9 +219,13 @@ export default class ExpiredInventory extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -533,16 +539,19 @@ export default class ExpiredInventory extends Component {
                         var programJson = JSON.parse(programData);
                         console.log("3----", programJson);
                         var list = (programJson.supplyPlan).filter(c => (c.expiredStock > 0 && (c.transDate >= startDate && c.transDate <= endDate)));
+                        console.log("D----------------->List---------------->", list);
+                        console.log("D-----------------> supply plan", (programJson.supplyPlan).filter(c => (c.expiredStock > 0)));
                         var data = []
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
-                            var list1 = ele.batchDetails.filter(c => c.expiredQty > 0 && (c.expiryDate >= startDate && c.expiryDate <= endDate))
+                            var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0 || c.openingBalance > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
                             list1.map(ele1 => {
                                 // ele1.createdDate=ele.transDate
                                 var json = {
                                     planningUnit: pu.planningUnit,
+                                    shelfLife: pu.shelfLife,
                                     batchInfo: ele1,
-                                    expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps,
+                                    expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
                                     program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
                                 }
                                 data.push(json)
@@ -562,8 +571,12 @@ export default class ExpiredInventory extends Component {
                 ReportService.getExpiredStock(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));
+                        var data=[]
+                        data=response.data.map(ele=>({...ele,...{shelfLife:(this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnit.id))[0].shelfLife
+                        }}))
+                        console.log(data)
                         this.setState({
-                            outPutList: response.data
+                            outPutList: data
                         }, () => {
                             this.buildJExcel();
                         });
@@ -574,6 +587,7 @@ export default class ExpiredInventory extends Component {
                             }, () => {
                                 this.buildJExcel();
                             });
+                            console.log(error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -675,7 +689,7 @@ export default class ExpiredInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatter(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(Math.ceil(moment(new Date(ele.batchInfo.expiryDate)).diff(new Date(ele.batchInfo.createdDate), 'months', true))), (this.dateformatter(ele.batchInfo.expiryDate)).replaceAll(' ', '%20')])));
+        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatter(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(ele.shelfLife), (this.dateformatter(ele.batchInfo.expiryDate)).replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -763,7 +777,7 @@ export default class ExpiredInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), Math.ceil(moment(new Date(ele.batchInfo.expiryDate)).diff(new Date(ele.batchInfo.createdDate), 'months', true)), this.dateformatter(ele.batchInfo.expiryDate)]);
+        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -793,7 +807,7 @@ export default class ExpiredInventory extends Component {
             data[3] = outPutList[j].batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no')
             // data[4] = outPutList[j].batchInfo.createdDate
             data[4] = (outPutList[j].batchInfo.createdDate ? moment(outPutList[j].batchInfo.createdDate).format(`YYYY-MM-DD`) : null)
-            data[5] = Math.ceil(moment(new Date(outPutList[j].batchInfo.expiryDate)).diff(new Date(outPutList[j].batchInfo.createdDate), 'months', true))
+            data[5] = outPutList[j].shelfLife
             data[6] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`YYYY-MM-DD`) : null)
 
             outPutListArray[count] = data;

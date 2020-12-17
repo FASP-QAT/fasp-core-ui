@@ -1,6 +1,5 @@
 import { Date } from 'core-js';
 import { Formik } from 'formik';
-import moment from 'moment';
 import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
@@ -47,7 +46,7 @@ const validationSchema = function (values, t) {
             // .transform((o, v) => parseFloat(v.replace(/,/g, '')))
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
-            .matches(/^\d{0,10}(\.\d{1,4})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // startDate: Yup.string()
         //     .required(i18n.t('static.budget.startdatetext')),
@@ -483,6 +482,7 @@ class AddBudgetComponent extends Component {
 
                                     console.log("this.state--->", this.state);
                                     let { budget } = this.state;
+                                    let budget1 = this.state.budget;
                                     var getCurrencyId = this.state.budget.currency.currencyId;
                                     var currencyId = getCurrencyId.split("~");
                                     budget.currency.currencyId = currencyId[0];
@@ -494,11 +494,11 @@ class AddBudgetComponent extends Component {
                                     // this.setState({ budget: budget });
 
 
-                                    var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
-                                    budget.startDate = startDate;
+                                    var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
+                                    budget.startDate = new Date(startDateString);
 
-                                    var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
-                                    budget.stopDate = stopDate;
+                                    var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
+                                    budget.stopDate = new Date(stopDateString);
 
                                     // this.setState({
                                     //     loading: true
@@ -519,6 +519,13 @@ class AddBudgetComponent extends Component {
                                         })
                                         .catch(
                                             error => {
+                                                let budget = budget1;
+                                                budget.currency.currencyId = budget1.currency.currencyId +"~"+ budget1.currency.conversionRateToUsd;
+                                                this.setState({
+                                                    budget: budget
+                                                }, () => {
+                                                    console.log("BUDGET--->", this.state.budget);
+                                                })
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         message: 'static.unkownError',
@@ -770,7 +777,7 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span className="red Reqasterisk">*</span></Label>
                                                         <DatePicker
                                                             id="startDate"
                                                             name="startDate"
@@ -787,7 +794,7 @@ class AddBudgetComponent extends Component {
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
 
                                                         <DatePicker
                                                             id="stopDate"

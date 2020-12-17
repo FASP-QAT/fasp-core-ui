@@ -198,7 +198,8 @@ class ShipmentSummery extends Component {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             planningUnitValues: [],
             planningUnitLabels: [],
@@ -222,7 +223,7 @@ class ShipmentSummery extends Component {
             shipmentDetailsMonthList: [],
             message: '',
             viewById: 1,
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
@@ -263,16 +264,16 @@ class ShipmentSummery extends Component {
     exportCSV() {
 
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
+            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.display') + '  :  ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.display') + '  :  ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
 
@@ -293,9 +294,9 @@ class ShipmentSummery extends Component {
         csvRow.push('')
         csvRow.push('')
 
-        var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'),(i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'),
-        i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'), i18n.t('static.report.erpOrder').replaceAll(' ', '%20'), 
-        i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo1').replaceAll(' ', '%20'), 
+        var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.report.qatPIDFID')).replaceAll(' ', '%20'), (i18n.t('static.report.planningUnit/ForecastingUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.id')).replaceAll(' ', '%20'),
+        i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'), i18n.t('static.report.erpOrder').replaceAll(' ', '%20'),
+        i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo').replaceAll(' ', '%20').replaceAll('#', '%23'),
         (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
         (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
         (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
@@ -304,25 +305,28 @@ class ShipmentSummery extends Component {
 
         re = this.state.shipmentDetailsList
 
-
+console.log('shipment detail length',re.length)
         for (var item = 0; item < re.length; item++) {
-            B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id,(getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
-            re[item].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'):'',
-            re[item].erpOrder==true?i18n.t('static.report.erpOrder').replaceAll(' ', '%20'):'',
-            re[item].localProcurement==true?i18n.t('static.supplyPlan.localprocurement').replaceAll(' ', '%20'):'',
-            re[item].orderNo!=null? re[item].orderNo:'', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            //console.log(item,'===>',re[item])
+            B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
+            re[item].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20') : '',
+            re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
+            re[item].localProcurement == true ? i18n.t('static.supplyPlan.localprocurement').replaceAll(' ', '%20') : '',
+            re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (parseFloat(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
             parseFloat(re[item].productCost).toFixed(2),
             parseFloat(re[item].freightCost).toFixed(2),
             parseFloat(re[item].totalCost).toFixed(2),
-            ((re[item].notes).replaceAll(',', ' ')).replaceAll(' ', '%20')
+            ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
             ]))
         }
         for (var i = 0; i < B.length; i++) {
+            console.log(B[i])
             csvRow.push(B[i].join(","))
         }
 
         var csvString = csvRow.join("%0A")
+        console.log(csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -346,7 +350,7 @@ class ShipmentSummery extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -598,9 +602,13 @@ class ShipmentSummery extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                 })
 
             }.bind(this);
@@ -744,8 +752,13 @@ class ShipmentSummery extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            var lang = this.state.lang;
                             this.setState({
-                                planningUnits: proList, message: ''
+                                planningUnits: proList.sort(function (a, b) {
+                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }), message: ''
                             }, () => {
                                 this.fetchData();
                             })
@@ -913,8 +926,8 @@ class ShipmentSummery extends Component {
                         // const activeFilter = shipmentList;
                         console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c =>(c.receivedDate == null || c.receivedDate == "") ? ( c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate ):  (c.receivedDate >= startDate && c.receivedDate <= endDate))
-
+                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate === '') ? (c.expectedDeliveryDate >=  moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <=  moment(endDate).format('YYYY-MM-DD')) : (c.receivedDate >=  moment(startDate).format('YYYY-MM-DD') && c.receivedDate <=  moment(endDate).format('YYYY-MM-DD')))
+console.log('dateFilter',dateFilter)
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -924,7 +937,7 @@ class ShipmentSummery extends Component {
                                 }
                             }
                         }
-
+console.log('planningUnitFilter',planningUnitFilter)
                         var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('planningUnit');
                         var planningunitRequest = planningunitOs.getAll();
@@ -977,10 +990,10 @@ class ShipmentSummery extends Component {
                                     "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
                                     "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
                                     "notes": planningUnitFilter[i].notes,
-                                    "emergencyOrder":planningUnitFilter[i].emergencyOrder,
-                                    "erpFlag":planningUnitFilter[i].erpFlag,
-                                    "localProcurement":planningUnitFilter[i].localProcurement,
-                                    "orderNo":planningUnitFilter[i].orderNo
+                                    "emergencyOrder": planningUnitFilter[i].emergencyOrder,
+                                    "erpFlag": planningUnitFilter[i].erpFlag,
+                                    "localProcurement": planningUnitFilter[i].localProcurement,
+                                    "orderNo": planningUnitFilter[i].orderNo
                                 }
                                 data.push(json);
 
@@ -1746,7 +1759,7 @@ class ShipmentSummery extends Component {
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.erpOrder')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.localprocurement')}</th>
                                                             <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.orderNo')}</th>
-                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
+                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
                                                             <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
@@ -1812,10 +1825,10 @@ class ShipmentSummery extends Component {
                                                                 <tr id="addr0" key={idx} >
                                                                     <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.shipmentDetailsList[idx].planningUnit.label, this.state.lang)}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder==true?i18n.t('static.supplyPlan.consideAsEmergencyOrder'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder==true?i18n.t('static.report.erpOrder'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localProcurement==true?i18n.t('static.report.localprocurement'):'')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo!=null? this.state.shipmentDetailsList[idx].orderNo:'')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder') : '')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder == true ? i18n.t('static.report.erpOrder') : '')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localProcurement == true ? i18n.t('static.report.localprocurement') : '')}</td>
+                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo != null ? this.state.shipmentDetailsList[idx].orderNo : '')}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>
                                                                     <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].shipmentStatus.label, this.state.lang)}</td>

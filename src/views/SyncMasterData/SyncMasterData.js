@@ -105,7 +105,7 @@ export default class SyncMasterData extends Component {
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
+                <h6 className="mt-success" style={{ color: this.props.match.params.color }}>{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col xs="12" sm="12">
@@ -166,14 +166,14 @@ export default class SyncMasterData extends Component {
             // this.refs.problemListChild.qatProblemActions(programList[i].id);
             if (navigator.onLine) {
                 //Code to Sync Country list
-                MasterSyncService.syncProgram(programList[i].programId, programList[i].version,programList[i].userId, date)
+                MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
                     .then(response => {
                         console.log("Response", response);
                         if (response.status == 200) {
                             console.log("Response=========================>", response.data);
                             console.log("i", i);
                             var curUser = AuthenticationService.getLoggedInUserId();
-                            var prog = programList.filter(c => c.programId == response.data.programId && c.version==response.data.versionId && c.userId==response.data.userId)[0];
+                            var prog = programList.filter(c => c.programId == response.data.programId && c.version == response.data.versionId && c.userId == response.data.userId)[0];
                             console.log("Prog=====================>", prog)
                             var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -229,7 +229,7 @@ export default class SyncMasterData extends Component {
                             for (var pr = 0; pr < problemReportArray.length; pr++) {
                                 console.log("problemReportArray[pr].problemReportId---------->", problemReportArray[pr].problemReportId);
                                 var index = problemReportList.findIndex(c => c.problemReportId == problemReportArray[pr].problemReportId)
-                                console.log("D------------->Index----------->", index,"D------------>",problemReportArray[pr].problemStatus.id);
+                                console.log("D------------->Index----------->", index, "D------------>", problemReportArray[pr].problemStatus.id);
                                 if (index == -1) {
                                     problemReportList.push(problemReportArray[pr]);
                                 } else {
@@ -266,6 +266,7 @@ export default class SyncMasterData extends Component {
                             getDatabase();
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
+                                console.log("D--------------------------->in 1")
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 },
@@ -286,10 +287,16 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, date);
+                                    var dt = date;
+                                    if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
+                                        dt = "2020-01-01 00:00:00";
+                                    }
+                                    console.log("M------------------------>", dt);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt);
                                 }.bind(this)
                             }.bind(this)
                         } else {
+                            console.log("D--------------------------->in 2")
                             this.setState({
                                 message: response.data.messageCode
                             },
@@ -300,7 +307,9 @@ export default class SyncMasterData extends Component {
                             valid = false;
                         }
                     }).catch(error => {
+                        console.log("D------------------------> 3 error", error);
                         if (error.message === "Network Error") {
+                            console.log("D--------------------------->in 3")
                             this.setState({ message: error.message },
                                 () => {
                                     this.hideSecondComponent();
@@ -312,12 +321,14 @@ export default class SyncMasterData extends Component {
                                 case 404:
                                 case 406:
                                 case 412:
+                                    console.log("D--------------------------->in 4")
                                     this.setState({ message: error.response.data.messageCode },
                                         () => {
                                             this.hideSecondComponent();
                                         });
                                     break;
                                 default:
+                                    console.log("D--------------------------->in 5")
                                     this.setState({ message: 'static.unkownError' },
                                         () => {
                                             this.hideSecondComponent();
@@ -329,6 +340,7 @@ export default class SyncMasterData extends Component {
                         valid = false;
                     });
             } else {
+                console.log("D--------------------------->in 6")
                 document.getElementById("retryButtonDiv").style.display = "block";
                 this.setState({
                     message: 'static.common.onlinealerttext'
@@ -349,6 +361,7 @@ export default class SyncMasterData extends Component {
                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
             })
         } else {
+            console.log("D--------------------------->in 7")
             document.getElementById("retryButtonDiv").style.display = "block";
             this.setState({
                 message: 'static.common.onlinealerttext'
@@ -417,11 +430,26 @@ export default class SyncMasterData extends Component {
                         var myResult = [];
                         myResult = pGetRequest.result;
                         var validation = this.syncProgramData(lastSyncDate, myResult);
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var pIds = [];
+
+
+                        var programIds = myResult.filter(c => c.userId == userId).map(program => {
+                            pIds.push(program.programId);
+                        });
+                        
+
+
                         console.log("Validation", validation);
                         if (validation) {
                             AuthenticationService.setupAxiosInterceptors();
                             if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
-                                MasterSyncService.getSyncAllMasters(lastSyncDateRealm)
+
+
+                                MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)
+
+
                                     .then(response => {
                                         if (response.status == 200) {
                                             console.log("M sync Response", response.data)
@@ -432,6 +460,7 @@ export default class SyncMasterData extends Component {
                                             console.log("M sync country transaction start")
                                             var countryObjectStore = countryTransaction.objectStore('country');
                                             var json = (response.countryList);
+                                            countryObjectStore.delete(0);
                                             for (var i = 0; i < json.length; i++) {
                                                 console.log("M sync in for", i)
                                                 countryObjectStore.put(json[i]);
@@ -643,7 +672,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                     var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
                                                                                                                                                                     console.log("M sync supplier transaction start")
                                                                                                                                                                     var supplierObjectStore = supplierTransaction.objectStore('supplier');
-                                                                                                                                                                    var json = (response.supplierList);
+                                                                                                                                                                    var json = [];
                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                         supplierObjectStore.put(json[i]);
                                                                                                                                                                     }
@@ -658,6 +687,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                             console.log("M sync forecastingUnit transaction start")
                                                                                                                                                                             var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
                                                                                                                                                                             var json = (response.forecastingUnitList);
+                                                                                                                                                                            forecastingUnitObjectStore.delete(0);
                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                 forecastingUnitObjectStore.put(json[i]);
                                                                                                                                                                             }
@@ -672,6 +702,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                     console.log("M sync planningUnit transaction start")
                                                                                                                                                                                     var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
                                                                                                                                                                                     var json = (response.planningUnitList);
+                                                                                                                                                                                    planningUnitObjectStore.delete(0);
                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                         planningUnitObjectStore.put(json[i]);
                                                                                                                                                                                     }
@@ -686,6 +717,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                             console.log("M sync procurementUnit transaction start")
                                                                                                                                                                                             var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
                                                                                                                                                                                             var json = (response.procurementUnitList);
+                                                                                                                                                                                            procurementUnitObjectStore.delete(0);
                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                 procurementUnitObjectStore.put(json[i]);
                                                                                                                                                                                             }
@@ -700,6 +732,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                     console.log("M sync realmCountry transaction start")
                                                                                                                                                                                                     var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
                                                                                                                                                                                                     var json = (response.realmCountryList);
+                                                                                                                                                                                                    realmCountryObjectStore.delete(0);
                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                         realmCountryObjectStore.put(json[i]);
                                                                                                                                                                                                     }
@@ -714,6 +747,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                             console.log("M sync realmCountryPlanningUnit transaction start")
                                                                                                                                                                                                             var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
                                                                                                                                                                                                             var json = (response.realmCountryPlanningUnitList);
+                                                                                                                                                                                                            realmCountryPlanningUnitObjectStore.delete(0);
                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                 realmCountryPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                                                             }
@@ -728,6 +762,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                     console.log("M sync procurementAgentPlanningUnit transaction start")
                                                                                                                                                                                                                     var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
                                                                                                                                                                                                                     var json = (response.procurementAgentPlanningUnitList);
+                                                                                                                                                                                                                    procurementAgentPlanningUnitObjectStore.delete(0);
                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                         procurementAgentPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                                                                     }
@@ -742,6 +777,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                             console.log("M sync procurementAgentProcurementUnit transaction start")
                                                                                                                                                                                                                             var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
                                                                                                                                                                                                                             var json = (response.procurementAgentProcurementUnitList);
+                                                                                                                                                                                                                            procurementAgentProcurementUnitObjectStore.delete(0);
                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                 procurementAgentProcurementUnitObjectStore.put(json[i]);
                                                                                                                                                                                                                             }
@@ -756,6 +792,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                     console.log("M sync program transaction start")
                                                                                                                                                                                                                                     var programObjectStore = programTransaction.objectStore('program');
                                                                                                                                                                                                                                     var json = (response.programList);
+                                                                                                                                                                                                                                    programObjectStore.delete(0);
                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                         programObjectStore.put(json[i]);
                                                                                                                                                                                                                                     }
@@ -770,6 +807,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                             console.log("M sync programPlanningUnit transaction start")
                                                                                                                                                                                                                                             var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                                                                                                                                                                                                                                             var json = (response.programPlanningUnitList);
+                                                                                                                                                                                                                                            programPlanningUnitObjectStore.delete(0);
                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                 programPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                                                                                             }
@@ -784,6 +822,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                     console.log("M sync region transaction start")
                                                                                                                                                                                                                                                     var regionObjectStore = regionTransaction.objectStore('region');
                                                                                                                                                                                                                                                     var json = (response.regionList);
+                                                                                                                                                                                                                                                    regionObjectStore.delete(0);
                                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                         regionObjectStore.put(json[i]);
                                                                                                                                                                                                                                                     }
@@ -798,6 +837,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                             console.log("M sync budget transaction start")
                                                                                                                                                                                                                                                             var budgetObjectStore = budgetTransaction.objectStore('budget');
                                                                                                                                                                                                                                                             var json = (response.budgetList);
+                                                                                                                                                                                                                                                            budgetObjectStore.delete(0);
                                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                                 budgetObjectStore.put(json[i]);
                                                                                                                                                                                                                                                             }

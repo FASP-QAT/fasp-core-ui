@@ -47,6 +47,8 @@ const pickerLang = {
 class ProcurementAgentExport extends Component {
     constructor(props) {
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             regionList: [],
             message: '',
@@ -66,7 +68,7 @@ class ProcurementAgentExport extends Component {
             fundingSourceLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
@@ -210,9 +212,13 @@ class ProcurementAgentExport extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -352,9 +358,13 @@ class ProcurementAgentExport extends Component {
                     }
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    procurementAgents: proList
+                    procurementAgents: proList.sort(function (a, b) {
+                        a = a.procurementAgentCode.toLowerCase();
+                        b = b.procurementAgentCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -490,8 +500,13 @@ class ProcurementAgentExport extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            var lang = this.state.lang;
                             this.setState({
-                                planningUnits: proList, message: ''
+                                planningUnits: proList.sort(function (a, b) {
+                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }), message: ''
                             }, () => {
                                 this.fetchData();
                             })
@@ -1191,11 +1206,11 @@ class ProcurementAgentExport extends Component {
                                     var freightCost = 0;
                                     var totalCost = 0;
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
+                                        qty = parseInt(qty) + parseInt(planningUnitFilterdata[pf].qty);
+                                        productCost = parseFloat(productCost) + parseFloat(planningUnitFilterdata[pf].productCost);
                                         freightPerc = parseFloat(freightPerc) + isNaN(parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        freightCost = parseFloat(freightCost) + parseFloat(planningUnitFilterdata[pf].freightCost) * parseFloat(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = parseFloat(totalCost) + (parseFloat(planningUnitFilterdata[pf].productCost) * parseFloat(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (parseFloat(planningUnitFilterdata[pf].freightCost) * parseFloat(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,
@@ -2138,9 +2153,13 @@ class ProcurementAgentExport extends Component {
                     }
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    fundingSources: proList
+                    fundingSources: proList.sort(function (a, b) {
+                        a = a.fundingSourceCode.toLowerCase();
+                        b = b.fundingSourceCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);

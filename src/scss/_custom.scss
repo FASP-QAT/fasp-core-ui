@@ -3517,47 +3517,47 @@ margin-left: -45px;
 }
 //supply plan graph align with table 
 .graphwidth{
-  width: 1384px!important;
-  max-width: 1384px!important;
+  width: 100%!important;
+  max-width: 100%!important;
   // margin-right: -597px;
-  margin-left: 229px;
+  // margin-left: 229px;
 
 }
 @media (min-width: 1920px){
   .graphwidth{
-    width: 1571px!important;
-    max-width: 1571px!important;
-    margin-left: 238px;
+    width: 100%!important;
+    max-width: 100%!important;
+    // margin-left: 238px;
   
   }
 }
-@media (min-width:2052px) and (max-width:2732px)
- {
-  .graphwidth{
-    width: 2074px!important;
-    max-width: 2074px!important;
-    margin-left: 376px;
+// @media (min-width:2052px) and (max-width:2732px)
+//  {
+//   .graphwidth{
+//     width: 2074px!important;
+//     max-width: 2074px!important;
+//     margin-left: 376px;
   
-  }
- }
- @media (min-width:2733px) and (max-width:4102px) 
-  {
-    .graphwidth{
-      width: 3237px!important;
-      max-width: 3237px!important;
-      margin-left: 610px;
+//   }
+//  }
+//  @media (min-width:2733px) and (max-width:4102px) 
+//   {
+//     .graphwidth{
+//       width: 3237px!important;
+//       max-width: 3237px!important;
+//       margin-left: 610px;
     
-    }
- }
- @media (min-width:4103px) and (max-width:5464px)
- {
-  .graphwidth{
-    width: 4317px!important;
-    max-width: 4317px!important;
-    margin-left: 751px;
+//     }
+//  }
+//  @media (min-width:4103px) and (max-width:5464px)
+//  {
+//   .graphwidth{
+//     width: 4317px!important;
+//     max-width: 4317px!important;
+//     margin-left: 751px;
   
-  }
- }
+//   }
+//  }
 
 .localProcurementEmergencyComment{
     background-image:url('/src/assets/img/emergencyComment.png'),url('/src/assets/img/localProcurement.png');
@@ -3882,4 +3882,22 @@ color: #000000!important;
 .lowCriticality{
   background-color: yellow!important;
   color: #000000!important;
+}
+
+.jexcel_filters label {  overflow: initial !important; }
+.MuiInputBase-root{
+  height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem !important;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+    color: #697069 !important;
+}
+
+.problemListMarginTop{
+  padding: 0px 20px 20px 20px!important;
+}
+
+.selection-cell-header{
+  text-align: center;
 }

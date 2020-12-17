@@ -437,7 +437,9 @@ export default class PipelineProgramInventory extends Component {
                                         },
                                         {
                                             title: i18n.t('static.unit.multiplier'),
-                                            type: 'text',
+                                            type: 'numeric',
+                                            mask: '#,##.000000',
+                                            decimal: '.',
                                             readOnly: true
                                         },
                                         {

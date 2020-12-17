@@ -166,7 +166,8 @@ class Consumption extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 10);
     this.state = {
       sortType: 'asc',
       dropdownOpen: false,
@@ -183,7 +184,7 @@ class Consumption extends Component {
       offlineProductCategoryList: [],
       show: false,
       message: '',
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true
@@ -478,7 +479,7 @@ class Consumption extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -965,9 +966,13 @@ class Consumption extends Component {
 
 
         }
-
+        var lang = this.state.lang;
         this.setState({
-          programs: proList
+          programs: proList.sort(function (a, b) {
+            a = getLabelText(a.label, lang).toLowerCase();
+            b = getLabelText(b.label, lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          }),
         })
 
       }.bind(this);
@@ -1018,9 +1023,14 @@ class Consumption extends Component {
                   proList[i] = myResult[i]
                 }
               }
+              var lang = this.state.lang;
               this.setState({
                 planningUnits: proList, message: '',
-                offlinePlanningUnitList: proList
+                offlinePlanningUnitList: proList.sort(function (a, b) {
+                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
               }, () => {
                 this.filterData();
               })

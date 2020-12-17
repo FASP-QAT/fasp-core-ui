@@ -156,7 +156,8 @@ class ForecastMetrics extends Component {
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-      loading: true
+      loading: true,
+      programLst: []
 
 
 
@@ -179,6 +180,7 @@ class ForecastMetrics extends Component {
     this.pickAMonth2 = React.createRef();
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
+    this.filterProgram = this.filterProgram.bind(this)
   }
 
   makeText = m => {
@@ -435,8 +437,48 @@ class ForecastMetrics extends Component {
       countryValues: countrysId.map(ele => ele),
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
+      this.filterProgram();
+      // this.filterData()
+    })
+  }
 
-      this.filterData()
+  filterProgram = () => {
+    let countryIds = this.state.countryValues.map(ele => ele.value);
+    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    this.setState({
+      programLst: [],
+      programValues: [],
+      programLabels: []
+    }, () => {
+      if (countryIds.length != 0) {
+        let programLst = [];
+        for (var i = 0; i < countryIds.length; i++) {
+          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+        }
+
+        console.log('programLst', programLst)
+        if (programLst.length > 0) {
+
+          this.setState({
+            programLst: programLst
+          }, () => {
+            this.filterData()
+          });
+        } else {
+          this.setState({
+            programLst: []
+          }, () => {
+            this.filterData()
+          });
+        }
+      } else {
+        this.setState({
+          programLst: []
+        }, () => {
+          this.filterData()
+        });
+      }
+
     })
   }
   handleChangeProgram(programIds) {
@@ -551,7 +593,12 @@ class ForecastMetrics extends Component {
           }
         }
       }.bind(this),
-
+      onsearch: function (el) {
+        el.jexcel.updateTable();
+      },
+      onfilter: function (el) {
+        el.jexcel.updateTable();
+      },
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
@@ -1105,10 +1152,10 @@ class ForecastMetrics extends Component {
 
         )
       }, this);
-    const { programs } = this.state;
+    const { programLst } = this.state;
     let programList = [];
-    programList = programs.length > 0
-      && programs.map((item, i) => {
+    programList = programLst.length > 0
+      && programLst.map((item, i) => {
         return (
 
           { label: getLabelText(item.label, this.state.lang), value: item.programId }
@@ -1234,7 +1281,7 @@ class ForecastMetrics extends Component {
           <div className="Card-header-reporticon">
             <div className="card-header-actions">
               <a className="card-header-action">
-                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix1() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
 
               </a>
               {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong> */}

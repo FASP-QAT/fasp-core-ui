@@ -70,8 +70,10 @@ export default class ManualTagging extends Component {
     }
     link() {
         var conversionFactor = document.getElementById("conversionFactor").value;
+        var programId = document.getElementById("programId").value;
+        console.log("my conversionFactor--------",conversionFactor);
         this.setState({ loading: true })
-        ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor)
+        ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor,programId)
             .then(response => {
                 console.log("response m tagging---", response)
                 this.setState({
@@ -134,9 +136,24 @@ export default class ManualTagging extends Component {
     }
     getConvertedQATShipmentQty = () => {
         var conversionFactor = document.getElementById("conversionFactor").value;
+        // conversionFactor = conversionFactor.slice(0,13)
         conversionFactor = conversionFactor.replace("-", "")
-        console.log("changedConversionFactor---",conversionFactor);
-        console.log("conversionFactor---",conversionFactor);
+        // var regex = "/^\d{0,6}(\.\d{1,2})?$/";
+        // var regResult = regex.test(conversionFactor);
+
+        // Reg start
+        var beforeDecimal = 10;
+        var afterDecimal = 4;
+        conversionFactor = conversionFactor.replace(/[^\d.]/g, '')
+            .replace(new RegExp("(^[\\d]{" + beforeDecimal + "})[\\d]", "g"), '$1')
+            .replace(/(\..*)\./g, '$1')
+            .replace(new RegExp("(\\.[\\d]{" + afterDecimal + "}).", "g"), '$1');
+        // Reg end
+
+        console.log("reg result---", conversionFactor);
+
+        console.log("changedConversionFactor---", conversionFactor);
+        console.log("conversionFactor---", conversionFactor);
         var erpShipmentQty = document.getElementById("erpShipmentQty").value;
         if (conversionFactor != null && conversionFactor != "" && conversionFactor != 0) {
             var result = erpShipmentQty * conversionFactor;
@@ -145,7 +162,7 @@ export default class ManualTagging extends Component {
                 conversionFactorEntered: true
             })
         } else {
-            this.setState({ conversionFactorEntered: false})
+            this.setState({ conversionFactorEntered: false })
         }
         document.getElementById("conversionFactor").value = conversionFactor;
     }
@@ -159,7 +176,8 @@ export default class ManualTagging extends Component {
         var searchId = document.getElementById("searchId").value;
         var programId = document.getElementById("programId").value;
         var erpPlanningUnitId = this.state.planningUnitIdUpdated;
-        if (roNoOrderNo != "") {
+        console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
+        if (roNoOrderNo != "" && erpPlanningUnitId != null && erpPlanningUnitId != "") {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, searchId, programId, erpPlanningUnitId)
                 .then(response => {
                     console.log("artmis response===", response.data);
@@ -210,6 +228,11 @@ export default class ManualTagging extends Component {
                         }
                     }
                 );
+        } else {
+            this.setState({
+                artmisList: [],
+                displayButton: false
+            })
         }
         // else if (orderNo == "" && primeLineNo == "") {
         //     this.setState({
@@ -258,6 +281,12 @@ export default class ManualTagging extends Component {
 
         var planningUnitSelect = document.getElementById("planningUnitId");
         var planningUnitName = planningUnitSelect.options[planningUnitSelect.selectedIndex].text;
+
+        // var head = document.getElementsByClassName('selection-cell-header')
+        // var ned = document.createTextNode('Link');
+        // head.innerHTML = "Link";
+        // console.log("head---", head);
+        // .innerHtml = "Link?";
 
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
@@ -347,7 +376,7 @@ export default class ManualTagging extends Component {
     getPlanningUnitListByTracerCategory = (term) => {
         console.log("planning unit term---", term)
         this.setState({ planningUnitName: term });
-        PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term)
+        PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term.toUpperCase())
             .then(response => {
                 console.log("tracercategoryPlanningUnit response===", response);
                 var tracercategoryPlanningUnit = [];
@@ -782,8 +811,10 @@ export default class ManualTagging extends Component {
 
     toggleLarge() {
         console.log("procurementAgentId---", this.state.procurementAgentId)
+        console.log("planning unit in modal---", document.getElementById("planningUnitId").value);
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
+            planningUnitIdUpdated: document.getElementById("planningUnitId").value,
             artmisList: [],
             reason: "1",
             result: '',
@@ -818,6 +849,13 @@ export default class ManualTagging extends Component {
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,
+            selectionHeaderRenderer: () => 'Link?',
+            headerColumnStyle: {
+                headerAlign: 'center'
+                // align:  function callback(cell, row, rowIndex, colIndex) { 
+                //     console.log("my row----------------------")
+                //     return "center" }
+            },
             onSelect: (row, isSelect, rowIndex, e) => {
                 document.getElementById("erpShipmentQty").value = row.quantity;
                 this.getConvertedQATShipmentQty();
@@ -1246,14 +1284,25 @@ export default class ManualTagging extends Component {
                                                         onChange={(event, value) => {
                                                             // this.getOrderDetails()
                                                             console.log("demo2 value---", value);
-                                                            this.setState({
-                                                                erpPlanningUnitId: value.value,
-                                                                planningUnitIdUpdated: value.value,
-                                                                planningUnitName: value.label
-                                                            }, () => { this.getOrderDetails() });
+                                                            if (value != null) {
+                                                                this.setState({
+                                                                    erpPlanningUnitId: value.value,
+                                                                    planningUnitIdUpdated: value.value,
+                                                                    planningUnitName: value.label
+                                                                }, () => { this.getOrderDetails() });
+                                                            } else {
+                                                                this.setState({
+                                                                    erpPlanningUnitId: '',
+                                                                    planningUnitIdUpdated: '',
+                                                                    planningUnitName: ''
+                                                                }, () => { this.getOrderDetails() });
+                                                            }
 
                                                         }} // prints the selected value
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                        renderInput={(params) => <TextField
+                                                            {...params}
+                                                            // InputProps={{ style: { fontSize: 12.24992 } }}
+                                                            variant="outlined"
                                                             onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
                                                     />
                                                     {/* <InputGroup>
@@ -1301,7 +1350,12 @@ export default class ManualTagging extends Component {
                                                         getOptionLabel={(option) => option.label}
                                                         style={{ width: 300 }}
                                                         onChange={(event, value) => {
-                                                            this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+                                                            console.log("ro combo box---", value)
+                                                            if (value != null) {
+                                                                this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+                                                            } else {
+                                                                this.setState({ searchedValue: '' }, () => { this.getOrderDetails() });
+                                                            }
 
                                                         }} // prints the selected value
                                                         renderInput={(params) => <TextField {...params} variant="outlined"
@@ -1371,11 +1425,14 @@ export default class ManualTagging extends Component {
                                                 <InputGroup>
                                                     <Input
                                                         // value={this.state.changedConversionFactor}
-                                                        type="number"
-                                                        min={0.1}
+                                                        type="text"
+                                                        pattern="/^\d+(\.\d{1,4})?$/"
+                                                        // min={0.1}
                                                         name="conversionFactor"
                                                         id="conversionFactor"
                                                         bsSize="sm"
+                                                        // maxLength="14"
+                                                        // step={.0001}
                                                         autocomplete="off"
                                                         onChange={this.getConvertedQATShipmentQty}
                                                     >

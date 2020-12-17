@@ -130,7 +130,11 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                      })
                 })
 
 
@@ -158,9 +162,16 @@ export default class ConsumptionDetails extends React.Component {
                     })
 
                     var programIdd = this.props.match.params.programId;
+                    var needToCalculate = this.props.match.params.calculate;
                     if (programIdd != '' && programIdd != undefined) {
                         document.getElementById("programId").value = programIdd;
-                        this.getProblemListAfterCalculation();
+                        // console.log("value==================>", needToCalculate);
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
                     }
 
                     var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
@@ -339,7 +350,7 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.reviewNotes'),
@@ -1102,7 +1113,7 @@ export default class ConsumptionDetails extends React.Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
                     <ProblemListFormulas ref="formulaeChild" />
-                    <div className="Card-header-addicon">
+                    <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">

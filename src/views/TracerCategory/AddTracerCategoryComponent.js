@@ -317,7 +317,7 @@ import { BUDGET_NAME_REGEX } from '../../Constants.js';
 const entityname = i18n.t('static.tracercategory.tracercategory');
 
 
-const initialValues = {
+let initialValues = {
     realmId: [],
     tracerCategoryCode: "",
     tracerCategoryName: "",
@@ -494,6 +494,23 @@ class AddTracerCategoryComponent extends Component {
                     }
                 }
             );
+        let realmId = AuthenticationService.getRealmId();
+        if (realmId != -1) {
+            // document.getElementById('realmId').value = realmId;
+            initialValues = {
+                realmId: realmId
+            }
+
+            let { tracerCategory } = this.state;
+            tracerCategory.realm.id = realmId;
+            document.getElementById("realmId").disabled = true;
+            this.setState({
+                tracerCategory
+            },
+                () => {
+
+                })
+        }
 
     }
     hideSecondComponent() {
@@ -524,6 +541,7 @@ class AddTracerCategoryComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {

@@ -634,7 +634,8 @@ export default class SupplyPlanComponent extends React.Component {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
                             name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                            id: programJson.regionList[i].regionId
+                            id: programJson.regionList[i].regionId,
+                            label:programJson.regionList[i].label
                         }
                         regionList.push(regionJson)
 
@@ -1330,13 +1331,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                             if (noOfActualEntries > 0) {
                                                 if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                    consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                    consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
+                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 }
                                                 actualFlagForRegion = true;
                                             } else {
-                                                consumptionQtyForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
-                                                consumptionTotalForRegion += parseInt(consumptionListForRegionalDetails[cr].consumptionQty);
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 actualFlagForRegion = false;
                                             }
                                         }
@@ -1353,8 +1354,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
                                             if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
                                                 actualCount += 1;
-                                                actualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                totalActualQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].actualQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                                actualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                totalActualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                 var index = regionsReportingActualInventory.findIndex(c => c == regionListFiltered[r].id);
                                                 if (index == -1) {
                                                     regionsReportingActualInventory.push(regionListFiltered[r].id)
@@ -1362,8 +1363,8 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                             if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
                                                 adjustmentsCount += 1;
-                                                adjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
-                                                totalAdjustmentsQtyForRegion += parseInt(inventoryListForRegionalDetails[cr].adjustmentQty) * parseInt(inventoryListForRegionalDetails[cr].multiplier);
+                                                adjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                totalAdjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                             }
                                         }
                                         if (actualCount == 0) {
@@ -2413,10 +2414,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                                {
+                        </div>
+                        {
                                     this.state.jsonArrForGraph.length > 0
                                     &&
-                                    <div className="" >
+                                    <div className="row" >
 
                                         <div className="graphwidth">
                                         <div className="col-md-12">
@@ -2425,9 +2427,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             </div>
                                             </div>
                                         </div>
-                                        <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                        <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                     </div>}
-                            </div>
+
                         </div>
                     </div>
 
@@ -2833,11 +2835,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.expiredStockDetails.map(item => (
                                             <tr>
-                                                <td align="left">{item.batchNo}</td>
-                                                <td align="left">{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                <td align="left">{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
-                                                <td align="left">{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
+                                                <td>{item.batchNo}</td>
+                                                <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
+                                                <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty>0?item.expiredQty:item.openingBalance} /></td>
                                             </tr>
                                         )
                                         )
@@ -2845,8 +2847,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th style={{ textAlign: 'left' }} colSpan="4">{i18n.t('static.supplyPlan.total')}</th>
-                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
+                                        <th colSpan="4">{i18n.t('static.supplyPlan.total')}</th>
+                                        <th><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
                                     </tr>
                                 </tfoot>
                             </Table>
