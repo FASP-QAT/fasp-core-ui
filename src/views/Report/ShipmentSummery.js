@@ -313,10 +313,10 @@ console.log('shipment detail length',re.length)
             re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
             re[item].localProcurement == true ? i18n.t('static.supplyPlan.localprocurement').replaceAll(' ', '%20') : '',
             re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-            viewById == 1 ? re[item].shipmentQty : (parseFloat(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
-            parseFloat(re[item].productCost).toFixed(2),
-            parseFloat(re[item].freightCost).toFixed(2),
-            parseFloat(re[item].totalCost).toFixed(2),
+            viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            Number(re[item].productCost).toFixed(2),
+            Number(re[item].freightCost).toFixed(2),
+            Number(re[item].totalCost).toFixed(2),
             ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
             ]))
         }
