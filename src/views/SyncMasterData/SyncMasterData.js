@@ -447,7 +447,7 @@ export default class SyncMasterData extends Component {
                             if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
 
 
-                                MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, programIds)
+                                MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)
 
 
                                     .then(response => {
