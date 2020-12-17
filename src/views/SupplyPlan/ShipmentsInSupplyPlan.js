@@ -332,6 +332,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
                                         console.log("Shipment list------------------------------->", shipmentList);
                                         var erpType = "hidden";
+                                        shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate)))});
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var shipmentMode = 1;
                                             if (shipmentList[i].shipmentMode == "Air") {
@@ -1300,7 +1301,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         // tr.children[17].classList.add('AsteriskTheadtrTd');
         tr.children[19].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = (instance).jexcel;
-        shipmentInstance.orderBy(4, 0);
         var json = shipmentInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
         var jsonLength;
