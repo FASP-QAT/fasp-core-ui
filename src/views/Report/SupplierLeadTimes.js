@@ -280,12 +280,12 @@ class SupplierLeadTimes extends Component {
                 (ele.procurementAgent.code == null ? '' : ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),
                 ele.plannedToSubmittedLeadTime == undefined || ele.plannedToSubmittedLeadTime == null ? '' : ele.plannedToSubmittedLeadTime,
                 // ele.draftToSubmittedLeadTime,
-                ele.submittedToApprovedLeadTime==null?'':ele.submittedToApprovedLeadTime,
-                ele.approvedToShippedLeadTime==null?'':ele.approvedToShippedLeadTime,
-                ele.shippedToArrivedBySeaLeadTime==null?'':ele.shippedToArrivedBySeaLeadTime,
-                ele.shippedToArrivedByAirLeadTime==null?'':ele.shippedToArrivedByAirLeadTime,
-                ele.arrivedToDeliveredLeadTime==null?'':ele.arrivedToDeliveredLeadTime,
-                ele.totalSeaLeadTime == undefined  || ele.totalSeaLeadTime==null? '' : ele.totalSeaLeadTime,
+                ele.submittedToApprovedLeadTime == null ? '' : ele.submittedToApprovedLeadTime,
+                ele.approvedToShippedLeadTime == null ? '' : ele.approvedToShippedLeadTime,
+                ele.shippedToArrivedBySeaLeadTime == null ? '' : ele.shippedToArrivedBySeaLeadTime,
+                ele.shippedToArrivedByAirLeadTime == null ? '' : ele.shippedToArrivedByAirLeadTime,
+                ele.arrivedToDeliveredLeadTime == null ? '' : ele.arrivedToDeliveredLeadTime,
+                ele.totalSeaLeadTime == undefined || ele.totalSeaLeadTime == null ? '' : ele.totalSeaLeadTime,
                 ele.totalAirLeadTime == undefined || ele.totalAirLeadTime == null ? '' : ele.totalAirLeadTime,
                 ele.localProcurementAgentLeadTime == null ? '' : ele.localProcurementAgentLeadTime
 
@@ -704,8 +704,13 @@ class SupplierLeadTimes extends Component {
                         }
                     }
                 }
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -835,8 +840,13 @@ class SupplierLeadTimes extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            var lang = this.state.lang;
                             this.setState({
-                                planningUnits: proList, message: ''
+                                planningUnits: proList.sort(function (a, b) {
+                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }), message: ''
                             }, () => {
                                 this.fetchData();
                             })
@@ -1064,7 +1074,11 @@ class SupplierLeadTimes extends Component {
                 }
 
                 this.setState({
-                    procurementAgents: proList
+                    procurementAgents: proList.sort(function (a, b) {
+                        a = a.procurementAgentCode.toLowerCase();
+                        b = b.procurementAgentCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);

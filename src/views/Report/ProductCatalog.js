@@ -114,7 +114,7 @@ class ProductCatalog extends Component {
                 getLabelText(ele.tracerCategory.label, this.state.lang) != null ? getLabelText(ele.tracerCategory.label, this.state.lang).replaceAll(' ', '%20') : '',
                 getLabelText(ele.forecastingUnit.label, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.fUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                getLabelText(ele.genericName, this.state.lang)!=null ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
+                getLabelText(ele.genericName, this.state.lang) != null ? getLabelText(ele.genericName, this.state.lang).replaceAll(' ', '%20') : '',
                 ele.forecastingtoPlanningUnitMultiplier,
                 ele.planningUnit.id,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
@@ -368,15 +368,20 @@ class ProductCatalog extends Component {
                             var tcList = [];
                             flList.filter(function (item) {
                                 var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
-                                if (i <= -1) {
+                                if (i <= -1 && item.tracerCategory.id != 0) {
                                     tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
                                 }
                                 return null;
                             });
 
                             console.log('tcList', tcList)
+                            var lang = this.state.lang;
                             this.setState({
-                                tracerCategories: tcList,
+                                tracerCategories: tcList.sort(function (a, b) {
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 planningUnitList: planningList
                             }, () => { this.fetchData() })
 
@@ -528,9 +533,13 @@ class ProductCatalog extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -637,9 +646,14 @@ class ProductCatalog extends Component {
                         const dedup = [...set].map(item => JSON.parse(item));
                         console.log(`Removed ${outPutList.length - dedup.length} elements`);
                         console.log("dedup----------------", dedup);
+                        var lang = this.state.lang;
                         this.setState({
                             loading: false,
-                            productCategoriesOffline: dedup
+                            productCategoriesOffline: dedup.sort(function (a, b) {
+                                a = a.label.toLowerCase();
+                                b = b.label.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
                         })
                     }.bind(this);
                 }.bind(this);

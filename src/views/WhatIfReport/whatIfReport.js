@@ -231,6 +231,7 @@ export default class WhatIfReportComponent extends React.Component {
         //
     }
     handleRangeDissmis(value) {
+        console.log("Value-------------------->",value)
         this.setState({ rangeValue: value })
         this.formSubmit(this.state.planningUnit, value);
     }
@@ -571,8 +572,9 @@ export default class WhatIfReportComponent extends React.Component {
                             startDate: moment(startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)
                         })
-
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } }, message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        var dt = new Date();
+                        dt.setMonth(dt.getMonth() - 10);
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',  message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -604,6 +606,7 @@ export default class WhatIfReportComponent extends React.Component {
                             );
                         }
                         consumptionList[index].consumptionQty = parseInt(parseInt(consumptionFiltered[i].consumptionQty) + parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionQty)));
+                        consumptionList[index].consumptionRcpuQty = parseInt(parseInt(consumptionFiltered[i].consumptionRcpuQty) + parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionRcpuQty)));
                     }
                     programJson.consumptionList = consumptionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -624,7 +627,12 @@ export default class WhatIfReportComponent extends React.Component {
                             startDate: moment(startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } }, message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        var dt = new Date();
+                        dt.setMonth(dt.getMonth() - 10);
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',  message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' },
+                            () => {
+                                console.log("D--------------->", this.state.rangeValue);
+                            })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -656,6 +664,7 @@ export default class WhatIfReportComponent extends React.Component {
                             );
                         }
                         consumptionList[index].consumptionQty = parseInt(parseInt(consumptionFiltered[i].consumptionQty) - parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionQty)));
+                        consumptionList[index].consumptionRcpuQty = parseInt(parseInt(consumptionFiltered[i].consumptionRcpuQty) - parseInt(((parseInt(this.state.percentage)) / 100) * parseInt(consumptionFiltered[i].consumptionRcpuQty)));
                     }
                     programJson.consumptionList = consumptionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -676,7 +685,9 @@ export default class WhatIfReportComponent extends React.Component {
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } }, message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        var dt = new Date();
+                        dt.setMonth(dt.getMonth() - 10);
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',  message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -758,7 +769,6 @@ export default class WhatIfReportComponent extends React.Component {
                             startDate: "",
                             stopDate: ""
                         })
-
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
@@ -842,7 +852,6 @@ export default class WhatIfReportComponent extends React.Component {
                             startDate: "",
                             stopDate: ""
                         })
-
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
@@ -937,7 +946,6 @@ export default class WhatIfReportComponent extends React.Component {
                             startDate: "",
                             stopDate: ""
                         })
-
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
@@ -1492,7 +1500,11 @@ export default class WhatIfReportComponent extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList,
+                    programList: proList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                     loading: false
                 })
             }.bind(this);
@@ -1644,10 +1656,18 @@ export default class WhatIfReportComponent extends React.Component {
                                         }
                                     }
                                     this.setState({
-                                        planningUnitList: proList,
+                                        planningUnitList: proList.sort(function (a, b) {
+                                            a = a.label.toLowerCase();
+                                            b = b.label.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
                                         programPlanningUnitList: myResult,
                                         planningUnitListAll: myResult,
-                                        regionList: regionList,
+                                        regionList: regionList.sort(function (a, b) {
+                                            a = a.name.toLowerCase();
+                                            b = b.name.toLowerCase();
+                                            return a < b ? -1 : a > b ? 1 : 0;
+                                        }),
                                         programJson: programJson,
                                         dataSourceListAll: dataSourceListAll,
                                         planningUnitListForConsumption: planningUnitListForConsumption,
@@ -2295,13 +2315,13 @@ export default class WhatIfReportComponent extends React.Component {
                                         for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                             if (noOfActualEntries > 0) {
                                                 if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 }
                                                 actualFlagForRegion = true;
                                             } else {
-                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 actualFlagForRegion = false;
                                             }
                                         }
@@ -3312,13 +3332,13 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 <Picker
                                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                     ref={this.pickRange}
-                                                                    value={rangeValue}
+                                                                    value={this.state.rangeValue}
                                                                     lang={pickerLang}
                                                                     //theme="light"
                                                                     onChange={this.handleRangeChange}
                                                                     onDismiss={this.handleRangeDissmis}
                                                                 >
-                                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                                    <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                                 </Picker>
                                                             </div>
                                                         </FormGroup>
@@ -3725,26 +3745,26 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-              
+
                             </div>
                             <div className="row" >
-                                    {
-                                        this.state.jsonArrForGraph.length > 0
-                                        &&
-                                        <div className="" >
+                                {
+                                    this.state.jsonArrForGraph.length > 0
+                                    &&
+                                    <div className="" >
 
-                                            <div className="graphwidth">
-                                                <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report">
-                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                    </div>
+                                        <div className="graphwidth">
+                                            <div className="col-md-12">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                 </div>
                                             </div>
-                                            <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
-                                    }
+                                        <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                    </div>
+                                }
 
-                                </div>
+                            </div>
                         </div>
                     </div>
                     {/* <div className="row" >
@@ -4157,11 +4177,11 @@ export default class WhatIfReportComponent extends React.Component {
                                     {
                                         this.state.expiredStockDetails.map(item => (
                                             <tr>
-                                                <td align="left">{item.batchNo}</td>
-                                                <td align="left">{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                <td align="left">{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
-                                                <td align="left">{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty > 0 ? item.expiredQty : item.openingBalance} /></td>
+                                                <td>{item.batchNo}</td>
+                                                <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
+                                                <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty > 0 ? item.expiredQty : item.openingBalance} /></td>
                                             </tr>
                                         )
                                         )
@@ -4169,8 +4189,8 @@ export default class WhatIfReportComponent extends React.Component {
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th style={{ textAlign: 'left' }} colSpan="4">{i18n.t('static.supplyPlan.total')}</th>
-                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
+                                        <th colSpan="4">{i18n.t('static.supplyPlan.total')}</th>
+                                        <th><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.expiredStockDetailsTotal} /></th>
                                     </tr>
                                 </tfoot>
                             </Table>
