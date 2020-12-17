@@ -1603,7 +1603,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     shipmentChanged = function (instance, cell, x, y, value) {
-        console.log("Y--------------->", y, "x", x, "Value", value);
+        console.log("D--------------------->Y--------------->", y, "x", x, "Value", value);
         var elInstance = instance.jexcel;
         console.log("El instance------------>", elInstance)
         var rowData = elInstance.getRowData(y);
