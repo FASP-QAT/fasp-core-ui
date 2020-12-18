@@ -3766,11 +3766,11 @@ export default class WhatIfReportComponent extends React.Component {
                                 </Table>
 
                             </div>
-                            <div className="row" >
+                            {/* <div className="row" > */}
                                 {
                                     this.state.jsonArrForGraph.length > 0
                                     &&
-                                    <div className="" >
+                                    <div className="row" >
 
                                         <div className="graphwidth">
                                             <div className="col-md-12">
@@ -3783,7 +3783,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     </div>
                                 }
 
-                            </div>
+                            {/* </div> */}
                         </div>
                     </div>
                     {/* <div className="row" >
