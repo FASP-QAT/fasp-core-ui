@@ -204,7 +204,11 @@ export default class ShipmentDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList,
+                    programList: proList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                     loading: false
                 })
                 if (document.getElementById("addRowButtonId") != null) {
@@ -297,7 +301,11 @@ export default class ShipmentDetails extends React.Component {
                         }
                         console.log("proList---" + proList);
                         this.setState({
-                            planningUnitList: proList,
+                            planningUnitList: proList.sort(function (a, b) {
+                                a = a.label.toLowerCase();
+                                b = b.label.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
                             planningUnitListAll: myResult,
                             loading: false
                         })

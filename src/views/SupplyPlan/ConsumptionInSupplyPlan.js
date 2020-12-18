@@ -139,7 +139,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value) {
+                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId!=0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -329,6 +329,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
+                            console.log("D-------------------->In update table")
                             var elInstance = el.jexcel;
                             var lastY = -1;
                             if (y != null && lastY != y) {
@@ -358,6 +359,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 }
                             }
                         }.bind(this),
+                        onsearch: function (el) {
+                            el.jexcel.updateTable();
+                        },
+                        onfilter: function (el) {
+                            el.jexcel.updateTable();
+                        },
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             //Add consumption batch info
@@ -621,7 +628,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             console.log("D---------------->showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length - 1) / parseInt(showOption));
                 console.log("D---------------->pageNo", pageNo);
                 console.log("D---------------->json length", json.length);
                 obj.page(pageNo);
@@ -666,11 +673,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         } else {
             mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE && c.active.toString() == "true");
         }
-        return mylist;
+        return mylist.sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this)
 
     filterRealmCountryPlanningUnit = function (instance, cell, c, r, source) {
-        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true");
+        return this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
     }.bind(this);
 
     consumptionChanged = function (instance, cell, x, y, value) {
@@ -682,10 +697,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         if (x != 13 && rowData[13] != 1) {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
-        if (x == 0) {
+        if (x == 0 || x == 10) {
             var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
             if (valid == true) {
-                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && rowData[10].toString() == "true" && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
@@ -775,7 +790,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(11, y, "", true);
             var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
             if (valid == true) {
-                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
@@ -1128,7 +1143,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                     elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
                         inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                         valid = false;
                     } else {
@@ -1198,7 +1213,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                     elInstance.setValueFromCoords(14, y, 1, true);
                 } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
                         inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                         valid = false;
                     } else {

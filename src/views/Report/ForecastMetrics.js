@@ -157,7 +157,7 @@ class ForecastMetrics extends Component {
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true,
-      programLst:[]
+      programLst: []
 
 
 
@@ -180,7 +180,7 @@ class ForecastMetrics extends Component {
     this.pickAMonth2 = React.createRef();
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
-    this.filterProgram=this.filterProgram.bind(this)
+    this.filterProgram = this.filterProgram.bind(this)
   }
 
   makeText = m => {
@@ -446,41 +446,41 @@ class ForecastMetrics extends Component {
     let countryIds = this.state.countryValues.map(ele => ele.value);
     console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
-        programLst: [],
-        programValues: [],
-        programLabels: []
+      programLst: [],
+      programValues: [],
+      programLabels: []
     }, () => {
-        if (countryIds.length != 0) {
-            let programLst = [];
-            for (var i = 0; i < countryIds.length; i++) {
-                programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-            }
-
-            console.log('programLst', programLst)
-            if (programLst.length > 0) {
-
-                this.setState({
-                    programLst: programLst
-                }, () => {
-                    this.filterData()
-                });
-            } else {
-                this.setState({
-                    programLst: []
-                }, () => {
-                    this.filterData()
-                });
-            }
-        } else {
-            this.setState({
-                programLst: []
-            }, () => {
-                this.filterData()
-            });
+      if (countryIds.length != 0) {
+        let programLst = [];
+        for (var i = 0; i < countryIds.length; i++) {
+          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
         }
 
+        console.log('programLst', programLst)
+        if (programLst.length > 0) {
+
+          this.setState({
+            programLst: programLst
+          }, () => {
+            this.filterData()
+          });
+        } else {
+          this.setState({
+            programLst: []
+          }, () => {
+            this.filterData()
+          });
+        }
+      } else {
+        this.setState({
+          programLst: []
+        }, () => {
+          this.filterData()
+        });
+      }
+
     })
-}
+  }
   handleChangeProgram(programIds) {
     programIds = programIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
@@ -593,7 +593,12 @@ class ForecastMetrics extends Component {
           }
         }
       }.bind(this),
-
+      onsearch: function (el) {
+        el.jexcel.updateTable();
+      },
+      onfilter: function (el) {
+        el.jexcel.updateTable();
+      },
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
       search: true,
