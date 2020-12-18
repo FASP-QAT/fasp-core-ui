@@ -16,6 +16,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import classNames from 'classnames';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Add Budget"
@@ -53,6 +54,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.budgetamounttext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
+        startDate: Yup
+            .string().required(i18n.t('static.budget.startdatetext')).nullable().default(undefined),
+        // .required(i18n.t('static.budget.startdatetext')),
+        stopDate: Yup.string()
+            .required(i18n.t('static.budget.stopdatetext')).nullable().default(undefined),
     })
 }
 
@@ -163,7 +169,9 @@ export default class BudgetTicketComponent extends Component {
             budgetCode: true,
             currency: true,
             budgetAmount: true,
-            notes: true
+            notes: true,
+            startDate: true,
+            stopDate: true
         })
         this.validateForm(errors)
     }
@@ -548,7 +556,10 @@ export default class BudgetTicketComponent extends Component {
                                 isSubmitting,
                                 isValid,
                                 setTouched,
-                                handleReset
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched,
+                                setFieldError
                             }) => (
                                     <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
                                         < FormGroup >
@@ -666,36 +677,58 @@ export default class BudgetTicketComponent extends Component {
                                             <FormFeedback className="red">{errors.budgetAmount}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                            <Label for="startDate">{i18n.t('static.common.startdate')}<span className="red Reqasterisk">*</span></Label>
                                             <DatePicker
                                                 id="startDate"
                                                 name="startDate"
                                                 bsSize="sm"
                                                 minDate={this.addMonths(new Date(), -6)}
                                                 selected={this.state.budget.startDate}
-                                                onChange={(date) => { this.dataChangeDate(date) }}
+                                                // onChange={(date) => { this.dataChangeDate(date) }}
+                                                onChange={(date) => {
+                                                    handleChange(date);
+                                                    setFieldValue("startDate", date);
+                                                    this.dataChangeDate(date)
+                                                }}
+                                                onBlur={() => setFieldTouched("startDate", true)}
+                                                className={classNames('form-control', 'd-block', 'w-100',
+                                                    { 'is-valid': !errors.startDate && this.state.budget.startDate != '' },
+                                                    { 'is-invalid': (touched.startDate && !!errors.startDate) }
+                                                )}
                                                 placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                className="form-control-sm form-control date-color"
+                                                // className="form-control-sm form-control date-color"
                                                 disabledKeyboardNavigation
                                                 autoComplete={"off"}
                                                 dateFormat={DATE_FORMAT_SM}
                                             />
+                                            <div className="red">{(touched.startDate && !!errors.startDate ? errors.startDate : '')}</div>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                            <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
                                             <DatePicker
                                                 id="stopDate"
                                                 name="stopDate"
                                                 bsSize="sm"
                                                 minDate={this.state.budget.startDate}
                                                 selected={this.state.budget.stopDate}
-                                                onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                // onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                onChange={(date) => {
+                                                    handleChange(date);
+                                                    setFieldValue("stopDate", date);
+                                                    this.dataChangeEndDate(date)
+                                                }}
+                                                onBlur={() => setFieldTouched("stopDate", true)}
+                                                className={classNames('form-control', 'd-block', 'w-100',
+                                                    { 'is-valid': !errors.stopDate && this.state.budget.stopDate != '' },
+                                                    { 'is-invalid': (touched.stopDate && !!errors.stopDate) }
+                                                )}
                                                 placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                className="form-control-sm form-control date-color"
+                                                // className="form-control-sm form-control date-color"
                                                 disabledKeyboardNavigation
                                                 autoComplete={"off"}
                                                 dateFormat={DATE_FORMAT_SM}
                                             />
+                                            <div className="red">{(touched.stopDate && !!errors.stopDate ? errors.stopDate : '')}</div>
                                         </FormGroup>
 
                                         <FormGroup>
