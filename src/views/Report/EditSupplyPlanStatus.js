@@ -1361,7 +1361,7 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 console.log("deliveredShipmentsTotalData", deliveredShipmentsTotalData);
 
-                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
+                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
                                 monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
                                 amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
@@ -2008,7 +2008,7 @@ class EditSupplyPlanStatus extends Component {
                     id: 'A',
                     scaleLabel: {
                         display: true,
-                        labelString: i18n.t('static.dashboard.unit'),
+                        labelString: i18n.t('static.shipment.qty'),
                         fontColor: 'black'
                     },
                     stacked: false,

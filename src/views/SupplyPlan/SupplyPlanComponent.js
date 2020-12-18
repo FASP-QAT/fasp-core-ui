@@ -1743,9 +1743,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     if (count < 7) {
                                                         return (
                                                             <>
-                                                                <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
                                                                 </td>
-                                                                {(item.actualQty) > 0 ? <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
+                                                                {(item.actualQty) > 0 ? <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
                                                             </>
                                                         )
                                                     }
@@ -4441,7 +4441,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 plannedErpShipmentsTotalData.push("")
                                             }
 
-                                            inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
+                                            inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                             totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                             monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
                                             amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
