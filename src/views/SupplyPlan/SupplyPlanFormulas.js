@@ -288,9 +288,9 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
                     <br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}</p>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
 
