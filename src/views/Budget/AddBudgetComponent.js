@@ -14,6 +14,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
+import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.dashboard.budget');
@@ -23,8 +24,8 @@ const initialValues = {
     programId: '',
     fundingSourceId: '',
     budgetAmt: '',
-    // startDate: '',
-    // stopDate: '',
+    startDate: '',
+    stopDate: '',
     programList: [],
     budgetCode: '',
     fundingSourceList: [],
@@ -48,10 +49,11 @@ const validationSchema = function (values, t) {
             // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
-        // startDate: Yup.string()
-        //     .required(i18n.t('static.budget.startdatetext')),
-        // stopDate: Yup.string()
-        //     .required(i18n.t('static.budget.stopdatetext'))
+        startDate: Yup
+            .string().required(i18n.t('static.budget.startdatetext')).nullable().default(undefined),
+        // .required(i18n.t('static.budget.startdatetext')),
+        stopDate: Yup.string()
+            .required(i18n.t('static.budget.stopdatetext')).nullable().default(undefined),
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetCode: Yup.string()
@@ -181,7 +183,7 @@ class AddBudgetComponent extends Component {
     dataChangeDate(date) {
         let { budget } = this.state
         budget.startDate = date;
-        // budget.stopDate = '';
+        budget.stopDate = '';
         this.setState({ budget: budget });
     }
 
@@ -252,8 +254,8 @@ class AddBudgetComponent extends Component {
             budgetAmt: true,
             currencyId: true,
             budgetCode: true,
-            // startDate: true,
-            // stopDate: true
+            startDate: true,
+            stopDate: true
         }
         );
         this.validateForm(errors);
@@ -520,7 +522,7 @@ class AddBudgetComponent extends Component {
                                         .catch(
                                             error => {
                                                 let budget = budget1;
-                                                budget.currency.currencyId = budget1.currency.currencyId +"~"+ budget1.currency.conversionRateToUsd;
+                                                budget.currency.currencyId = budget1.currency.currencyId + "~" + budget1.currency.conversionRateToUsd;
                                                 this.setState({
                                                     budget: budget
                                                 }, () => {
@@ -576,7 +578,10 @@ class AddBudgetComponent extends Component {
                                         isSubmitting,
                                         isValid,
                                         setTouched,
-                                        handleReset
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched,
+                                        setFieldError
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                                                 <CardBody>
@@ -784,14 +789,23 @@ class AddBudgetComponent extends Component {
                                                             bsSize="sm"
                                                             minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
-                                                            onChange={(date) => { this.dataChangeDate(date) }}
+                                                            onChange={(date) => {
+                                                                handleChange(date);
+                                                                setFieldValue("startDate", date);
+                                                                this.dataChangeDate(date)
+                                                            }}
                                                             placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            // placeholderText="mm-dd-yyy"
-                                                            className="form-control-sm form-control date-color"
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
                                                             dateFormat={DATE_FORMAT_SM}
+                                                            onBlur={() => setFieldTouched("startDate", true)}
+                                                            // className="form-control-sm form-control date-color"
+                                                            className={classNames('form-control', 'd-block', 'w-100',
+                                                                { 'is-valid': !errors.startDate && this.state.budget.startDate != '' },
+                                                                { 'is-invalid': (touched.startDate && !!errors.startDate) }
+                                                            )}
                                                         />
+                                                        <div className="red">{(touched.startDate && !!errors.startDate ? errors.startDate : '')}</div>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
@@ -802,13 +816,24 @@ class AddBudgetComponent extends Component {
                                                             bsSize="sm"
                                                             minDate={this.state.budget.startDate}
                                                             selected={this.state.budget.stopDate}
-                                                            onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                            // onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                            onChange={(date) => {
+                                                                handleChange(date);
+                                                                setFieldValue("stopDate", date);
+                                                                this.dataChangeEndDate(date)
+                                                            }}
+                                                            onBlur={() => setFieldTouched("stopDate", true)}
                                                             placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            className="form-control-sm form-control date-color"
+                                                            // className="form-control-sm form-control date-color"
+                                                            className={classNames('form-control', 'd-block', 'w-100', 
+                                                                { 'is-valid': !errors.stopDate && this.state.budget.stopDate != '' },
+                                                                { 'is-invalid': (touched.stopDate && !!errors.stopDate) }
+                                                            )}
                                                             disabledKeyboardNavigation
                                                             autoComplete={"off"}
                                                             dateFormat={DATE_FORMAT_SM}
                                                         />
+                                                        <div className="red">{(touched.stopDate && !!errors.stopDate ? errors.stopDate : '')}</div>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="notes">{i18n.t('static.program.notes')}</Label>
