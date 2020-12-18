@@ -839,7 +839,7 @@ class ListBudgetComponent extends Component {
     var elInstance = instance.jexcel;
     var json = elInstance.getJson();
 
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L','M']
     for (var j = 0; j < json.length; j++) {
 
 
