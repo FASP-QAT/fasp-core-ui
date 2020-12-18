@@ -443,7 +443,7 @@ export default class AddHealthAreaComponent extends Component {
           console.log("Realm Country List list---", response.data);
           if (response.status == 200) {
             var json = response.data;
-            var regList = [{ value: "-1", label: "Select All" }];
+            var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
             for (var i = 0; i < json.length; i++) {
               regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
             }
