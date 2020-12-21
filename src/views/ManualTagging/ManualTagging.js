@@ -586,10 +586,10 @@ export default class ManualTagging extends Component {
             data[2] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
             data[3] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[4] = manualTaggingList[j].procurementAgent.code;
-            data[5] = manualTaggingList[j].fundingSource.code
-            data[6] = getLabelText(manualTaggingList[j].budget.label, this.state.lang)
+            data[5] = manualTaggingList[j].orderNo
+            // data[6] = getLabelText(manualTaggingList[j].budget.label, this.state.lang)
             // data[7] = getLabelText(manualTaggingList[j].fundingSource.label, this.state.lang)
-            data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
+            data[6] = this.addCommas(manualTaggingList[j].shipmentQty);
 
             manualTaggingArray[count] = data;
             count++;
@@ -607,7 +607,7 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 25, 20, 20, 40, 40, 40, 25],
+            colWidths: [20, 25, 20, 20, 40, 40, 25],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -632,11 +632,7 @@ export default class ManualTagging extends Component {
                 }
                 ,
                 {
-                    title: i18n.t('static.budget.fundingsource'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.dashboard.budget'),
+                    title: i18n.t('static.manualTagging.procOrderNo'),
                     type: 'text',
                 },
                 {
@@ -956,14 +952,15 @@ export default class ManualTagging extends Component {
                 headerAlign: 'center',
                 style: { width: '40px' }
                 // formatter: this.formatLabel
-            }, {
-                dataField: 'fundingSource.code',
-                text: i18n.t('static.fundingSourceHead.fundingSource'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { width: '40px' }
             },
+            //  {
+            //     dataField: 'fundingSource.code',
+            //     text: i18n.t('static.fundingSourceHead.fundingSource'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     style: { width: '40px' }
+            // },
             // {
             //     dataField: 'budget.label.label_en',
             //     text: i18n.t('static.budgetHead.budget'),
