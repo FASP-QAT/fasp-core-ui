@@ -232,7 +232,11 @@ class DeleteLocalProgramComponent extends Component {
           }
         }
         this.setState({
-          programs: proList, loading: false
+          programs: proList.sort(function (a, b) {
+            a = a.label.toLowerCase();
+            b = b.label.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          }), loading: false
         })
         this.checkNewerVersions(proList1);
       }.bind(this);

@@ -479,7 +479,7 @@ class Consumption extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -966,9 +966,13 @@ class Consumption extends Component {
 
 
         }
-
+        var lang = this.state.lang;
         this.setState({
-          programs: proList
+          programs: proList.sort(function (a, b) {
+            a = getLabelText(a.label, lang).toLowerCase();
+            b = getLabelText(b.label, lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          }),
         })
 
       }.bind(this);
@@ -1019,9 +1023,14 @@ class Consumption extends Component {
                   proList[i] = myResult[i]
                 }
               }
+              var lang = this.state.lang;
               this.setState({
                 planningUnits: proList, message: '',
-                offlinePlanningUnitList: proList
+                offlinePlanningUnitList: proList.sort(function (a, b) {
+                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
               }, () => {
                 this.filterData();
               })

@@ -562,8 +562,32 @@ class ListBudgetComponent extends Component {
   filterData() {
     let fundingSourceId = document.getElementById("fundingSourceId").value;
     let programId = document.getElementById("programId").value;
-    if (fundingSourceId != 0 && programId != 0) {
+    var selStatus = document.getElementById("active").value;
+    let tempSelStatus = (selStatus == "true" ? true : false)
+
+    if (fundingSourceId != 0 && programId != 0 && selStatus != "") {
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId && c.active == tempSelStatus)
+      this.setState({
+        selBudget: selBudget
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (fundingSourceId != 0 && programId != 0) {
       const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId)
+      this.setState({
+        selBudget: selBudget
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (fundingSourceId != 0 && selStatus != "") {
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.active == tempSelStatus)
+      this.setState({
+        selBudget: selBudget
+      }, () => {
+        this.buildJExcel();
+      });
+    } else if (programId != 0 && selStatus != "") {
+      const selBudget = this.state.budgetList.filter(c => c.program.id == programId && c.active == tempSelStatus)
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -583,6 +607,13 @@ class ListBudgetComponent extends Component {
       }, () => {
         this.buildJExcel();
       });
+    } else if (selStatus != "") {
+      const selBudget = this.state.budgetList.filter(c => c.active == tempSelStatus)
+      this.setState({
+        selBudget: selBudget
+      }, () => {
+        this.buildJExcel();
+      });
     } else {
       this.setState({
         selBudget: this.state.budgetList
@@ -590,6 +621,40 @@ class ListBudgetComponent extends Component {
         this.buildJExcel();
       });
     }
+
+
+
+
+
+
+    // if (fundingSourceId != 0 && programId != 0) {
+    //   const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId)
+    //   this.setState({
+    //     selBudget: selBudget
+    //   }, () => {
+    //     this.buildJExcel();
+    //   });
+    // } else if (fundingSourceId != 0) {
+    //   const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+    //   this.setState({
+    //     selBudget: selBudget
+    //   }, () => {
+    //     this.buildJExcel();
+    //   });
+    // } else if (programId != 0) {
+    //   const selBudget = this.state.budgetList.filter(c => c.program.id == programId)
+    //   this.setState({
+    //     selBudget: selBudget
+    //   }, () => {
+    //     this.buildJExcel();
+    //   });
+    // } else {
+    //   this.setState({
+    //     selBudget: this.state.budgetList
+    //   }, () => {
+    //     this.buildJExcel();
+    //   });
+    // }
   }
   formatDate(cell, row) {
     if (cell != null && cell != "") {
@@ -839,7 +904,7 @@ class ListBudgetComponent extends Component {
     var elInstance = instance.jexcel;
     var json = elInstance.getJson();
 
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
     for (var j = 0; j < json.length; j++) {
 
 
@@ -942,7 +1007,8 @@ class ListBudgetComponent extends Component {
             budgetList: response.data,
             selBudget: response.data, loading: false
           }, () => {
-            this.buildJExcel();
+            // this.buildJExcel();
+            this.filterData();
           });
         } else {
           this.setState({
@@ -1289,6 +1355,25 @@ class ListBudgetComponent extends Component {
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {fundingSources}
+                      </Input>
+                    </InputGroup>
+                  </div>
+                </FormGroup>
+                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                  <div className="controls SelectGo">
+                    <InputGroup>
+                      <Input
+                        type="select"
+                        name="active"
+                        id="active"
+                        bsSize="sm"
+                        onChange={this.filterData}
+                      >
+                        <option value="">{i18n.t('static.common.all')}</option>
+                        <option value="true" selected>{i18n.t('static.common.active')}</option>
+                        <option value="false">{i18n.t('static.common.disabled')}</option>
+
                       </Input>
                     </InputGroup>
                   </div>

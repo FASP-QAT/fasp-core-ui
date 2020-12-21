@@ -389,9 +389,25 @@ export default class AddOrganisationComponent extends Component {
     }
 
     updateFieldData(value) {
+
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
+        }
+
+        if (selectedArray.includes("-1")) {
+            this.setState({ realmCountryId: [] });
+            var list = this.state.realmCountryList.filter(c => c.value != -1)
+            this.setState({ realmCountryId: list });
+            var realmCountryId = list;
+        } else {
+            this.setState({ realmCountryId: value });
+            var realmCountryId = value;
+        }
+
         let { organisation } = this.state;
-        this.setState({ realmCountryId: value });
-        var realmCountryId = value;
+        // this.setState({ realmCountryId: value });
+        // var realmCountryId = value;
         var realmCountryIdArray = [];
         for (var i = 0; i < realmCountryId.length; i++) {
             realmCountryIdArray[i] = realmCountryId[i].value;
@@ -408,9 +424,9 @@ export default class AddOrganisationComponent extends Component {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
                         var json = (response.data).filter(c => c.active == true);
-                        var regList = [];
+                        var regList = [{ value: "-1", label: i18n.t("static.common.all")  }];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
                             realmCountryId: '',

@@ -303,7 +303,7 @@ export default class EditLanguageComponent extends Component {
     }
 
     getProblemStatusById(problemStatusInputId) {
-        console.log("hi==========================hi");
+        // console.log("hi==========================hi");
         var problemStatusObject = {};
         var db1;
         getDatabase();
@@ -316,9 +316,9 @@ export default class EditLanguageComponent extends Component {
             var programRequest = programTransaction.get(this.state.programId);
 
             programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programJson = JSON.parse(programData);
 
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                 var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
@@ -341,7 +341,7 @@ export default class EditLanguageComponent extends Component {
                             problemStatusObject: problemStatusObject
                         },
                         () => {
-                            console.log("problemStatusObject------>", this.state.problemStatusObject)
+                            // console.log("problemStatusObject------>", this.state.problemStatusObject)
                         });
 
                 }.bind(this);
@@ -364,9 +364,9 @@ export default class EditLanguageComponent extends Component {
             var programRequest = programTransaction.get(this.state.programId);
 
             programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programJson = JSON.parse(programData);
 
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                 var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
@@ -452,23 +452,20 @@ export default class EditLanguageComponent extends Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-
                 var transaction = db1.transaction(['programData'], 'readwrite');
                 var programTransaction = transaction.objectStore('programData');
                 var programRequest = programTransaction.get(programId);
-
                 programRequest.onsuccess = function (event) {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-
                     var problemReportList = (programJson.problemReportList);
-                    console.log("EDIT problemReportList---->", problemReportList);
+                    // console.log("EDIT problemReportList---->", problemReportList);
 
                     // const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
                     if (problemReportId != 0) {
                         const problemReport = problemReportList.filter(c => c.problemReportId == problemReportId)[0];
-                        console.log("problemReport--->", problemReport);
+                        // console.log("problemReport--->", problemReport);
                         // var outputString = problemReport.realmProblem.problem.label.label_en.replace("<%X", problemReport.realmProblem.data1);
                         this.setState({
                             problemReport: problemReport,
@@ -481,7 +478,7 @@ export default class EditLanguageComponent extends Component {
                             });
                     } else {
                         const problemReport = problemReportList.filter(c => c.problemActionIndex == problemActionIndex)[0];
-                        console.log("problemReport--->", problemReport);
+                        // console.log("problemReport--->", problemReport);
                         this.setState({
                             problemReport: problemReport,
                             data: problemReport.problemTransList,

@@ -280,6 +280,12 @@ class RealmCountry extends Component {
                                                         }
                                                     }
                                                 },
+                                                onsearch: function (el) {
+                                                    el.jexcel.updateTable();
+                                                },
+                                                onfilter: function (el) {
+                                                    el.jexcel.updateTable();
+                                                },
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
                                                 search: true,
@@ -854,7 +860,7 @@ class RealmCountry extends Component {
             }
         }
         //Active
-        if (x == 3) {
+        if (x != 6) {
             this.el.setValueFromCoords(6, y, 1, true);
         }
 

@@ -216,10 +216,24 @@ class AddUserComponent extends Component {
     };
 
     roleChange(roleId) {
+        var selectedArray = [];
+        for (var p = 0; p < roleId.length; p++) {
+          selectedArray.push(roleId[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            this.setState({ roleId: [] });
+            var list = this.state.roleList.filter(c => c.value != -1)
+            this.setState({ roleId: list });
+            var roleId = list;
+        }else{
+            this.setState({ roleId: roleId });
+            var roleId = roleId;
+        }
+
         let { user } = this.state;
         let count = 0;
         let count1 = 0;
-        this.setState({ roleId });
+        // this.setState({ roleId });
         var roleIdArray = [];
         for (var i = 0; i < roleId.length; i++) {
             roleIdArray[i] = roleId[i].value;
@@ -411,9 +425,9 @@ class AddUserComponent extends Component {
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
-                    var roleList = [];
+                    var roleList = [{ value: "-1", label: i18n.t("static.common.all")  }];
                     for (var i = 0; i < response.data.length; i++) {
-                        roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                        roleList[i + 1] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     this.setState({
                         roleList,
@@ -469,7 +483,7 @@ class AddUserComponent extends Component {
                 }
             );
 
-        let realmId = AuthenticationService.getRealmId();        
+        let realmId = AuthenticationService.getRealmId();
         if (realmId != -1) {
             // document.getElementById('realmId').value = realmId;
             initialValues = {

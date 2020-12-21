@@ -175,7 +175,11 @@ export default class AddInventory extends Component {
                     }
                 }
                 this.setState({
-                    programList: proList, loading: false
+                    programList: proList.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }), loading: false
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -293,9 +297,17 @@ export default class AddInventory extends Component {
                             }
                             console.log("proList---" + proList);
                             this.setState({
-                                planningUnitList: proList,
+                                planningUnitList: proList.sort(function (a, b) {
+                                    a = a.label.toLowerCase();
+                                    b = b.label.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 planningUnitListAll: myResult,
-                                regionList: regionList,
+                                regionList: regionList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 loading: false
                             })
 
@@ -402,12 +414,13 @@ export default class AddInventory extends Component {
                         var inventoryListUnFiltered = (programJson.inventoryList);
                         var inventoryList = (programJson.inventoryList).filter(c =>
                             c.planningUnit.id == planningUnitId &&
-                            c.region != null && c.region.id != 0);
+                            c.region != null && c.region.id != 0);    
                         if (this.state.inventoryType == 1) {
-                            inventoryList = inventoryList.filter(c => c.actualQty != "" && c.actualQty != undefined && c.actualQty != null);
+                            inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
                         } else {
-                            inventoryList = inventoryList.filter(c => c.adjustmentQty != "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                            inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                         }
+
                         inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                         this.setState({
                             batchInfoList: batchList,
