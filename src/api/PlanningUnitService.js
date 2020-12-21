@@ -51,5 +51,9 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
         );
     }
+    getActivePlanningUnitByProductCategoryId(json) {
+        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}`, {}
+        );
+    }
 }
 export default new PlanningUnitService();

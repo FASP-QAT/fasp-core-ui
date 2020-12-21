@@ -1773,7 +1773,7 @@ class ShipmentGlobalDemandView extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                            if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -1793,8 +1793,11 @@ class ShipmentGlobalDemandView extends Component {
                 let productCategoryId = document.getElementById("productCategoryId").value;
                 // AuthenticationService.setupAxiosInterceptors();
                 if (productCategoryId != -1) {
-                    PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
+                    PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
                         // console.log("PLANNING-UNIT--->", response.data);
+                        response.data.sort(function (a, b) {
+                            return a.localeCompare(b); //using String.prototype.localCompare()
+                          });
                         this.setState({
                             planningUnits: response.data,
                         }, () => {
