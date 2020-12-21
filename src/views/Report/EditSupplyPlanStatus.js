@@ -1626,7 +1626,7 @@ class EditSupplyPlanStatus extends Component {
 
         // AuthenticationService.setupAxiosInterceptors();
 
-        ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+        ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
                 planningUnits: response.data, message: ''

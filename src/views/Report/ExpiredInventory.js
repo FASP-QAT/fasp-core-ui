@@ -365,7 +365,7 @@ export default class ExpiredInventory extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
+                                if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -383,7 +383,7 @@ export default class ExpiredInventory extends Component {
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
 
-                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
                         this.setState({
                             planningUnits: response.data, message: ''
@@ -505,6 +505,9 @@ export default class ExpiredInventory extends Component {
 
         if (programId > 0 && versionId != 0) {
             if (versionId.includes('Local')) {
+                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
+         endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        
                 this.setState({ loading: true })
                 var db1;
                 var storeOS;
@@ -544,7 +547,7 @@ export default class ExpiredInventory extends Component {
                         var data = []
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
-                            var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0 || c.openingBalance > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
+                           if(pu!=null){ var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0 || c.openingBalance > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
                             list1.map(ele1 => {
                                 // ele1.createdDate=ele.transDate
                                 var json = {
@@ -555,7 +558,7 @@ export default class ExpiredInventory extends Component {
                                     program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
                                 }
                                 data.push(json)
-                            })
+                             })}
                         })
                         console.log(data)
                         this.setState({
