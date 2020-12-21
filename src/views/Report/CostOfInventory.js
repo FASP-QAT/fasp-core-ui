@@ -676,7 +676,7 @@ export default class CostOfInventory extends Component {
                             myResult = planningunitRequest.result;
 
                             for (var i = 0, j = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
+                                if (myResult[i].program.id == programId && myResult[i].active== true) {
                                     proList[j++] = myResult[i]
                                 }
                             }

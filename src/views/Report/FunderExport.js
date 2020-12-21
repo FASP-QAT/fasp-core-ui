@@ -459,7 +459,7 @@ class FunderExport extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                            if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -478,7 +478,7 @@ class FunderExport extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                     // console.log('**' + JSON.stringify(response.data))
                     this.setState({
                         planningUnits: response.data, message: ''
