@@ -143,7 +143,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId!=0) {
+                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -695,7 +695,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
             console.log("showOption", showOption);
             if (showOption != 5000000) {
-                var pageNo = parseInt(parseInt(json.length-1) / parseInt(showOption));
+                var pageNo = parseInt(parseInt(json.length - 1) / parseInt(showOption));
                 obj.page(pageNo);
             }
         }
@@ -1365,63 +1365,75 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 // openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).balance;
                 // consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).consumptionQty;
                 // adjustmentsQty += (map.get("7") * map.get("4"))
-                var colArr = ['D'];
-                for (var c = 0; c < colArr.length; c++) {
-                    positiveValidation(colArr[c], y, elInstance);
-                }
-                var col = ("C").concat(parseInt(y) + 1);
                 var rowData = elInstance.getRowData(y);
-                var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(16, y, 1, true);
-                } else {
-                    if (rowData[4] == 1) {
-                        if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
-                            inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
-                            valid = false
-                        } else {
-                            positiveValidation("A", y, elInstance);
-                        }
+                var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                }else{
+                    var colArr = ['D'];
+                    for (var c = 0; c < colArr.length; c++) {
+                        positiveValidation(colArr[c], y, elInstance);
                     }
-                }
+                    var col = ("C").concat(parseInt(y) + 1);
 
-                var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(16, y, 1, true);
-                }
-
-                var validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(16, y, 1, true);
-                }
-
-
-                var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(16, y, 1, true);
-                }
-
-                if (rowData[4] == 2) {
-                    var validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                    var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     } else {
-                        if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 10) {
-                            inValid("F", y, i18n.t('static.common.max10digittext'), elInstance);
-                            valid = false;
-                        } else {
-                            positiveValidation("F", y, elInstance);
+                        if (rowData[4] == 1) {
+                            if (moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
+                                inValid("A", y, i18n.t('static.inventory.notAllowedForFutureMonths'), elInstance);
+                                valid = false
+                            } else {
+                                positiveValidation("A", y, elInstance);
+                            }
                         }
                     }
-                    var validation = checkValidtion("text", "K", y, rowData[10], elInstance);
+
+                    var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+                    var validation = checkValidtion("text", "C", y, rowData[2], elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+
+                    var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(16, y, 1, true);
+                    }
+
+                    if (rowData[4] == 2) {
+                        var validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, 0, 0);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(16, y, 1, true);
+                        } else {
+                            if (elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim().length > 10) {
+                                inValid("F", y, i18n.t('static.common.max10digittext'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("F", y, elInstance);
+                            }
+                        }
+                        var validation = checkValidtion("text", "K", y, rowData[10], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(16, y, 1, true);
+                        } else {
+                            if (rowData[10].length > 600) {
+                                inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("K", y, elInstance);
+                            }
+                        }
                     } else {
                         if (rowData[10].length > 600) {
                             inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
@@ -1430,24 +1442,18 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             positiveValidation("K", y, elInstance);
                         }
                     }
-                } else {
-                    if (rowData[10].length > 600) {
-                        inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                        valid = false;
-                    } else {
-                        positiveValidation("K", y, elInstance);
-                    }
-                }
 
 
-                if (rowData[4] == 1) {
-                    var validation = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-                    if (validation == false) {
-                        valid = false;
-                        elInstance.setValueFromCoords(16, y, 1, true);
+                    if (rowData[4] == 1) {
+                        var validation = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(16, y, 1, true);
+                        }
                     }
                 }
             }
+
         }
         return valid;
     }
@@ -1506,7 +1512,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
-                    var username=AuthenticationService.getLoggedInUsername();
+                    var username = AuthenticationService.getLoggedInUsername();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
                         if (map.get("15") == 1) {
@@ -1520,11 +1526,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             console.log("Adjustment qty", (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null);
                             inventoryDataList[parseInt(map.get("14"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
                             inventoryDataList[parseInt(map.get("14"))].region.id = map.get("1");
-                            inventoryDataList[parseInt(map.get("14"))].region.label=(this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label
+                            inventoryDataList[parseInt(map.get("14"))].region.label = (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].dataSource.id = map.get("2");
-                            inventoryDataList[parseInt(map.get("14"))].dataSource.label=(this.state.dataSourceList).filter(c => c.id == map.get("2"))[0].label
+                            inventoryDataList[parseInt(map.get("14"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("2"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
-                            inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.label=(this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
+                            inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].multiplier = map.get("7");
                             inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                             inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
@@ -1561,7 +1567,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 active: map.get("11"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("3"),
-                                    label:(this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
+                                    label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
                                 },
                                 multiplier: map.get("7"),
                                 planningUnit: {
@@ -1573,12 +1579,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 index: inventoryDataList.length,
                                 createdBy: {
                                     userId: curUser,
-                                    username:username
+                                    username: username
                                 },
                                 createdDate: curDate,
                                 lastModifiedBy: {
                                     userId: curUser,
-                                    username:username
+                                    username: username
                                 },
                                 lastModifiedDate: curDate
                             }

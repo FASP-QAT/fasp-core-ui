@@ -139,7 +139,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId!=0) {
+                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -790,7 +790,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(11, y, "", true);
             var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
             if (valid == true) {
-                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
+                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
@@ -1132,92 +1132,106 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 this.props.updateState("consumptionDuplicateError", i18n.t('static.supplyPlan.duplicateConsumption'));
                 this.props.hideSecondComponent();
             } else {
-                var colArr = ['E'];
-                for (var c = 0; c < colArr.length; c++) {
-                    positiveValidation(colArr[c], y, elInstance);
-                }
-
                 var rowData = elInstance.getRowData(y);
-                var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
-                        inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
-                        valid = false;
+
+                if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                    var lastEditableDate = "";
+                    if (rowData[2] == 1) {
+                        lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                     } else {
-                        positiveValidation("C", y, elInstance);
+                        lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                     }
-                }
+                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
 
-                validation = checkValidtion("text", "B", y, rowData[1], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                }
-
-                validation = checkValidtion("text", "D", y, rowData[3], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                }
-
-
-                validation = checkValidtion("text", "E", y, rowData[4], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                }
-
-                validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    var batchDetails = rowData[11];
-                    var consumptionBatchQty = 0;
-                    for (var b = 0; b < batchDetails.length; b++) {
-                        consumptionBatchQty += batchDetails[b].consumptionQty;
-                    }
-                    if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) < parseInt(consumptionBatchQty)) {
-                        inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
-                        valid = false;
                     } else {
-                        positiveValidation("F", y, elInstance)
-                    }
-                }
 
-                validation = checkValidtion("numberNotRequired", "I", y, elInstance.getValue(`I${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    if (parseInt(elInstance.getValue(`I${parseInt(y) + 1}`, true)) > 31) {
-                        inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
-                        valid = false;
-                    } else {
-                        positiveValidation("I", y, elInstance);
-                    }
-                }
+                        var colArr = ['E'];
+                        for (var c = 0; c < colArr.length; c++) {
+                            positiveValidation(colArr[c], y, elInstance);
+                        }
 
-                if (rowData[9].length > 600) {
-                    inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                    valid = false;
-                } else {
-                    positiveValidation("J", y, elInstance);
-                }
+                        var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
+                                inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("C", y, elInstance);
+                            }
+                        }
 
-                validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
-                        inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
-                        valid = false;
-                    } else {
-                        positiveValidation("C", y, elInstance);
+                        validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+                        validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+
+                        validation = checkValidtion("text", "E", y, rowData[4], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+                        validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            var batchDetails = rowData[11];
+                            var consumptionBatchQty = 0;
+                            for (var b = 0; b < batchDetails.length; b++) {
+                                consumptionBatchQty += batchDetails[b].consumptionQty;
+                            }
+                            if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) < parseInt(consumptionBatchQty)) {
+                                inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("F", y, elInstance)
+                            }
+                        }
+
+                        validation = checkValidtion("numberNotRequired", "I", y, elInstance.getValue(`I${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            if (parseInt(elInstance.getValue(`I${parseInt(y) + 1}`, true)) > 31) {
+                                inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("I", y, elInstance);
+                            }
+                        }
+
+                        if (rowData[9].length > 600) {
+                            inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("J", y, elInstance);
+                        }
+
+                        validation = checkValidtion("text", "C", y, rowData[2], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
+                                inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("C", y, elInstance);
+                            }
+                        }
                     }
                 }
             }

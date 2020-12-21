@@ -1241,9 +1241,9 @@ class AuthenticationService {
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1264,6 +1264,10 @@ class AuthenticationService {
         localStorage.setItem('sesPlanningUnitId', "");
         // localStorage.setItem('sesLocalVersionChange', false);
         localStorage.setItem("sesLatestProgram", false);
+        localStorage.setItem("sesProblemStatus", JSON.stringify([{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]));
+        localStorage.setItem('sesProblemType', "-1");
+        localStorage.setItem('sesProblemCategory', "-1");
+        localStorage.setItem('sesReviewed', "-1");
     }
 
     getIconAndStaticLabel(val) {

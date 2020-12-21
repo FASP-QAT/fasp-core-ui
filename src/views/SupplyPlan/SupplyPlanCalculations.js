@@ -351,7 +351,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
                             console.log("inventiryListForRegion", inventoryListForRegion);
                             // Check how many regions have reported actual stock count
-                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != undefined && c.actualQty != null && c.actualQty != "")).length;
+                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != undefined && c.actualQty != null && c.actualQty !== "")).length;
                             // Adding count of regions reporting actual inventory
                             if (noOfEntriesOfActualStockCount > 0) {
                                 regionsReportingActualInventory += 1;
@@ -360,7 +360,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 // If region have reported actual stock count that only consider actual stock count
                                 if (noOfEntriesOfActualStockCount > 0) {
                                     console.log("Actual stock count", actualStockCount);
-                                    if (inventoryListForRegion[inv].actualQty != "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
+                                    if (inventoryListForRegion[inv].actualQty !== "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
                                         actualStockCount += Math.round(parseFloat(inventoryListForRegion[inv].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
@@ -398,7 +398,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
-                                    if (inventoryListForRegion[inv].adjustmentQty != "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
+                                    if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
                                         adjustmentQty += Math.round(parseFloat(inventoryListForRegion[inv].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
                                     }
                                     // Check batch details for adjustments if available
@@ -529,31 +529,31 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Calculating expected stock
                         var expectedStock = 0;
                         console.log("D----------------->expiredStock-------------------->", expiredStock)
-                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty != "" ? parseInt(consumptionQty) : 0) + (adjustmentQty != "" ? parseInt(adjustmentQty) : 0);
+                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? parseInt(consumptionQty) : 0) + (adjustmentQty !== "" ? parseInt(adjustmentQty) : 0);
                         console.log("D--------------->Expected stock------------>", expectedStock);
                         console.log("D------------>openingBalance------------ -->", openingBalance, "---Expired stock-->", expiredStock, "--shipmentTotalQty-->", shipmentTotalQty, "--consumptionQty--->", consumptionQty, "---adjustmentQty--->", adjustmentQty);
                         // Calculating expected stock wps
                         var expectedStockWps = 0;
-                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty != "" ? parseInt(consumptionQty) : 0) + (adjustmentQty != "" ? parseInt(adjustmentQty) : 0);
+                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? parseInt(consumptionQty) : 0) + (adjustmentQty !== "" ? parseInt(adjustmentQty) : 0);
 
                         // Calculations of national adjustments
                         var nationalAdjustment = 0;
-                        console.log("National adjustment");
+                        console.log("D-------------->National adjustment");
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
-                        console.log("regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
+                        console.log("D-------------->regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
                             console.log("D-------------->In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
-                        } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
-                            console.log("In second if");
+                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                            console.log("D-------------->In second if");
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
-                            console.log("In 3rd if");
+                            console.log("D-------------->In 3rd if");
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
-                        console.log("National adjutsment", nationalAdjustment);
+                        console.log("D-------------->National adjutsment", nationalAdjustment);
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps
