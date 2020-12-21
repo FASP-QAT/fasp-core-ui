@@ -808,7 +808,10 @@ class ShipmentGlobalView extends Component {
         let productCategoryId = document.getElementById("productCategoryId").value;
         // AuthenticationService.setupAxiosInterceptors();
         if (productCategoryId != -1) {
-            PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
+            PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
+                response.data.sort(function (a, b) {
+                    return a.localeCompare(b); //using String.prototype.localCompare()
+                  });
                 this.setState({
                     planningUnits: response.data,
                 }, () => {
