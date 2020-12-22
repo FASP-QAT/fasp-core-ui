@@ -164,5 +164,10 @@ class ProgramService {
         );
     }
 
+    getActiveProgramPlaningUnitListByProgramId(json) {
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit/`, {}
+        );
+    }
+
 }
 export default new ProgramService()

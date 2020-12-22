@@ -2129,7 +2129,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("number", "F", y, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
             if (valid == true) {
                 if (elInstance1 != undefined && elInstance1 != "") {
-                    console.log("In instance is not defined");
                     elInstance1.setValueFromCoords(10, 0, ((elInstance.getCell(`F${parseInt(0) + 1}`)).innerHTML).toString().replaceAll("\,", ""), true);
                 }
             }
@@ -3732,7 +3731,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     allowInsertRow: false,
                     allowManualInsertRow: false,
                     allowExport: false,
-                    editable: false,
+                    editable: true,
                     text: {
                         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                         show: '',
