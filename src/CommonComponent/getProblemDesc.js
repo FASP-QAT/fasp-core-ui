@@ -267,6 +267,18 @@ export default function getProblemDesc(row, lang) {
         // label.label_en="Inventory doen't fall within min/max range";
         return getLabelText(label, lang);
     }
+    if (row.realmProblem.problem.problemId == 14) {
+       // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
+       var label = row.realmProblem.problem.label;
+       // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
+       return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 15) {
+       // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
+       var label = row.realmProblem.problem.label;
+       // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
+       return getLabelText(label, lang);
+    }
     if (row.realmProblem.problem.problemId == 16) {
         // Inventory doen't fall within min/max range
         var label = row.realmProblem.problem.label;

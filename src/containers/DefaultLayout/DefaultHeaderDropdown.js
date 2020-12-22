@@ -81,6 +81,7 @@ class DefaultHeaderDropdown extends Component {
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
+console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {

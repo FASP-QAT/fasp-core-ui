@@ -206,7 +206,8 @@ class ForcastMatrixOverTime extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 10);
     this.state = {
       loading: true,
       matricsList: [],
@@ -220,7 +221,7 @@ class ForcastMatrixOverTime extends Component {
       countries: [],
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
@@ -268,14 +269,14 @@ class ForcastMatrixOverTime extends Component {
   }
   roundN = num => {
     if (num != '' && num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+      return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     } else {
       return NaN
     }
   }
   round = num => {
     if (num != '' && num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+      return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
     } else {
       return NaN
     }
@@ -343,7 +344,7 @@ class ForcastMatrixOverTime extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -561,9 +562,13 @@ class ForcastMatrixOverTime extends Component {
 
 
         }
-
+        var lang = this.state.lang;
         this.setState({
-          programs: proList
+          programs: proList.sort(function (a, b) {
+            a = getLabelText(a.label, lang).toLowerCase();
+            b = getLabelText(b.label, lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          }),
         })
 
       }.bind(this);
@@ -703,13 +708,18 @@ class ForcastMatrixOverTime extends Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId) {
+                if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                   proList[i] = myResult[i]
                 }
               }
+              var lang = this.state.lang;
               this.setState({
-                planningUnits: proList, message: ''
+                planningUnits: proList.sort(function (a, b) {
+                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }), message: ''
               }, () => {
                 this.fetchData();
               })
@@ -721,7 +731,7 @@ class ForcastMatrixOverTime extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
               planningUnits: response.data, message: ''
@@ -874,9 +884,9 @@ class ForcastMatrixOverTime extends Component {
                   }
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + parseInt(conlist[l].consumptionQty)
+                      actconsumption = actconsumption + Math.round(Number(conlist[l].consumptionQty))
                     } else {
-                      forConsumption = forConsumption + parseInt(conlist[l].consumptionQty)
+                      forConsumption = forConsumption + Math.round(Number(conlist[l].consumptionQty))
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
@@ -885,8 +895,7 @@ class ForcastMatrixOverTime extends Component {
                     console.log(currentActualconsumption, ' ', actconsumption)
                     if (currentActualconsumption == null && actconsumption > 0) {
                       currentActualconsumption = actconsumption
-                    }
-                    if (currentActualconsumption != null) {
+                    } else if (currentActualconsumption != null) {
                       currentActualconsumption = currentActualconsumption + actconsumption
                     }
                     currentForcastConsumption = currentForcastConsumption + forConsumption
@@ -908,7 +917,7 @@ class ForcastMatrixOverTime extends Component {
                   message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null || actualconsumption == 0) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
-
+                console.log("Json------------->", json);
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     matricsList: data,

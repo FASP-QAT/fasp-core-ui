@@ -189,7 +189,8 @@ class ShipmentGlobalDemandView extends Component {
 
         this.toggledata = this.toggledata.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             labels: ['PSM', 'GF', 'Local', 'Govt'],
             datasets: [{
@@ -229,10 +230,11 @@ class ShipmentGlobalDemandView extends Component {
             table1Headers: [],
             show: false,
             message: '',
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programLst: []
         };
 
 
@@ -243,6 +245,8 @@ class ShipmentGlobalDemandView extends Component {
         this.getRandomColor = this.getRandomColor.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.getProductCategories = this.getProductCategories.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.filterProgram = this.filterProgram.bind(this)
     }
 
     makeText = m => {
@@ -258,14 +262,14 @@ class ShipmentGlobalDemandView extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-      
+
         if (navigator.onLine) {
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-                csvRow.push('')
-                this.state.programLabels.map(ele =>
+            csvRow.push('')
+            this.state.programLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-     csvRow.push('')
+            csvRow.push('')
             csvRow.push('"' + (i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
             csvRow.push('')
             this.state.planningUnitLabels.map(ele =>
@@ -276,8 +280,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-                csvRow.push('')
-                csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
 
 
         } else {
@@ -313,7 +317,7 @@ class ShipmentGlobalDemandView extends Component {
                 console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
-            tableHeadTemp.push(i18n.t('static.supplyPlan.total'));
+            tableHeadTemp.push(i18n.t('static.report.totalUnit').replaceAll(' ', '%20'));
 
             A[0] = this.addDoubleQuoteToRowContent(tableHeadTemp);
             re = this.state.procurementAgentSplit;
@@ -411,17 +415,17 @@ class ShipmentGlobalDemandView extends Component {
 
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
-        var len = 120 
+        var len = 120
         if (navigator.onLine) {
-          
+
             var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
-           len=len + countryLabelsText.length * 10
+            len = len + countryLabelsText.length * 10
 
             var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 8, len, planningText)
             len = len + 10 + planningText.length * 10
-           
+
             doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
                 align: 'left'
             })
@@ -526,7 +530,7 @@ class ShipmentGlobalDemandView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 70 },
             startY: startYtable,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 50, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
                 0: { cellWidth: 61.89 },
                 // 1: { cellWidth: 100 },
@@ -669,7 +673,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            }  else if (this.state.programValues.length == 0) {
+            } else if (this.state.programValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.common.selectProgram'),
                     data: [],
@@ -678,7 +682,7 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            }else if (productCategoryId == -1) {
+            } else if (productCategoryId == -1) {
                 this.setState({
                     message: i18n.t('static.product.productcategorytext'),
                     data: [],
@@ -1030,7 +1034,7 @@ class ShipmentGlobalDemandView extends Component {
             this.getCountrys();
             this.getPrograms();
             //this.getRelamList();
-            this.getProductCategories(); 
+            this.getProductCategories();
             this.getFundingSource();
             this.getShipmentStatusList();
         } else {
@@ -1107,10 +1111,50 @@ class ShipmentGlobalDemandView extends Component {
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
-
-            this.fetchData()
+            this.filterProgram();
+            // this.fetchData()
         })
     }
+    filterProgram = () => {
+        let countryIds = this.state.countryValues.map(ele => ele.value);
+        console.log('countryIds', countryIds, 'programs', this.state.programs)
+        this.setState({
+            programLst: [],
+            programValues: [],
+            programLabels: []
+        }, () => {
+            if (countryIds.length != 0) {
+                let programLst = [];
+                for (var i = 0; i < countryIds.length; i++) {
+                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                }
+
+                console.log('programLst', programLst)
+                if (programLst.length > 0) {
+
+                    this.setState({
+                        programLst: programLst
+                    }, () => {
+                        this.fetchData()
+                    });
+                } else {
+                    this.setState({
+                        programLst: []
+                    }, () => {
+                        this.fetchData()
+                    });
+                }
+            } else {
+                this.setState({
+                    programLst: []
+                }, () => {
+                    this.fetchData()
+                });
+            }
+
+        })
+    }
+
     handleChangeProgram = (programIds) => {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1729,7 +1773,7 @@ class ShipmentGlobalDemandView extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                            if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -1748,9 +1792,13 @@ class ShipmentGlobalDemandView extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 let productCategoryId = document.getElementById("productCategoryId").value;
                 // AuthenticationService.setupAxiosInterceptors();
+               var lang=this.state.lang
                 if (productCategoryId != -1) {
-                    PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
+                    PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
                         // console.log("PLANNING-UNIT--->", response.data);
+                         (response.data).sort(function (a, b) {
+                    return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
+                  });
                         this.setState({
                             planningUnits: response.data,
                         }, () => {
@@ -1861,8 +1909,8 @@ class ShipmentGlobalDemandView extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value },()=>{ this.fetchData();})
-       
+        this.setState({ rangeValue: value }, () => { this.fetchData(); })
+
     }
 
     _handleClickRangeBox(e) {
@@ -1917,10 +1965,10 @@ class ShipmentGlobalDemandView extends Component {
                 )
             }, this);
 
-        const { programs } = this.state;
+        const { programLst } = this.state;
         let programList = [];
-        programList = programs.length > 0
-            && programs.map((item, i) => {
+        programList = programLst.length > 0
+            && programLst.map((item, i) => {
                 return (
 
                     { label: getLabelText(item.label, this.state.lang), value: item.programId }
@@ -2130,7 +2178,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </FormGroup>
                                         </Online> */}
-                                      <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
@@ -2150,110 +2198,110 @@ class ShipmentGlobalDemandView extends Component {
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
-                                            <MultiSelect
+                                                <MultiSelect
 
-                                                bsSize="sm"
-                                                name="programIds"
-                                                id="programIds"
-                                                value={this.state.programValues}
-                                                onChange={(e) => { this.handleChangeProgram(e) }}
-                                                options={programList && programList.length > 0 ? programList : []}
-                                            />
-                                          </div>
-
-                                        </FormGroup>
-                                        
-<Online>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="productCategoryId"
-                                                        id="productCategoryId"
-                                                        bsSize="sm"
-                                                        onChange={this.getPlanningUnit}
-                                                    >
-                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                        {productCategories.length > 0
-                                                            && productCategories.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
-                                                </InputGroup>
+                                                    bsSize="sm"
+                                                    name="programIds"
+                                                    id="programIds"
+                                                    value={this.state.programValues}
+                                                    onChange={(e) => { this.handleChangeProgram(e) }}
+                                                    options={programList && programList.length > 0 ? programList : []}
+                                                />
                                             </div>
 
                                         </FormGroup>
+
+                                        <Online>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="productCategoryId"
+                                                            id="productCategoryId"
+                                                            bsSize="sm"
+                                                            onChange={this.getPlanningUnit}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            {productCategories.length > 0
+                                                                && productCategories.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                            {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+
+                                            </FormGroup>
                                         </Online>
-                                    <Offline>
+                                        <Offline>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="programId"
+                                                            id="programId"
+                                                            bsSize="sm"
+                                                            onChange={this.filterVersion}
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {programLst.length > 0
+                                                                && programLst.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.programId}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                        </Offline>
+                                        <Offline>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionId"
+                                                            id="versionId"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            {versionList}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                        </Offline>
+
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="programId"
-                                                        id="programId"
-                                                        bsSize="sm"
-                                                        onChange={this.filterVersion}
-                                                    >
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {programs.length > 0
-                                                            && programs.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.programId}>
-                                                                        {getLabelText(item.label, this.state.lang)}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect
+                                                    name="planningUnitId"
+                                                    id="planningUnitId"
+                                                    bsSize="md"
+                                                    value={this.state.planningUnitValues}
+                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                />
 
-                                                    </Input>
-
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                    </Offline>
-                                    <Offline>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="versionId"
-                                                        id="versionId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.getPlanningUnit(); }}
-                                                    >
-                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                        {versionList}
-                                                    </Input>
-
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                    </Offline>
-
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                        <div className="controls">
-                                            <MultiSelect
-                                                name="planningUnitId"
-                                                id="planningUnitId"
-                                                bsSize="md"
-                                                value={this.state.planningUnitValues}
-                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                            // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                            />
-
-                                            {/* <Multiselect
+                                                {/* <Multiselect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="md"
@@ -2267,60 +2315,60 @@ class ShipmentGlobalDemandView extends Component {
                                                     // displayValue="label" // Property name to display in the dropdown options
                                                 /> */}
 
-                                        </div>
-                                    </FormGroup>
+                                            </div>
+                                        </FormGroup>
 
-                                    <FormGroup className="col-md-3" id="fundingSourceDiv">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
-                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                        <div className="controls ">
-                                            <MultiSelect
+                                        <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls ">
+                                                <MultiSelect
 
-                                                name="fundingSourceId"
-                                                id="fundingSourceId"
-                                                bsSize="sm"
-                                                value={this.state.fundingSourceValues}
-                                                onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                                options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                            />
-                                        </div>
-                                    </FormGroup>
-
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
-                                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                        <div className="controls ">
-                                            <MultiSelect
-
-                                                name="shipmentStatusId"
-                                                id="shipmentStatusId"
-                                                bsSize="sm"
-                                                value={this.state.shipmentStatusValues}
-                                                onChange={(e) => { this.handleShipmentStatusChange(e) }}
-                                                options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
-                                            />
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
-                                        <div className="controls ">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="includeApprovedVersions"
-                                                    id="includeApprovedVersions"
+                                                    name="fundingSourceId"
+                                                    id="fundingSourceId"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.fetchData() }}
-                                                >
-                                                    <option value="true">{i18n.t('static.program.yes')}</option>
-                                                    <option value="false">{i18n.t('static.program.no')}</option>
-                                                </Input>
+                                                    value={this.state.fundingSourceValues}
+                                                    onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                    options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                />
+                                            </div>
+                                        </FormGroup>
 
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls ">
+                                                <MultiSelect
 
-                                    {/* <FormGroup className="col-md-3">
+                                                    name="shipmentStatusId"
+                                                    id="shipmentStatusId"
+                                                    bsSize="sm"
+                                                    value={this.state.shipmentStatusValues}
+                                                    onChange={(e) => { this.handleShipmentStatusChange(e) }}
+                                                    options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
+                                                />
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="includeApprovedVersions"
+                                                        id="includeApprovedVersions"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.fetchData() }}
+                                                    >
+                                                        <option value="true">{i18n.t('static.program.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+
+                                        {/* <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <div className="controls">
                                                 <InputGroup>
@@ -2340,34 +2388,34 @@ class ShipmentGlobalDemandView extends Component {
                                         </FormGroup> */}
 
 
-                                </div>
-                                {/* </Col> */}
+                                    </div>
+                                    {/* </Col> */}
                                 </div>
                             </Form>
-                        <Col md="12 pl-0  ">
-                            <div className="row grid-divider ">
-                                {
-                                    this.state.planningUnitSplit.length > 0 &&
-                                    <Col md="8 pl-0">
-                                        <div className="chart-wrapper shipmentOverviewgraphheight" >
-                                            <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
-                                        </div>
-                                    </Col>
-                                }
-                                {
-                                    this.state.fundingSourceSplit.length > 0 &&
-                                    <Col md="4 pl-0">
-                                        <div className="chart-wrapper">
-                                            <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
-                                            /><br />
-                                        </div>
-                                    </Col>
-                                }
-                            </div>
+                            <Col md="12 pl-0  ">
+                                <div className="row grid-divider ">
+                                    {
+                                        this.state.planningUnitSplit.length > 0 &&
+                                        <Col md="8 pl-0">
+                                            <div className="chart-wrapper shipmentOverviewgraphheight" >
+                                                <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
+                                            </div>
+                                        </Col>
+                                    }
+                                    {
+                                        this.state.fundingSourceSplit.length > 0 &&
+                                        <Col md="4 pl-0">
+                                            <div className="chart-wrapper">
+                                                <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                /><br />
+                                            </div>
+                                        </Col>
+                                    }
+                                </div>
 
 
-                        </Col>
-                        {/* {
+                            </Col>
+                            {/* {
                                 this.state.procurementAgentSplit.length > 0 &&
                                 <Col md="12 pl-0">
                                     <div className="col-md-12 p-0">
@@ -2380,79 +2428,79 @@ class ShipmentGlobalDemandView extends Component {
                                 </Col>
                             } */}
 
-                        <Col md="12 pl-0 pb-lg-1">
-                            <div className="globalviwe-scroll">
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        {this.state.procurementAgentSplit.length > 0 &&
-                                            <div className="table-responsive ">
-                                                <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                            <Col md="12 pl-0 pb-lg-1">
+                                <div className="globalviwe-scroll">
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            {this.state.procurementAgentSplit.length > 0 &&
+                                                <div className="table-responsive ">
+                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
-                                                    <thead>
-                                                        <tr>
-                                                            <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
-                                                            <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
-                                                            <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
-                                                        </tr>
-                                                        <tr>
+                                                        <thead>
+                                                            <tr>
+                                                                <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
+                                                                <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
+                                                                <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
+                                                            </tr>
+                                                            <tr>
+                                                                {
+                                                                    this.state.table1Headers.map((item, idx) =>
+                                                                        <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
+                                                                            {this.state.table1Headers[idx]}
+                                                                        </th>
+                                                                    )
+                                                                }
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+
                                                             {
-                                                                this.state.table1Headers.map((item, idx) =>
-                                                                    <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
-                                                                        {this.state.table1Headers[idx]}
-                                                                    </th>
-                                                                )
-                                                            }
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-
-                                                        {
-                                                            this.state.procurementAgentSplit.map((item, idx) =>
-                                                                <tr id="addr0" key={idx} >
-                                                                    <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
-                                                                    {
-                                                                        Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
-                                                                            <td id="addr1" key={idx1}>
-                                                                                {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                            </td>
-                                                                        )
-                                                                    }
-                                                                    <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                this.state.procurementAgentSplit.map((item, idx) =>
+                                                                    <tr id="addr0" key={idx} >
+                                                                        <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
+                                                                        {
+                                                                            Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
+                                                                                <td id="addr1" key={idx1}>
+                                                                                    {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                </td>
+                                                                            )
+                                                                        }
+                                                                        <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
 
 
-                                                                </tr>
-                                                            )}
+                                                                    </tr>
+                                                                )}
 
-                                                    </tbody>
-                                                </Table>
+                                                        </tbody>
+                                                    </Table>
 
-                                            </div>
+                                                </div>
 
 
 
-                                        }
+                                            }
 
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Col>
+                            </Col>
 
                         </div>
 
                     </CardBody>
                 </Card>
-            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                    <div class="align-items-center">
-                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                        <div class="spinner-border blue ml-4" role="status">
+                            <div class="spinner-border blue ml-4" role="status">
 
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
             </div >
         );

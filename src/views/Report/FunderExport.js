@@ -40,6 +40,8 @@ const pickerLang = {
 class FunderExport extends Component {
     constructor(props) {
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             regionList: [],
             message: '',
@@ -53,7 +55,7 @@ class FunderExport extends Component {
             planningUnitLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: false
@@ -457,7 +459,7 @@ class FunderExport extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId) {
+                            if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -476,7 +478,7 @@ class FunderExport extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
-                ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                     // console.log('**' + JSON.stringify(response.data))
                     this.setState({
                         planningUnits: response.data, message: ''

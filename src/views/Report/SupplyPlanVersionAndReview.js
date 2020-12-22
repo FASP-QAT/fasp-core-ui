@@ -73,7 +73,8 @@ class SupplyPlanVersionAndReview extends Component {
 
     constructor(props) {
         super(props);
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             loading: true,
             matricsList: [],
@@ -85,7 +86,7 @@ class SupplyPlanVersionAndReview extends Component {
             countries: [],
             message: '',
             programLst: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
@@ -129,7 +130,7 @@ class SupplyPlanVersionAndReview extends Component {
     buildJexcel() {
 
         let matricsList = this.state.matricsList;
-        // console.log("matricsList---->", matricsList);
+        console.log("matricsList---->", matricsList);
         let matricsArray = [];
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
@@ -139,12 +140,13 @@ class SupplyPlanVersionAndReview extends Component {
             data[2] = getLabelText(matricsList[j].versionType.label, this.state.lang)
             data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
             data[4] = matricsList[j].createdBy.username
-            data[5] = getLabelText(matricsList[j].versionStatus.label, this.state.lang)
-            data[6] = (matricsList[j].lastModifiedBy.username)
-            data[7] = (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null)
+            data[5] = matricsList[j].versionStatus.id == 1 ? "" : getLabelText(matricsList[j].versionStatus.label, this.state.lang);
+            data[6] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedBy.username) : ''
+            data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
+            data[11] = matricsList[j].program.id
             matricsArray[count] = data;
             count++;
         }
@@ -215,6 +217,11 @@ class SupplyPlanVersionAndReview extends Component {
                     title: 'versionStatusId',
                     type: 'hidden',
                     readOnly: true
+                },
+                {
+                    title: 'programId',
+                    type: 'hidden',
+
                 }
             ],
             text: {
@@ -266,7 +273,7 @@ class SupplyPlanVersionAndReview extends Component {
 
             if (hasRole) {
 
-                let programId = document.getElementById("programId").value;
+
                 // let countryId = document.getElementById("countryId").value;
                 // let versionStatusId = this.el.getValueFromCoords(5, x);
                 // let versionTypeId =this.el.getValueFromCoords(2, x);
@@ -275,9 +282,10 @@ class SupplyPlanVersionAndReview extends Component {
                 var elInstance = instance.jexcel;
                 var rowData = elInstance.getRowData(x);
                 console.log("rowData==>", rowData);
+                let programId = rowData[11];
                 let versionStatusId = rowData[10];
                 let versionTypeId = rowData[9];
-                console.log("====>", versionStatusId, "====>", versionTypeId);
+                // console.log("====>", versionStatusId, "====>", versionTypeId);
 
                 // if (versionStatusId == 1 && versionTypeId == 2) {
                 this.props.history.push({
@@ -304,8 +312,8 @@ class SupplyPlanVersionAndReview extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
         this.getPrograms()
-        this.getStatusList()
         this.getVersionTypeList()
+        this.getStatusList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -520,6 +528,8 @@ class SupplyPlanVersionAndReview extends Component {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
                 versionTypeList: response.data, loading: false
+            }, () => {
+                document.getElementById("versionTypeId").value = 2;
             })
         }).catch(
             error => {
@@ -568,6 +578,8 @@ class SupplyPlanVersionAndReview extends Component {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
                 statuses: response.data, loading: false
+            }, () => {
+                this.fetchData()
             })
         }).catch(
             error => {
@@ -643,6 +655,7 @@ class SupplyPlanVersionAndReview extends Component {
         let countryId = document.getElementById("countryId").value;
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
+        console.log("D------------->VersionTypeId", versionTypeId);
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         console.log('endDate', endDate)
@@ -652,8 +665,12 @@ class SupplyPlanVersionAndReview extends Component {
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
+                    var result = response.data;
+                    if (versionStatusId == 1) {
+                        result = result.filter(c => c.versionType.id != 1);
+                    }
                     this.setState({
-                        matricsList: response.data,
+                        matricsList: result,
                         message: ''
                     }, () => { this.buildJexcel() })
                 }).catch(
@@ -1165,7 +1182,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     name="countryId"
                                                     id="countryId"
                                                     onChange={(e) => { this.filterProgram(); this.fetchData() }}
-                                                >  <option value="0">{i18n.t('static.common.select')}</option>
+                                                >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
                                                     this.props.touched && (
@@ -1185,7 +1202,7 @@ class SupplyPlanVersionAndReview extends Component {
 
 
                                                     >
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {programList}
                                                     </Input>
 

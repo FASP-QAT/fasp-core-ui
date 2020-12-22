@@ -57,8 +57,9 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
-            problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]
+            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]
         }
+
 
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -93,6 +94,10 @@ export default class ConsumptionDetails extends React.Component {
 
     componentDidMount = function () {
         // qatProblemActions();
+        // console.log("]]]]]]]======>", localStorage.getItem("sesProblemStatus"));
+
+
+
         this.hideFirstComponent();
         // let problemStatusId = document.getElementById('problemStatusId').value;
         // console.log("problemStatusId ---------> ", problemStatusId);
@@ -130,7 +135,11 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
                 this.setState({
-                    programList: proList
+                    programList: proList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
 
@@ -157,11 +166,7 @@ export default class ConsumptionDetails extends React.Component {
                         problemStatusList: proList
                     })
 
-                    var programIdd = this.props.match.params.programId;
-                    if (programIdd != '' && programIdd != undefined) {
-                        document.getElementById("programId").value = programIdd;
-                        this.getProblemListAfterCalculation();
-                    }
+
 
                     var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
                     var problemCategoryOs = problemCategoryTransaction.objectStore('problemCategory');
@@ -187,11 +192,31 @@ export default class ConsumptionDetails extends React.Component {
                             problemCategoryList: procList
                         })
 
+                        document.getElementById("problemTypeId").value = localStorage.getItem("sesProblemType");
+                        document.getElementById("problemCategoryId").value = localStorage.getItem("sesProblemCategory");
+                        document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
+                        console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
+
+                        var programIdd = this.props.match.params.programId;
+                        var needToCalculate = this.props.match.params.calculate;
+                        if (programIdd != '' && programIdd != undefined) {
+                            document.getElementById("programId").value = programIdd;
+                            // console.log("value==================>", needToCalculate);
+                            if (needToCalculate == "true") {
+                                // console.log("============>***");
+                                this.getProblemListAfterCalculation();
+                            } else {
+                                this.fetchData();
+                            }
+                        }
+
                     }.bind(this)
 
                 }.bind(this);
             }.bind(this);
         }.bind(this);
+
+
 
     };
 
@@ -339,7 +364,7 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.reviewNotes'),
@@ -727,6 +752,9 @@ export default class ConsumptionDetails extends React.Component {
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
+                localStorage.setItem("sesProblemType", document.getElementById('problemTypeId').value);
+                localStorage.setItem("sesProblemCategory", document.getElementById('problemCategoryId').value);
+                localStorage.setItem("sesReviewed", document.getElementById('reviewedStatusId').value);
             });
         let programId = document.getElementById('programId').value;
         // let problemStatusId = document.getElementById('problemStatusId').value;
@@ -883,6 +911,7 @@ export default class ConsumptionDetails extends React.Component {
             problemStatusLabels: problemStatusIds.map(ele => ele.label)
         }, () => {
             console.log("problemStatusValues===>", this.state.problemStatusValues);
+            localStorage.setItem("sesProblemStatus", JSON.stringify(this.state.problemStatusValues));
             this.fetchData()
         })
 
@@ -1102,7 +1131,7 @@ export default class ConsumptionDetails extends React.Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
                     <ProblemListFormulas ref="formulaeChild" />
-                    <div className="Card-header-addicon">
+                    <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">

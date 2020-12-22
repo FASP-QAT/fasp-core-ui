@@ -217,7 +217,8 @@ class StockStatus extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 10);
     this.state = {
       loading: true,
       dropdownOpen: false,
@@ -228,7 +229,7 @@ class StockStatus extends Component {
       stockStatusList: [],
       versions: [],
       show: false,
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
 
@@ -244,13 +245,13 @@ class StockStatus extends Component {
 
   roundN = num => {
     if (num != '') {
-      return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+      return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
     }
   }
   formatAmc = value => {
-    return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
   }
 
   formatter = value => {
@@ -283,23 +284,23 @@ class StockStatus extends Component {
   }
 
   rowtextFormatClassName = (row) => {
-    return (!row.actualConsumption) ? 'textcolor-purple' : '';
+    return  'textcolor-purple' ;
   }
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push('"'+(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('')
     csvRow.push('')
-    csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+    csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
 
 
@@ -308,7 +309,7 @@ class StockStatus extends Component {
     i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
     i18n.t('static.report.actual').replaceAll(' ', '%20'),
     i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20')+ " | " + (i18n.t('static.report.procurementAgentName')),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.amc').replaceAll(' ', '%20'),
@@ -318,13 +319,13 @@ class StockStatus extends Component {
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.actualConsumption ? '' : ele.consumptionQty, ele.actualConsumption ? ele.consumptionQty : '', ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty , ele.actualConsumptionQty , ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
-        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)+ " | " + item.procurementAgent.code
+        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos),this.roundN(ele.minMos),this.roundN(ele.maxMos)])));
+      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -357,7 +358,7 @@ class StockStatus extends Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
       }
@@ -419,7 +420,7 @@ class StockStatus extends Component {
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual'),
     i18n.t('static.shipment.qty'),
-    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')+ " | " + (i18n.t('static.report.procurementAgentName'))),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName'))),
     i18n.t('static.report.adjustmentQty'),
     i18n.t('static.supplyPlan.endingBalance'),
     i18n.t('static.report.amc'),
@@ -428,12 +429,12 @@ class StockStatus extends Component {
     i18n.t('static.report.maxmonth')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), ele.actualConsumption ? '' : this.formatter(ele.consumptionQty), ele.actualConsumption ? this.formatter(ele.consumptionQty) : '', this.formatter(ele.shipmentQty),
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty),  this.formatter(ele.actualConsumptionQty) , this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
-          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang)+ " | " + item.procurementAgent.code)
+          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)),this.formatter(this.roundN(ele.minMos)),this.formatter(this.roundN(ele.maxMos))]);
+        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -500,7 +501,7 @@ class StockStatus extends Component {
 
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
             var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-
+            var consumptionList=(programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId );
             var monthstartfrom = this.state.rangeValue.from.month
             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
               var monthlydata = [];
@@ -516,11 +517,19 @@ class StockStatus extends Component {
                   var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                   var totalShipmentQty = 0;
                   shiplist.map(elt => {
-                    totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
+                    totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
                   })
-                  var json = {
+                var conList= consumptionList.filter(c =>c.actualFlag == false &&  (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+              var totalforecastConsumption=null;
+                conList.map(elt=>{
+                  totalforecastConsumption=(totalforecastConsumption==null)?elt.consumptionQty:totalforecastConsumption+elt.consumptionQty
+                 } ) 
+                 console.log(conList)
+                 console.log(totalforecastConsumption)
+                var json = {
                     dt: new Date(from, month - 1),
-                    consumptionQty: list[0].consumptionQty,
+                    forecastedConsumptionQty: totalforecastConsumption,
+                    actualConsumptionQty:list[0].actualFlag==true?list[0].consumptionQty:null,
                     actualConsumption: list[0].actualFlag,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
@@ -834,9 +843,13 @@ class StockStatus extends Component {
 
 
         }
-
+        var lang = this.state.lang;
         this.setState({
-          programs: proList
+          programs: proList.sort(function (a, b) {
+            a = getLabelText(a.label, lang).toLowerCase();
+            b = getLabelText(b.label, lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          })
         })
 
       }.bind(this);
@@ -970,13 +983,18 @@ class StockStatus extends Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId) {
+                if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                   proList[i] = myResult[i]
                 }
               }
+              var lang = this.state.lang;
               this.setState({
-                planningUnits: proList, message: ''
+                planningUnits: proList.sort(function (a, b) {
+                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }), message: ''
               }, () => {
                 this.filterData();
               })
@@ -988,7 +1006,7 @@ class StockStatus extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
               planningUnits: response.data, message: ''
@@ -1455,7 +1473,7 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')+ " | " + (i18n.t('static.report.procurementAgentName')))}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
@@ -1479,10 +1497,10 @@ class StockStatus extends Component {
                             </td>
 
                             <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                              {this.state.stockStatusList[idx].actualConsumption ? '' : this.formatter(this.state.stockStatusList[idx].consumptionQty)}
+                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty) }
                             </td> <td>
 
-                              {this.state.stockStatusList[idx].actualConsumption ? this.formatter(this.state.stockStatusList[idx].consumptionQty) : ''}
+                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty) }
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}

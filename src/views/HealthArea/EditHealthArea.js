@@ -256,9 +256,9 @@ export default class EditHealthAreaComponent extends Component {
                     console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
                         var json = response.data;
-                        var regList = [];
+                        var regList = [{ value: "-1", label: i18n.t("static.common.all")  }];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
                             realmCountryList: regList, loading: false
@@ -354,9 +354,25 @@ export default class EditHealthAreaComponent extends Component {
     }
 
     updateFieldData(value) {
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            // console.log("------->2 in if");
+            this.setState({ realmCountryId: [] });
+            var list = this.state.realmCountryList.filter(c => c.value != -1)
+            this.setState({ realmCountryId: list });
+            var realmCountryId = list;
+        } else {
+            // console.log("------->3 in else");
+            this.setState({ realmCountryId: value });
+            var realmCountryId = value;
+        }
+
         let { healthArea } = this.state;
-        this.setState({ realmCountryId: value });
-        var realmCountryId = value;
+        // this.setState({ realmCountryId: value });
+        // var realmCountryId = value;
         var realmCountryIdArray = [];
         for (var i = 0; i < realmCountryId.length; i++) {
             realmCountryIdArray[i] = realmCountryId[i].value;
@@ -687,9 +703,9 @@ export default class EditHealthAreaComponent extends Component {
                     console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
                         var json = response.data;
-                        var regList = [];
+                        var regList = [{ value: "-1", label: i18n.t("static.common.all")  }];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         this.setState({
                             realmCountryList: regList

@@ -47,6 +47,8 @@ const pickerLang = {
 class ProcurementAgentExport extends Component {
     constructor(props) {
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             regionList: [],
             message: '',
@@ -66,7 +68,7 @@ class ProcurementAgentExport extends Component {
             fundingSourceLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
@@ -210,9 +212,13 @@ class ProcurementAgentExport extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -352,9 +358,13 @@ class ProcurementAgentExport extends Component {
                     }
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    procurementAgents: proList
+                    procurementAgents: proList.sort(function (a, b) {
+                        a = a.procurementAgentCode.toLowerCase();
+                        b = b.procurementAgentCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -485,13 +495,18 @@ class ProcurementAgentExport extends Component {
                             var proList = []
                             // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
+                                if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                     proList[i] = myResult[i]
                                 }
                             }
+                            var lang = this.state.lang;
                             this.setState({
-                                planningUnits: proList, message: ''
+                                planningUnits: proList.sort(function (a, b) {
+                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }), message: ''
                             }, () => {
                                 this.fetchData();
                             })
@@ -504,7 +519,7 @@ class ProcurementAgentExport extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
                         this.setState({
                             planningUnits: response.data, message: ''
@@ -696,11 +711,11 @@ class ProcurementAgentExport extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)]
         // this.state.data.map(ele => A.push([(getLabelText(ele.program.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format('MMM YYYY')).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes]));
         if (viewby == 1) {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (parseFloat(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (parseFloat(ele.totalCost).toFixed(2))])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.procurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.procurementAgent.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (Number(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (Number(ele.totalCost).toFixed(2))])));
         } else if (viewby == 2) {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (parseFloat(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (parseFloat(ele.totalCost).toFixed(2))])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (Number(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (Number(ele.totalCost).toFixed(2))])));
         } else {
-            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (parseFloat(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (parseFloat(ele.totalCost).toFixed(2))])));
+            this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, (Number(ele.productCost).toFixed(2)), ele.freightPerc, ele.freightCost, (Number(ele.totalCost).toFixed(2))])));
         }
 
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
@@ -814,14 +829,14 @@ class ProcurementAgentExport extends Component {
         let data = [];
         if (viewby == 1) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.procurementAgent.label, this.state.lang), ele.procurementAgent.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else if (viewby == 2) {
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [getLabelText(ele.fundingSource.label, this.state.lang), ele.fundingSource.code, ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         } else {
             columns.splice(0, 2);
             columns.map((item, idx) => { headers[idx] = (item.text) });
-            data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (parseFloat(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
+            data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), (ele.qty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.freightPerc).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (ele.freightCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Number(ele.totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")]);
         }
         let startY = 220 + (this.state.planningUnitValues.length * 3)
         let content = {
@@ -1167,7 +1182,7 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": isNaN(parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                            "freightPerc": isNaN(Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1191,11 +1206,11 @@ class ProcurementAgentExport extends Component {
                                     var freightCost = 0;
                                     var totalCost = 0;
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = parseFloat(freightPerc) + isNaN(parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
+                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
+                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
+                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,
@@ -1472,7 +1487,7 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                            "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1497,7 +1512,7 @@ class ProcurementAgentExport extends Component {
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
                                         qty = qty + planningUnitFilterdata[pf].qty;
                                         productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = parseFloat(freightPerc) + isNaN(parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
+                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
                                         freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
                                         totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
                                     }
@@ -1767,7 +1782,7 @@ class ProcurementAgentExport extends Component {
                                         "planningUnit": planningUnitFilter[j].planningUnit,
                                         "qty": planningUnitFilter[j].shipmentQty,
                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "freightPerc": parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
+                                        "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                         "currency": planningUnitFilter[j].currency
@@ -1792,7 +1807,7 @@ class ProcurementAgentExport extends Component {
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
                                         qty = qty + planningUnitFilterdata[pf].qty;
                                         productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = parseFloat(freightPerc) + isNaN(parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : parseFloat((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
+                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
                                         freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
                                         totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
                                     }
@@ -2138,9 +2153,13 @@ class ProcurementAgentExport extends Component {
                     }
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    fundingSources: proList
+                    fundingSources: proList.sort(function (a, b) {
+                        a = a.fundingSourceCode.toLowerCase();
+                        b = b.fundingSourceCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);

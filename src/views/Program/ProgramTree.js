@@ -794,97 +794,199 @@ class Program extends Component {
         else {
             console.log("Checl boxes checked array", checkboxesChecked)
             var programThenCount = 0;
-            for (var i = 0; i < checkboxesChecked.length; i++) {
-                // var version = (checkboxesChecked[i]).versionId;
-                if (navigator.onLine) {
-                    // AuthenticationService.setupAxiosInterceptors();
-                    ProgramService.getProgramData(checkboxesChecked[i])
-                        .then(response => {
-                            // console.log("ProgramThenCount", programThenCount)
-                            // console.log("Response data", response.data)
-                            var json = response.data;
-                            // console.log("Json-------->", json);
-                            // console("version befor -1 check",version)
-                            var version = json.requestedProgramVersion;
+            // for (var i = 0; i < checkboxesChecked.length; i++) {
+            // var version = (checkboxesChecked[i]).versionId;
+            if (navigator.onLine) {
+                // AuthenticationService.setupAxiosInterceptors();
+                ProgramService.getAllProgramData(checkboxesChecked)
+                    .then(response => {
+                        // console.log("ProgramThenCount", programThenCount)
+                        // console.log("Response data", response.data)
+                        var json = response.data;
+                        var programAndVersionList = [];
+                        for (var r = 0; r < json.length; r++) {
+                            var version = json[r].requestedProgramVersion;
                             if (version == -1) {
-                                version = json.currentVersion.versionId
+                                version = json[r].currentVersion.versionId
                             }
-                            // console.log("Version", version)
-                            var db1;
-                            getDatabase();
-                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                            openRequest.onsuccess = function (e) {
-                                db1 = e.target.result;
-                                var transaction = db1.transaction(['programData'], 'readwrite');
-                                var program = transaction.objectStore('programData');
-                                var count = 0;
-                                var getRequest = program.getAll();
-                                getRequest.onerror = function (event) {
-                                    // Handle errors!
-                                };
-                                getRequest.onsuccess = function (event) {
-                                    var myResult = [];
-                                    myResult = getRequest.result;
-                                    console.log("myResult---", myResult)
-                                    for (var i = 0; i < myResult.length; i++) {
-                                        // for (var j = 0; j < json.length; j++) {
-                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        if (myResult[i].id == json.programId + "_v" + version + "_uId_" + userId) {
-                                            count++;
-                                        }
-                                    }
-                                    if (count == 0) {
-                                        db1 = e.target.result;
-                                        var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                                        var programSaveData = transactionForSavingData.objectStore('programData');
+                            programAndVersionList.push({ programId: json[r].programId, version: version })
+                        }
+                        // console.log("Json-------->", json);
+                        // console("version befor -1 check",version)
 
-                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
-                                        // for (var i = 0; i < json.length; i++) {
-                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                        // console.log("Version", version)
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction = db1.transaction(['programData'], 'readwrite');
+                            var program = transaction.objectStore('programData');
+                            var count = 0;
+                            var getRequest = program.getAll();
+                            getRequest.onerror = function (event) {
+                                // Handle errors!
+                            };
+                            getRequest.onsuccess = function (event) {
+                                var myResult = [];
+                                myResult = getRequest.result;
+                                console.log("myResult---", myResult)
+                                var programAndVersionListLocal = [];
+                                for (var i = 0; i < myResult.length; i++) {
+                                    // for (var j = 0; j < json.length; j++) {
+                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                    if (myResult[i].userId == userId) {
+                                        programAndVersionListLocal.push({ programId: myResult[i].programId, version: myResult[i].version })
+                                    }
+                                }
+                                var isExists = 0;
+                                var downloadProgram = false;
+                                console.log("D------------------>", programAndVersionListLocal);
+                                console.log("D------------------>", programAndVersionList);
+                                for (var r = 0; r < programAndVersionList.length; r++) {
+                                    var filterList = programAndVersionListLocal.filter(c => c.programId == programAndVersionList[r].programId && c.version == programAndVersionList[r].version);
+                                    console.log("D---------------->filterList", filterList)
+                                    if (filterList.length > 0) {
+                                        isExists += 1;
+                                    }
+
+                                }
+                                if (isExists > 0) {
+                                    confirmAlert({
+                                        title: i18n.t('static.program.confirmsubmit'),
+                                        message: i18n.t('static.program.programwithsameversion'),
+                                        buttons: [
+                                            {
+                                                label: i18n.t('static.program.yes'),
+                                                onClick: () => {
+                                                    console.log("D-------------------->Yes clicked");
+                                                    console.log("D--------------> in download program")
+                                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                                    for (var r = 0; r < json.length; r++) {
+                                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                        var version = json[r].requestedProgramVersion;
+                                                        if (version == -1) {
+                                                            version = json[r].currentVersion.versionId
+                                                        }
+                                                        var item = {
+                                                            id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                            programId: json[r].programId,
+                                                            version: version,
+                                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                            programData: encryptedText.toString(),
+                                                            userId: userId
+                                                        };
+                                                        // console.log("Item------------>", item);
+                                                        var putRequest = programSaveData.put(item);
+
+                                                    }
+                                                    transactionForSavingData.oncomplete = function (event) {
+                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                                        for (var r = 0; r < json.length; r++) {
+                                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                            var version = json[r].requestedProgramVersion;
+                                                            if (version == -1) {
+                                                                version = json[r].currentVersion.versionId
+                                                            }
+                                                            var item = {
+                                                                id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                                programId: json[r].programId,
+                                                                version: version,
+                                                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                                programData: encryptedText.toString(),
+                                                                userId: userId
+                                                            };
+                                                            // console.log("Item------------>", item);
+                                                            var putRequest = downloadedProgramSaveData.put(item);
+
+                                                        }
+                                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                                            this.setState({
+                                                                message: 'static.program.downloadsuccess',
+                                                                color: 'green',
+                                                                loading: false
+                                                            })
+                                                            this.hideFirstComponent();
+                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                            this.setState({ loading: false })
+                                                            // this.refs.programListChild.checkNewerVersions();
+                                                            this.getPrograms();
+                                                            this.getLocalPrograms();
+                                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                                        }.bind(this)
+                                                    }.bind(this)
+                                                }
+                                            }, {
+                                                label: i18n.t('static.program.no'),
+                                                onClick: () => {
+                                                    this.setState({
+                                                        message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                                                    })
+                                                    this.setState({ loading: false, color: "red" })
+                                                    this.hideFirstComponent()
+                                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
+                                                }
+                                            }
+                                        ]
+                                    })
+                                } else {
+                                    downloadProgram = true;
+                                }
+                                if (downloadProgram) {
+                                    console.log("D--------------> in download program")
+                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                    for (var r = 0; r < json.length; r++) {
+                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                        var version = json[r].requestedProgramVersion;
+                                        if (version == -1) {
+                                            version = json[r].currentVersion.versionId
+                                        }
                                         var item = {
-                                            id: json.programId + "_v" + version + "_uId_" + userId,
-                                            programId: json.programId,
+                                            id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                            programId: json[r].programId,
                                             version: version,
-                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                             programData: encryptedText.toString(),
                                             userId: userId
                                         };
                                         // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
-                                        programThenCount++;
-                                        putRequest.onerror = function (error) {
-                                            this.setState({ loading: false })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        }.bind(this);
 
-                                        var putRequestDownloadedProgramData = downloadedProgramSaveData.put(item);
-                                        // programThenCount++;
-                                        putRequestDownloadedProgramData.onerror = function (error) {
-                                            this.setState({ loading: false })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        }.bind(this);
-                                        // }
-                                        transactionForSavingData.oncomplete = function (event) {
-                                            // console.log("in transaction complete");
+                                    }
+                                    transactionForSavingData.oncomplete = function (event) {
+                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                        for (var r = 0; r < json.length; r++) {
+                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                            var version = json[r].requestedProgramVersion;
+                                            if (version == -1) {
+                                                version = json[r].currentVersion.versionId
+                                            }
+                                            var item = {
+                                                id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                programId: json[r].programId,
+                                                version: version,
+                                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                programData: encryptedText.toString(),
+                                                userId: userId
+                                            };
+                                            // console.log("Item------------>", item);
+                                            var putRequest = downloadedProgramSaveData.put(item);
 
-                                            // this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
-                                        }.bind(this);
-                                        transactionForSavingData.onerror = function (event) {
-                                            this.setState({ loading: false })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        }.bind(this);
-                                        programSaveData.onerror = function (event) {
-                                            this.setState({ loading: false })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        }.bind(this)
-
-
+                                        }
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                            // console.log("in transaction complete");
                                             this.setState({
                                                 message: 'static.program.downloadsuccess',
                                                 color: 'green',
@@ -896,149 +998,59 @@ class Program extends Component {
                                             // this.refs.programListChild.checkNewerVersions();
                                             this.getPrograms();
                                             this.getLocalPrograms();
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
-                                        }.bind(this);
-                                        transactionForSavingDownloadedProgramData.onerror = function (event) {
-                                            this.setState({ loading: false })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        }.bind(this);
-                                        downloadedProgramSaveData.onerror = function (event) {
-                                            this.setState({ loading: false })
-                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this)
-                                    } else {
-                                        confirmAlert({
-                                            title: i18n.t('static.program.confirmsubmit'),
-                                            message: i18n.t('static.program.programwithsameversion'),
-                                            buttons: [
-                                                {
-                                                    label: i18n.t('static.program.yes'),
-                                                    onClick: () => {
-                                                        db1 = e.target.result;
-                                                        var transactionForOverwrite = db1.transaction(['programData'], 'readwrite');
-                                                        var programOverWrite = transactionForOverwrite.objectStore('programData');
-
-                                                        var transactionForOverwriteDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                                        var programOverWriteForDownloadedProgramData = transactionForOverwriteDownloadedProgramData.objectStore('downloadedProgramData');
-                                                        // for (var i = 0; i < json.length; i++) {
-                                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                        var item = {
-                                                            id: json.programId + "_v" + version + "_uId_" + userId,
-                                                            programId: json.programId,
-                                                            version: version,
-                                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                                                            programData: encryptedText.toString(),
-                                                            userId: userId
-                                                        };
-                                                        // console.log("Item------------------>", item)
-                                                        var putRequest = programOverWrite.put(item);
-                                                        programThenCount++;
-                                                        putRequest.onerror = function (error) {
-                                                            this.setState({ loading: false })
-                                                            this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
-                                                        }.bind(this);
-
-                                                        // }
-                                                        transactionForOverwrite.oncomplete = function (event) {
-                                                            // this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
-                                                        }.bind(this);
-                                                        transactionForOverwrite.onerror = function (event) {
-                                                            this.setState({ loading: false })
-                                                            this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
-                                                        }.bind(this);
-
-                                                        var putRequestDownloadedProgramData = programOverWriteForDownloadedProgramData.put(item);
-                                                        // programThenCount++;
-                                                        putRequestDownloadedProgramData.onerror = function (error) {
-                                                            this.setState({ loading: false })
-                                                            this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
-                                                        }.bind(this);
-
-                                                        // }
-                                                        transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
-                                                            // this.props.history.push(`/dashboard/` + 'green/' + "Program downloaded successfully.")
-                                                            this.setState({
-                                                                message: 'static.program.downloadsuccess',
-                                                                color: 'green',
-                                                                loading: false
-                                                            })
-                                                            this.hideFirstComponent();
-                                                            this.getPrograms();
-                                                            this.getLocalPrograms();
-                                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.downloadsuccess'))
-
-                                                        }.bind(this);
-                                                        transactionForOverwriteDownloadedProgramData.onerror = function (event) {
-                                                            this.setState({ loading: false })
-                                                            this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
-                                                        }.bind(this);
-                                                    }
-                                                },
-                                                {
-                                                    label: i18n.t('static.program.no'),
-                                                    onClick: () => {
-                                                        this.setState({
-                                                            message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
-                                                        })
-                                                        this.setState({ loading: false, color: "red" })
-                                                        this.hideFirstComponent()
-                                                        this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
-                                                    }
-                                                }
-                                            ]
-                                        });
-                                    }
-                                }.bind(this)
+                                    }.bind(this)
+                                }
                             }.bind(this)
-                        })
-                        .catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                        }.bind(this)
+                    })
+                    .catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
                                 }
                             }
-                        );
+                        }
+                    );
 
-                } else {
-                    this.setState({ loading: false, color: "red" })
-                    alert(i18n.t('static.common.online'))
-                }
+            } else {
+                this.setState({ loading: false, color: "red" })
+                alert(i18n.t('static.common.online'))
             }
+            // }
 
         }
 

@@ -167,7 +167,7 @@ class AddRoleComponent extends Component {
           var probList = [];
           probList = getRequestP.result;
           var filteredList = probList.filter(c => c.problemType.id != 1)
-          console.log("problemList====>", filteredList);
+          // console.log("problemList====>", filteredList);
           this.setState({ problemList: filteredList });
 
         }.bind(this);
@@ -204,11 +204,11 @@ class AddRoleComponent extends Component {
       planningunitRequest.onsuccess = function (e) {
         var myResult = [];
         myResult = planningunitRequest.result;
-        console.log("myResult", myResult);
+        // console.log("myResult", myResult);
         // alert((document.getElementById("programId").value).split("_")[0]);
         var programId = (document.getElementById("programId").value).split("_")[0];
-        console.log('programId----->>>', programId)
-        console.log(myResult);
+        // console.log('programId----->>>', programId)
+        // console.log(myResult);
         var proList = []
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -377,11 +377,11 @@ class AddRoleComponent extends Component {
             var problemActionList = programJson.problemReportList;
 
             if (problemId == 13) {
-              console.log("programObj====>", programObj);
-              console.log("planningUnitObj====>", planningUnitObj);
-              console.log("regionObj====>", regionObj);
-              console.log("problemObj====>", problemObj);
-              console.log("problemActionList====>", problemActionList);
+              // console.log("programObj====>", programObj);
+              // console.log("planningUnitObj====>", planningUnitObj);
+              // console.log("regionObj====>", regionObj);
+              // console.log("problemObj====>", problemObj);
+              // console.log("problemActionList====>", problemActionList);
               problemActionIndex = problemActionList.length;
 
               var index = problemActionList.findIndex(
@@ -429,8 +429,8 @@ class AddRoleComponent extends Component {
                     }
                   },
                   reviewed: false,
-                  reviewNotes:'',
-                  reviewedDate:'',
+                  reviewNotes: '',
+                  reviewedDate: '',
                   createdBy: {
                     userId: userId,
                     username: username
@@ -467,7 +467,7 @@ class AddRoleComponent extends Component {
 
                 }
                 problemActionList.push(json);
-                console.log("problemActionList===>", problemActionList);
+                // console.log("problemActionList===>", problemActionList);
 
 
                 var problemTransaction = db1.transaction(['programData'], 'readwrite');
@@ -487,7 +487,7 @@ class AddRoleComponent extends Component {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
                   var programId = document.getElementById("programId").value;
-                  this.props.history.push(`/report/problemList/` + programId + '/green/' + i18n.t('static.problem.addedSuccessfully'));
+                  this.props.history.push(`/report/problemList/` + programId + '/' + false + '/green/' + i18n.t('static.problem.addedSuccessfully'));
 
                 }.bind(this);
 
@@ -495,7 +495,7 @@ class AddRoleComponent extends Component {
               } else {
                 this.props.history.push(`/report/addProblem/` + 'red/' + i18n.t('static.problem.allreadyExist'));
                 this.hideSecondComponent();
-                console.log("in else============>");
+                // console.log("in else============>");
 
               }
 

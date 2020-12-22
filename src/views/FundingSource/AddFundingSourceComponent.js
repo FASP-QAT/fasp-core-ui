@@ -306,6 +306,23 @@ class AddFundingSourceComponent extends Component {
           }
         }
       );
+    let realmId = AuthenticationService.getRealmId();
+    if (realmId != -1) {
+      // document.getElementById('realmId').value = realmId;
+      // initialValues = {
+      //   realmId: realmId
+      // }
+
+      let { fundingSource } = this.state;
+      fundingSource.realm.id = realmId;
+      document.getElementById("realmId").disabled = true;
+      this.setState({
+        fundingSource
+      },
+        () => {
+
+        })
+    }
   }
   hideSecondComponent() {
     setTimeout(function () {

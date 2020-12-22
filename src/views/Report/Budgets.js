@@ -58,6 +58,13 @@ const chartoptions =
 
         }],
         xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString:  i18n.t('static.supplyPlan.amountInUSD')+''+i18n.t('static.report.inmillions'),
+                fontColor: 'black',
+                fontStyle: "normal",
+                fontSize: "12"
+            },
             ticks: {
                 fontColor: 'black',
                 callback: function (value) {
@@ -114,6 +121,8 @@ const chartoptions =
 class Budgets extends Component {
     constructor(props) {
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             budgetList: [],
             lang: localStorage.getItem('lang'),
@@ -125,7 +134,7 @@ class Budgets extends Component {
             versions: [],
             show: false,
             loading: true,
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             fundingSourceValues: [],
@@ -242,7 +251,11 @@ class Budgets extends Component {
                 }
 
                 this.setState({
-                    fundingSources: proList
+                    fundingSources: proList.sort(function (a, b) {
+                        a = a.fundingSourceCode.toLowerCase();
+                        b = b.fundingSourceCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -313,7 +326,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -459,7 +472,7 @@ class Budgets extends Component {
                             console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
                             console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
                             // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
-                            if (budgetResult[k].program.id == programId && (budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
+                            if (budgetResult[k].program.id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
                                 budgetList[j++] = budgetResult[k]
                         }
                         console.log("budgetList---", budgetList);
@@ -484,7 +497,7 @@ class Budgets extends Component {
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
                                     console.log(ele)
-                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                    plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
                                 console.log("B** planned shipment budget ---", plannedShipmentbudget);
                                 var OrderedShipmentbudget = 0;
@@ -492,7 +505,7 @@ class Budgets extends Component {
                                 console.log("B** shiplist ---", shiplist);
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                                    OrderedShipmentbudget = OrderedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                    OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
                                 console.log("B** order shipment budget ---", OrderedShipmentbudget);
                                 console.log("B** budget list l ==>", budgetList[l]);
@@ -750,9 +763,13 @@ class Budgets extends Component {
 
 
                 }
-
+                var lang = this.state.lang;
                 this.setState({
-                    programs: proList
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                 })
 
             }.bind(this);
@@ -764,7 +781,7 @@ class Budgets extends Component {
 
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
+        return Number(Math.round(num * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
 
     }
     filterVersion = () => {

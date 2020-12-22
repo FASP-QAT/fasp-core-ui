@@ -42,6 +42,7 @@ import EditTracerCategoryTicketComponent from './EditTracerCategoryTicketCompone
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
 import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
+import ChangeRequestTicketComponent from './ChangeRequestTicketComponent';
 
 export default class InitialTicketPageComponent extends Component {
 
@@ -99,7 +100,9 @@ export default class InitialTicketPageComponent extends Component {
       showEditRealmCountryData: 0,
       showEditRealmCountryRegionData: 0,
       showEditTechnicalAreaData: 0,
-      showEditTracerCategoryData: 0
+      showEditTracerCategoryData: 0,
+
+      showChangeRequest: 0
     };
 
     this.togglehelp = this.togglehelp.bind(this);
@@ -120,6 +123,8 @@ export default class InitialTicketPageComponent extends Component {
     this.backFromAddMasterForms = this.backFromAddMasterForms.bind(this);
     this.showOnlyEditMasterForms = this.showOnlyEditMasterForms.bind(this);
     this.backFromEditMasterForms = this.backFromEditMasterForms.bind(this);
+
+    this.toggleChangeRequest = this.toggleChangeRequest.bind(this);
   }
 
   componentDidMount() {
@@ -172,7 +177,9 @@ export default class InitialTicketPageComponent extends Component {
         showEditRealmCountryData: 0,
         showEditRealmCountryRegionData: 0,
         showEditTechnicalAreaData: 0,
-        showEditTracerCategoryData: 0
+        showEditTracerCategoryData: 0,
+
+        showChangeRequest:0
       });
     } else {
       confirmAlert({
@@ -208,6 +215,14 @@ export default class InitialTicketPageComponent extends Component {
     this.setState({
       initialPage: 0,
       showBugReport: 1
+    });
+  }
+
+  // Show Bug Report
+  toggleChangeRequest() {
+    this.setState({
+      initialPage: 0,
+      showChangeRequest: 1
     });
   }
 
@@ -248,7 +263,8 @@ export default class InitialTicketPageComponent extends Component {
     this.setState({
       initialPage: 1,
       showBugReport: 0,
-      showUserData: 0
+      showUserData: 0,
+      showChangeRequest: 0
     });
   }
 
@@ -717,10 +733,10 @@ export default class InitialTicketPageComponent extends Component {
               <div className="mt-2 mb-2">
 
                 <ListGroup>
-                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')}</ListGroupItem>
                   <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglechangemaster} action><i className="icon-list  icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateMasterData')} <i className="fa fa-angle-right helpclickicon mr-2 mt-1 float-right"></i></ListGroupItem>
-                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>
-
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.toggleChangeRequest} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.ticket.changeRequest')}</ListGroupItem>
+                  <ListGroupItem className="list-group-item-help" tag="a" onClick={this.togglebugreport} action>  <i className="icon-list icons helpclickicon mr-2"></i>{i18n.t('static.common.bugreport')}</ListGroupItem>                  
                 </ListGroup>
               </div>
 
@@ -804,6 +820,7 @@ export default class InitialTicketPageComponent extends Component {
                 </div>}
 
                 {this.state.showUserData == 1 && <UserTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state}/>}
+                {this.state.showChangeRequest == 1 && <ChangeRequestTicketComponent toggleMain={() => this.toggleMain()} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state}/>}
 
                 {this.state.showBudgetData == 1 && <BudgetTicketComponent toggleMaster={() => this.backFromAddMasterForms(1)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state}/>}
                 {this.state.showDataSourceData == 1 && <DataSourceTicketComponent toggleMaster={() => this.backFromAddMasterForms(2)} togglehelp={this.togglehelp} toggleSmall={this.toggleSmall} items={this.state}/>}

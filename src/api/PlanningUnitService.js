@@ -35,7 +35,7 @@ class PlanningUnitService {
         );
     }
 
-    editPlanningUnitCapacity(json){
+    editPlanningUnitCapacity(json) {
         return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
         );
     }
@@ -45,6 +45,14 @@ class PlanningUnitService {
     }
     getPlanningUnitByProgramIds(json) {
         return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
+        );
+    }
+    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId,term) {
+        return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
+        );
+    }
+    getActivePlanningUnitByProductCategoryId(json) {
+        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}`, {}
         );
     }
 }

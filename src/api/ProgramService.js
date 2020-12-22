@@ -8,6 +8,11 @@ class ProgramService {
         });
     }
 
+    getAllProgramData(json) {
+        return axios.post(`${API_URL}/api/programData`, json, {
+        });
+    }
+
     getProgramList() {
         return axios.get(`${API_URL}/api/program/`, {
         });
@@ -156,6 +161,11 @@ class ProgramService {
 
     getProblemStatusList() {
         return axios.get(`${API_URL}/api/problemStatus`, {}
+        );
+    }
+
+    getActiveProgramPlaningUnitListByProgramId(json) {
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit/`, {}
         );
     }
 
