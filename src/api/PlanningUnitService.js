@@ -52,7 +52,7 @@ class PlanningUnitService {
         );
     }
     getActivePlanningUnitByProductCategoryId(json) {
-        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}`, {}
+        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/active`, {}
         );
     }
 }
