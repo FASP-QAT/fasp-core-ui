@@ -524,13 +524,20 @@ class StockStatus extends Component {
                 conList.map(elt=>{
                   totalforecastConsumption=(totalforecastConsumption==null)?elt.consumptionQty:totalforecastConsumption+elt.consumptionQty
                  } ) 
+
+                 var conListAct= consumptionList.filter(c =>c.actualFlag == true &&  (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+              var totalActualConsumption=null;
+                conListAct.map(elt=>{
+                  totalActualConsumption=(totalActualConsumption==null)?elt.consumptionQty:totalActualConsumption+elt.consumptionQty
+                 } ) 
                  console.log(conList)
                  console.log(totalforecastConsumption)
                 var json = {
                     dt: new Date(from, month - 1),
                     forecastedConsumptionQty: totalforecastConsumption,
-                    actualConsumptionQty:list[0].actualFlag==true?list[0].consumptionQty:null,
+                    actualConsumptionQty:totalActualConsumption,
                     actualConsumption: list[0].actualFlag,
+                    consumptionQty:list[0].consumptionQty,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
                     adjustment: list[0].adjustmentQty,
