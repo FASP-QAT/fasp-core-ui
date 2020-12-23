@@ -1478,28 +1478,28 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tbody>
 
                                 </Table>
-                                
+
                             </div>
-                           
-                                        {/* <div className="row" > */}
-                                            {
-                                                this.state.jsonArrForGraph.length > 0
-                                                &&
-                                                <div className="row" >
 
-                                                    <div className="graphwidth">
-                                                        <div className="col-md-12">
-                                                            <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
-                                                </div>
-                                            }
+                            {/* <div className="row" > */}
+                            {
+                                this.state.jsonArrForGraph.length > 0
+                                &&
+                                <div className="row" >
 
-                                        {/* </div> */}
-    
+                                    <div className="graphwidth">
+                                        <div className="col-md-12">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                </div>
+                            }
+
+                            {/* </div> */}
+
 
                         </div>
                     </div>
@@ -2039,7 +2039,15 @@ export default class SupplyPlanComponent extends React.Component {
                     }),
                     loading: false
                 })
-                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                // var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                var programIdd = '';
+                if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
+                    programIdd = this.props.match.params.programId;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
+                } else if (proList.length == 1) {
+                    programIdd = proList[0].value;
+                }
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -2199,7 +2207,15 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
                                 })
-                                var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                var planningUnitIdProp = '';
+                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                                    planningUnitIdProp = this.props.match.params.planningUnitId;
+                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                    planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                } else if (proList.length == 1) {
+                                    planningUnitIdProp = proList[0].value;
+                                }
                                 console.log("planningUnitIdProp===>", planningUnitIdProp);
                                 if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                     var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -2622,10 +2638,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
-                                    var paColor1="";
-                                    var paColor2="";
-                                    var paColor3="";
-                                    var paColor4="";
+                                    var paColor1 = "";
+                                    var paColor2 = "";
+                                    var paColor3 = "";
+                                    var paColor4 = "";
                                     var isEmergencyOrder1 = 0;
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;

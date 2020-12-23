@@ -232,13 +232,28 @@ class StockStatus extends Component {
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-
+      programId: '',
+      versionId: ''
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+    this.programChange = this.programChange.bind(this);
+    this.versionChange = this.versionChange.bind(this);
 
+  }
+
+  programChange(event) {
+    this.setState({
+      programId: event.target.value
+    })
+  }
+
+  versionChange(event) {
+    this.setState({
+      versionId: event.target.value
+    })
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -284,7 +299,7 @@ class StockStatus extends Component {
   }
 
   rowtextFormatClassName = (row) => {
-    return  'textcolor-purple' ;
+    return 'textcolor-purple';
   }
 
   exportCSV() {
@@ -319,7 +334,7 @@ class StockStatus extends Component {
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty , ele.actualConsumptionQty , ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty, ele.actualConsumptionQty, ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
@@ -429,7 +444,7 @@ class StockStatus extends Component {
     i18n.t('static.report.maxmonth')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty),  this.formatter(ele.actualConsumptionQty) , this.formatter(ele.shipmentQty),
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
@@ -501,7 +516,7 @@ class StockStatus extends Component {
 
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
             var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-            var consumptionList=(programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId );
+            var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
             var monthstartfrom = this.state.rangeValue.from.month
             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
               var monthlydata = [];
@@ -519,17 +534,17 @@ class StockStatus extends Component {
                   shiplist.map(elt => {
                     totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
                   })
-                var conList= consumptionList.filter(c =>c.actualFlag == false &&  (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-              var totalforecastConsumption=null;
-                conList.map(elt=>{
-                  totalforecastConsumption=(totalforecastConsumption==null)?elt.consumptionQty:totalforecastConsumption+elt.consumptionQty
-                 } ) 
-                 console.log(conList)
-                 console.log(totalforecastConsumption)
-                var json = {
+                  var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                  var totalforecastConsumption = null;
+                  conList.map(elt => {
+                    totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
+                  })
+                  console.log(conList)
+                  console.log(totalforecastConsumption)
+                  var json = {
                     dt: new Date(from, month - 1),
                     forecastedConsumptionQty: totalforecastConsumption,
-                    actualConsumptionQty:list[0].actualFlag==true?list[0].consumptionQty:null,
+                    actualConsumptionQty: list[0].actualFlag == true ? list[0].consumptionQty : null,
                     actualConsumption: list[0].actualFlag,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
@@ -844,13 +859,27 @@ class StockStatus extends Component {
 
         }
         var lang = this.state.lang;
-        this.setState({
-          programs: proList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
+        if (proList.length == 1) {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: proList[0].programId
+          }, () => {
+            this.filterVersion();
           })
-        })
+        } else {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -936,11 +965,23 @@ class StockStatus extends Component {
         }
 
         console.log(verList)
-        this.setState({
-          versions: verList.filter(function (x, i, a) {
-            return a.indexOf(x) === i;
+        if (verList.length == 1) {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            }),
+            versionId: verList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
-        })
+        } else {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -1387,8 +1428,9 @@ class StockStatus extends Component {
                               name="programId"
                               id="programId"
                               bsSize="sm"
-                              onChange={this.filterVersion}
-
+                              // onChange={this.filterVersion}
+                              onChange={(e) => { this.programChange(e); this.filterVersion(e) }}
+                              value={this.state.programId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {programList}
@@ -1407,7 +1449,9 @@ class StockStatus extends Component {
                               name="versionId"
                               id="versionId"
                               bsSize="sm"
-                              onChange={(e) => { this.getPlanningUnit(); }}
+                              // onChange={(e) => { this.getPlanningUnit(); }}
+                              onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              value={this.state.versionId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {versionList}
@@ -1497,10 +1541,10 @@ class StockStatus extends Component {
                             </td>
 
                             <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty) }
+                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
                             </td> <td>
 
-                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty) }
+                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}

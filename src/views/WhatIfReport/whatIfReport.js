@@ -231,7 +231,7 @@ export default class WhatIfReportComponent extends React.Component {
         //
     }
     handleRangeDissmis(value) {
-        console.log("Value-------------------->",value)
+        console.log("Value-------------------->", value)
         this.setState({ rangeValue: value })
         this.formSubmit(this.state.planningUnit, value);
     }
@@ -574,7 +574,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',  message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -629,7 +629,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',  message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' },
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' },
                             () => {
                                 console.log("D--------------->", this.state.rangeValue);
                             })
@@ -687,7 +687,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',  message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1507,6 +1507,20 @@ export default class WhatIfReportComponent extends React.Component {
                     }),
                     loading: false
                 })
+
+                var programIdd = '';
+                if (proList.length == 1) {
+                    programIdd = proList[0].value;
+                }
+                if (programIdd != '' && programIdd != undefined) {
+                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
+                    this.setState({
+                        programSelect: programSelect,
+                        programId: programIdd
+                    })
+                    this.getPlanningUnitList(programSelect);
+                }
+
             }.bind(this);
         }.bind(this);
     };
@@ -1673,6 +1687,19 @@ export default class WhatIfReportComponent extends React.Component {
                                         planningUnitListForConsumption: planningUnitListForConsumption,
                                         loading: false
                                     })
+
+                                    let planningUnitIdProp = '';
+                                    if (proList.length == 1) {
+                                        planningUnitIdProp = proList[0].value;
+                                    }
+                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                        this.setState({
+                                            planningUnit: planningUnit,
+                                            planningUnitId: planningUnitIdProp
+                                        })
+                                        this.formSubmit(planningUnit, this.state.monthCount);
+                                    }
                                 }.bind(this);
                             }.bind(this);
                         }.bind(this);
@@ -2081,10 +2108,10 @@ export default class WhatIfReportComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
-                                    var paColor1="";
-                                    var paColor2="";
-                                    var paColor3="";
-                                    var paColor4="";
+                                    var paColor1 = "";
+                                    var paColor2 = "";
+                                    var paColor3 = "";
+                                    var paColor4 = "";
                                     var isEmergencyOrder1 = 0;
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;
@@ -3767,21 +3794,21 @@ export default class WhatIfReportComponent extends React.Component {
 
                             </div>
                             {/* <div className="row" > */}
-                                {
-                                    this.state.jsonArrForGraph.length > 0
-                                    &&
-                                    <div className="row" >
+                            {
+                                this.state.jsonArrForGraph.length > 0
+                                &&
+                                <div className="row" >
 
-                                        <div className="graphwidth">
-                                            <div className="col-md-12">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                </div>
+                                    <div className="graphwidth">
+                                        <div className="col-md-12">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                             </div>
                                         </div>
-                                        <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                     </div>
-                                }
+                                    <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                </div>
+                            }
 
                             {/* </div> */}
                         </div>
