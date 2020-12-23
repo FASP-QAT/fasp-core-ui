@@ -85,7 +85,7 @@ class AnnualShipmentCost extends Component {
     }
     roundN = num => {
         if (num != '') {
-            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+            return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
         } else {
             return ''
         }
@@ -260,7 +260,7 @@ class AnnualShipmentCost extends Component {
                                                         console.log(list2)
                                                         var cost = 0;
                                                         for (var k = 0; k < list2.length; k++) {
-                                                            cost += parseFloat(list2[k].productCost * list2[k].currency.conversionRateToUsd) + parseFloat(list2[k].freightCost * list2[k].currency.conversionRateToUsd);
+                                                            cost += Number(list2[k].productCost * list2[k].currency.conversionRateToUsd) + Number(list2[k].freightCost * list2[k].currency.conversionRateToUsd);
                                                         }
                                                         json[from] = this.roundN(cost)
                                                         console.log(json)
@@ -307,7 +307,7 @@ class AnnualShipmentCost extends Component {
                                     var keyValue = shipmentAmt[key];
                                     console.log("keyName--", keyName);
                                     console.log("keyValue--", keyValue);
-                                    json[keyName] = parseFloat(keyValue).toFixed(2);
+                                    json[keyName] = Number(keyValue).toFixed(2);
                                 }
                                 outPutList.push(json);
                             }
@@ -682,10 +682,10 @@ class AnnualShipmentCost extends Component {
                 for (var n = 0; n < keys.length; n++) {
                     if (year[x] == keys[n]) {
                         console.log(values[n])
-                        total = parseFloat(total) + parseFloat(values[n])
+                        total = Number(total) + Number(values[n])
                         initalvalue = initalvalue + index
-                        totalAmount[x] = totalAmount[x] == null ? parseFloat(values[n]) : parseFloat(totalAmount[x]) + parseFloat(values[n])
-                        GrandTotalAmount[x] = GrandTotalAmount[x] == null ? parseFloat(values[n]) : parseFloat(GrandTotalAmount[x]) + parseFloat(values[n])
+                        totalAmount[x] = totalAmount[x] == null ? Number(values[n]) : Number(totalAmount[x]) + Number(values[n])
+                        GrandTotalAmount[x] = GrandTotalAmount[x] == null ? Number(values[n]) : Number(GrandTotalAmount[x]) + Number(values[n])
                         doc.setFont('helvetica', 'normal')
                         if (yindex - 40 > doc.internal.pageSize.height - 110) {
                             doc.addPage();
@@ -750,7 +750,7 @@ class AnnualShipmentCost extends Component {
                     var Gtotal = 0
                     for (var l = 0; l < totalAmount.length; l++) {
                         initalvalue += index;
-                        Gtotal = parseFloat(Gtotal) + parseFloat(totalAmount[l])
+                        Gtotal = Number(Gtotal) + Number(totalAmount[l])
                         doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
@@ -778,7 +778,7 @@ class AnnualShipmentCost extends Component {
                 var Gtotal = 0
                 for (var l = 0; l < totalAmount.length; l++) {
                     initalvalue += index;
-                    Gtotal = parseFloat(Gtotal) + parseFloat(totalAmount[l])
+                    Gtotal = Number(Gtotal) + Number(totalAmount[l])
                     doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
                         align: 'left'
                     })
@@ -839,7 +839,7 @@ class AnnualShipmentCost extends Component {
         return '?'
     }
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
 
 
@@ -972,7 +972,7 @@ class AnnualShipmentCost extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
+                                if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -996,7 +996,7 @@ class AnnualShipmentCost extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data))
                         this.setState({
                             planningUnits: response.data, message: ''

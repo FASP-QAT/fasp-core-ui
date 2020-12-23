@@ -260,13 +260,13 @@ class StockStatus extends Component {
 
   roundN = num => {
     if (num != '') {
-      return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+      return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
     }
   }
   formatAmc = value => {
-    return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
   }
 
   formatter = value => {
@@ -532,20 +532,27 @@ class StockStatus extends Component {
                   var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                   var totalShipmentQty = 0;
                   shiplist.map(elt => {
-                    totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
+                    totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
                   })
                   var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
                   var totalforecastConsumption = null;
                   conList.map(elt => {
                     totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
                   })
+
+                  var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                  var totalActualConsumption = null;
+                  conListAct.map(elt => {
+                    totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
+                  })
                   console.log(conList)
                   console.log(totalforecastConsumption)
                   var json = {
                     dt: new Date(from, month - 1),
                     forecastedConsumptionQty: totalforecastConsumption,
-                    actualConsumptionQty: list[0].actualFlag == true ? list[0].consumptionQty : null,
+                    actualConsumptionQty: totalActualConsumption,
                     actualConsumption: list[0].actualFlag,
+                    consumptionQty: list[0].consumptionQty,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
                     adjustment: list[0].adjustmentQty,
@@ -1024,7 +1031,7 @@ class StockStatus extends Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId) {
+                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                   proList[i] = myResult[i]
                 }
@@ -1047,7 +1054,7 @@ class StockStatus extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
               planningUnits: response.data, message: ''

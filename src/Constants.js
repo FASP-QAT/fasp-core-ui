@@ -1,12 +1,15 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
 export const API_URL='http://localhost:8084'
-//export const API_URL = 'http://localhost:8081'
+// export const API_URL = 'http://localhost:8081'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
+// export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
+//export const API_URL = 'https://api.quantificationanalytics.org'
 
 
 // export const API_URL='http://192.168.43.70:8080/FASP'
+
 export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
 export const TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 18
@@ -74,14 +77,17 @@ export const JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA = "Add / Update Mast
 export const JEXCEL_DATE_FORMAT = "DD-MON-YY"
 export const JEXCEL_DATE_FORMAT_SM = "DD-Mon-YY"
 export const JEXCEL_DATE_FORMAT_WITHOUT_DATE = "MON-YY"
-export const APP_VERSION_REACT = "0.0[3483]"
+export const APP_VERSION_REACT = "[3774]"
 export const BATCH_PREFIX = "QAT"
 export const NONE_SELECTED_DATA_SOURCE_ID = 17
 export const JEXCEL_PAGINATION_OPTION = [15, 25, 50, 5000000]
 export const JEXCEL_DEFAULT_PAGINATION = 15
 export const JEXCEL_INTEGER_REGEX = /^[0-9]{0,10}$/
+export const JEXCEL_INTEGER_REGEX_LONG = /^[0-9]{0,15}$/
 export const JEXCEL_NEGATIVE_INTEGER_NO_REGEX = /^[-+]?\d{0,10}$/
+export const JEXCEL_NEGATIVE_INTEGER_NO_REGEX_LONG = /^[-+]?\d{0,15}$/
 export const JEXCEL_DECIMAL_NO_REGEX = /^\d{0,10}(\.\d{1,2})?$/
+export const JEXCEL_DECIMAL_NO_REGEX_LONG = /^\d{0,15}(\.\d{1,2})?$/
 export const JEXCEL_DECIMAL_CATELOG_PRICE = /^\d{0,10}(\.\d{1,4})?$/
 export const JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT=/^\d{0,10}(\.\d{1,2})?$/
 export const JEXCEL_DECIMAL_LEAD_TIME = /^\d{0,2}(\.\d{1,2})?$/
@@ -104,6 +110,9 @@ export const SHIPPED_TO_ARRIVED_AIR = 1
 export const SHIPPED_TO_ARRIVED_SEA = 1
 export const ARRIVED_TO_RECEIVED = 1
 export const JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER = /^\d{0,10}(\.\d{1,6})?$/
+export const JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY = /^[0-9]{0,15}$/
+export const JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY = /^[-+]?\d{0,15}$/
+export const JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY = /^\d{0,15}(\.\d{1,2})?$/
 export const ASSIGNEE_ID_FOR_BUG_ISSUE = "5f1af96c4be9da001d844be3"
 export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = "5e95b3262b755a0c091b38a1"
 export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = "5f1af96c4be9da001d844be3"

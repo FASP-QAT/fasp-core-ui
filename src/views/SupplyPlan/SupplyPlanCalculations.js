@@ -149,8 +149,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         console.log("D----------------->expiredBatchDetailsOfPrevMonth-------------->", expiredBatchDetailsOfPrevMonth);
                         for (var e = 0; e < expiredBatchDetailsOfPrevMonth.length; e++) {
                             console.log("D------------------> In for loop", expiredBatchDetailsOfPrevMonth[e].qty);
-                            expiredStock += parseInt(expiredBatchDetailsOfPrevMonth[e].qty);
-                            expiredStockWps += parseInt(expiredBatchDetailsOfPrevMonth[e].qtyWps);
+                            expiredStock += Math.round(Number(expiredBatchDetailsOfPrevMonth[e].qty));
+                            expiredStockWps += Math.round(Number(expiredBatchDetailsOfPrevMonth[e].qtyWps));
                             // var index = batchDetails.findIndex(c => c.batchNo == expiredBatchDetailsOfPrevMonth[e].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiredBatchDetailsOfPrevMonth[e].expiryDate).format("YYYY-MM"));
                             // batchDetails[index].expiredQty = expiredBatchDetailsOfPrevMonth[e].qty;
                             // batchDetails[index].qty = 0;
@@ -232,11 +232,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // For loop for getting total shipment qty
                         for (var j = 0; j < shipmentArr.length; j++) {
                             // Adding total shipment qty
-                            shipmentTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                            shipmentTotalQty += Number((shipmentArr[j].shipmentQty));
                             console.log("D Shipment Arr----------------->(shipmentArr[j].shipmentQty)", (shipmentArr[j].shipmentQty));
                             // Adding total shipment qty wps
                             if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
-                                shipmentTotalQtyWps += parseInt((shipmentArr[j].shipmentQty));
+                                shipmentTotalQtyWps += Number((shipmentArr[j].shipmentQty));
                             }
                             // Adding manual shipments
                             console.log("D Shipment Arr----------------->shipmentArr[j].erpFlag.toString()", shipmentArr[j].erpFlag.toString());
@@ -244,39 +244,39 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             console.log("D Shipment Arr----------------->manualTotalQty------------>", manualTotalQty);
                             if (shipmentArr[j].erpFlag.toString() == "false") {
                                 console.log("D Shipment Arr----------------->In if", shipmentArr[j].shipmentQty);
-                                manualTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                manualTotalQty += Number((shipmentArr[j].shipmentQty));
                                 // Adding shipments based on status
                                 if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                    receivedShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    receivedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                    shippedShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    shippedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                    approvedShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    approvedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                    submittedShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    submittedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                    plannedShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    plannedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                    onholdShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    onholdShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 }
                             } else {
                                 // Adding erp shipments
                                 console.log("D Shipment Arr----------------->In else", shipmentArr[j].shipmentQty, "Planning unit", shipmentArr[j].planningUnit.id, "Shipmentg sttays", shipmentArr[j].shipmentStatus.id, "Shipment Ud", shipmentArr[j].shipmentId);
-                                erpTotalQty += parseInt((shipmentArr[j].shipmentQty));
+                                erpTotalQty += Number((shipmentArr[j].shipmentQty));
                                 console.log("D Shipment Arr----------------->ErpTotalQty", erpTotalQty);
                                 // Adding shipments based on status
                                 if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                    receivedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    receivedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                    shippedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    shippedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                    approvedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    approvedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                    submittedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    submittedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                    plannedErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    plannedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                    onholdErpShipmentsTotalData += parseInt((shipmentArr[j].shipmentQty));
+                                    onholdErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                 }
                             }
 
@@ -322,18 +322,18 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
 
                                 } else {
-                                    myArray[index].shipment = parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                    myArray[index].shipment = Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
                                     if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
-                                        myArray[index].shipmentWps = parseInt(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
+                                        myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
                                     }
                                 }
                                 console.log("D------------>MyArray", myArray);
                                 var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
                                 console.log("D------------------>Index--------->", index, "BatchNo----------->", batchNo, "Expiry date---------->", expiryDate);
                                 if (index != -1) {
-                                    shipmentBatchQtyTotal += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                    shipmentBatchQtyTotal += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
                                     if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
-                                        shipmentBatchQtyTotalWps += parseInt(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                        shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
                                     }
                                 }
                             }
@@ -361,7 +361,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 if (noOfEntriesOfActualStockCount > 0) {
                                     console.log("Actual stock count", actualStockCount);
                                     if (inventoryListForRegion[inv].actualQty !== "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
-                                        actualStockCount += Math.round(parseFloat(inventoryListForRegion[inv].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                        actualStockCount += Math.round(Number(inventoryListForRegion[inv].actualQty) * Number(inventoryListForRegion[inv].multiplier));
                                     }
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
                                     for (var b = 0; b < batchListForInventory.length; b++) {
@@ -382,7 +382,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     openingBalanceWps: 0,
                                                     consumption: 0,
                                                     adjustment: 0,
-                                                    stock: Math.round(parseInt(batchListForInventory[b].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier)),
+                                                    stock: Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)),
                                                     shipment: 0,
                                                     shipmentWps: shipmentQtyWps,
                                                     expiredQty: 0,
@@ -391,15 +391,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 myArray.push(json);
                                             }
                                         } else {
-                                            myArray[index].stock = parseInt(myArray[index].stock) + Math.round(parseInt(batchListForInventory[b].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                            myArray[index].stock = Number(myArray[index].stock) + Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier));
                                         }
                                         var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                        actualBatchQtyTotal += Math.round(parseInt(batchListForInventory[b].actualQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                        actualBatchQtyTotal += Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier));
                                     }
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
                                     if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
-                                        adjustmentQty += Math.round(parseFloat(inventoryListForRegion[inv].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                        adjustmentQty += Math.round(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                     }
                                     // Check batch details for adjustments if available
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
@@ -419,7 +419,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     openingBalance: 0,
                                                     openingBalanceWps: 0,
                                                     consumption: 0,
-                                                    adjustment: Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier)),
+                                                    adjustment: Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)),
                                                     stock: 0,
                                                     shipment: 0,
                                                     shipmentWps: shipmentQtyWps,
@@ -427,12 +427,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     expiredQtyWps: 0
                                                 }
                                                 myArray.push(json);
-                                                adjustmentBatchQtyTotal += Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                                adjustmentBatchQtyTotal += Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                             }
                                         } else {
-                                            myArray[index].adjustment = parseInt(myArray[index].adjustment) + Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                            myArray[index].adjustment = Number(myArray[index].adjustment) + Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                             if (myArray[index].stock == 0) {
-                                                adjustmentBatchQtyTotal += Math.round(parseInt(batchListForInventory[b].adjustmentQty) * parseFloat(inventoryListForRegion[inv].multiplier));
+                                                adjustmentBatchQtyTotal += Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                             }
                                         }
 
@@ -455,7 +455,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             console.log("consumptionList[c].actualFlag", consumptionList[c].actualFlag.toString())
                             if (consumptionList[c].actualFlag.toString() == "true") {
                                 console.log("In if for actual true");
-                                actualConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty)*parseFloat(consumptionList[c].multiplier));
+                                actualConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier));
                                 // Adding regions reporting actual consumption
                                 var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                                 if (index == -1) {
@@ -463,7 +463,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             } else {
                                 // Calculating forecated consumption qty
-                                forecastedConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty)*parseFloat(consumptionList[c].multiplier))
+                                forecastedConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
                             }
                         }
                         console.log("regionsReportingActualConsumption", regionsReportingActualConsumption);
@@ -502,7 +502,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 autoGenerated: bd.autoGenerated,
                                                 openingBalance: 0,
                                                 openingBalanceWps: 0,
-                                                consumption: Math.round(parseInt(batchListForConsumption[b].consumptionQty) * parseFloat(consumptionListForActualConsumption[ac].multiplier)),
+                                                consumption: Math.round(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)),
                                                 adjustment: 0,
                                                 stock: 0,
                                                 shipment: 0,
@@ -513,10 +513,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             myArray.push(json);
                                         }
                                     } else {
-                                        myArray[index].consumption = parseInt(myArray[index].consumption) + Math.round(parseInt(batchListForConsumption[b].consumptionQty) * parseFloat(consumptionListForActualConsumption[ac].multiplier));
+                                        myArray[index].consumption = Number(myArray[index].consumption) + Math.round(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier));
                                     }
                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                    consumptionBatchQtyTotal += Math.round(parseInt(batchListForConsumption[b].consumptionQty) * parseFloat(consumptionListForActualConsumption[ac].multiplier));
+                                    consumptionBatchQtyTotal += Math.round(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier));
                                 }
                             }
                         } else {
@@ -529,31 +529,31 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Calculating expected stock
                         var expectedStock = 0;
                         console.log("D----------------->expiredStock-------------------->", expiredStock)
-                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? parseInt(consumptionQty) : 0) + (adjustmentQty !== "" ? parseInt(adjustmentQty) : 0);
+                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
                         console.log("D--------------->Expected stock------------>", expectedStock);
                         console.log("D------------>openingBalance------------ -->", openingBalance, "---Expired stock-->", expiredStock, "--shipmentTotalQty-->", shipmentTotalQty, "--consumptionQty--->", consumptionQty, "---adjustmentQty--->", adjustmentQty);
                         // Calculating expected stock wps
                         var expectedStockWps = 0;
-                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? parseInt(consumptionQty) : 0) + (adjustmentQty !== "" ? parseInt(adjustmentQty) : 0);
+                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
 
                         // Calculations of national adjustments
                         var nationalAdjustment = 0;
-                        console.log("National adjustment");
+                        console.log("D-------------->National adjustment");
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
-                        console.log("regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
+                        console.log("D-------------->regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
                             console.log("D-------------->In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
-                        } else if (inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
-                            console.log("In second if");
+                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                            console.log("D-------------->In second if");
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
-                            console.log("In 3rd if");
+                            console.log("D-------------->In 3rd if");
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
-                        console.log("National adjutsment", nationalAdjustment);
+                        console.log("D-------------->National adjutsment", nationalAdjustment);
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps
@@ -568,14 +568,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
                         // Accounting unallocated batchs
                         // Again sorting the batch details
-                        var unallocatedQty = parseInt(consumptionQty) - parseInt(adjustmentQty) - parseInt(nationalAdjustment) - (parseInt(consumptionBatchQtyTotal) - parseInt(adjustmentBatchQtyTotal));
+                        var unallocatedQty = Number(consumptionQty) - Number(adjustmentQty) - Number(nationalAdjustment) - (Number(consumptionBatchQtyTotal) - Number(adjustmentBatchQtyTotal));
                         myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
                         myArray = myArray.filter(c => (c.openingBalance != 0 || c.consumption != 0 || c.shipment != 0 || c.stock != 0 || c.adjustment != 0) || moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
                         for (var a = 0; a < myArray.length; a++) {
-                            var expectedB = parseInt(myArray[a].openingBalance) + parseInt(myArray[a].shipment) - parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
-                            var expectedBWps = parseInt(myArray[a].openingBalanceWps) + parseInt(myArray[a].shipmentWps) - parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
-                            myArray[a].expectedB = parseInt(expectedB) < 0 ? 0 : parseInt(expectedB);
-                            myArray[a].expectedBWps = parseInt(expectedBWps) < 0 ? 0 : parseInt(expectedBWps);
+                            var expectedB = Number(myArray[a].openingBalance) + Number(myArray[a].shipment) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                            var expectedBWps = Number(myArray[a].openingBalanceWps) + Number(myArray[a].shipmentWps) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                            myArray[a].expectedB = Number(expectedB) < 0 ? 0 : Number(expectedB);
+                            myArray[a].expectedBWps = Number(expectedBWps) < 0 ? 0 : Number(expectedBWps);
                             if (a == 0) {
                                 myArray[a].unallocated = unallocatedQty;
                                 myArray[a].unallocatedWps = unallocatedQty;
@@ -602,10 +602,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                             myArray[a].closingBalanceWps = maxWps;
 
-                            var used = -parseInt(max) + parseInt(myArray[a].openingBalance) + parseInt(myArray[a].shipment) - parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
+                            var used = -Number(max) + Number(myArray[a].openingBalance) + Number(myArray[a].shipment) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                             myArray[a].used = used;
 
-                            var usedWps = -parseInt(maxWps) + parseInt(myArray[a].openingBalanceWps) + parseInt(myArray[a].shipmentWps) - parseInt(myArray[a].consumption) + (parseInt(myArray[a].stock) == 0 ? parseInt(myArray[a].adjustment) : 0);
+                            var usedWps = -Number(maxWps) + Number(myArray[a].openingBalanceWps) + Number(myArray[a].shipmentWps) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                             myArray[a].usedWps = usedWps;
 
                             myArray[a].qty = max;
@@ -631,7 +631,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
                             var amcFilter = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(amcDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
                             if (amcFilter.length > 0) {
-                                amcTotal += (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty !== "" ? parseInt(amcFilter[0].consumptionQty) : 0);
+                                amcTotal += (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty !== "" ? Number(amcFilter[0].consumptionQty) : 0);
                                 if (amcFilter[0].consumptionQty != null && amcFilter[0].consumptionQty !== "") {
                                     totalMonths += 1;
                                 }
@@ -649,13 +649,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
                             for (var c = 0; c < amcFilter.length; c++) {
                                 if (amcFilter[c].actualFlag.toString() == "true") {
-                                    actualConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty)*parseFloat(amcFilter[c].multiplier));
+                                    actualConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
                                     var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                     if (index == -1) {
                                         regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                     }
                                 } else {
-                                    forecastedConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty)*parseFloat(amcFilter[c].multiplier));
+                                    forecastedConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
                                 }
                             }
                             noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
@@ -667,7 +667,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 consumptionQtyAmc = forecastedConsumptionQtyAmc;
                             }
                             if (amcFilter.length > 0) {
-                                amcTotal += (consumptionQtyAmc !== "" ? parseInt(consumptionQtyAmc) : 0);
+                                amcTotal += (consumptionQtyAmc !== "" ? Number(consumptionQtyAmc) : 0);
                                 if (consumptionQtyAmc !== "") {
                                     totalMonths += 1;
                                 }
@@ -675,7 +675,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
                         console.log("D--------------------->AmcTotal", amcTotal);
                         console.log("D--------------------->totalMonths", totalMonths);
-                        var amc = Math.round((parseInt(amcTotal) / parseInt(totalMonths)));
+                        var amc = Math.round((Number(amcTotal) / Number(totalMonths)));
 
                         console.log("D--------------------->AMC", amc);
 
@@ -691,7 +691,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         } else {
                             maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
                         }
-                        var minStockMoSQty = parseInt(maxForMonths);
+                        var minStockMoSQty = Number(maxForMonths);
 
 
                         // Calculations for Max Stock
@@ -702,10 +702,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         } else {
                             minForMonths = (maxForMonths + programPlanningUnitList[ppL].reorderFrequencyInMonths);
                         }
-                        var maxStockMoSQty = parseInt(minForMonths);
+                        var maxStockMoSQty = Number(minForMonths);
 
-                        var minStock = parseInt(amc) * parseInt(minStockMoSQty);
-                        var maxStock = parseInt(amc) * parseInt(maxStockMoSQty);
+                        var minStock = Number(amc) * Number(minStockMoSQty);
+                        var maxStock = Number(amc) * Number(maxStockMoSQty);
 
                         // Calculations of Closing balance
                         var closingBalance = 0;
@@ -750,7 +750,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         var mos = "";
                         if (closingBalance != 0 && amc != 0) {
-                            mos = parseFloat(closingBalance / amc).toFixed(4);
+                            mos = Number(closingBalance / amc).toFixed(4);
                         } else {
                             mos = 0;
                         }
