@@ -204,69 +204,86 @@ class AddRoleComponent extends Component {
       planningunitRequest.onsuccess = function (e) {
         var myResult = [];
         myResult = planningunitRequest.result;
-        // console.log("myResult", myResult);
-        // alert((document.getElementById("programId").value).split("_")[0]);
-        var programId = (document.getElementById("programId").value).split("_")[0];
-        // console.log('programId----->>>', programId)
-        // console.log(myResult);
-        var proList = []
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].program.id == programId && myResult[i].active == true) {
-            var productJson = {
-              name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-              id: myResult[i].planningUnit.id
-            }
-            proList[i] = productJson
-          }
-        }
-        // console.log("planningUnitList---" + proList);
-        this.setState({
-          planningUnitList: proList
-        })
 
-        var programId = document.getElementById('programId').value;
-        // alert(programId);
-        this.setState({ programId: programId });
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        var regionList = []
-        openRequest.onerror = function (event) {
+        var planningUnitTransactionAll = db1.transaction(['planningUnit'], 'readwrite');
+        var planningunitOsAll = planningUnitTransactionAll.objectStore('planningUnit');
+        var planningunitRequestAll = planningunitOsAll.getAll();
+        var planningUnitListAll = []
+        planningunitRequestAll.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: 'red'
           })
         }.bind(this);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
-          programRequest.onerror = function (event) {
+        planningunitRequestAll.onsuccess = function (e) {
+          // var myResultAll = [];
+          planningUnitListAll = planningunitRequestAll.result;
+          // console.log("myResult", myResult);
+          // alert((document.getElementById("programId").value).split("_")[0]);
+          var programId = (document.getElementById("programId").value).split("_")[0];
+          // console.log('programId----->>>', programId)
+          // console.log(myResult);
+          var proList = []
+          for (var i = 0; i < myResult.length; i++) {
+            var pu = planningUnitListAll.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0];
+
+            if (myResult[i].program.id == programId && myResult[i].active == true && pu.active == true) {
+              var productJson = {
+                name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                id: myResult[i].planningUnit.id
+              }
+              proList[i] = productJson
+            }
+          }
+          // console.log("planningUnitList---" + proList);
+          this.setState({
+            planningUnitList: proList
+          })
+
+          var programId = document.getElementById('programId').value;
+          // alert(programId);
+          this.setState({ programId: programId });
+          var db1;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          var regionList = []
+          openRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: 'red'
             })
           }.bind(this);
-          programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+            programRequest.onerror = function (event) {
+              this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+              })
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              var programJson = JSON.parse(programData);
 
 
-            for (var i = 0; i < programJson.regionList.length; i++) {
-              var regionJson = {
-                // name: // programJson.regionList[i].regionId,
-                name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                id: programJson.regionList[i].regionId
+              for (var i = 0; i < programJson.regionList.length; i++) {
+                var regionJson = {
+                  // name: // programJson.regionList[i].regionId,
+                  name: getLabelText(programJson.regionList[i].label, this.state.lang),
+                  id: programJson.regionList[i].regionId
+                }
+                regionList.push(regionJson);
+
               }
-              regionList.push(regionJson);
-
-            }
-            // console.log("regionList---->", regionList);
-            this.setState({
-              regionList: regionList
-            })
+              // console.log("regionList---->", regionList);
+              this.setState({
+                regionList: regionList
+              })
+            }.bind(this);
           }.bind(this);
         }.bind(this);
       }.bind(this);

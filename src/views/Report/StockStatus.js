@@ -513,8 +513,47 @@ class StockStatus extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+
+
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                var realmOs = realmTransaction.objectStore('realm');
+                var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+                realmRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                realmRequest.onsuccess = function (event) {
+                    var maxForMonths = 0;
+                    var realm = realmRequest.result;
+                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                    if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                    } else {
+                        maxForMonths = pu.minMonthsOfStock
+                    }
+                    var minStockMoS = parseInt(maxForMonths);
+
+                    // Calculations for Max Stock
+                    var minForMonths = 0;
+                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                    } else {
+                        minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                    }
+                    var maxStockMoS = parseInt(minForMonths);
+                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                        maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                    }
+
+
+
+            
             var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
             var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
             var monthstartfrom = this.state.rangeValue.from.month
@@ -552,7 +591,7 @@ class StockStatus extends Component {
                     forecastedConsumptionQty: totalforecastConsumption,
                     actualConsumptionQty: totalActualConsumption,
                     actualConsumption: list[0].actualFlag,
-                    consumptionQty: list[0].consumptionQty,
+                    finalConsumptionQty:list[0].consumptionQty,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
                     adjustment: list[0].adjustmentQty,
@@ -560,8 +599,8 @@ class StockStatus extends Component {
                     openingBalance: list[0].openingBalance,
                     mos: list[0].mos,
                     amc: list[0].amc,
-                    minMos: list[0].minStockMoS,
-                    maxMos: list[0].maxStockMoS
+                    minMos: minStockMoS,
+                    maxMos: maxStockMoS
                   }
                 } else {
                   var json = {
@@ -575,8 +614,8 @@ class StockStatus extends Component {
                     openingBalance: '',
                     mos: '',
                     amc: '',
-                    minMos: '',
-                    maxMos: ''
+                    minMos: minStockMoS,
+                    maxMos: maxStockMoS
                   }
                 }
                 data.push(json)
@@ -599,7 +638,7 @@ class StockStatus extends Component {
           }.bind(this)
 
         }.bind(this)
-
+      }.bind(this)
 
 
 
@@ -1352,7 +1391,7 @@ class StockStatus extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
+          data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
         },
         {
           label: i18n.t('static.report.stock'),
