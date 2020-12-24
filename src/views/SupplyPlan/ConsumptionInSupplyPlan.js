@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -139,7 +139,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId!=0) {
+                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -292,9 +292,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 80, },
+                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 80, readOnly: true },
+                            { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100 },
@@ -441,11 +441,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                                 data[3] = batchInfo[sb].consumptionTransBatchInfoId; //E
                                                 data[4] = y; //F
                                                 data[5] = date;
-                                                consumptionBatchInfoQty += parseInt(batchInfo[sb].consumptionQty);
+                                                consumptionBatchInfoQty += Number(batchInfo[sb].consumptionQty);
                                                 json.push(data);
                                             }
-                                            if (parseInt(consumptionQty) > consumptionBatchInfoQty) {
-                                                var qty = parseInt(consumptionQty) - parseInt(consumptionBatchInfoQty);
+                                            if (Number(consumptionQty) > consumptionBatchInfoQty) {
+                                                var qty = Number(consumptionQty) - Number(consumptionBatchInfoQty);
                                                 var data = [];
                                                 data[0] = -1; //A
                                                 data[1] = "";
@@ -724,15 +724,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 5) {
-            console.log("Consumption qty", elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
-            var valid = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+            var valid = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == true) {
                 var batchDetails = rowData[11];
                 var consumptionBatchQty = 0;
                 for (var b = 0; b < batchDetails.length; b++) {
-                    consumptionBatchQty += parseInt(batchDetails[b].consumptionQty);
+                    consumptionBatchQty += Number(batchDetails[b].consumptionQty);
                 }
-                if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) < parseInt(consumptionBatchQty)) {
+                if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) < Number(consumptionBatchQty)) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -747,9 +746,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             for (var b = 0; b < batchDetails.length; b++) {
                 consumptionBatchQty += batchDetails[b].consumptionQty;
             }
-            console.log("D-------------------------->Qty", parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")));
-            console.log("D-------------------------->Batch QTy entered by user", parseInt(consumptionBatchQty));
-            if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).replaceAll(",", "")) < parseInt(consumptionBatchQty)) {
+            // console.log("D-------------------------->Qty", parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")));
+            // console.log("D-------------------------->Batch QTy entered by user", parseInt(consumptionBatchQty));
+            if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).replaceAll(",", "")) < Number(consumptionBatchQty)) {
                 inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                 valid = false;
             } else {
@@ -758,9 +757,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 8) {
-            var valid = checkValidtion("numberNotRequired", "I", y, elInstance.getValue(`I${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
+            var valid = checkValidtion("numberNotRequired", "I", y, elInstance.getValue(`I${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == true) {
-                if (parseInt(elInstance.getValue(`I${parseInt(y) + 1}`, true)) > 31) {
+                if (Number(elInstance.getValue(`I${parseInt(y) + 1}`, true)) > 31) {
                     inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
                 } else {
                     positiveValidation("I", y, elInstance);
@@ -790,7 +789,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(11, y, "", true);
             var valid = checkValidtion("text", "C", y, rowData[2], elInstance);
             if (valid == true) {
-                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
+                if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
@@ -845,7 +844,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 2) {
-            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
         }
     }
 
@@ -950,11 +949,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""), elInstance, JEXCEL_INTEGER_REGEX, 1, 0);
+                validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
                 if (validation == false) {
                     valid = false;
                 }
-                totalConsumptionBatchQty += parseInt(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+                totalConsumptionBatchQty += Number(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             }
         }
         if (valid == true) {
@@ -963,7 +962,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var consumptionQty = consumptionInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "");
             console.log("D------------>Consumption Qty------------->", consumptionQty);
             console.log("D---------------->", totalConsumptionBatchQty);
-            if (parseInt(consumptionQty) < parseInt(totalConsumptionBatchQty)) {
+            if (Number(consumptionQty) < Number(totalConsumptionBatchQty)) {
                 console.log("In if");
                 this.props.updateState("consumptionBatchInfoNoStockError", i18n.t('static.consumption.missingBatch'));
                 this.props.hideThirdComponent();
@@ -1001,11 +1000,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             expiryDate: moment(map.get("1")).format("YYYY-MM-DD"),
                             createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
                         },
-                        consumptionQty: parseInt(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")),
+                        consumptionQty: Number(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")),
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
-                totalConsumption += parseInt(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
+                totalConsumption += Number(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
             }
             var allConfirm = true;
             var consumptionInstance = this.state.consumptionEl;
@@ -1132,92 +1131,107 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 this.props.updateState("consumptionDuplicateError", i18n.t('static.supplyPlan.duplicateConsumption'));
                 this.props.hideSecondComponent();
             } else {
-                var colArr = ['E'];
-                for (var c = 0; c < colArr.length; c++) {
-                    positiveValidation(colArr[c], y, elInstance);
-                }
-
                 var rowData = elInstance.getRowData(y);
-                var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
-                        inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
-                        valid = false;
+
+                if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                    var lastEditableDate = "";
+                    if (rowData[2] == 1) {
+                        lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                     } else {
-                        positiveValidation("C", y, elInstance);
+                        lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                     }
-                }
+                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
 
-                validation = checkValidtion("text", "B", y, rowData[1], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                }
-
-                validation = checkValidtion("text", "D", y, rowData[3], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                }
-
-
-                validation = checkValidtion("text", "E", y, rowData[4], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                }
-
-                validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    var batchDetails = rowData[11];
-                    var consumptionBatchQty = 0;
-                    for (var b = 0; b < batchDetails.length; b++) {
-                        consumptionBatchQty += batchDetails[b].consumptionQty;
-                    }
-                    if (batchDetails.length > 0 && parseInt(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) < parseInt(consumptionBatchQty)) {
-                        inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
-                        valid = false;
                     } else {
-                        positiveValidation("F", y, elInstance)
-                    }
-                }
 
-                validation = checkValidtion("numberNotRequired", "I", y, elInstance.getValue(`I${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX, 1, 1);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    if (parseInt(elInstance.getValue(`I${parseInt(y) + 1}`, true)) > 31) {
-                        inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
-                        valid = false;
-                    } else {
-                        positiveValidation("I", y, elInstance);
-                    }
-                }
+                        var colArr = ['E'];
+                        for (var c = 0; c < colArr.length; c++) {
+                            positiveValidation(colArr[c], y, elInstance);
+                        }
 
-                if (rowData[9].length > 600) {
-                    inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                    valid = false;
-                } else {
-                    positiveValidation("J", y, elInstance);
-                }
+                        var rowData = elInstance.getRowData(y);
+                        var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
+                                inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("C", y, elInstance);
+                            }
+                        }
 
-                validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(14, y, 1, true);
-                } else {
-                    if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")  && rowData[10].toString() == "true") {
-                        inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
-                        valid = false;
-                    } else {
-                        positiveValidation("C", y, elInstance);
+                        validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+                        validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+
+                        validation = checkValidtion("text", "E", y, rowData[4], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        }
+
+                        validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            var batchDetails = rowData[11];
+                            var consumptionBatchQty = 0;
+                            for (var b = 0; b < batchDetails.length; b++) {
+                                consumptionBatchQty += batchDetails[b].consumptionQty;
+                            }
+                            if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) < Number(consumptionBatchQty)) {
+                                inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("F", y, elInstance)
+                            }
+                        }
+
+                        validation = checkValidtion("numberNotRequired", "I", y, elInstance.getValue(`I${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            if (Number(elInstance.getValue(`I${parseInt(y) + 1}`, true)) > 31) {
+                                inValid("I", y, i18n.t('static.supplyPlan.daysOfStockMaxValue'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("I", y, elInstance);
+                            }
+                        }
+
+                        if (rowData[9].length > 600) {
+                            inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("J", y, elInstance);
+                        }
+
+                        validation = checkValidtion("text", "C", y, rowData[2], elInstance);
+                        if (validation == false) {
+                            valid = false;
+                            elInstance.setValueFromCoords(14, y, 1, true);
+                        } else {
+                            if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
+                                inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("C", y, elInstance);
+                            }
+                        }
                     }
                 }
             }

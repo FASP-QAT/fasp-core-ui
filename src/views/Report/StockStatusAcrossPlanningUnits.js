@@ -107,6 +107,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             }
                         }
                         console.log('proList', proList)
+                        this.setState({ programPlanningUnitList: myResult })
                         var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
                         var planningunitRequest1 = planningunitOs1.getAll();
@@ -594,7 +595,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     round = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+        return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
     }
 
     formatLabel = (cell, row) => {
@@ -1020,56 +1021,91 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
-
-                        this.state.planningUnitList.map(planningUnit => {
-                            console.log(planningUnit)
-                            this.state.tracerCategoryValues.map(tc => {
-                                if (tc.value == planningUnit.forecastingUnit.tracerCategory.id) {
-                                    var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnitId);
-                                    let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
-                                    var maxDate = moments.length > 0 ? moment.max(moments) : ''
-                                    var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
-                                    var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
-                                    console.log(planningUnit)
-                                    if (list.length > 0) {
-                                        var json = {
-                                            planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
-                                            lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                            mos: includePlanningShipments.toString() == 'true' ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-                                            minMos: list[0].minStockMoS,
-                                            maxMos: list[0].maxStockMoS,
-                                            stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
-                                            amc: list[0].amc
-                                        }
-                                        data.push(json)
-
-                                    } else {
-                                        var json = {
-                                            planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
-                                            lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                            mos: null,
-                                            minMos: planningUnit.minMonthsOfStock,
-                                            maxMos: planningUnit.minMonthsOfStock + planningUnit.reorderFrequencyInMonths,
-                                            stock: 0,
-                                            amc: 0
-                                        }
-                                        data.push(json)
-                                    }
-                                }
+                        var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                        var realmOs = realmTransaction.objectStore('realm');
+                        var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+                        realmRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false,
                             })
-                        })
-                        console.log(data)
-                        this.setState({
-                            selData: data,
-                            message: ''
-                        }, () => {
-                            this.filterDataAsperstatus();
-                        });
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        realmRequest.onsuccess = function (event) {
+                            var maxForMonths = 0;
+                            var realm = realmRequest.result;
+
+                            this.state.planningUnitList.map(planningUnit => {
+                                console.log(planningUnit)
+                                this.state.tracerCategoryValues.map(tc => {
+                                    if (tc.value == planningUnit.forecastingUnit.tracerCategory.id) {
+                                        var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnitId);
+                                        let moments = (inventoryList.filter(c => moment(c.inventoryDate).isBefore(endDate) || moment(c.inventoryDate).isSame(endDate))).map(d => moment(d.inventoryDate))
+                                        var maxDate = moments.length > 0 ? moment.max(moments) : ''
+                                        var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
+                                        var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
+                                        console.log("D-------------->programPlanningUnitList",this.state.programPlanningUnitList)
+                                        var pu = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == planningUnit.planningUnitId)[0];
+                                        var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                        var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                                        if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                                            maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                        } else {
+                                            maxForMonths = pu.minMonthsOfStock
+                                        }
+                                        var minStockMoS = parseInt(maxForMonths);
+
+                                        // Calculations for Max Stock
+                                        var minForMonths = 0;
+                                        var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                        if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                                            minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                        } else {
+                                            minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                                        }
+                                        var maxStockMoS = parseInt(minForMonths);
+                                        if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                                            maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                                        }
+                                        console.log(planningUnit)
+                                        if (list.length > 0) {
+                                            var json = {
+                                                planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
+                                                lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
+                                                mos: includePlanningShipments.toString() == 'true' ? this.roundN(list[0].mos) : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : 0,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
+                                                minMos: minStockMoS,
+                                                maxMos: maxStockMoS,
+                                                stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
+                                                amc: list[0].amc
+                                            }
+                                            data.push(json)
+
+                                        } else {
+                                            var json = {
+                                                planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
+                                                lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
+                                                mos: null,
+                                                minMos: minStockMoS,
+                                                maxMos: maxStockMoS,
+                                                stock: 0,
+                                                amc: 0
+                                            }
+                                            data.push(json)
+                                        }
+                                    }
+                                })
+                            })
+                            console.log(data)
+                            this.setState({
+                                selData: data,
+                                message: ''
+                            }, () => {
+                                this.filterDataAsperstatus();
+                            });
+                        }.bind(this)
+
                     }.bind(this)
 
                 }.bind(this)
-
-
 
 
 

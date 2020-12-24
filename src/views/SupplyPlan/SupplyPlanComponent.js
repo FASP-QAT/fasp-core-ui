@@ -182,15 +182,15 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     roundN = num => {
-        if (num != '') {
-            return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        if (num!=null && num != '') {
+            return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
         } else {
             return ''
         }
     }
 
     formatter = value => {
-        if (value != '' && !isNaN(Number.parseInt(value))) {
+        if (value!=null && value != '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -201,7 +201,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (isNaN(Number.parseInt(value))) {
+        } else if (value!=null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -209,7 +209,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatterDouble = value => {
-        if (value != '' && !isNaN(Number.parseInt(value))) {
+        if (value!=null && value != '' && !isNaN(Number(value))) {
             var cell1 = this.roundN(value)
             cell1 += '';
             var x = cell1.split('.');
@@ -220,7 +220,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (isNaN(Number.parseInt(value))) {
+        } else if (value!=null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -600,6 +600,7 @@ export default class SupplyPlanComponent extends React.Component {
         var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        console.log("D--------------------->Inventory Arrr" + inventoryArr);
         var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray]
         var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
         var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
@@ -611,7 +612,7 @@ export default class SupplyPlanComponent extends React.Component {
         const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 80, bottom: 70 },
             startY: height,
             head: headers,
             body: data,
@@ -781,7 +782,7 @@ export default class SupplyPlanComponent extends React.Component {
             let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
             let content = {
-                margin: { top: 80, bottom: 50 },
+                margin: { top: 80, bottom: 70 },
                 startY: 170,
                 head: headers,
                 body: data1,
@@ -1478,28 +1479,28 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tbody>
 
                                 </Table>
-                                
+
                             </div>
-                           
-                                        {/* <div className="row" > */}
-                                            {
-                                                this.state.jsonArrForGraph.length > 0
-                                                &&
-                                                <div className="row" >
 
-                                                    <div className="graphwidth">
-                                                        <div className="col-md-12">
-                                                            <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
-                                                </div>
-                                            }
+                            {/* <div className="row" > */}
+                            {
+                                this.state.jsonArrForGraph.length > 0
+                                &&
+                                <div className="row" >
 
-                                        {/* </div> */}
-    
+                                    <div className="graphwidth">
+                                        <div className="col-md-12">
+                                            <div className="chart-wrapper chart-graph-report">
+                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                </div>
+                            }
+
+                            {/* </div> */}
+
 
                         </div>
                     </div>
@@ -1743,9 +1744,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     if (count < 7) {
                                                         return (
                                                             <>
-                                                                <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
                                                                 </td>
-                                                                {(item.actualQty) > 0 ? <td style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
+                                                                {(item.actualQty) > 0 ? <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
                                                             </>
                                                         )
                                                     }
@@ -2039,7 +2040,15 @@ export default class SupplyPlanComponent extends React.Component {
                     }),
                     loading: false
                 })
-                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                // var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                var programIdd = '';
+                if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
+                    programIdd = this.props.match.params.programId;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
+                } else if (proList.length == 1) {
+                    programIdd = proList[0].value;
+                }
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -2199,7 +2208,15 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
                                 })
-                                var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                var planningUnitIdProp = '';
+                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                                    planningUnitIdProp = this.props.match.params.planningUnitId;
+                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                    planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                } else if (proList.length == 1) {
+                                    planningUnitIdProp = proList[0].value;
+                                }
                                 console.log("planningUnitIdProp===>", planningUnitIdProp);
                                 if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                     var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -2609,7 +2626,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                        plannedShipmentsTotalData.push({ qty: Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                     } else {
                                         plannedShipmentsTotalData.push("")
                                     }
@@ -2622,10 +2639,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
-                                    var paColor1="";
-                                    var paColor2="";
-                                    var paColor3="";
-                                    var paColor4="";
+                                    var paColor1 = "";
+                                    var paColor2 = "";
+                                    var paColor3 = "";
+                                    var paColor4 = "";
                                     var isEmergencyOrder1 = 0;
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;
@@ -2791,7 +2808,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                        plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].submittedErpShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                     } else {
                                         plannedErpShipmentsTotalData.push("")
                                     }
@@ -2799,7 +2816,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
-                                    amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                    amcTotalData.push(Math.round(Number(jsonList[0].amc)))
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -2815,14 +2832,14 @@ export default class SupplyPlanComponent extends React.Component {
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     var stockInHand = jsonList[0].closingBalance;
-                                    var amc = Math.round(parseFloat(jsonList[0].amc));
-                                    if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
-                                        var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
+                                    var amc = Math.round(Number(jsonList[0].amc));
+                                    if (compare && Number(stockInHand) <= Number(amc * Number(minStockMoSQty))) {
+                                        var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                 parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                             var isEmergencyOrder = 0;
                                             if (expectedDeliveryDate >= currentMonth) {
                                                 isEmergencyOrder = 0;
@@ -2834,7 +2851,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                 parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                 parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                             var isEmergencyOrder = 0;
                                             if (expectedDeliveryDate >= currentMonth) {
                                                 isEmergencyOrder = 0;
@@ -2847,7 +2864,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                             parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                         var isEmergencyOrder = 0;
                                         if (expectedDeliveryDate >= currentMonth) {
                                             isEmergencyOrder = 0;
@@ -2896,7 +2913,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         var actualCount = 0;
                                         var adjustmentsCount = 0;
                                         for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
-                                            if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
+                                            if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty !== "") {
                                                 actualCount += 1;
                                                 actualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                 totalActualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
@@ -2905,7 +2922,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     regionsReportingActualInventory.push(regionListFiltered[r].id)
                                                 }
                                             }
-                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
+                                            if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty !== "") {
                                                 adjustmentsCount += 1;
                                                 adjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                 totalAdjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
@@ -2936,11 +2953,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         month: m[n].month,
                                         consumption: jsonList[0].consumptionQty,
                                         stock: jsonList[0].closingBalance,
-                                        planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
-                                        delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
-                                        shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
-                                        ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
-                                        mos: parseFloat(jsonList[0].mos).toFixed(2),
+                                        planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
+                                        delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
+                                        shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
+                                        ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
+                                        mos: parseFloat(jsonList[0].mos).toFixed(1),
                                         minMos: minStockMoSQty,
                                         maxMos: maxStockMoSQty
                                     }
@@ -4274,7 +4291,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (sd4.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
+                                                plannedShipmentsTotalData.push({ qty: Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
                                             } else {
                                                 plannedShipmentsTotalData.push("")
                                             }
@@ -4436,15 +4453,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (sd4.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
+                                                plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].submittedErpShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
                                             } else {
                                                 plannedErpShipmentsTotalData.push("")
                                             }
 
-                                            inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? "" : jsonList[0].adjustmentQty);
+                                            inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                             totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                             monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
-                                            amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                            amcTotalData.push(Math.round(Number(jsonList[0].amc)))
                                             minStockMoS.push(jsonList[0].minStockMoS)
                                             maxStockMoS.push(jsonList[0].maxStockMoS)
                                             unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -4460,14 +4477,14 @@ export default class SupplyPlanComponent extends React.Component {
                                             var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                             var compare = (m[n].startDate >= currentMonth);
                                             var stockInHand = jsonList[0].closingBalance;
-                                            var amc = Math.round(parseFloat(jsonList[0].amc));
-                                            if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
-                                                var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
+                                            var amc = Math.round(Number(jsonList[0].amc));
+                                            if (compare && Number(stockInHand) <= Number(amc * Number(minStockMoSQty))) {
+                                                var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - jsonList[0].closingBalance);
                                                 if (suggestedOrd == 0) {
                                                     var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                         parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                         parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                                     var isEmergencyOrder = 0;
                                                     if (expectedDeliveryDate >= currentMonth) {
                                                         isEmergencyOrder = 0;
@@ -4479,7 +4496,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                         parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                         parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                                     var isEmergencyOrder = 0;
                                                     if (expectedDeliveryDate >= currentMonth) {
                                                         isEmergencyOrder = 0;
@@ -4492,7 +4509,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                                     parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                                     parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                                var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                                 var isEmergencyOrder = 0;
                                                 if (expectedDeliveryDate >= currentMonth) {
                                                     isEmergencyOrder = 0;
@@ -4540,7 +4557,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var actualCount = 0;
                                                 var adjustmentsCount = 0;
                                                 for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
-                                                    if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty != "") {
+                                                    if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty !== "") {
                                                         actualCount += 1;
                                                         actualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                         totalActualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
@@ -4549,7 +4566,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             regionsReportingActualInventory.push(regionListFiltered[r].id)
                                                         }
                                                     }
-                                                    if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty != "") {
+                                                    if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty !== "") {
                                                         adjustmentsCount += 1;
                                                         adjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                         totalAdjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
@@ -4580,11 +4597,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                 month: m[n].month,
                                                 consumption: jsonList[0].consumptionQty,
                                                 stock: jsonList[0].closingBalance,
-                                                planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
-                                                delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
-                                                shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
-                                                ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
-                                                mos: parseFloat(jsonList[0].mos).toFixed(2),
+                                                planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
+                                                delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
+                                                shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
+                                                ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
+                                                mos: parseFloat(jsonList[0].mos).toFixed(1),
                                                 minMos: minStockMoSQty,
                                                 maxMos: maxStockMoSQty
                                             }

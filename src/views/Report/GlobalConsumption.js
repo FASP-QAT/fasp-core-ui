@@ -296,7 +296,7 @@ class GlobalConsumption extends Component {
   }
 
   roundN = num => {
-    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+    return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
   }
 
   exportPDF = () => {

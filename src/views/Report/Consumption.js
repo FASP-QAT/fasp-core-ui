@@ -595,16 +595,16 @@ class Consumption extends Component {
 
   roundN = num => {
     if (num != '' || num != null) {
-      return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+      return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     } else {
       return ''
     }
   }
   round = num => {
-    if (num == '' || num == null) {
+    if (num === '' || num == null) {
       return null
     } else {
-      return parseFloat(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+      return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
 
     }
   }
@@ -713,7 +713,6 @@ class Consumption extends Component {
             for (var j = 0; j < dateArray.length; j++) {
               let objActual = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == true);
               let objForecast = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == false);
-
               let actualValue = null;
               let forecastValue = null;
               let transDate = '';
@@ -725,7 +724,6 @@ class Consumption extends Component {
                 forecastValue = this.round(objForecast[0].consumptionQty);
                 transDate = objForecast[0].consumptionDate;
               }
-
               if (viewById == 2) {
                 //  this.toggleView();
                 let json = {
@@ -1018,7 +1016,7 @@ class Consumption extends Component {
               var proList = []
               console.log("myResult===============", myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId) {
+                if (myResult[i].program.id == programId && myResult[i].active==true) {
 
                   proList[i] = myResult[i]
                 }
@@ -1042,7 +1040,7 @@ class Consumption extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
               planningUnits: response.data, message: ''

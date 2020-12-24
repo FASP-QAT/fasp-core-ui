@@ -325,7 +325,7 @@ export default class CostOfInventory extends Component {
         return moment(dt).format('MMM-DD-YYYY');
     }
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
+        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
     formatterDouble = value => {
 
@@ -676,7 +676,7 @@ export default class CostOfInventory extends Component {
                             myResult = planningunitRequest.result;
 
                             for (var i = 0, j = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId) {
+                                if (myResult[i].program.id == programId && myResult[i].active== true) {
                                     proList[j++] = myResult[i]
                                 }
                             }

@@ -497,7 +497,7 @@ class Budgets extends Component {
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
                                     console.log(ele)
-                                    plannedShipmentbudget = plannedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                    plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
                                 console.log("B** planned shipment budget ---", plannedShipmentbudget);
                                 var OrderedShipmentbudget = 0;
@@ -505,7 +505,7 @@ class Budgets extends Component {
                                 console.log("B** shiplist ---", shiplist);
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                                    OrderedShipmentbudget = OrderedShipmentbudget + (parseFloat(ele.productCost) + parseFloat(ele.freightCost)) * parseFloat(ele.currency.conversionRateToUsd)
+                                    OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
                                 console.log("B** order shipment budget ---", OrderedShipmentbudget);
                                 console.log("B** budget list l ==>", budgetList[l]);
@@ -781,7 +781,7 @@ class Budgets extends Component {
 
 
     roundN = num => {
-        return parseFloat(Math.round(num * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
+        return Number(Math.round(num * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
 
     }
     filterVersion = () => {

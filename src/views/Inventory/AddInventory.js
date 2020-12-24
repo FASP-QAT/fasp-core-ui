@@ -184,7 +184,15 @@ export default class AddInventory extends Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                // var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                var programIdd = '';
+                if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
+                    programIdd = this.props.match.params.programId;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
+                } else if (proList.length == 1) {
+                    programIdd = proList[0].value;
+                }
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -311,7 +319,15 @@ export default class AddInventory extends Component {
                                 loading: false
                             })
 
-                            var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                            // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                            var planningUnitIdProp = '';
+                            if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                                planningUnitIdProp = this.props.match.params.planningUnitId;
+                            } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                            } else if (proList.length == 1) {
+                                planningUnitIdProp = proList[0].value;
+                            }
                             console.log("planningUnitIdProp===>", planningUnitIdProp);
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
@@ -414,7 +430,7 @@ export default class AddInventory extends Component {
                         var inventoryListUnFiltered = (programJson.inventoryList);
                         var inventoryList = (programJson.inventoryList).filter(c =>
                             c.planningUnit.id == planningUnitId &&
-                            c.region != null && c.region.id != 0);    
+                            c.region != null && c.region.id != 0);
                         if (this.state.inventoryType == 1) {
                             inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
                         } else {

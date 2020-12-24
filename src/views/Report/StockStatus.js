@@ -232,26 +232,41 @@ class StockStatus extends Component {
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-
+      programId: '',
+      versionId: ''
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+    this.programChange = this.programChange.bind(this);
+    this.versionChange = this.versionChange.bind(this);
 
+  }
+
+  programChange(event) {
+    this.setState({
+      programId: event.target.value
+    })
+  }
+
+  versionChange(event) {
+    this.setState({
+      versionId: event.target.value
+    })
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   roundN = num => {
     if (num != '') {
-      return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+      return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
     }
   }
   formatAmc = value => {
-    return parseFloat(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0)).toFixed(0);
+    return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
   }
 
   formatter = value => {
@@ -284,7 +299,7 @@ class StockStatus extends Component {
   }
 
   rowtextFormatClassName = (row) => {
-    return  'textcolor-purple' ;
+    return 'textcolor-purple';
   }
 
   exportCSV() {
@@ -319,7 +334,7 @@ class StockStatus extends Component {
 
     var A = headers
     var re;
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty , ele.actualConsumptionQty , ele.shipmentQty,
+    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty, ele.actualConsumptionQty, ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
@@ -429,7 +444,7 @@ class StockStatus extends Component {
     i18n.t('static.report.maxmonth')]];
 
     let data =
-      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty),  this.formatter(ele.actualConsumptionQty) , this.formatter(ele.shipmentQty),
+      this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
@@ -498,10 +513,49 @@ class StockStatus extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
-
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+
+
+
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                var realmOs = realmTransaction.objectStore('realm');
+                var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+                realmRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                realmRequest.onsuccess = function (event) {
+                    var maxForMonths = 0;
+                    var realm = realmRequest.result;
+                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                    if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                    } else {
+                        maxForMonths = pu.minMonthsOfStock
+                    }
+                    var minStockMoS = parseInt(maxForMonths);
+
+                    // Calculations for Max Stock
+                    var minForMonths = 0;
+                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                    } else {
+                        minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                    }
+                    var maxStockMoS = parseInt(minForMonths);
+                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                        maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                    }
+
+
+
+            
             var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-            var consumptionList=(programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId );
+            var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
             var monthstartfrom = this.state.rangeValue.from.month
             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
               var monthlydata = [];
@@ -517,20 +571,27 @@ class StockStatus extends Component {
                   var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                   var totalShipmentQty = 0;
                   shiplist.map(elt => {
-                    totalShipmentQty = totalShipmentQty + parseInt(elt.shipmentQty)
+                    totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
                   })
-                var conList= consumptionList.filter(c =>c.actualFlag == false &&  (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-              var totalforecastConsumption=null;
-                conList.map(elt=>{
-                  totalforecastConsumption=(totalforecastConsumption==null)?elt.consumptionQty:totalforecastConsumption+elt.consumptionQty
-                 } ) 
-                 console.log(conList)
-                 console.log(totalforecastConsumption)
-                var json = {
+                  var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                  var totalforecastConsumption = null;
+                  conList.map(elt => {
+                    totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
+                  })
+
+                  var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                  var totalActualConsumption = null;
+                  conListAct.map(elt => {
+                    totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
+                  })
+                  console.log(conList)
+                  console.log(totalforecastConsumption)
+                  var json = {
                     dt: new Date(from, month - 1),
                     forecastedConsumptionQty: totalforecastConsumption,
-                    actualConsumptionQty:list[0].actualFlag==true?list[0].consumptionQty:null,
+                    actualConsumptionQty: totalActualConsumption,
                     actualConsumption: list[0].actualFlag,
+                    finalConsumptionQty:list[0].consumptionQty,
                     shipmentQty: totalShipmentQty,
                     shipmentInfo: shiplist,
                     adjustment: list[0].adjustmentQty,
@@ -538,8 +599,8 @@ class StockStatus extends Component {
                     openingBalance: list[0].openingBalance,
                     mos: list[0].mos,
                     amc: list[0].amc,
-                    minMos: list[0].minStockMoS,
-                    maxMos: list[0].maxStockMoS
+                    minMos: minStockMoS,
+                    maxMos: maxStockMoS
                   }
                 } else {
                   var json = {
@@ -553,8 +614,8 @@ class StockStatus extends Component {
                     openingBalance: '',
                     mos: '',
                     amc: '',
-                    minMos: '',
-                    maxMos: ''
+                    minMos: minStockMoS,
+                    maxMos: maxStockMoS
                   }
                 }
                 data.push(json)
@@ -577,7 +638,7 @@ class StockStatus extends Component {
           }.bind(this)
 
         }.bind(this)
-
+      }.bind(this)
 
 
 
@@ -844,13 +905,27 @@ class StockStatus extends Component {
 
         }
         var lang = this.state.lang;
-        this.setState({
-          programs: proList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
+        if (proList.length == 1) {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: proList[0].programId
+          }, () => {
+            this.filterVersion();
           })
-        })
+        } else {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -936,11 +1011,23 @@ class StockStatus extends Component {
         }
 
         console.log(verList)
-        this.setState({
-          versions: verList.filter(function (x, i, a) {
-            return a.indexOf(x) === i;
+        if (verList.length == 1) {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            }),
+            versionId: verList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
-        })
+        } else {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -983,7 +1070,7 @@ class StockStatus extends Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId) {
+                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                   proList[i] = myResult[i]
                 }
@@ -1006,7 +1093,7 @@ class StockStatus extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
               planningUnits: response.data, message: ''
@@ -1304,7 +1391,7 @@ class StockStatus extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.consumptionQty))
+          data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
         },
         {
           label: i18n.t('static.report.stock'),
@@ -1387,8 +1474,9 @@ class StockStatus extends Component {
                               name="programId"
                               id="programId"
                               bsSize="sm"
-                              onChange={this.filterVersion}
-
+                              // onChange={this.filterVersion}
+                              onChange={(e) => { this.programChange(e); this.filterVersion(e) }}
+                              value={this.state.programId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {programList}
@@ -1407,7 +1495,9 @@ class StockStatus extends Component {
                               name="versionId"
                               id="versionId"
                               bsSize="sm"
-                              onChange={(e) => { this.getPlanningUnit(); }}
+                              // onChange={(e) => { this.getPlanningUnit(); }}
+                              onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              value={this.state.versionId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {versionList}
@@ -1497,10 +1587,10 @@ class StockStatus extends Component {
                             </td>
 
                             <td className={this.rowtextFormatClassName(this.state.stockStatusList[idx])}>
-                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty) }
+                              {this.formatter(this.state.stockStatusList[idx].forecastedConsumptionQty)}
                             </td> <td>
 
-                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty) }
+                              {this.formatter(this.state.stockStatusList[idx].actualConsumptionQty)}
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].shipmentQty)}

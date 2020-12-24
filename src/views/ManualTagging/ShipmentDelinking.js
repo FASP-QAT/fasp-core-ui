@@ -422,7 +422,8 @@ export default class ShipmentDelinking extends Component {
             haslink: false,
             notes: false,
             shipmentId: '',
-            active: true
+            active: true,
+            programId: ''
         }
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -433,8 +434,14 @@ export default class ShipmentDelinking extends Component {
         this.getProgramList = this.getProgramList.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.programChange = this.programChange.bind(this);
     }
 
+    programChange(event) {
+        this.setState({
+            programId: event.target.value
+        });
+    }
     dataChange(val) {
         console.log("val---------------------------%%%%%%%%%%%%%", val)
         if (val === "no") {
@@ -851,9 +858,20 @@ export default class ShipmentDelinking extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
-                    this.setState({
-                        programs: response.data, loading: false
-                    })
+                    if (response.data.length == 1) {
+                        this.setState({
+                            programs: response.data,
+                            loading: false,
+                            programId: response.data[0].programId
+                        }, () => {
+                            this.getPlanningUnitList();
+                        })
+                    } else {
+                        this.setState({
+                            programs: response.data, loading: false
+                        })
+                    }
+
                 }
                 else {
 
@@ -1148,7 +1166,9 @@ export default class ShipmentDelinking extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
-                                                onChange={this.getPlanningUnitList}
+                                                value={this.state.programId}
+                                                // onChange={this.getPlanningUnitList}
+                                                onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e); }}
                                             >
                                                 <option value="-1">{i18n.t('static.common.select')}</option>
                                                 {programList}
