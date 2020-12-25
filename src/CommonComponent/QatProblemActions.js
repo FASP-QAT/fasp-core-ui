@@ -724,7 +724,7 @@ export default class QatProblemActions extends Component {
                                                             var shipmentList = programList[pp].shipmentList;
                                                             // //console.log("shipmentList=======>", shipmentList);
                                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                            var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7 && c.active == true && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                            var filteredShipmentList = shipmentList.filter(c => moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD') && c.shipmentStatus.id != 7 && c.active == true && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0 && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                                                             if (filteredShipmentList.length > 0) {
 
                                                                 var shipmentIdsFromShipmnetList = [];
@@ -1176,7 +1176,7 @@ export default class QatProblemActions extends Component {
                                                             // submited shipments logic======================
                                                             var shipmentList = programList[pp].shipmentList;
                                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && c.active == true && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0 && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                                                             // //console.log("submited status list===>", filteredShipmentList);
                                                             if (filteredShipmentList.length > 0) {
                                                                 var shipmentIdsFromShipmnetList = [];
@@ -1450,7 +1450,7 @@ export default class QatProblemActions extends Component {
                                                             // approved shipments logic======================
                                                             var shipmentList = programList[pp].shipmentList;
                                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) && c.active == true && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0 && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                                                             // //console.log("approved status list===>", filteredShipmentList);
                                                             if (filteredShipmentList.length > 0) {
 
@@ -1728,7 +1728,7 @@ export default class QatProblemActions extends Component {
                                                             // shipped shipments logic======================
                                                             var shipmentList = programList[pp].shipmentList;
                                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) && c.active == true && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0 && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                                                             // //console.log("shipped status list===>", filteredShipmentList);
 
                                                             if (filteredShipmentList.length > 0) {
@@ -2006,7 +2006,7 @@ export default class QatProblemActions extends Component {
                                                             // arrived shipments logic======================
                                                             var shipmentList = programList[pp].shipmentList;
                                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
-                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                            var filteredShipmentList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) && c.active == true && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0 && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                                                             //  //console.log("approved status list===>", filteredShipmentList);
                                                             if (filteredShipmentList.length > 0) {
                                                                 var shipmentIdsFromShipmnetList = [];
