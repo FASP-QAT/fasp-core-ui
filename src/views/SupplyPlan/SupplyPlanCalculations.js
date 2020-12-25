@@ -171,6 +171,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 openingBalance: batchDetails[b].qty,
                                 consumption: 0,
                                 adjustment: 0,
+                                negativeAdjustment: 0,
                                 stock: 0,
                                 shipment: 0,
                                 expiredQty: batchDetails[b].expiredQty,
@@ -227,6 +228,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var shipmentBatchQtyTotalWps = 0;
                         var consumptionBatchQtyTotal = 0;
                         var adjustmentBatchQtyTotal = 0;
+                        var negativeAdjustmentBatchQtyTotal=0;
                         var actualBatchQtyTotal = 0;
 
                         // For loop for getting total shipment qty
@@ -312,6 +314,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             openingBalanceWps: 0,
                                             consumption: 0,
                                             adjustment: 0,
+                                            negativeAdjustment:0,
                                             stock: 0,
                                             shipment: batchListForShipments[b].shipmentQty,
                                             shipmentWps: shipmentQtyWps,
@@ -344,6 +347,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
                         var actualStockCount = 0;
                         var adjustmentQty = 0;
+                        var negativeAdjustmentQty = 0;
                         var regionsReportingActualInventory = 0;
                         var totalNoOfRegions = (regionListFiltered).length;
                         for (var r = 0; r < totalNoOfRegions; r++) {
@@ -382,9 +386,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     openingBalanceWps: 0,
                                                     consumption: 0,
                                                     adjustment: 0,
+                                                    negativeAdjustment:0,
                                                     stock: Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)),
                                                     shipment: 0,
-                                                    shipmentWps: shipmentQtyWps,
+                                                    shipmentWps: 0,
                                                     expiredQty: 0,
                                                     expiredQtyWps: 0
                                                 }
@@ -399,7 +404,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else {
                                     // If region has not reported actual stock count we will only consider adjustments
                                     if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
-                                        adjustmentQty += Math.round(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                        if (Number(inventoryListForRegion[inv].adjustmentQty > 0)) {
+                                            adjustmentQty += Math.round(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                        } else {
+                                            negativeAdjustmentQty += Math.round(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                        }
                                     }
                                     // Check batch details for adjustments if available
                                     var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
@@ -419,21 +428,33 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     openingBalance: 0,
                                                     openingBalanceWps: 0,
                                                     consumption: 0,
-                                                    adjustment: Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)),
+                                                    adjustment: Number(batchListForInventory[b].adjustmentQty)>0?Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)):0,
+                                                    negativeAdjustment:Number(batchListForInventory[b].adjustmentQty)<0?Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)):0,
                                                     stock: 0,
                                                     shipment: 0,
-                                                    shipmentWps: shipmentQtyWps,
+                                                    shipmentWps: 0,
                                                     expiredQty: 0,
                                                     expiredQtyWps: 0
                                                 }
                                                 myArray.push(json);
+                                                if(batchListForInventory[b].adjustmentQty>0){
                                                 adjustmentBatchQtyTotal += Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                                }else{
+                                                    negativeAdjustmentBatchQtyTotal += Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                                }
                                             }
                                         } else {
+                                            if(batchListForInventory[b].adjustmentQty>0){
                                             myArray[index].adjustment = Number(myArray[index].adjustment) + Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                             if (myArray[index].stock == 0) {
                                                 adjustmentBatchQtyTotal += Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                             }
+                                        }else{
+                                            myArray[index].negativeAdjustment = Number(myArray[index].negativeAdjustment) + Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                            if (myArray[index].stock == 0) {
+                                                negativeAdjustmentBatchQtyTotal += Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                            }
+                                        }
                                         }
 
                                     }
@@ -504,9 +525,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 openingBalanceWps: 0,
                                                 consumption: Math.round(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)),
                                                 adjustment: 0,
+                                                negativeAdjustment:0,
                                                 stock: 0,
                                                 shipment: 0,
-                                                shipmentWps: shipmentQtyWps,
+                                                shipmentWps: 0,
                                                 expiredQty: 0,
                                                 expiredQtyWps: 0
                                             }
@@ -528,38 +550,29 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         // Calculating expected stock
                         var expectedStock = 0;
-                        console.log("D----------------->expiredStock-------------------->", expiredStock)
-                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
-                        console.log("D--------------->Expected stock------------>", expectedStock);
-                        console.log("D------------>openingBalance------------ -->", openingBalance, "---Expired stock-->", expiredStock, "--shipmentTotalQty-->", shipmentTotalQty, "--consumptionQty--->", consumptionQty, "---adjustmentQty--->", adjustmentQty);
+                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0)+ (negativeAdjustmentQty !== "" ? Number(negativeAdjustmentQty) : 0);
                         // Calculating expected stock wps
                         var expectedStockWps = 0;
-                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
+                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0)+ (negativeAdjustmentQty !== "" ? Number(negativeAdjustmentQty) : 0);
 
                         // Calculations of national adjustments
                         var nationalAdjustment = 0;
-                        console.log("D-------------->National adjustment");
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment
-                        console.log("D-------------->regionsReportingActualInventory", regionsReportingActualInventory, "totalNoOfRegions", totalNoOfRegions, "expectedStock", expectedStock, "actualStockCount", actualStockCount, "Adjutsment qty", adjustmentQty);
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
-                            console.log("D-------------->In first if");
                             nationalAdjustment = actualStockCount - expectedStock;
-                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
-                            console.log("D-------------->In second if");
+                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty+negativeAdjustmentQty)) {
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
-                            console.log("D-------------->In 3rd if");
                             // If expected is less than 0 than make an national adjustment
                             nationalAdjustment = actualStockCount - expectedStock;
                         }
-                        console.log("D-------------->National adjutsment", nationalAdjustment);
                         // Calculations of national adjustments wps
                         var nationalAdjustmentWps = 0;
                         // Check if all the regions have reported actual inventory and expected stock is not equal to actual stock make an national adjustment wps
                         if (regionsReportingActualInventory == totalNoOfRegions && expectedStockWps != actualStockCount) {
                             nationalAdjustmentWps = actualStockCount - expectedStockWps;
-                        } else if (actualStockCount > (expectedStockWps + adjustmentQty)) {
+                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty+negativeAdjustmentQty)) {
                             // If actual stock count is greater than expected + adjustment qty that consider that stock as national adjustment wps
                             nationalAdjustmentWps = actualStockCount - expectedStockWps;
                         } else if (regionsReportingActualInventory > 0 && expectedStockWps < 0) {
@@ -568,9 +581,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
                         // Accounting unallocated batchs
                         // Again sorting the batch details
-                        var unallocatedQty = Number(consumptionQty) - Number(adjustmentQty) - Number(nationalAdjustment) - (Number(consumptionBatchQtyTotal) - Number(adjustmentBatchQtyTotal));
+                        var unallocatedQty = Number(consumptionQty) - Number(adjustmentQty) - (Number(nationalAdjustment)>0?Number(nationalAdjustment):0) - (Number(consumptionBatchQtyTotal) - Number(adjustmentBatchQtyTotal));
                         myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
-                        myArray = myArray.filter(c => (c.openingBalance != 0 || c.consumption != 0 || c.shipment != 0 || c.stock != 0 || c.adjustment != 0) || moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
+                        myArray = myArray.filter(c => (c.openingBalance != 0 || c.consumption != 0 || c.shipment != 0 || c.stock != 0 || c.adjustment != 0 || c.negativeAdjustment!=0) || moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
                         for (var a = 0; a < myArray.length; a++) {
                             var expectedB = Number(myArray[a].openingBalance) + Number(myArray[a].shipment) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                             var expectedBWps = Number(myArray[a].openingBalanceWps) + Number(myArray[a].shipmentWps) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
@@ -613,6 +626,48 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                         }
                         console.log("MyArray----------------->", myArray);
+
+                        var negativeUnallocatedQty=Number(negativeAdjustmentQty) - (Number(nationalAdjustment)<0?Number(nationalAdjustment):0) - (Number(adjustmentBatchQtyTotal));
+                        for (var a = myArray.length; a < 0; a--) {
+                            var expectedB = Number(myArray[a].openingBalance)  + (Number(myArray[a].stock) == 0 ? Number(myArray[a].negativeAdjustment) : 0);
+                            var expectedBWps = Number(myArray[a].openingBalanceWps)  + (Number(myArray[a].stock) == 0 ? Number(myArray[a].negativeAdjustment) : 0);
+                            myArray[a].expectedB = Number(expectedB) < 0 ? 0 : Number(expectedB);
+                            myArray[a].expectedBWps = Number(expectedBWps) < 0 ? 0 : Number(expectedBWps);
+                            if (a == 0) {
+                                myArray[a].unallocated = negativeUnallocatedQty;
+                                myArray[a].unallocatedWps = negativeUnallocatedQty;
+                            } else {
+                                myArray[a].unallocated = myArray[a - 1].unallocated + myArray[a - 1].used;
+                                myArray[a].unallocatedWps = myArray[a - 1].unallocatedWps + myArray[a - 1].usedWps;
+                            }
+
+                            var max = 0;
+                            if (myArray[a].expectedB + myArray[a].unallocated > max) {
+                                max = myArray[a].expectedB + myArray[a].unallocated;
+                            }
+                            if (myArray[a].stock > max) {
+                                max = myArray[a].stock;
+                            }
+                            myArray[a].closingBalance = max;
+
+                            var maxWps = 0;
+                            if (myArray[a].expectedBWps + myArray[a].unallocatedWps > maxWps) {
+                                maxWps = myArray[a].expectedBWps + myArray[a].unallocatedWps;
+                            }
+                            if (myArray[a].stock > maxWps) {
+                                maxWps = myArray[a].stock;
+                            }
+                            myArray[a].closingBalanceWps = maxWps;
+
+                            var used = -Number(max) + Number(myArray[a].openingBalance) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].negativeAdjustment) : 0);
+                            myArray[a].used = used;
+
+                            var usedWps = -Number(maxWps) + Number(myArray[a].openingBalanceWps) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].negativeAdjustment) : 0);
+                            myArray[a].usedWps = usedWps;
+
+                            myArray[a].qty = max;
+                            myArray[a].qtyWps = maxWps;
+                        }
 
                         // Adding national adjustments to adjustment qty
                         adjustmentQty = adjustmentQty + nationalAdjustment;
