@@ -27,9 +27,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.role.roletext')),
         // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
-            .required(i18n.t('static.role.businessfunctiontext')),
-        canCreateRoles: Yup.string()
-            .required(i18n.t('static.role.cancreateroletext'))
+            .required(i18n.t('static.role.businessfunctiontext'))
+        // canCreateRoles: Yup.string()
+        //     .required(i18n.t('static.role.cancreateroletext'))
 
         // businessFunctions: Yup.array()
         //     .min(1, i18n.t('static.role.businessfunctiontext'))
@@ -163,8 +163,8 @@ class EditRoleComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             roleName: true,
-            businessFunctions: true,
-            canCreateRoles: true
+            businessFunctions: true
+            // canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -510,16 +510,16 @@ class EditRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} </Label>
                                                         <Select
+                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                // { 'is-valid': !errors.canCreateRoles },
+                                                                // { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
+                                                            )}
                                                             // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             //     { 'is-valid': !errors.canCreateRoles },
-                                                            //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
+                                                            //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
                                                             // )}
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.canCreateRoles },
-                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
-                                                            )}
                                                             bsSize="sm"
                                                             onChange={(e) => {
                                                                 handleChange(e);
@@ -530,12 +530,12 @@ class EditRoleComponent extends Component {
                                                             name="canCreateRoles"
                                                             id="canCreateRoles"
                                                             multi
-                                                            required
+                                                            // required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.role.canCreateRoles}
                                                         />
-                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
+                                                        {/* <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback> */}
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
