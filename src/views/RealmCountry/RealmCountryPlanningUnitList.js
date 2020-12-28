@@ -1143,7 +1143,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 // var text = this.el.getValueFromCoords(1, y);
                 var text = this.el.getValue(`B${parseInt(y) + 1}`, true)
                 console.log("TEXT-------->", text);
-                this.el.setValueFromCoords(2, y, text, true);
+                // this.el.setVaslueFromCoords(2, y, text, true);
             }
         }
 

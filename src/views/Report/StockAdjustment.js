@@ -793,7 +793,7 @@ class StockAdjustmentComponent extends Component {
                         console.log(startDate, endDate)
                         var data = []
                         planningUnitIds.map(planningUnitId => {
-                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.adjustmentQty != 0));
+                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty!=null)));
                             console.log(inventoryList)
 
                             inventoryList.map(ele => {

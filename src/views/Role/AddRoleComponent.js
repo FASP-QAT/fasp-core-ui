@@ -451,9 +451,9 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.role.roletext')),
         businessFunctions: Yup.string()
-            .required(i18n.t('static.role.businessfunctiontext')),
-        canCreateRoles: Yup.string()
-            .required(i18n.t('static.role.cancreateroletext'))
+            .required(i18n.t('static.role.businessfunctiontext'))
+        // canCreateRoles: Yup.string()
+        //     .required(i18n.t('static.role.cancreateroletext'))
 
         // businessFunctions: Yup.array()
         //     .min(1, i18n.t('static.role.businessfunctiontext'))
@@ -578,8 +578,8 @@ class AddRoleComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             roleName: true,
-            businessFunctions: true,
-            canCreateRoles: true
+            businessFunctions: true
+            // canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -930,12 +930,12 @@ class AddRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} </Label>
 
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },
-                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles) }
+                                                                // { 'is-valid': !errors.canCreateRoles && this.state.role.canCreateRoles.length != 0 },
+                                                                // { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles) }
                                                             )}
                                                             bsSize="sm"
                                                             name="canCreateRoles"
@@ -947,12 +947,12 @@ class AddRoleComponent extends Component {
                                                             }}
                                                             onBlur={() => setFieldTouched("canCreateRoles", true)}
                                                             multi
-                                                            required
+                                                            // required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
                                                         />
-                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
+                                                        {/* <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback> */}
                                                         {/* {errors.canCreateRoles && touched.canCreateRoles && (<span className="red" style={{ fontSize: '12px' }}>{errors.canCreateRoles}</span>)} */}
                                                     </FormGroup>
                                                 </CardBody>

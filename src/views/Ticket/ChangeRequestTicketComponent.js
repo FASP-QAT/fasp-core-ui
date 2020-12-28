@@ -9,10 +9,10 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import { SPACE_REGEX } from '../../Constants';
 
-let summaryText_1 = (i18n.t('static.ticket.changeRequest'))
-let summaryText_2 = "Change Request"
+// let summaryText_1 = (i18n.t('static.ticket.changeRequest'))
+// let summaryText_2 = "Change Request"
 const initialValues = {
-    summary: summaryText_1,
+    summary: "",
     description: ""
 }
 const entityname = i18n.t('static.program.realmcountry');
@@ -56,7 +56,7 @@ export default class ChangeRequestTicketComponent extends Component {
         super(props);
         this.state = {
             changeRequest: {
-                summary: summaryText_1,
+                summary: '',
                 description: '',
                 file: '',
                 attachFile: ''
@@ -125,7 +125,7 @@ export default class ChangeRequestTicketComponent extends Component {
 
     resetClicked() {
         let { changeRequest } = this.state;
-        // changeRequest.summary = '';
+        changeRequest.summary = '';
         changeRequest.description = '';
         changeRequest.file = '';
         changeRequest.attachFile = '';
@@ -150,7 +150,7 @@ export default class ChangeRequestTicketComponent extends Component {
                             this.setState({
                                 loading: true
                             })
-                            this.state.changeRequest.summary = summaryText_2;
+                            // this.state.changeRequest.summary = summaryText_2;
                             JiraTikcetService.addChangeRequest(this.state.changeRequest).then(response => {
                                 console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
@@ -233,12 +233,13 @@ export default class ChangeRequestTicketComponent extends Component {
                                     <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                         < FormGroup >
                                             <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
+                                            <Input type="text" name="summary" id="summary"
                                                 bsSize="sm"
                                                 valid={!errors.summary && this.state.changeRequest.summary != ''}
                                                 invalid={touched.summary && !!errors.summary}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
+                                                onBlur={handleBlur}                                                
+                                                maxLength={100}
                                                 value={this.state.changeRequest.summary}
                                                 required />
                                             <FormFeedback className="red">{errors.summary}</FormFeedback>

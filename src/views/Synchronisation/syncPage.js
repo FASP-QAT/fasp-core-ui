@@ -2602,6 +2602,7 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+      problemReportList = problemReportList.filter(c=>c.planningUnitActive!=false);
       var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
@@ -2685,6 +2686,7 @@ export default class syncPage extends Component {
               }
             }
             problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+            problemReportList = problemReportList.filter(c=>c.planningUnitActive!=false);
             console.log("Planning unit list", planningUnitList);
             console.log("Consumption data", consumptionData);
             console.log("InventoryData", inventoryData);
@@ -2920,6 +2922,7 @@ export default class syncPage extends Component {
         // Getting other entries of latest problemList data
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
+        mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false)
 
         var data = [];
         var mergedProblemListJexcel = [];

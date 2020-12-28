@@ -195,7 +195,7 @@ export default class ConsumptionDetails extends React.Component {
                         document.getElementById("problemTypeId").value = localStorage.getItem("sesProblemType");
                         document.getElementById("problemCategoryId").value = localStorage.getItem("sesProblemCategory");
                         document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
-                        console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
+                        // console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
 
                         var programIdd = this.props.match.params.programId;
                         var needToCalculate = this.props.match.params.calculate;
@@ -239,7 +239,7 @@ export default class ConsumptionDetails extends React.Component {
     buildJExcel() {
         var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.data;
-        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
         // console.log("problemListDate---->",problemListDate);
         // console.log("problemList---->", problemList);
         let problemArray = [];
