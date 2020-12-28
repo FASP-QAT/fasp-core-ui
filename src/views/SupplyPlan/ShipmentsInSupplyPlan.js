@@ -3117,16 +3117,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             receivedDate = null;
                         }
-                        if (shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                        if (shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             arrivedDate = null;
                         }
-                        if (shipmentStatusId != SHIPPED_SHIPMENT_STATUS || shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                        if (shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             shippedDate = null;
                         }
-                        if (shipmentStatusId != APPROVED_SHIPMENT_STATUS || shipmentStatusId != SHIPPED_SHIPMENT_STATUS || shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                        if (shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             approvedDate = null;
                         }
-                        if (shipmentStatusId != SUBMITTED_SHIPMENT_STATUS || shipmentStatusId != APPROVED_SHIPMENT_STATUS || shipmentStatusId != SHIPPED_SHIPMENT_STATUS || shipmentStatusId != ARRIVED_SHIPMENT_STATUS || shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
+                        if (shipmentStatusId != SUBMITTED_SHIPMENT_STATUS && shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             submittedDate = null;
                         }
                         console.log("shipmentDatesJson", shipmentDatesJson);
