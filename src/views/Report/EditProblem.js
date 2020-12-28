@@ -260,8 +260,9 @@ export default class EditLanguageComponent extends Component {
         this.setState({ message: message })
     }
     getNote(row, lang) {
-        var transList = row.problemTransList;
-        var listLength = row.problemTransList.length;
+        // var transList = row.problemTransList;
+        var transList = row.problemTransList.filter(c => c.reviewed == false);
+        var listLength = transList.length;
         return transList[listLength - 1].notes;
     }
     Capitalize(str) {
