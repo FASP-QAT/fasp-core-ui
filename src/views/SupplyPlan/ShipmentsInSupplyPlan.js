@@ -675,6 +675,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             title: i18n.t('static.supplyPlan.shipmentQty'),
                                                                             type: 'numeric',
                                                                             textEditor: true,
+                                                                            disabledMaskOnEdition:true,
                                                                             mask: '#,##.00', decimal: '.'
                                                                         },
                                                                         {
