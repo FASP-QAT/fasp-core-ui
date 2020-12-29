@@ -1591,5 +1591,10 @@
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = MIN (7,18)",
-    "static.ticket.changeRequest":"Pedido de mudança"
+    "static.common.max15digittext": "Máximo de 15 caracteres",
+    "static.common.max25digittext": "Máximo de 25 caracteres apenas",
+    "static.budget.usedUSDAmount": "Quantidade Usada",
+    "static.ticket.changeRequest":"Pedido de mudança",
+    "static.common.max20digittext": "Máximo de 20 caracteres",
+    "static.shipment.totalCost":"Custo total"
 }
