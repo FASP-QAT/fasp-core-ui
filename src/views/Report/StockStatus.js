@@ -247,6 +247,9 @@ class StockStatus extends Component {
   programChange(event) {
     this.setState({
       programId: event.target.value
+    }, () => {
+      console.log("ProgramId-------->1", this.state.programId);
+      this.filterVersion();
     })
   }
 
@@ -906,6 +909,7 @@ class StockStatus extends Component {
         }
         var lang = this.state.lang;
         if (proList.length == 1) {
+          console.log("*****1");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -916,7 +920,21 @@ class StockStatus extends Component {
           }, () => {
             this.filterVersion();
           })
+        } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+          //from session
+          console.log("*****2");
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: localStorage.getItem("sesProgramIdReport")
+          }, () => {
+            this.filterVersion();
+          })
         } else {
+          console.log("*****3");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -936,9 +954,12 @@ class StockStatus extends Component {
 
 
   filterVersion = () => {
-    let programId = document.getElementById("programId").value;
+    console.log("ProgramId-------->2", this.state.programId);
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     if (programId != 0) {
 
+      localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
@@ -1020,6 +1041,15 @@ class StockStatus extends Component {
           }, () => {
             this.getPlanningUnit();
           })
+        } else if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            }),
+            versionId: localStorage.getItem("sesVersionIdReport")
+          }, () => {
+            this.getPlanningUnit();
+          })
         } else {
           this.setState({
             versions: verList.filter(function (x, i, a) {
@@ -1041,6 +1071,7 @@ class StockStatus extends Component {
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
+    console.log("VERSION-------->", versionId);
     this.setState({
       planningUnits: []
     }, () => {
@@ -1048,6 +1079,7 @@ class StockStatus extends Component {
       if (versionId == 0) {
         this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
       } else {
+        localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
           const lan = 'en';
           var db1;
@@ -1475,7 +1507,8 @@ class StockStatus extends Component {
                               id="programId"
                               bsSize="sm"
                               // onChange={this.filterVersion}
-                              onChange={(e) => { this.programChange(e); this.filterVersion(e) }}
+                              // onChange={(e) => { this.programChange(e); this.filterVersion(e) }}
+                              onChange={(e) => { this.programChange(e); }}
                               value={this.state.programId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
