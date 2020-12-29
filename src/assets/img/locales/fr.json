@@ -1591,5 +1591,6 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.ticket.changeRequest":"Changer de requête"
+    "static.ticket.changeRequest":"Changer de requête",
+    "static.supplyPlan.startMonth":"Mois de début"
 }

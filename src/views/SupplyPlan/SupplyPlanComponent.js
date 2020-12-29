@@ -42,9 +42,10 @@ export default class SupplyPlanComponent extends React.Component {
 
     constructor(props) {
         super(props);
-        var currentDate = moment(Date.now()).utcOffset('-0500')
-        var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
-        console.log("CurDate-------------------------------->", curDate,"-------------------->",{ year: moment(curDate).format("YYYY"), month: moment(curDate).format("M") });
+        var value = JSON.parse(localStorage.getItem("sesStartDate"));
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
             loading: true,
             monthsArray: [],
@@ -77,7 +78,7 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: 0,
+            monthCount: monthDifference,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -113,7 +114,7 @@ export default class SupplyPlanComponent extends React.Component {
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
-            startDate: { year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) },
+            startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             // startDateFormat:curDate
@@ -166,8 +167,12 @@ export default class SupplyPlanComponent extends React.Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ startDate: value })
-        this.formSubmit(this.state.planningUnit, value);
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
+        this.setState({ startDate: value, monthCount: monthDifference })
+        localStorage.setItem("sesStartDate", JSON.stringify(value));
+        this.formSubmit(this.state.planningUnit, monthDifference);
     }
 
     hideFirstComponent() {
@@ -330,6 +335,11 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             activeTab: newArray,
         });
+        console.log("Tab---------->", tab)
+        if (tab == 2) {
+            console.log("In if", this.compareChild)
+            this.refs.compareChild.formSubmit(this.state.monthCount)
+        }
     }
 
 
@@ -2271,6 +2281,8 @@ export default class SupplyPlanComponent extends React.Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -3078,6 +3090,7 @@ export default class SupplyPlanComponent extends React.Component {
                             })
                             console.log("consumptionTotalData------------->", consumptionTotalData)
                             console.log("Opening balance array", openingBalanceArray);
+                            // this.compareChild.formSubmit(this.state.monthCount);
                             // } else {
                             // console.log("In else")
                             // this.setState({ loading: false })
@@ -3667,6 +3680,23 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                        <div className="controls edit">
+
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={this.state.startDate}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
@@ -3691,23 +3721,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 value={this.state.planningUnit}
                                                                 onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
                                                             />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
-
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={this.state.startDate}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
                                                         </div>
                                                     </FormGroup>
                                                     <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
