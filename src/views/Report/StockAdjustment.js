@@ -1176,7 +1176,7 @@ class StockAdjustmentComponent extends Component {
 
                                         <Picker
                                             ref="pickRange"
-                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                           // years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             value={rangeValue}
                                             lang={pickerLang}
                                             //theme="light"

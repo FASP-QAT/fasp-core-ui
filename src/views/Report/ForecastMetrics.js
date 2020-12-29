@@ -1308,7 +1308,7 @@ class ForecastMetrics extends Component {
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
-                          years={{ min: this.state.minDate, max: this.state.maxDate }}
+                         // years={{ min: this.state.minDate, max: this.state.maxDate }}
                           value={singleValue2}
                           lang={pickerLang.months}
                           theme="dark"
