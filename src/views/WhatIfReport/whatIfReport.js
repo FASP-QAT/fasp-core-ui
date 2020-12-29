@@ -1511,14 +1511,18 @@ export default class WhatIfReportComponent extends React.Component {
                 var programIdd = '';
                 if (proList.length == 1) {
                     programIdd = proList[0].value;
+                } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    //from session
+                    programIdd = localStorage.getItem("sesProgramIdReport");
                 }
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
                         programSelect: programSelect,
                         programId: programIdd
+                    }, () => {
+                        this.getPlanningUnitList(programSelect);
                     })
-                    this.getPlanningUnitList(programSelect);
                 }
 
             }.bind(this);
@@ -1539,6 +1543,7 @@ export default class WhatIfReportComponent extends React.Component {
         })
         var programId = value != "" && value != undefined ? value.value : 0;
         if (programId != 0) {
+            localStorage.setItem("sesProgramIdReport", programId);
             var db1;
             var storeOS;
             getDatabase();
@@ -1697,8 +1702,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         this.setState({
                                             planningUnit: planningUnit,
                                             planningUnitId: planningUnitIdProp
+                                        }, () => {
+                                            this.formSubmit(planningUnit, this.state.monthCount);
                                         })
-                                        this.formSubmit(planningUnit, this.state.monthCount);
+
                                     }
                                 }.bind(this);
                             }.bind(this);

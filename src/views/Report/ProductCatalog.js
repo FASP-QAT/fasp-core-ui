@@ -413,9 +413,22 @@ class ProductCatalog extends Component {
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
-                    this.setState({
-                        programs: response.data, loading: false
-                    }, () => { })
+                    console.log("sesProgramIdReport----->", localStorage.getItem("sesProgramIdReport"));
+                    if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                        this.setState({
+                            programs: response.data, loading: false,
+                            programId: localStorage.getItem("sesProgramIdReport")
+                        }, () => {
+                            this.fetchData();
+                            this.getProductCategories();
+                            this.getTracerCategoryList();
+                        })
+                    } else {
+                        this.setState({
+                            programs: response.data, loading: false
+                        }, () => { })
+                    }
+
                 }).catch(
                     error => {
                         this.setState({
@@ -534,13 +547,29 @@ class ProductCatalog extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.fetchData();
+                        this.getProductCategories();
+                        this.getTracerCategoryList();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -821,7 +850,7 @@ class ProductCatalog extends Component {
         }
 
         if (programId > 0) {
-
+            localStorage.setItem("sesProgramIdReport", programId);
             if (navigator.onLine) {
 
                 this.setState({ loading: true })
@@ -1304,6 +1333,7 @@ class ProductCatalog extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
+                                                value={this.state.programId}
                                                 // onChange={this.filterVersion}
                                                 onChange={(e) => { this.fetchData(); this.getProductCategories(); this.getTracerCategoryList(); }}
                                             >

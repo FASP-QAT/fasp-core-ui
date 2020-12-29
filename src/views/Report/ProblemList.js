@@ -57,7 +57,8 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
-            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]
+            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            programId: ''
         }
 
 
@@ -134,13 +135,29 @@ export default class ConsumptionDetails extends React.Component {
                         proList[i] = programJson
                     }
                 }
-                this.setState({
-                    programList: proList.sort(function (a, b) {
-                        a = a.name.toLowerCase();
-                        b = b.name.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramId")
+                    }, () => {
+                        this.getProblemListAfterCalculation();
                     })
-                })
+
+                } else {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
 
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
