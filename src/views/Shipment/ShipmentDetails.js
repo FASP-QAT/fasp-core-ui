@@ -214,7 +214,15 @@ export default class ShipmentDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                // var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
+                var programIdd = '';
+                if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
+                    programIdd = this.props.match.params.programId;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
+                } else if (proList.length == 1) {
+                    programIdd = proList[0].value;
+                }
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -309,7 +317,15 @@ export default class ShipmentDetails extends React.Component {
                             planningUnitListAll: myResult,
                             loading: false
                         })
-                        var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                        // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                        var planningUnitIdProp = '';
+                        if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                            planningUnitIdProp = this.props.match.params.planningUnitId;
+                        } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                            planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                        } else if (proList.length == 1) {
+                            planningUnitIdProp = proList[0].value;
+                        }
                         console.log("planningUnitIdProp===>", planningUnitIdProp);
                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                             var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };

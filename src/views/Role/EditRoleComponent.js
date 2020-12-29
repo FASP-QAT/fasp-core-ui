@@ -510,16 +510,16 @@ class EditRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} <span className="red Reqasterisk">*</span></Label>
                                                         <Select
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-valid': !errors.canCreateRoles },
-                                                            //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
-                                                            // )}
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                                 { 'is-valid': !errors.canCreateRoles },
-                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
+                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
                                                             )}
+                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            //     { 'is-valid': !errors.canCreateRoles },
+                                                            //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
+                                                            // )}
                                                             bsSize="sm"
                                                             onChange={(e) => {
                                                                 handleChange(e);
