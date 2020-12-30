@@ -1330,7 +1330,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+              ( ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
             }))
             return count
           })
@@ -1348,7 +1348,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 ||ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
             }))
             return count
           })
