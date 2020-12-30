@@ -2602,7 +2602,7 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-      problemReportList = problemReportList.filter(c=>c.planningUnitActive!=false);
+      problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
       var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
@@ -2686,7 +2686,7 @@ export default class syncPage extends Component {
               }
             }
             problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-            problemReportList = problemReportList.filter(c=>c.planningUnitActive!=false);
+            problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
             console.log("Planning unit list", planningUnitList);
             console.log("Consumption data", consumptionData);
             console.log("InventoryData", inventoryData);
@@ -2929,9 +2929,9 @@ export default class syncPage extends Component {
         for (var cd = 0; cd < mergedProblemListData.length; cd++) {
           data = []
           data[0] = mergedProblemListData[cd].problemReportId
-          data[1] = 1;
+          data[1] = mergedProblemListData[cd].problemActionIndex;
           data[2] = mergedProblemListData[cd].program.code
-          data[3] = 1;
+          data[3] = mergedProblemListData[cd].versionId;
           data[4] = (mergedProblemListData[cd].region.label != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''
           data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang)
           data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''
@@ -2965,6 +2965,7 @@ export default class syncPage extends Component {
           }
           data[19] = downloadedData;//Downloaded data
           data[20] = 4;
+          data[21] = mergedProblemListData[cd].reviewed
           mergedProblemListJexcel.push(data);
         }
         console.log("MergedProblem list jexcel", mergedProblemListJexcel);
@@ -3058,6 +3059,7 @@ export default class syncPage extends Component {
           allowDeleteRow: false,
           editable: false,
           onload: this.loadedFunctionForMergeProblemList,
+          onselection: this.selected,
           filters: true,
           license: JEXCEL_PRO_KEY,
           text: {
@@ -3067,16 +3069,52 @@ export default class syncPage extends Component {
           },
           contextMenu: function (obj, x, y, e) {
             var items = [];
-            //Resolve conflicts
-            var rowData = obj.getRowData(y)
-            if (rowData[20].toString() == 1) {
-              items.push({
-                title: "Resolve conflicts",
-                onclick: function () {
-                  this.setState({ loading: true })
-                  this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
-                }.bind(this)
-              })
+            if (y != null) {
+
+
+              //Resolve conflicts
+              var rowData = obj.getRowData(y)
+              if (rowData[20].toString() == 1) {
+                items.push({
+                  title: "Resolve conflicts",
+                  onclick: function () {
+                    this.setState({ loading: true })
+                    this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
+                  }.bind(this)
+                })
+              }
+
+              // For ticket Id 275
+              console.log("in context menue===>", this.el.getValueFromCoords(12, y));
+              if ((this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
+                items.push({
+                  title: i18n.t('static.problemContext.editProblem'),
+                  onclick: function () {
+                    // let problemStatusId = document.getElementById('problemStatusId').value;
+                    // let problemTypeId = document.getElementById('problemTypeId').value;
+                    var index = 0;
+                    if (this.el.getValueFromCoords(1, y) == "") {
+                      var index = 0;
+                    } else {
+                      index = this.el.getValueFromCoords(1, y);
+                    }
+                    this.props.history.push({
+                      pathname: `/report/editProblem/${this.el.getValueFromCoords(0, y)}/${this.state.programId.value}/${index}/${this.el.getValueFromCoords(12, y)}/${this.el.getValueFromCoords(21, y)}`,
+                    });
+                    // this.props.history.push({
+                    //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
+                    // });
+
+
+                    // console.log("onclick------>", this.el.getValueFromCoords(12, y));
+                    // var planningunitId = this.el.getValueFromCoords(13, y);
+                    // var programId = document.getElementById('programId').value;
+                    // var versionId = this.el.getValueFromCoords(3, y)
+                    // window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, y)}/${programId}/${versionId}/${planningunitId}`);
+                  }.bind(this)
+                });
+              }
+              // For ticket Id 275
             }
 
             // if (rowData[0].toString() > 0) {
@@ -3102,4 +3140,45 @@ export default class syncPage extends Component {
       }.bind(this)
     }.bind(this)
   }
+
+  // For ticket Id 275
+  selected = function (instance, cell, x, y, value) {
+
+    if ((x == 0 && value != 0) || (y == 0)) {
+      // console.log("HEADER SELECTION--------------------------");
+    } else {
+      // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+      // if (this.state.data.length != 0) {
+      if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+        // console.log("this.el.getValueFromCoords(12, y)===>", this.el.getRowData(x));
+        if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
+          console.log("onclick------>", this.el.getValueFromCoords(12, x));
+          var planningunitId = this.el.getValueFromCoords(13, x);
+          var programId = (this.state.programId).value;
+          var versionId = this.el.getValueFromCoords(3, x)
+          console.log("URL------------------->", this.state.programId);
+          window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
+
+          // let problemStatusId = document.getElementById('problemStatusId').value;
+          // let problemTypeId = document.getElementById('problemTypeId').value;
+          // var index = 0;
+          // if (this.el.getValueFromCoords(1, x) == "") {
+          //     var index = 0;
+          // } else {
+          //     index = this.el.getValueFromCoords(1, x);
+          // }
+          // console.log("URL====>", `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`);
+          // this.props.history.push({
+          //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${this.el.getValueFromCoords(12, x)}/${this.el.getValueFromCoords(17, x)}`,
+          // });
+          // this.props.history.push({
+          //     pathname: `/report/editProblem/${this.el.getValueFromCoords(0, x)}/${this.state.programId}/${index}/${problemStatusId}/${problemTypeId}`,
+          // });
+          // }
+
+        }
+      }
+    }
+  }.bind(this);
+  // For ticket Id 275
 }
