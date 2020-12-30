@@ -1595,5 +1595,6 @@
     "static.common.max25digittext": "Maximum 25 characters only",
     "static.budget.usedUSDAmount": "Used Amount",
     "static.ticket.changeRequest":"Change Request",
-    "static.common.max20digittext": "Maximum of 20 characters"
+    "static.common.max20digittext": "Maximum of 20 characters",
+    "static.common.million": "Millions"
 }
