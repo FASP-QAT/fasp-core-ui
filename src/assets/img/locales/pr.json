@@ -1596,5 +1596,6 @@
     "static.budget.usedUSDAmount": "Quantidade Usada",
     "static.ticket.changeRequest":"Pedido de mudança",
     "static.common.max20digittext": "Máximo de 20 caracteres",
-    "static.shipment.totalCost":"Custo total"
+    "static.shipment.totalCost":"Custo total",
+    "static.supplyPlan.startMonth":"Mês de início"
 }

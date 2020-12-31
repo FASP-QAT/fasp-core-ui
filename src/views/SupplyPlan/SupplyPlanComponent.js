@@ -32,6 +32,8 @@ import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import SupplyPlanFormulas from "./SupplyPlanFormulas";
 import AuthenticationService from "../Common/AuthenticationService";
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -40,6 +42,10 @@ export default class SupplyPlanComponent extends React.Component {
 
     constructor(props) {
         super(props);
+        var value = JSON.parse(localStorage.getItem("sesStartDate"));
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
             loading: true,
             monthsArray: [],
@@ -72,7 +78,7 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: 0,
+            monthCount: monthDifference,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -107,8 +113,18 @@ export default class SupplyPlanComponent extends React.Component {
             showInventory: 0,
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
-            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            startDate: JSON.parse(localStorage.getItem("sesStartDate")),
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            // startDateFormat:curDate
         }
+
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
+
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -140,6 +156,23 @@ export default class SupplyPlanComponent extends React.Component {
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.hideFourthComponent = this.hideFourthComponent.bind(this);
         this.hideFifthComponent = this.hideFifthComponent.bind(this);
+    }
+
+    _handleClickRangeBox(e) {
+        console.log("Thuis.refs", this);
+        this.pickRange.current.show()
+    }
+
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
+        this.setState({ startDate: value, monthCount: monthDifference })
+        localStorage.setItem("sesStartDate", JSON.stringify(value));
+        this.formSubmit(this.state.planningUnit, monthDifference);
     }
 
     hideFirstComponent() {
@@ -182,7 +215,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     roundN = num => {
-        if (num!=null && num != '') {
+        if (num != null && num != '') {
             return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
         } else {
             return ''
@@ -190,7 +223,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatter = value => {
-        if (value!=null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -201,7 +234,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (value!=null && isNaN(Number(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -209,7 +242,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatterDouble = value => {
-        if (value!=null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = this.roundN(value)
             cell1 += '';
             var x = cell1.split('.');
@@ -220,7 +253,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (value!=null && isNaN(Number(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -302,6 +335,11 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             activeTab: newArray,
         });
+        console.log("Tab---------->", tab)
+        if (tab == 2) {
+            console.log("In if", this.compareChild)
+            this.refs.compareChild.formSubmit(this.state.monthCount)
+        }
     }
 
 
@@ -2243,6 +2281,8 @@ export default class SupplyPlanComponent extends React.Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -3050,6 +3090,7 @@ export default class SupplyPlanComponent extends React.Component {
                             })
                             console.log("consumptionTotalData------------->", consumptionTotalData)
                             console.log("Opening balance array", openingBalanceArray);
+                            // this.compareChild.formSubmit(this.state.monthCount);
                             // } else {
                             // console.log("In else")
                             // this.setState({ loading: false })
@@ -3595,6 +3636,16 @@ export default class SupplyPlanComponent extends React.Component {
 
     render() {
         const { programList } = this.state;
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -3629,6 +3680,23 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                        <div className="controls edit">
+
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={this.state.startDate}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">

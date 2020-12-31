@@ -98,6 +98,10 @@ export default class WhatIfReportComponent extends React.Component {
         let rows = [];
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
+        var value = JSON.parse(localStorage.getItem("sesStartDate"));
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
             loading: true,
             monthsArray: [],
@@ -130,7 +134,7 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: 0,
+            monthCount: monthDifference,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -174,8 +178,15 @@ export default class WhatIfReportComponent extends React.Component {
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             showScenarioList: false,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
-            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            startDate: JSON.parse(localStorage.getItem("sesStartDate")),
         }
+
+        this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
+        this.handleRangeChange1 = this.handleRangeChange1.bind(this);
+        this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
+        this.pickRange1 = React.createRef();
+
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -223,6 +234,23 @@ export default class WhatIfReportComponent extends React.Component {
 
         this.toggleAccordionScenarioList = this.toggleAccordionScenarioList.bind(this);
         this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
+    }
+
+    _handleClickRangeBox1(e) {
+        console.log("Thuis.refs", this);
+        this.pickRange1.current.show()
+    }
+
+    handleRangeChange1(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis1(value) {
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
+        this.setState({ startDate: value, monthCount: monthDifference })
+        localStorage.setItem("sesStartDate", JSON.stringify(value));
+        this.formSubmit(this.state.planningUnit, monthDifference);
     }
 
     show() {
@@ -1717,6 +1745,8 @@ export default class WhatIfReportComponent extends React.Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -4267,7 +4297,16 @@ export default class WhatIfReportComponent extends React.Component {
 
     render() {
         const { programList } = this.state;
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
 
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -4286,6 +4325,23 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <div className=" pl-0">
                             <div className="row">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <div className="controls edit">
+
+                                        <Picker
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                            ref={this.pickRange}
+                                            value={this.state.startDate}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+                                    </div>
+                                </FormGroup>
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
