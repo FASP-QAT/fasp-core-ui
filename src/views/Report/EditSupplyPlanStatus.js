@@ -1379,9 +1379,14 @@ class EditSupplyPlanStatus extends Component {
                                 var sstd = {}
                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                 var compare = (m[n].startDate >= currentMonth);
-                                var stockInHand = jsonList[0].closingBalance;
                                 var amc = Math.round(parseFloat(jsonList[0].amc));
-                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
+                                var spd1=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).format("YYYY-MM"));
+                                    var spd2=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(1,'months').format("YYYY-MM"));
+                                    var spd3=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(2,'months').format("YYYY-MM"));
+                                    var mosForMonth1=spd1.length>0?spd1[0].mos:0;
+                                    var mosForMonth2=spd2.length>0?spd2[0].mos:0;
+                                    var mosForMonth3=spd3.length>0?spd3[0].mos:0;
+                                    if (compare && Number(mosForMonth1)<=Number(minStockMoSQty) && Number(mosForMonth2)<=Number(minStockMoSQty) && Number(mosForMonth3)<=Number(minStockMoSQty)) {
                                     var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
                                     if (suggestedOrd == 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
