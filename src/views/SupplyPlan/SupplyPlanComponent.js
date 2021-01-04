@@ -182,7 +182,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     roundN = num => {
-        if (num!=null && num != '') {
+        if (num != null && num != '') {
             return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
         } else {
             return ''
@@ -190,7 +190,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatter = value => {
-        if (value!=null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -201,7 +201,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (value!=null && isNaN(Number(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -209,7 +209,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatterDouble = value => {
-        if (value!=null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = this.roundN(value)
             cell1 += '';
             var x = cell1.split('.');
@@ -220,7 +220,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (value!=null && isNaN(Number(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -2832,13 +2832,13 @@ export default class SupplyPlanComponent extends React.Component {
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     var amc = Math.round(Number(jsonList[0].amc));
-                                    var spd1=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).format("YYYY-MM"));
-                                    var spd2=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(1,'months').format("YYYY-MM"));
-                                    var spd3=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(2,'months').format("YYYY-MM"));
-                                    var mosForMonth1=spd1.length>0?spd1[0].mos:0;
-                                    var mosForMonth2=spd2.length>0?spd2[0].mos:0;
-                                    var mosForMonth3=spd3.length>0?spd3[0].mos:0;
-                                    if (compare && Number(mosForMonth1)<=Number(minStockMoSQty) && Number(mosForMonth2)<=Number(minStockMoSQty) && Number(mosForMonth3)<=Number(minStockMoSQty)) {
+                                    var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                    var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                    var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                    if (compare && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
                                         var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
@@ -4482,13 +4482,13 @@ export default class SupplyPlanComponent extends React.Component {
                                             var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                             var compare = (m[n].startDate >= currentMonth);
                                             var amc = Math.round(Number(jsonList[0].amc));
-                                            var spd1=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).format("YYYY-MM"));
-                                    var spd2=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(1,'months').format("YYYY-MM"));
-                                    var spd3=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(2,'months').format("YYYY-MM"));
-                                    var mosForMonth1=spd1.length>0?spd1[0].mos:0;
-                                    var mosForMonth2=spd2.length>0?spd2[0].mos:0;
-                                    var mosForMonth3=spd3.length>0?spd3[0].mos:0;
-                                    if (compare && Number(mosForMonth1)<=Number(minStockMoSQty) && Number(mosForMonth2)<=Number(minStockMoSQty) && Number(mosForMonth3)<=Number(minStockMoSQty)) {
+                                            var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                            var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                            var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                            if (compare && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
                                                 var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - jsonList[0].closingBalance);
                                                 if (suggestedOrd == 0) {
                                                     var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +

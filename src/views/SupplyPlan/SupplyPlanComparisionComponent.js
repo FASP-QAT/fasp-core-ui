@@ -186,12 +186,12 @@ export default class SupplyPlanComponent extends React.Component {
 
     exportCSV = () => {
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
 
-        csvRow.push( "\""+(i18n.t('static.planningunit.planningunit') + ' : ' + this.props.items.planningUnitName).replaceAll(' ', '%20')+ "\"")
+        csvRow.push("\"" + (i18n.t('static.planningunit.planningunit') + ' : ' + this.props.items.planningUnitName).replaceAll(' ', '%20') + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
@@ -269,7 +269,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatter = value => {
-        if (value!=null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -280,7 +280,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (value!=null && isNaN(Number(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -635,7 +635,7 @@ export default class SupplyPlanComponent extends React.Component {
                             // name: // programJson.regionList[i].regionId,
                             name: getLabelText(programJson.regionList[i].label, this.state.lang),
                             id: programJson.regionList[i].regionId,
-                            label:programJson.regionList[i].label
+                            label: programJson.regionList[i].label
                         }
                         regionList.push(regionJson)
 
@@ -1097,10 +1097,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
-                                    var paColor1=""
-                                    var paColor2=""
-                                    var paColor3=""
-                                    var paColor4=""
+                                    var paColor1 = ""
+                                    var paColor2 = ""
+                                    var paColor3 = ""
+                                    var paColor4 = ""
                                     var isEmergencyOrder1 = 0;
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;
@@ -1291,13 +1291,13 @@ export default class SupplyPlanComponent extends React.Component {
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     var amc = Math.round(Number(jsonList[0].amc));
-                                    var spd1=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).format("YYYY-MM"));
-                                    var spd2=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(1,'months').format("YYYY-MM"));
-                                    var spd3=supplyPlanData.filter(c=>moment(c.transDate).format("YYYY-MM")==moment(m[n].startDate).add(2,'months').format("YYYY-MM"));
-                                    var mosForMonth1=spd1.length>0?spd1[0].mos:0;
-                                    var mosForMonth2=spd2.length>0?spd2[0].mos:0;
-                                    var mosForMonth3=spd3.length>0?spd3[0].mos:0;
-                                    if (compare && Number(mosForMonth1)<=Number(minStockMoSQty) && Number(mosForMonth2)<=Number(minStockMoSQty) && Number(mosForMonth3)<=Number(minStockMoSQty)) {
+                                    var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                    var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                    var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                    if (compare && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
                                         var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - jsonList[0].closingBalance);
                                         if (suggestedOrd == 0) {
                                             var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
@@ -1355,13 +1355,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                             if (noOfActualEntries > 0) {
                                                 if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 }
                                                 actualFlagForRegion = true;
                                             } else {
-                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 actualFlagForRegion = false;
                                             }
                                         }
@@ -1850,7 +1850,7 @@ export default class SupplyPlanComponent extends React.Component {
                     c.region.id == region &&
                     moment(c.inventoryDate).format("MMM YY") == month);
                 if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty !=="" && c.actualQty != undefined && c.actualQty != null);
+                    inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
                 } else {
                     inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                 }
@@ -2438,21 +2438,21 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                        </div>
-                        {
-                                    this.state.jsonArrForGraph.length > 0
-                                    &&
-                                    <div className="row" >
+                            </div>
+                            {
+                                this.state.jsonArrForGraph.length > 0
+                                &&
+                                <div className="row" >
 
-                                        <div className="graphwidth">
+                                    <div className="graphwidth">
                                         <div className="col-md-12">
                                             <div className="chart-wrapper chart-graph-report">
                                                 <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                             </div>
-                                            </div>
                                         </div>
-                                        <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
-                                    </div>}
+                                    </div>
+                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                </div>}
 
                         </div>
                     </div>
@@ -2863,7 +2863,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty>0?item.expiredQty:item.openingBalance} /></td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty > 0 ? item.expiredQty : item.openingBalance} /></td>
                                             </tr>
                                         )
                                         )
