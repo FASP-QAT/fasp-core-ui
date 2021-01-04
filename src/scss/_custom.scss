@@ -670,6 +670,19 @@ label.arrow_label:after {
   background-color: #808080 !important;
 }
 
+.jexcel > tbody > tr > td.shipmentEntryEmergency {
+  color: red !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryDoNotInclude {
+  background-color: #D3D3D3 !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryDelete {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
 .shipmentNotActive{
   color: #808080 !important;
   background-color: #808080 !important;
