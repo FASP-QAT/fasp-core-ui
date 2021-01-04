@@ -98,6 +98,10 @@ export default class WhatIfReportComponent extends React.Component {
         let rows = [];
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
+        var value = JSON.parse(localStorage.getItem("sesStartDate"));
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
             loading: true,
             monthsArray: [],
@@ -130,7 +134,7 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: 0,
+            monthCount: monthDifference,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -174,8 +178,15 @@ export default class WhatIfReportComponent extends React.Component {
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             showScenarioList: false,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
-            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            startDate: JSON.parse(localStorage.getItem("sesStartDate")),
         }
+
+        this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
+        this.handleRangeChange1 = this.handleRangeChange1.bind(this);
+        this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
+        this.pickRange1 = React.createRef();
+
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -223,6 +234,25 @@ export default class WhatIfReportComponent extends React.Component {
 
         this.toggleAccordionScenarioList = this.toggleAccordionScenarioList.bind(this);
         this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
+        this.scenarioCheckedChanged = this.scenarioCheckedChanged.bind(this);
+        this.saveScenario = this.saveScenario.bind(this);
+    }
+
+    _handleClickRangeBox1(e) {
+        console.log("Thuis.refs", this);
+        this.pickRange1.current.show()
+    }
+
+    handleRangeChange1(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis1(value) {
+        var date = moment(value.year + "-" + value.month + "-01").format("YYYY-MM-DD");
+        var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
+        this.setState({ startDate: value, monthCount: monthDifference })
+        localStorage.setItem("sesStartDate", JSON.stringify(value));
+        this.formSubmit(this.state.planningUnit, monthDifference);
     }
 
     show() {
@@ -503,6 +533,369 @@ export default class WhatIfReportComponent extends React.Component {
         });
     }
 
+    scenarioCheckedChanged(id) {
+        var rows = this.state.rows;
+        rows[id].scenarioChecked = !rows[id].scenarioChecked;
+        this.setState({
+            rows: rows
+        }, () => {
+            document.getElementById("saveScenarioDiv").style.display = 'block'
+        })
+    }
+
+    saveScenario() {
+        this.setState({ loading: true });
+        var db1;
+        var storeOS;
+        var programId = (document.getElementById("programId").value);
+        var planningUnitId = (document.getElementById("planningUnitId").value);
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "red"
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+            programRequest.onerror = function (event) {
+                this.setState({
+                    supplyPlanError: i18n.t('static.program.errortext'),
+                    loading: false,
+                    color: "red"
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                // var consumptionList=programJson.consumptionList;
+                // var inventoryList=programJson.inventoryList;
+                // var shipmentList=programJson.shipmentList;
+                var rows = this.state.rows;
+                var minimumDate = moment(Date.now()).format("YYYY-MM-DD");
+                console.log("Rows---------------------->", rows);
+                for (var r = 0; r < rows.length; r++) {
+                    if (rows[r].scenarioChecked) {
+                        console.log("In scenario Checked---------------------->");
+                        if (rows[r].scenarioId == 3) {
+                            // var rangeValue = this.state.rangeValue;
+                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                            var shipmentList = programJson.shipmentList;
+                            var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
+                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                minimumDate = minDate;
+                            }
+                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
+                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                var index = 0;
+                                if (shipmentUnFundedList[i].shipmentId > 0) {
+                                    index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                } else {
+                                    index = shipmentUnFundedList[i].index;
+                                }
+                                shipmentList[index].active = 0;
+                            }
+                            programJson.shipmentList = shipmentList;
+                        } else if (rows[r].scenarioId == 1) {
+                            console.log("In scenario Checked 1---------------------->", r);
+                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                            console.log("In scenario Checked 1---------------------->startDate", startDate);
+                            console.log("In scenario Checked 1---------------------->stop date", stopDate);
+
+                            var consumptionList = programJson.consumptionList;
+                            var consumptionFiltered = consumptionList.filter(c => c.active == true
+                                && c.planningUnit.id == planningUnitId
+                                && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
+                                && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
+                                && (c.actualFlag).toString() == "false"
+                            );
+                            console.log("In scenario Checked 1---------------------->", r, " Consumption filteered", consumptionFiltered);
+                            var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
+                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                minimumDate = minDate;
+                            }
+                            for (var i = 0; i < consumptionFiltered.length; i++) {
+                                var index = 0;
+                                if (consumptionFiltered[i].consumptionId > 0) {
+                                    index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
+                                } else {
+                                    index = consumptionList.findIndex(c =>
+                                        c.region.id == consumptionFiltered[i].region.id &&
+                                        c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
+                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).filter("YYYY-MM") &&
+                                        c.actualFlag == consumptionFiltered[i].actualFlag
+                                    );
+                                }
+                                consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                                consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                                console.log("In scenario Checked 1---------------------->", Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty)))))
+                            }
+                            programJson.consumptionList = consumptionList;
+                        } else if (rows[r].scenarioId == 2) {
+                            // var rangeValue = this.state.rangeValue;
+                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                            var consumptionList = programJson.consumptionList;
+                            var consumptionFiltered = consumptionList.filter(c => c.active == true
+                                && c.planningUnit.id == planningUnitId
+                                && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
+                                && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
+                                && (c.actualFlag).toString() == "false"
+                            );
+                            var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
+                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                minimumDate = minDate;
+                            }
+                            console.log("Consumption List", consumptionFiltered);
+                            for (var i = 0; i < consumptionFiltered.length; i++) {
+                                var index = 0;
+                                if (consumptionFiltered[i].consumptionId > 0) {
+                                    index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
+                                } else {
+                                    index = consumptionList.findIndex(c =>
+                                        c.region.id == consumptionFiltered[i].region.id &&
+                                        c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
+                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).filter("YYYY-MM") &&
+                                        c.actualFlag == consumptionFiltered[i].actualFlag
+                                    );
+                                }
+                                consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                                consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                                console.log("In scenario Checked 1---------------------->2 ", Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty)))))
+                            }
+                            programJson.consumptionList = consumptionList;
+                        } else if (rows[r].scenarioId == 4) {
+                            var shipmentList = programJson.shipmentList;
+                            var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                minimumDate = minDate;
+                            }
+                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
+                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                                var plannedDate = shipmentUnFundedList[i].plannedDate;
+                                var submittedDate = shipmentUnFundedList[i].submittedDate;
+                                var approvedDate = shipmentUnFundedList[i].approvedDate;
+                                var shippedDate = shipmentUnFundedList[i].shippedDate;
+                                var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                                var receivedDate = shipmentUnFundedList[i].receivedDate;
+                                var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                                if (shipmentUnFundedList[i].localProcurement) {
+                                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var leadTimesPerStatus = addLeadTimes / 5;
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                } else {
+                                    var ppUnit = papuResult;
+                                    var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
+                                    var approvedToShippedLeadTime = "";
+                                    approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                    if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                    }
+
+                                    var shippedToArrivedLeadTime = ""
+                                    if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                    } else {
+                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                    }
+
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                    var index = 0;
+                                    if (shipmentUnFundedList[i].shipmentId > 0) {
+                                        index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                    } else {
+                                        index = shipmentUnFundedList[i].index;
+                                    }
+                                    shipmentList[index].accountFlag = 0;
+                                }
+                            }
+                            programJson.shipmentList = shipmentList;
+                        } else if (rows[r].scenarioId == 5) {
+                            var shipmentList = programJson.shipmentList;
+                            var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
+                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                minimumDate = minDate;
+                            }
+                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                                var plannedDate = shipmentUnFundedList[i].plannedDate;
+                                var submittedDate = shipmentUnFundedList[i].submittedDate;
+                                var approvedDate = shipmentUnFundedList[i].approvedDate;
+                                var shippedDate = shipmentUnFundedList[i].shippedDate;
+                                var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                                var receivedDate = shipmentUnFundedList[i].receivedDate;
+                                var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                                if (shipmentUnFundedList[i].localProcurement) {
+                                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var leadTimesPerStatus = addLeadTimes / 5;
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                } else {
+                                    var ppUnit = papuResult;
+                                    var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
+                                    var approvedToShippedLeadTime = "";
+                                    approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                    if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                    }
+
+                                    var shippedToArrivedLeadTime = ""
+                                    if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                    } else {
+                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                    }
+
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                    var index = 0;
+                                    if (shipmentUnFundedList[i].shipmentId > 0) {
+                                        index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                    } else {
+                                        index = shipmentUnFundedList[i].index;
+                                    }
+                                    shipmentList[index].accountFlag = 0;
+                                }
+                            }
+                            programJson.shipmentList = shipmentList;
+                        } else if (rows[r].scenarioId == 6) {
+                            console.log("In6")
+                            var shipmentList = programJson.shipmentList;
+                            // var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
+                            var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
+                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                minimumDate = minDate;
+                            }
+                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
+                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                                var plannedDate = shipmentUnFundedList[i].plannedDate;
+                                var submittedDate = shipmentUnFundedList[i].submittedDate;
+                                var approvedDate = shipmentUnFundedList[i].approvedDate;
+                                var shippedDate = shipmentUnFundedList[i].shippedDate;
+                                var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                                var receivedDate = shipmentUnFundedList[i].receivedDate;
+                                var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                                if (shipmentUnFundedList[i].localProcurement) {
+                                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var leadTimesPerStatus = addLeadTimes / 5;
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                } else {
+                                    var ppUnit = papuResult;
+                                    var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    }
+                                    var approvedToShippedLeadTime = "";
+                                    approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                    if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                    }
+
+                                    var shippedToArrivedLeadTime = ""
+                                    if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                    } else {
+                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                    }
+
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                }
+                                if (moment(shippedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD") && ((shipmentUnFundedList[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS))) {
+                                    var index = 0;
+                                    if (shipmentUnFundedList[i].shipmentId > 0) {
+                                        index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                    } else {
+                                        index = shipmentUnFundedList[i].index;
+                                    }
+                                    shipmentList[index].accountFlag = 0;
+                                }
+                                if (moment(arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && ((shipmentUnFundedList[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentUnFundedList[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS))) {
+                                    var index = 0;
+                                    if (shipmentUnFundedList[i].shipmentId > 0) {
+                                        index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                    } else {
+                                        index = shipmentUnFundedList[i].index;
+                                    }
+                                    shipmentList[index].accountFlag = 0;
+                                }
+                            }
+                            programJson.shipmentList = shipmentList;
+
+                        }
+                    }
+                }
+                var transaction1 = db1.transaction(['whatIfProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('whatIfProgramData');
+                var programRequest1 = programTransaction1.get(programId);
+                programRequest1.onsuccess = function (event) {
+                    programRequest1.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest1 = programTransaction1.put(programRequest1.result);
+                    putRequest1.onerror = function (event) {
+                        this.setState({
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    putRequest1.onsuccess = function (event) {
+                        document.getElementById("saveScenarioDiv").style.display='none'
+                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"));
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
     addRow() {
         this.setState({ loading: true });
         var db1;
@@ -569,8 +962,9 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
-                            startDate: moment(startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
-                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)
+                            startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                            scenarioChecked: true
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
@@ -624,8 +1018,9 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
-                            startDate: moment(startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
-                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE),
+                            startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                            scenarioChecked: true
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
@@ -684,6 +1079,7 @@ export default class WhatIfReportComponent extends React.Component {
                             percentage: this.state.percentage,
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                            scenarioChecked: true
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
@@ -767,7 +1163,8 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
                             startDate: "",
-                            stopDate: ""
+                            stopDate: "",
+                            scenarioChecked: true
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
@@ -850,7 +1247,8 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
                             startDate: "",
-                            stopDate: ""
+                            stopDate: "",
+                            scenarioChecked: true
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
@@ -944,7 +1342,8 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
                             startDate: "",
-                            stopDate: ""
+                            stopDate: "",
+                            scenarioChecked: true
                         })
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
@@ -1724,6 +2123,8 @@ export default class WhatIfReportComponent extends React.Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -3431,6 +3832,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Table responsive>
                                     <thead>
                                         <tr>
+                                            <th></th>
                                             <th className="text-left">{i18n.t('static.whatIf.scenario')}</th>
                                             <th className="text-left">{i18n.t('static.common.startdate')}</th>
                                             <th className="text-left">{i18n.t('static.common.stopdate')}</th>
@@ -3441,9 +3843,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
+                                                    <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td>
                                                     <td>{this.state.rows[idx].scenarioName}</td>
-                                                    <td>{this.state.rows[idx].startDate}</td>
-                                                    <td>{this.state.rows[idx].stopDate}</td>
+                                                    <td>{moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
+                                                    <td>{moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                     <td>{this.state.rows[idx].percentage}</td>
 
                                                 </tr>
@@ -3451,6 +3854,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         }
                                     </tbody>
                                 </Table>
+                                <div id="saveScenarioDiv" style={{ display: "none" }}><Button type="submit" size="md" color="success" onClick={this.saveScenario} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button></div>
                             </Col>
                         </Col>
                     </Row>
@@ -4274,7 +4678,16 @@ export default class WhatIfReportComponent extends React.Component {
 
     render() {
         const { programList } = this.state;
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
 
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -4293,6 +4706,23 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <div className=" pl-0">
                             <div className="row">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <div className="controls edit">
+
+                                        <Picker
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                            ref={this.pickRange}
+                                            value={this.state.startDate}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+                                    </div>
+                                </FormGroup>
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">

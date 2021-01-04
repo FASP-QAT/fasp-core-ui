@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Online } from "react-detect-offline";
 import jwt_decode from 'jwt-decode'
-import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME, MONTHS_IN_PAST_FOR_SUPPLY_PLAN } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
@@ -1241,9 +1241,9 @@ class AuthenticationService {
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesProgramIdReport", "sesVersionIdReport"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed","sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesProgramIdReport", "sesVersionIdReport"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed","sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1270,6 +1270,9 @@ class AuthenticationService {
         localStorage.setItem('sesReviewed', "-1");
         localStorage.setItem('sesProgramIdReport', "");
         localStorage.setItem('sesVersionIdReport', "");
+        var currentDate = moment(Date.now()).utcOffset('-0500')
+        var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
+        localStorage.setItem('sesStartDate',JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
     }
 
     getIconAndStaticLabel(val) {
