@@ -68,6 +68,8 @@ class AnnualShipmentCost extends Component {
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             outPutList: [],
             message: '',
+            programId: '',
+            versionId: ''
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -81,6 +83,8 @@ class AnnualShipmentCost extends Component {
         this.getShipmentStatusList = this.getShipmentStatusList.bind(this);
         this.filterVersion = this.filterVersion.bind(this);
         //this.pickRange = React.createRef()
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
 
     }
     roundN = num => {
@@ -443,13 +447,28 @@ class AnnualShipmentCost extends Component {
                     }
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -845,9 +864,11 @@ class AnnualShipmentCost extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
@@ -926,11 +947,23 @@ class AnnualShipmentCost extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        }),
+                        versionId: localStorage.getItem("sesVersionIdReport")
+                    }, () => {
+                        this.getPlanningUnit();
                     })
-                })
+                } else {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })
+                    })
+                }
 
             }.bind(this);
 
@@ -950,6 +983,7 @@ class AnnualShipmentCost extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
             } else {
+                localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
                     const lan = 'en';
                     var db1;
@@ -972,7 +1006,7 @@ class AnnualShipmentCost extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -1314,6 +1348,24 @@ class AnnualShipmentCost extends Component {
         // this.getProductCategories()
     }
 
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.filterVersion();
+        })
+
+    }
+
+    setVersionId(event) {
+        this.setState({
+            versionId: event.target.value
+        }, () => {
+            this.getPlanningUnit();
+        })
+
+    }
+
     render() {
         const { versions } = this.state;
         let versionList = versions.length > 0
@@ -1470,7 +1522,9 @@ class AnnualShipmentCost extends Component {
                                                             id="programId"
                                                             bsSize="sm"
                                                             // onChange={this.getProductCategories}
-                                                            onChange={this.filterVersion}
+                                                            // onChange={this.filterVersion}
+                                                            onChange={(e) => { this.setProgramId(e); }}
+                                                            value={this.state.programId}
 
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
@@ -1509,7 +1563,8 @@ class AnnualShipmentCost extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                            onChange={(e) => { this.setVersionId(e); }}
+                                                            value={this.state.versionId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}

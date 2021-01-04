@@ -224,6 +224,8 @@ class ForcastMatrixOverTime extends Component {
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      programId: '',
+      versionId: ''
 
 
     };
@@ -236,6 +238,8 @@ class ForcastMatrixOverTime extends Component {
     // this.getProductCategories = this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    this.setProgramId = this.setProgramId.bind(this);
+    this.setVersionId = this.setVersionId.bind(this);
   }
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
@@ -563,13 +567,28 @@ class ForcastMatrixOverTime extends Component {
 
         }
         var lang = this.state.lang;
-        this.setState({
-          programs: proList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-          }),
-        })
+
+        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: localStorage.getItem("sesProgramIdReport")
+          }, () => {
+            this.filterVersion();
+          })
+        } else {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+          })
+        }
+
 
       }.bind(this);
 
@@ -580,9 +599,11 @@ class ForcastMatrixOverTime extends Component {
 
 
   filterVersion = () => {
-    let programId = document.getElementById("programId").value;
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     if (programId != 0) {
 
+      localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
@@ -659,11 +680,24 @@ class ForcastMatrixOverTime extends Component {
         }
 
         console.log(verList)
-        this.setState({
-          versions: verList.filter(function (x, i, a) {
-            return a.indexOf(x) === i;
+
+        if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            }),
+            versionId: localStorage.getItem("sesVersionIdReport")
+          }, () => {
+            this.getPlanningUnit();
           })
-        })
+        } else {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -686,6 +720,7 @@ class ForcastMatrixOverTime extends Component {
           this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
         })
       } else {
+        localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
           const lan = 'en';
           var db1;
@@ -708,7 +743,7 @@ class ForcastMatrixOverTime extends Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                   proList[i] = myResult[i]
                 }
@@ -816,6 +851,23 @@ class ForcastMatrixOverTime extends Component {
 
 
   }
+
+  setProgramId(event) {
+    this.setState({
+      programId: event.target.value
+    }, () => {
+      this.filterVersion();
+    })
+  }
+
+  setVersionId(event) {
+    this.setState({
+      versionId: event.target.value
+    }, () => {
+      this.getPlanningUnit();
+    })
+  }
+
   rowtextFormatClassName(row) {
     return (row.forecastError > 50) ? 'textcolor-red' : '';
   }
@@ -1225,7 +1277,9 @@ class ForcastMatrixOverTime extends Component {
                                   name="programId"
                                   id="programId"
                                   bsSize="sm"
-                                  onChange={this.filterVersion}
+                                  // onChange={this.filterVersion}
+                                  onChange={(e) => { this.setProgramId(e) }}
+                                  value={this.state.programId}
                                 >
                                   <option value="0">{i18n.t('static.common.select')}</option>
                                   {programs.length > 0
@@ -1290,7 +1344,9 @@ class ForcastMatrixOverTime extends Component {
                                   name="versionId"
                                   id="versionId"
                                   bsSize="sm"
-                                  onChange={(e) => { this.getPlanningUnit(); }}
+                                  // onChange={(e) => { this.getPlanningUnit(); }}
+                                  onChange={(e) => { this.setVersionId(e) }}
+                                  value={this.state.versionId}
                                 >
                                   <option value="0">{i18n.t('static.common.select')}</option>
                                   {versionList}

@@ -753,6 +753,7 @@ export default class ConsumptionDetails extends React.Component {
         let programId = document.getElementById('programId').value;
         this.setState({ programId: programId });
         if (programId != 0) {
+            localStorage.setItem("sesProgramId", programId);
             this.refs.problemListChild.qatProblemActions(programId);
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });

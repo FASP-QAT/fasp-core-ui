@@ -63,7 +63,9 @@ export default class StockStatusMatrix extends React.Component {
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
-      loading: true
+      loading: true,
+      programId: '',
+      versionId: ''
 
     }
     this.filterData = this.filterData.bind(this);
@@ -71,6 +73,8 @@ export default class StockStatusMatrix extends React.Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+    this.setProgramId = this.setProgramId.bind(this);
+    this.setVersionId = this.setVersionId.bind(this);
 
   }
 
@@ -184,9 +188,11 @@ export default class StockStatusMatrix extends React.Component {
     //console.log('In filter data---' + this.state.rangeValue.from.year)
     let startDate = this.state.startYear + '-01-01';
     let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
-    let programId = document.getElementById("programId").value;
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    let versionId = document.getElementById("versionId").value;
+    // let versionId = document.getElementById("versionId").value;
+    let versionId = this.state.versionId;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
     if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
 
@@ -702,13 +708,29 @@ export default class StockStatusMatrix extends React.Component {
 
         }
         var lang = this.state.lang;
-        this.setState({
-          programs: proList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
+
+        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: localStorage.getItem("sesProgramIdReport")
+          }, () => {
+            this.filterVersion();
+            this.filterData();
           })
-        })
+        } else {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -719,9 +741,11 @@ export default class StockStatusMatrix extends React.Component {
 
 
   filterVersion = () => {
-    let programId = document.getElementById("programId").value;
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     if (programId != 0) {
 
+      localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
@@ -794,11 +818,23 @@ export default class StockStatusMatrix extends React.Component {
         }
 
         console.log(verList)
-        this.setState({
-          versions: verList.filter(function (x, i, a) {
-            return a.indexOf(x) === i;
+        if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            }),
+            versionId: localStorage.getItem("sesVersionIdReport")
+          }, () => {
+            this.getPlanningUnit();
           })
-        })
+        } else {
+          this.setState({
+            versions: verList.filter(function (x, i, a) {
+              return a.indexOf(x) === i;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -824,6 +860,7 @@ export default class StockStatusMatrix extends React.Component {
       if (versionId == 0) {
         this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
       } else {
+        localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
           const lan = 'en';
           var db1;
@@ -846,7 +883,7 @@ export default class StockStatusMatrix extends React.Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                   proList[i] = myResult[i]
                 }
@@ -951,6 +988,25 @@ export default class StockStatusMatrix extends React.Component {
 
   componentDidMount() {
     this.getPrograms();
+
+  }
+
+  setProgramId(event) {
+    this.setState({
+      programId: event.target.value
+    }, () => {
+      this.filterVersion();
+      this.filterData()
+    })
+
+  }
+
+  setVersionId(event) {
+    this.setState({
+      versionId: event.target.value
+    }, () => {
+      this.getPlanningUnit();
+    })
 
   }
 
@@ -1445,8 +1501,9 @@ export default class StockStatusMatrix extends React.Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={(e) => { this.filterVersion(); this.filterData(e) }}
-
+                        // onChange={(e) => { this.filterVersion(); this.filterData(e) }}
+                        onChange={(e) => { this.setProgramId(e); }}
+                        value={this.state.programId}
 
                       >
                         <option value="0">{i18n.t('static.common.select')}</option>
@@ -1465,7 +1522,9 @@ export default class StockStatusMatrix extends React.Component {
                         name="versionId"
                         id="versionId"
                         bsSize="sm"
-                        onChange={(e) => { this.getPlanningUnit(); }}
+                        // onChange={(e) => { this.getPlanningUnit(); }}
+                        onChange={(e) => { this.setVersionId(e); }}
+                        value={this.state.versionId}
                       >
                         <option value="0">{i18n.t('static.common.select')}</option>
                         {versionList}

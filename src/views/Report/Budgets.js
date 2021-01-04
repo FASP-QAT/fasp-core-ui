@@ -60,7 +60,7 @@ const chartoptions =
         xAxes: [{
             scaleLabel: {
                 display: true,
-                labelString:  i18n.t('static.supplyPlan.amountInUSD')+''+i18n.t('static.report.inmillions'),
+                labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
                 fontColor: 'black',
                 fontStyle: "normal",
                 fontSize: "12"
@@ -139,7 +139,8 @@ class Budgets extends Component {
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             fundingSourceValues: [],
             fundingSourceLabels: [],
-            fundingSources: []
+            fundingSources: [],
+            programId: ''
         }
 
 
@@ -153,6 +154,8 @@ class Budgets extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
     }
     show() {
 
@@ -448,6 +451,7 @@ class Budgets extends Component {
 
         // console.log('programIds.length', programIds.length)
         if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length > 0) {
+            localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
 
                 var db1;
@@ -764,13 +768,29 @@ class Budgets extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
+                        this.filterData()
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+
+                }
 
             }.bind(this);
 
@@ -785,10 +805,12 @@ class Budgets extends Component {
 
     }
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         document.getElementById("versionId").value = 0
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
@@ -861,11 +883,23 @@ class Budgets extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        }),
+                        versionId: localStorage.getItem("sesVersionIdReport")
+                    }, () => {
+                        this.filterData();
                     })
-                })
+                } else {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -880,6 +914,25 @@ class Budgets extends Component {
     componentDidMount() {
         this.getPrograms()
         this.getFundingSource();
+    }
+
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.filterVersion();
+            this.filterData()
+        })
+
+    }
+
+    setVersionId(event) {
+        this.setState({
+            versionId: event.target.value
+        }, () => {
+            this.filterData();
+        })
+
     }
     // showSubFundingSourceLabel(cell, row) {
     //   return getLabelText(cell.label, this.state.lang);
@@ -1229,7 +1282,9 @@ class Budgets extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
-                                                onChange={(e) => { this.filterVersion(); this.filterData() }}
+                                                // onChange={(e) => { this.filterVersion(); this.filterData() }}
+                                                onChange={(e) => { this.setProgramId(e) }}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programList}
@@ -1247,7 +1302,9 @@ class Budgets extends Component {
                                                 name="versionId"
                                                 id="versionId"
                                                 bsSize="sm"
-                                                onChange={(e) => { this.filterData() }}
+                                                // onChange={(e) => { this.filterData() }}
+                                                onChange={(e) => { this.setVersionId(e) }}
+                                                value={this.state.versionId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {versionList}

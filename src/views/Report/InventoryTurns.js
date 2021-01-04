@@ -50,7 +50,9 @@ export default class InventoryTurns extends Component {
                 regionIds: [],
                 versionId: 0,
                 dt: new Date(),
-                includePlanningShipments: true
+                includePlanningShipments: true,
+                programId: '',
+                versionId: ''
             },
             programs: [],
             planningUnitList: [],
@@ -67,6 +69,8 @@ export default class InventoryTurns extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
 
     }
     makeText = m => {
@@ -208,13 +212,31 @@ export default class InventoryTurns extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        let costOfInventoryInput = this.state.CostOfInventoryInput;
+                        costOfInventoryInput.programId = localStorage.getItem("sesProgramIdReport");
+                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        this.filterVersion();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -225,11 +247,13 @@ export default class InventoryTurns extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         let costOfInventoryInput = this.state.CostOfInventoryInput;
         costOfInventoryInput.versionId = 0
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
@@ -307,11 +331,26 @@ export default class InventoryTurns extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        }),
+                        versionId: localStorage.getItem("sesVersionIdReport")
+                    }, () => {
+                        let costOfInventoryInput = this.state.CostOfInventoryInput;
+                        costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
                     })
-                })
+                } else {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -517,6 +556,30 @@ export default class InventoryTurns extends Component {
         this.getPrograms()
     }
 
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            let costOfInventoryInput = this.state.CostOfInventoryInput;
+            costOfInventoryInput.programId = this.state.programId;
+            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+            this.filterVersion();
+        })
+
+    }
+
+    setVersionId(event) {
+        this.setState({
+            versionId: event.target.value
+        }, () => {
+            let costOfInventoryInput = this.state.CostOfInventoryInput;
+            costOfInventoryInput.versionId = this.state.versionId;
+            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+        })
+
+    }
+
+
     getMonthArray = (currentDate) => {
         var month = [];
         var curDate = currentDate.subtract(0, 'months');
@@ -633,6 +696,7 @@ export default class InventoryTurns extends Component {
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
         if (programId != 0 && versionId != 0) {
+            localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
                 var startDate = moment(new Date(this.state.singleValue2.year - 1, this.state.singleValue2.month, 1));
                 var endDate = moment(this.state.CostOfInventoryInput.dt);
@@ -683,7 +747,7 @@ export default class InventoryTurns extends Component {
                             myResult = planningunitRequest.result;
 
                             for (var i = 0, j = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
                                     proList[j++] = myResult[i]
                                 }
                             }
@@ -1019,7 +1083,9 @@ export default class InventoryTurns extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
+                                                            // onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
+                                                            onChange={(e) => { this.setProgramId(e) }}
+                                                            value={this.state.programId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -1037,7 +1103,9 @@ export default class InventoryTurns extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            // onChange={(e) => { this.dataChange(e) }}
+                                                            onChange={(e) => { this.setVersionId(e) }}
+                                                            value={this.state.versionId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}

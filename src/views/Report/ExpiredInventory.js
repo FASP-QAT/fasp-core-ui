@@ -58,6 +58,8 @@ export default class ExpiredInventory extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.makeText = this.makeText.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
@@ -68,12 +70,32 @@ export default class ExpiredInventory extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programId: '',
+            versionId: ''
         }
     }
 
     componentDidMount() {
         this.getPrograms();
+    }
+
+    setProgramId(event) {
+        this.setState(
+            {
+                programId: event.target.value
+            }, () => {
+                this.filterVersion();
+            })
+    }
+
+    setVersionId(event) {
+        this.setState(
+            {
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
     }
 
     handleRangeChange(value, text, listIndex) {
@@ -220,13 +242,29 @@ export default class ExpiredInventory extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
                     })
-                })
+
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -237,9 +275,11 @@ export default class ExpiredInventory extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
@@ -317,11 +357,24 @@ export default class ExpiredInventory extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        }),
+                        versionId: localStorage.getItem("sesVersionIdReport")
+                    }, () => {
+                        this.getPlanningUnit();
                     })
-                })
+                } else {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -343,6 +396,7 @@ export default class ExpiredInventory extends Component {
                     this.el.destroy();
                 });
             } else {
+                localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
                     const lan = 'en';
                     var db1;
@@ -365,7 +419,7 @@ export default class ExpiredInventory extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -505,9 +559,9 @@ export default class ExpiredInventory extends Component {
 
         if (programId > 0 && versionId != 0) {
             if (versionId.includes('Local')) {
-                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
-         endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-        
+                startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
+                endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
                 this.setState({ loading: true })
                 var db1;
                 var storeOS;
@@ -547,18 +601,20 @@ export default class ExpiredInventory extends Component {
                         var data = []
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
-                           if(pu!=null){ var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0 || c.openingBalance > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
-                            list1.map(ele1 => {
-                                // ele1.createdDate=ele.transDate
-                                var json = {
-                                    planningUnit: pu.planningUnit,
-                                    shelfLife: pu.shelfLife,
-                                    batchInfo: ele1,
-                                    expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
-                                    program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
-                                }
-                                data.push(json)
-                             })}
+                            if (pu != null) {
+                                var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0 || c.openingBalance > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
+                                list1.map(ele1 => {
+                                    // ele1.createdDate=ele.transDate
+                                    var json = {
+                                        planningUnit: pu.planningUnit,
+                                        shelfLife: pu.shelfLife,
+                                        batchInfo: ele1,
+                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
+                                        program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
+                                    }
+                                    data.push(json)
+                                })
+                            }
                         })
                         console.log(data)
                         this.setState({
@@ -574,9 +630,12 @@ export default class ExpiredInventory extends Component {
                 ReportService.getExpiredStock(json)
                     .then(response => {
                         console.log("-----response", JSON.stringify(response.data));
-                        var data=[]
-                        data=response.data.map(ele=>({...ele,...{shelfLife:(this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnit.id))[0].shelfLife
-                        }}))
+                        var data = []
+                        data = response.data.map(ele => ({
+                            ...ele, ...{
+                                shelfLife: (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnit.id))[0].shelfLife
+                            }
+                        }))
                         console.log(data)
                         this.setState({
                             outPutList: data
@@ -1151,7 +1210,9 @@ export default class ExpiredInventory extends Component {
                                                         id="programId"
                                                         bsSize="sm"
                                                         // onChange={this.getProductCategories}
-                                                        onChange={this.filterVersion}
+                                                        // onChange={this.filterVersion}
+                                                        onChange={(e) => { this.setProgramId(e); }}
+                                                        value={this.state.programId}
 
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
@@ -1170,7 +1231,9 @@ export default class ExpiredInventory extends Component {
                                                         name="versionId"
                                                         id="versionId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.getPlanningUnit(); }}
+                                                        // onChange={(e) => { this.getPlanningUnit(); }}
+                                                        onChange={(e) => { this.setVersionId(e); }}
+                                                        value={this.state.versionId}
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {versionList}

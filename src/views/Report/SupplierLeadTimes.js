@@ -69,7 +69,8 @@ class SupplierLeadTimes extends Component {
             procurementAgenttValues: [],
             procurementAgentLabels: [],
             outPutList: [],
-            loading: true
+            loading: true,
+            programId: ''
         };
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -84,6 +85,7 @@ class SupplierLeadTimes extends Component {
         this.handleProcurementAgentChange = this.handleProcurementAgentChange.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.setprogramId = this.setprogramId.bind(this);
     }
     buildJexcel() {
 
@@ -705,13 +707,28 @@ class SupplierLeadTimes extends Component {
                     }
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.getPlanningUnit();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -801,10 +818,12 @@ class SupplierLeadTimes extends Component {
 
     getPlanningUnit = () => {
 
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         // alert(programId);
         // let versionId = document.getElementById("versionId").value;
         if (programId > 0) {
+            localStorage.setItem("sesProgramIdReport", programId);
             this.setState({
                 planningUnits: [],
                 planningUnitValues: [],
@@ -835,7 +854,7 @@ class SupplierLeadTimes extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -1501,6 +1520,15 @@ class SupplierLeadTimes extends Component {
         this.getProcurementAgent();
     }
 
+    setprogramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.getPlanningUnit();
+        })
+
+    }
+
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     onRadioBtnClick(radioSelected) {
@@ -1751,7 +1779,9 @@ class SupplierLeadTimes extends Component {
                                                 id="programId"
                                                 bsSize="sm"
                                                 // onChange={this.filterVersion}
-                                                onChange={(e) => { this.getPlanningUnit(); }}
+                                                // onChange={(e) => { this.getPlanningUnit(); }}
+                                                onChange={(e) => { this.setprogramId(e); }}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs.length > 0
