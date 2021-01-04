@@ -82,16 +82,20 @@ class Program extends Component {
                         message: response.data.messageCode,
                         loading: false,
                         color: "red"
+                    }, () => {
+                        this.hideFirstComponent()
                     })
-                    this.hideFirstComponent()
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false
-                        });
+                            loading: false,
+                            color: "red"
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
                     } else {
                         switch (error.response ? error.response.status : "") {
 
@@ -106,20 +110,29 @@ class Program extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                                 break;
                         }
                     }
@@ -168,16 +181,20 @@ class Program extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false, color: "red"
+                        }, () => {
+                            this.hideFirstComponent()
                         })
-                        this.hideFirstComponent()
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
-                            });
+                                loading: false,
+                                color: "red"
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
                         } else {
                             switch (error.response ? error.response.status : "") {
 
@@ -192,20 +209,29 @@ class Program extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                             }
                         }
@@ -230,8 +256,9 @@ class Program extends Component {
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
                 color: "red"
+            }, () => {
+                this.hideFirstComponent()
             })
-            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -313,16 +340,20 @@ class Program extends Component {
                                         message: response.data.messageCode,
                                         loading: false,
                                         color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
                                     })
-                                    this.hideFirstComponent()
                                 }
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                     } else {
                                         switch (error.response ? error.response.status : "") {
 
@@ -337,20 +368,29 @@ class Program extends Component {
                                             case 406:
                                                 this.setState({
                                                     message: error.response.data.messageCode,
-                                                    loading: false
-                                                });
+                                                    loading: false,
+                                                    color: "red"
+                                                }, () => {
+                                                    this.hideFirstComponent()
+                                                })
                                                 break;
                                             case 412:
                                                 this.setState({
                                                     message: error.response.data.messageCode,
-                                                    loading: false
-                                                });
+                                                    loading: false,
+                                                    color: "red"
+                                                }, () => {
+                                                    this.hideFirstComponent()
+                                                })
                                                 break;
                                             default:
                                                 this.setState({
                                                     message: 'static.unkownError',
-                                                    loading: false
-                                                });
+                                                    loading: false,
+                                                    color: "red"
+                                                }, () => {
+                                                    this.hideFirstComponent()
+                                                })
                                                 break;
                                         }
                                     }
@@ -392,16 +432,20 @@ class Program extends Component {
                         this.setState({
                             message: response.data.messageCode,
                             loading: false, color: "red"
+                        }, () => {
+                            this.hideFirstComponent()
                         })
-                        this.hideFirstComponent()
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
-                            });
+                                loading: false,
+                                color: "red"
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
                         } else {
                             switch (error.response ? error.response.status : "") {
 
@@ -416,20 +460,29 @@ class Program extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                             }
                         }
@@ -441,8 +494,9 @@ class Program extends Component {
             this.setState({
                 message: i18n.t('static.common.realmtext'),
                 color: "red"
+            }, () => {
+                this.hideFirstComponent()
             })
-            this.hideFirstComponent()
             this.setState({ loading: false });
         }
     }
@@ -475,6 +529,8 @@ class Program extends Component {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
+            }, () => {
+                this.hideFirstComponent()
             })
             // if (this.props.updateState != undefined) {
             //     this.props.updateState(false);
@@ -491,6 +547,8 @@ class Program extends Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red',
                     loading: false
+                }, () => {
+                    this.hideFirstComponent()
                 })
                 // if (this.props.updateState != undefined) {
                 //     this.props.updateState(false);
@@ -912,8 +970,9 @@ class Program extends Component {
                                                                 message: 'static.program.downloadsuccess',
                                                                 color: 'green',
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideFirstComponent()
                                                             })
-                                                            this.hideFirstComponent();
                                                             // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
                                                             this.setState({ loading: false })
                                                             // this.refs.programListChild.checkNewerVersions();
@@ -929,8 +988,9 @@ class Program extends Component {
                                                     this.setState({
                                                         message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
                                                     })
-                                                    this.setState({ loading: false, color: "red" })
-                                                    this.hideFirstComponent()
+                                                    this.setState({ loading: false, color: "red" }, () => {
+                                                        this.hideFirstComponent()
+                                                    })
                                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                 }
                                             }
@@ -1010,8 +1070,11 @@ class Program extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                             } else {
                                 switch (error.response ? error.response.status : "") {
 
@@ -1026,20 +1089,29 @@ class Program extends Component {
                                     case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                         break;
                                     case 412:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                         break;
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                         break;
                                 }
                             }
@@ -1047,7 +1119,9 @@ class Program extends Component {
                     );
 
             } else {
-                this.setState({ loading: false, color: "red" })
+                this.setState({ loading: false, color: "red" }, () => {
+                    this.hideFirstComponent()
+                })
                 alert(i18n.t('static.common.online'))
             }
             // }
