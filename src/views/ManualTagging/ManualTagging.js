@@ -21,6 +21,9 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
+import MasterSyncService from '../../api/MasterSyncService.js';
 
 
 
@@ -81,24 +84,123 @@ export default class ManualTagging extends Component {
         console.log("my conversionFactor--------", conversionFactor);
         this.setState({ loading: true })
         ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor, programId)
-            .then(response => {
-                console.log("response m tagging---", response)
-                this.setState({
-                    message: i18n.t('static.shipment.linkingsuccess'),
-                    color: 'green',
-                    haslinked: true,
-                    loading: false,
-                    alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
-                },
-                    () => {
-                        if (response.data != -1) {
-                            console.log(this.state.message, "success 1")
-                            this.hideSecondComponent();
-                            document.getElementById('div2').style.display = 'block';
-                            this.toggleLarge();
-                            this.filterData();
+            .then(response1 => {
+
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    var realmId = AuthenticationService.getRealmId();
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+                    var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+                    var updatedSyncDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var lastSyncDateRequest = lastSyncDateTransaction.getAll();
+                    lastSyncDateRequest.onsuccess = function (event) {
+
+                        var lastSyncDate = lastSyncDateRequest.result[0];
+                        console.log("lastsyncDate", lastSyncDate);
+                        var result = lastSyncDateRequest.result;
+                        console.log("Result", result)
+                        console.log("RealmId", realmId)
+                        for (var i = 0; i < result.length; i++) {
+                            if (result[i].id == realmId) {
+                                console.log("in if")
+                                var lastSyncDateRealm = lastSyncDateRequest.result[i];
+                                console.log("last sync date in realm", lastSyncDateRealm)
+                            }
+                            if (result[i].id == 0) {
+                                var lastSyncDate = lastSyncDateRequest.result[i];
+                                console.log("last sync date", lastSyncDate)
+                            }
                         }
-                    })
+                        if (lastSyncDate == undefined) {
+                            lastSyncDate = "2020-01-01 00:00:00";
+                        } else {
+                            lastSyncDate = lastSyncDate.lastSyncDate;
+                        }
+
+                        var transaction = db1.transaction(['programData'], 'readwrite');
+                        var program = transaction.objectStore('programData');
+                        var pGetRequest = program.getAll();
+                        var proList = []
+                        pGetRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext')
+                            })
+                        };
+                        pGetRequest.onsuccess = function (event) {
+                            var myResult = [];
+                            myResult = pGetRequest.result;
+
+                            let versionObject = myResult.filter(c => c.programId == programId);
+
+                            MasterSyncService.syncProgram(programId, versionObject.versionId, AuthenticationService.getLoggedInUserId(), lastSyncDate)
+                                .then(response => {
+
+                                    console.log("response1 m tagging---", response1)
+                                    this.setState({
+                                        message: i18n.t('static.shipment.linkingsuccess'),
+                                        color: 'green',
+                                        haslinked: true,
+                                        loading: false,
+                                        alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
+                                    },
+                                        () => {
+                                            if (response1.data != -1) {
+                                                console.log(this.state.message, "success 1")
+                                                this.hideSecondComponent();
+                                                document.getElementById('div2').style.display = 'block';
+                                                this.toggleLarge();
+                                                this.filterData();
+                                            }
+                                        })
+
+                                }).catch(
+                                    error => {
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 406:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
+
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
 
             }).catch(
                 error => {
@@ -108,7 +210,7 @@ export default class ManualTagging extends Component {
                             loading: false
                         });
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        switch (error.response1 ? error.response1.status : "") {
 
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
@@ -120,13 +222,13 @@ export default class ManualTagging extends Component {
                             case 404:
                             case 406:
                                 this.setState({
-                                    message: error.response.data.messageCode,
+                                    message: error.response1.data.messageCode,
                                     loading: false
                                 });
                                 break;
                             case 412:
                                 this.setState({
-                                    message: error.response.data.messageCode,
+                                    message: error.response1.data.messageCode,
                                     loading: false
                                 });
                                 break;
