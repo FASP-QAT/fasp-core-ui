@@ -273,9 +273,15 @@ class SupplyPlanFormulas extends Component {
 
                   <img className="formula-img-mr img-fluid" src={suggestorder} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx3")}</p>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx4")}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx5")}<br></br><br></br>
+                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx3")}
+
+                    </p>
                 </ListGroupItemText>
               </ListGroupItem>
 

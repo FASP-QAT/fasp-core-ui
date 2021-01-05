@@ -1591,5 +1591,10 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.ticket.changeRequest":"Changer de requête"
+    "static.ticket.changeRequest":"Changer de requête",
+    "static.supplyPlanFormula.suggestShipmentEx1":"MoS pour le mois en cours = 10",
+    "static.supplyPlanFormula.suggestShipmentEx2":"MoS pour le 1er mois suivant = 9.4",
+    "static.supplyPlanFormula.suggestShipmentEx3":"MoS pour le 2ème mois suivant = 8.4",
+    "static.supplyPlanFormula.suggestShipmentEx4":"MoS minimum = 12",
+    "static.supplyPlanFormula.suggestShipmentEx5":"Étant donné que la MoS pour les trois mois est inférieure à la MoS minimale, par conséquent"
 }

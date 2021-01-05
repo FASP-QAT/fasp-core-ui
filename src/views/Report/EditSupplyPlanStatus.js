@@ -1386,7 +1386,7 @@ class EditSupplyPlanStatus extends Component {
                                 var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
                                 var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
                                 var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
-                                if (compare && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                if (compare && Number(mosForMonth1) <= Number(minStockMoSQty) && Number(mosForMonth2) <= Number(minStockMoSQty) && Number(mosForMonth3) <= Number(minStockMoSQty)) {
                                     var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
                                     if (suggestedOrd == 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
