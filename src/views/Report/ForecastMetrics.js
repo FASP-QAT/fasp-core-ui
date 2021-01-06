@@ -154,8 +154,8 @@ class ForecastMetrics extends Component {
       message: '',
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      minDate: { year: 2017, month: 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: 12 },
       loading: true,
       programLst: []
 
@@ -1308,7 +1308,7 @@ class ForecastMetrics extends Component {
                       <div className="controls edit">
                         <Picker
                           ref="pickAMonth2"
-                         // years={{ min: this.state.minDate, max: this.state.maxDate }}
+                          years={{ min: this.state.minDate, max: this.state.maxDate }}
                           value={singleValue2}
                           lang={pickerLang.months}
                           theme="dark"

@@ -185,8 +185,8 @@ class Consumption extends Component {
       show: false,
       message: '',
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      minDate: { year: 2017, month: 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: 12 },
       loading: true
 
 
@@ -1412,7 +1412,7 @@ class Consumption extends Component {
 
                           <Picker
                             ref="pickRange"
-                           // years={{ min: this.state.minDate, max: this.state.maxDate }}
+                            years={{ min: this.state.minDate, max: this.state.maxDate }}
                             value={rangeValue}
                             lang={pickerLang}
                             //theme="light"
