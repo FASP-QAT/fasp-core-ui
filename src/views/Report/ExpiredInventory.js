@@ -73,6 +73,7 @@ export default class ExpiredInventory extends Component {
             loading: true,
             programId: '',
             versionId: ''
+
         }
     }
 

@@ -74,6 +74,7 @@ class ProcurementAgentExport extends Component {
             loading: true,
             programId: '',
             versionId: ''
+
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
