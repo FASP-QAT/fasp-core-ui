@@ -33,7 +33,6 @@ import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import SupplyPlanFormulas from "./SupplyPlanFormulas";
 import AuthenticationService from "../Common/AuthenticationService";
-import CreateCanvas from "../Common/CreateCanvas";
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -532,6 +531,11 @@ export default class SupplyPlanComponent extends React.Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
+                    var splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+                    doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
+                    splittext = doc.splitTextToSize(i18n.t('static.user.user')+' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
+                    doc.text( doc.internal.pageSize.width / 8, 60, splittext)
+          
                     doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 10, 80, {
                         align: 'left'
                     })
@@ -1514,7 +1518,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             </div>
                                             <div id="bars_div">
                                             {this.state.planningUnitData.filter(c=>c.planningUnit.id!=this.state.planningUnitId).map((ele,index)=> {
-                                               return( <div  className="chart-wrapper chart-graph-report"><Bar  id={"cool-canvas"+index} data={ele.bar} options={chartOptions}  /></div>)})}
+                                               return( <div  className="chart-wrapper chart-graph-report"><Bar  id={"cool-canvas"+index} data={ele.bar} options={ele.chartOptions}  /></div>)})}
                             </div>
                                         </div>
                                     </div>
@@ -3981,6 +3985,80 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
     getDataforExport = (report) => {
+        var chartOptions = {
+            title: {
+                display: true,
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? entityname + " - " + this.state.planningUnit.label : entityname
+            },
+            scales: {
+                yAxes: [{
+                    id: 'A',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'left',
+                },
+                {
+                    id: 'B',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'right',
+                }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return (tooltipItems.yLabel.toLocaleString());
+                    }
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
         document.getElementById("bars_div").style.display='block';
         this.setState({ loading: true }, () => {
             var m = this.state.monthsArray
@@ -4860,20 +4938,23 @@ export default class SupplyPlanComponent extends React.Component {
                                                 data: jsonArrForGraph.map((item, index) => (item.maxMos))
                                             }
                                         ]}
+                                        chartOptions.title.text=entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label,this.state.lang)
                                     var planningUnitDataforExport = {
                                         planningUnit: programPlanningUnit.planningUnit,
                                         info: planningUnitInfo,
                                         data: exportData,
-                                        bar:bar
+                                        bar:bar,
+                                        chartOptions:chartOptions
                                         
                                     }
 
                                         if(this.state.planningUnitId!=programPlanningUnit.planningUnit.id){
                                             planningUnitData.push(planningUnitDataforExport) 
-                                            this.setState({
-                                                planningUnitData: planningUnitData,
-                                                    loading: false
-                                            })   }
+                                            // this.setState({
+                                            //     planningUnitData: planningUnitData,
+                                            //         loading: false
+                                            // })
+                                           }
                                    else{
                                     selectedPlanningUnitdata=planningUnitDataforExport
                                    }
@@ -4885,9 +4966,10 @@ export default class SupplyPlanComponent extends React.Component {
                                             planningUnitData: planningUnitData,
                                             loading: false
                                         },()=>{
-                                            console.log('planningUnitData',planningUnitData)
+                                            setTimeout(() => {
                                             report == 1 ? this.exportPDF() : this.exportCSV()
                                             document.getElementById("bars_div").style.display='none';
+                                        },2000)
                                         })
 
                                      
