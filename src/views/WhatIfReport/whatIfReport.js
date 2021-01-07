@@ -4717,14 +4717,14 @@ export default class WhatIfReportComponent extends React.Component {
 
                                         <Picker
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                            ref={this.pickRange}
+                                            ref={this.pickRange1}
                                             value={this.state.startDate}
                                             lang={pickerLang}
                                             //theme="light"
-                                            onChange={this.handleRangeChange}
-                                            onDismiss={this.handleRangeDissmis}
+                                            onChange={this.handleRangeChange1}
+                                            onDismiss={this.handleRangeDissmis1}
                                         >
-                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox1} />
                                         </Picker>
                                     </div>
                                 </FormGroup>
