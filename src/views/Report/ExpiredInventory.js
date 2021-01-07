@@ -602,14 +602,14 @@ export default class ExpiredInventory extends Component {
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
                             if (pu != null) {
-                                var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0 || c.openingBalance > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
+                                var list1 = ele.batchDetails.filter(c => (c.expiredQty > 0) && (c.expiryDate >= startDate && c.expiryDate <= endDate))
                                 list1.map(ele1 => {
                                     // ele1.createdDate=ele.transDate
                                     var json = {
                                         planningUnit: pu.planningUnit,
                                         shelfLife: pu.shelfLife,
                                         batchInfo: ele1,
-                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
+                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps,
                                         program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
                                     }
                                     data.push(json)
