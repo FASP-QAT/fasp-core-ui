@@ -69,11 +69,8 @@ class StockStatusAcrossPlanningUnits extends Component {
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: 2017, month: 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: 12 },
-<<<<<<< HEAD
             programId: '',
             versionId: ''
-=======
->>>>>>> f939492cdf65fc8cfb455bca4485b555fce9eac2
 
         }
         this.buildJExcel = this.buildJExcel.bind(this);
