@@ -1597,5 +1597,10 @@
     "static.ticket.changeRequest":"Changer de requête",
     "static.common.max20digittext": "Maximum de 20 caractères",
     "static.shipment.totalCost":"Coût total",
-    "static.supplyPlan.startMonth":"Mois de début"
+    "static.supplyPlan.startMonth":"Mois de début",
+    "static.supplyPlanFormula.suggestShipmentEx1":"MoS pour le mois en cours = 10",
+    "static.supplyPlanFormula.suggestShipmentEx2":"MoS pour le 1er mois suivant = 9.4",
+    "static.supplyPlanFormula.suggestShipmentEx3":"MoS pour le 2ème mois suivant = 8.4",
+    "static.supplyPlanFormula.suggestShipmentEx4":"MoS minimum = 12",
+    "static.supplyPlanFormula.suggestShipmentEx5":"Étant donné que la MoS pour les trois mois est inférieure à la MoS minimale, par conséquent"
 }

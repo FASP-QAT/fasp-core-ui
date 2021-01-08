@@ -1194,10 +1194,10 @@ class EditSupplyPlanStatus extends Component {
                                 var isLocalProcurementAgent2 = 0;
                                 var isLocalProcurementAgent3 = 0;
                                 var isLocalProcurementAgent4 = 0;
-                                var paColor1="";
-                                var paColor2="";
-                                var paColor3="";
-                                var paColor4="";
+                                var paColor1 = "";
+                                var paColor2 = "";
+                                var paColor3 = "";
+                                var paColor4 = "";
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1379,9 +1379,14 @@ class EditSupplyPlanStatus extends Component {
                                 var sstd = {}
                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                 var compare = (m[n].startDate >= currentMonth);
-                                var stockInHand = jsonList[0].closingBalance;
                                 var amc = Math.round(parseFloat(jsonList[0].amc));
-                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
+                                var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                if (compare && Number(mosForMonth1) <= Number(minStockMoSQty) && Number(mosForMonth2) <= Number(minStockMoSQty) && Number(mosForMonth3) <= Number(minStockMoSQty)) {
                                     var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
                                     if (suggestedOrd == 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
@@ -1439,13 +1444,13 @@ class EditSupplyPlanStatus extends Component {
                                     for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                         if (noOfActualEntries > 0) {
                                             if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                             }
                                             actualFlagForRegion = true;
                                         } else {
-                                            consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                            consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                            consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                            consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                             actualFlagForRegion = false;
                                         }
                                     }
@@ -2686,11 +2691,11 @@ class EditSupplyPlanStatus extends Component {
                                                     <div className="" >
 
                                                         <div className="graphwidth">
-                                                        <div className="col-md-12">
-                                                            <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas1" data={bar} options={chartOptions} />
+                                                            <div className="col-md-12">
+                                                                <div className="chart-wrapper chart-graph-report">
+                                                                    <Bar id="cool-canvas1" data={bar} options={chartOptions} />
+                                                                </div>
                                                             </div>
-                                                        </div>
                                                         </div>
                                                         <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                     </div>}
@@ -3162,7 +3167,7 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
                     width: 80,
-                    readOnly:!this.state.editable
+                    readOnly: !this.state.editable
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
@@ -3265,7 +3270,7 @@ class EditSupplyPlanStatus extends Component {
                         title: i18n.t('static.problemContext.viewTrans'),
                         onclick: function () {
                             var myObj = obj.getRowData(y);
-                            console.log("my obj===>",myObj);
+                            console.log("my obj===>", myObj);
                             this.toggleTransView(myObj[23]);
                         }.bind(this)
                     });
@@ -3859,7 +3864,7 @@ class EditSupplyPlanStatus extends Component {
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty>0?item.expiredQty:item.openingBalance} /></td>
+                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                                     </tr>
                                                 )
                                                 )

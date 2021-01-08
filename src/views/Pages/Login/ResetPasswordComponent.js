@@ -125,12 +125,13 @@ class ResetPasswordComponent extends Component {
         this.hideFirstComponent();
         UserService.confirmForgotPasswordToken(this.state.emailId, this.state.token)
             .then(response => {
+                console.log("Reset password 1---",response)
                 this.setState({
                     message: response.data.messageCode
                 })
             }).catch(
                 error => {
-                    console.log("error---", error)
+                    console.log("Reset password 1 error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -142,6 +143,7 @@ class ResetPasswordComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
+                                console.log("Reset password 1 error 2---", error.response.data.messageCode)
                                 this.setState({ message: error.response.data.messageCode });
                                 break;
                             default:
@@ -178,10 +180,14 @@ class ResetPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                                            console.log("Reset password on submit called 1---",values)
                                             if (navigator.onLine) {
+                                                console.log("Reset password on submit email id---",this.state.emailId)
+                                                console.log("Reset password on submit token---",this.state.token)
+                                                console.log("Reset password on submit newPassword---",values.newPassword)
                                                 UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
                                                     .then(response => {
+                                                        console.log("Reset password on submit response---",response)
                                                         if (response.status == 200) {
                                                             this.props.history.push(`/login/static.message.user.passwordSuccess`)
                                                         } else {
@@ -194,6 +200,7 @@ class ResetPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
+                                                            console.log("Reset password error---",error)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
                                                                 document.getElementById('div1').style.display = 'block';
@@ -208,6 +215,7 @@ class ResetPasswordComponent extends Component {
                                                                     case 403:
                                                                     case 406:
                                                                     case 412:
+                                                                        console.log("Reset password error 2 ---",error.response.data.messageCode);
                                                                         this.setState({ message: error.response.data.messageCode },
                                                                             () => {
                                                                                 console.log("inside412");

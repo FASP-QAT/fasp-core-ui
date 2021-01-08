@@ -1594,8 +1594,13 @@
     "static.common.max15digittext": "Máximo de 15 caracteres",
     "static.common.max25digittext": "Máximo 25 caracteres solamente",
     "static.budget.usedUSDAmount": "Cantidad usada",
-    "static.ticket.changeRequest":"Solicitud de cambio",
     "static.common.max20digittext": "Máximo de 20 caracteres",
     "static.shipment.totalCost":"Coste total",
-    "static.supplyPlan.startMonth":"Mes de inicio"
+    "static.supplyPlan.startMonth":"Mes de inicio",
+    "static.ticket.changeRequest":"Solicitud de cambio",
+    "static.supplyPlanFormula.suggestShipmentEx1":"MoS para el mes actual = 10",
+    "static.supplyPlanFormula.suggestShipmentEx2":"MoS para el primer mes siguiente = 9.4",
+    "static.supplyPlanFormula.suggestShipmentEx3":"MoS para el segundo mes siguiente = 8.4",
+    "static.supplyPlanFormula.suggestShipmentEx4":"Mínimo MoS = 12",
+    "static.supplyPlanFormula.suggestShipmentEx5":"Dado que MoS para los tres meses es menor que Min MoS, por lo tanto"
 }
