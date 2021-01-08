@@ -59,11 +59,15 @@ export default class CostOfInventory extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
+            minDate: { year: 2017, month: 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: 12 },
+<<<<<<< HEAD
             loading: true,
             programId: '',
             versionId: ''
+=======
+            loading: true
+>>>>>>> f939492cdf65fc8cfb455bca4485b555fce9eac2
 
         }
         this.formSubmit = this.formSubmit.bind(this);
