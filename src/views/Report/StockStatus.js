@@ -531,6 +531,36 @@ class StockStatus extends Component {
           }
         };
         doc.autoTable(content);
+      /*  var y = doc.lastAutoTable.finalY + 20
+        var cnt=0
+        item.data.map(ele =>{ ele.shipmentInfo.map(ele1 => {
+          if (ele1.notes != null && ele1.notes != '') {
+              cnt = cnt + 1
+              if (cnt == 1) {
+                  y = y + 20
+                  doc.setFontSize(8)
+                  doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+                      align: 'left'
+                  })
+              }
+              doc.setFontSize(8)
+              y = y + 20
+              if (y > doc.internal.pageSize.height - 100) {
+                  doc.addPage();
+                  y = 80;
+
+              }
+              doc.text(moment(ele1.receivedDate == null || ele1.receivedDate == '' ? ele1.expectedDeliveryDate : ele1.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                  align: 'left'
+              })
+              doc.text(ele1.notes, doc.internal.pageSize.width / 5, y, {
+                  align: 'left'
+              })
+
+          }
+      }
+      )})*/
+
 
       }
     )
