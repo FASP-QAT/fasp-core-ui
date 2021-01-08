@@ -634,8 +634,6 @@ class StockStatus extends Component {
               }
 
 
-
-
               var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
               var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
               var monthstartfrom = this.state.rangeValue.from.month
@@ -660,7 +658,6 @@ class StockStatus extends Component {
                     conList.map(elt => {
                       totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
                     })
-
                     var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
                     var totalActualConsumption = null;
                     conListAct.map(elt => {

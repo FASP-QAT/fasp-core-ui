@@ -33,15 +33,9 @@ import ConsumptionInSupplyPlanComponent from "./ConsumptionInSupplyPlan";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
 import SupplyPlanFormulas from "./SupplyPlanFormulas";
 import AuthenticationService from "../Common/AuthenticationService";
-<<<<<<< HEAD
-<<<<<<< HEAD
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-=======
-import CreateCanvas from "../Common/CreateCanvas";
->>>>>>> multiple charts in pdf
-=======
->>>>>>> multiple planning unit export
+
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
