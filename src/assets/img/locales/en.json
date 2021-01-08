@@ -1598,6 +1598,7 @@
     "static.common.max20digittext": "Maximum of 20 characters",
     "static.shipment.totalCost":"Total Cost",
     "static.supplyPlan.startMonth":"Start Month",
+    "static.common.million": "Millions",
     "static.supplyPlanFormula.suggestShipmentEx1":"MoS for current month = 10",
     "static.supplyPlanFormula.suggestShipmentEx2":"MoS for following 1st month = 9.4",
     "static.supplyPlanFormula.suggestShipmentEx3":"MoS for following 2nd month = 8.4",
