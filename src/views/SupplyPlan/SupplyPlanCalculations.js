@@ -177,7 +177,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
 
-                            var remainingBatches = (programJsonForStoringTheResult.batchInfoList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.createdDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
+                            var remainingBatches = (programJsonForStoringTheResult.batchInfoList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.createdDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && moment(c.expiryDate).format("YYYY-MM")==moment(startDate).add(programPlanningUnitList[ppL].shelfLife,'months').format("YYYY-MM"));
                             for (var rb = 0; rb < remainingBatches.length; rb++) {
                                 var indexForRemainingBatch = myArray.findIndex(c => c.batchNo == remainingBatches[rb].batchNo && moment(remainingBatches[rb].expiryDate).format("YYYY-MM") == moment(c.expiryDate).format("YYYY-MM"));
                                 if (indexForRemainingBatch == -1) {
