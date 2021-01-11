@@ -1603,5 +1603,6 @@
     "static.supplyPlanFormula.suggestShipmentEx2":"MoS for following 1st month = 9.4",
     "static.supplyPlanFormula.suggestShipmentEx3":"MoS for following 2nd month = 8.4",
     "static.supplyPlanFormula.suggestShipmentEx4":"Min MoS = 12",
-    "static.supplyPlanFormula.suggestShipmentEx5":"Since MoS for all the three months is less than Min MoS, therefore"
+    "static.supplyPlanFormula.suggestShipmentEx5":"Since MoS for all the three months is less than Min MoS, therefore",
+    "static.pipeline.productToPlanningUnit":"PipeLine product to Planning Unit"
 }
