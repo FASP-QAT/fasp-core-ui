@@ -1597,5 +1597,6 @@
     "static.ticket.changeRequest":"Change Request",
     "static.common.max20digittext": "Maximum of 20 characters",
     "static.shipment.totalCost":"Total Cost",
-    "static.supplyPlan.startMonth":"Start Month"
+    "static.supplyPlan.startMonth":"Start Month",
+    "static.pipeline.productToPlanningUnit":"PipeLine product to Planning Unit"
 }

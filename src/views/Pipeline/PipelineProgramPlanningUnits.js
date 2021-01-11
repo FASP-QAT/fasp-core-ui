@@ -9,7 +9,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY,JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -69,7 +69,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
     loaded() {
         var list = this.state.planningUnitList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
 
         for (var y = 0; y < json.length; y++) {
@@ -295,9 +295,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 if (isNaN(parseInt(value)) || !(reg.test(value)) || value > 31 || value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    if (value > 31) { 
+                    if (value > 31) {
                         this.el.setComments(col, i18n.t('static.pipeline.shelfLifeValidation'));
-                    }else {
+                    } else {
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     }
                     // this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -338,13 +338,13 @@ export default class PipelineProgramPlanningUnits extends Component {
 
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("D------------>",json)
+        console.log("D------------>", json)
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
             var currentPlanningUnit = this.el.getRowData(y)[1];
             console.log("D------------>1", value);
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -506,9 +506,9 @@ export default class PipelineProgramPlanningUnits extends Component {
                 if (isNaN(parseInt(value)) || !(reg.test(value)) || value > 31 || value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    if (value > 31) { 
+                    if (value > 31) {
                         this.el.setComments(col, i18n.t('static.pipeline.shelfLifeValidation'));
-                    }else {
+                    } else {
                         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                     }
                     valid = false;
@@ -740,26 +740,27 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: i18n.t('static.unit.multiplier'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        // title: i18n.t('static.unit.multiplier'),
+                                                        title: i18n.t('static.pipeline.productToPlanningUnit'),
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
 
                                                     },
                                                     {
                                                         title: i18n.t('static.program.reorderFrequencyInMonths'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
 
                                                     },
                                                     {
                                                         title: i18n.t('static.supplyPlan.minStockMos'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.mosfuture'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.mospast'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.id'),
@@ -767,15 +768,15 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.pipeline.localprocurementleadtime'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.report.shelfLife'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true,textEditor: true, decimal: '.'
+                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
                                                     },
                                                     {
                                                         title: i18n.t('static.common.status'),
