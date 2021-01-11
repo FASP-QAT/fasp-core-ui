@@ -2393,7 +2393,7 @@ export default class QatProblemActions extends Component {
                                                                 // //console.log("mos element===>", mosArray[element]);
                                                                 var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                 var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
 
                                                                 if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
@@ -2463,7 +2463,7 @@ export default class QatProblemActions extends Component {
                                                                     // //console.log("mos element===>", mosArray[element]);
                                                                     var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                     var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
-                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate1).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate1).format('YYYY-MM-DD'));
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
 
                                                                     if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
@@ -2647,7 +2647,7 @@ export default class QatProblemActions extends Component {
                                                                 var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                 // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
                                                                 var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
 
                                                                 if (mosArray[element].mos > mosArray[element].maxForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosGreaterThenMax = mosArray[element].month;
@@ -2716,7 +2716,7 @@ export default class QatProblemActions extends Component {
                                                                     var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                     // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax1).subtract(3, 'months').format('YYYY-MM-DD');
                                                                     var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
-                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate1).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate1).format('YYYY-MM-DD'));
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
 
                                                                     if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosGreaterThenMax1 = mosArray1[element].month1;
@@ -2890,16 +2890,18 @@ export default class QatProblemActions extends Component {
                                                                     });
 
                                                             }
-                                                            //console.log("planningUnitId====>", planningUnitId);
-                                                            //console.log("mosArray============>$@##", mosArray);
+                                                            // console.log("######planningUnitId====>", planningUnitId);
+                                                            // console.log("######mosArray==========>", mosArray);
                                                             // for loop on array mosArray
                                                             var monthWithMosLessThenMin = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
                                                                 var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                 // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                                 var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-
+                                                                // console.log("######getStartDate",getStartDate);
+                                                                // console.log("######getEndDate",getEndDate);
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+                                                                // console.log("######filteredShipmentListForMonths",filteredShipmentListForMonths);
                                                                 if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length == 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
                                                                     break;
@@ -2968,7 +2970,7 @@ export default class QatProblemActions extends Component {
                                                                     var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                     // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin1).subtract(3, 'months').format('YYYY-MM-DD');
                                                                     var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
-                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate1).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate1).format('YYYY-MM-DD'));
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
 
                                                                     if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length == 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
@@ -3150,7 +3152,7 @@ export default class QatProblemActions extends Component {
                                                                 var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                 // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                                 var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
 
                                                                 if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
@@ -3400,7 +3402,7 @@ export default class QatProblemActions extends Component {
                                                                 var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                 // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
                                                                 var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
 
                                                                 if (mosArray[element].mos > mosArray[element].maxForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosGreaterThenMax = mosArray[element].month;
@@ -3471,7 +3473,7 @@ export default class QatProblemActions extends Component {
                                                                     var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                     // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax1).subtract(3, 'months').format('YYYY-MM-DD');
                                                                     var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
-                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate1).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate1).format('YYYY-MM-DD'));
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
                                                                     if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosGreaterThenMax1 = mosArray1[element].month1;
                                                                         break;
@@ -3653,7 +3655,7 @@ export default class QatProblemActions extends Component {
                                                                 var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                 // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
                                                                 var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
 
                                                                 if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length == 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
@@ -3723,7 +3725,7 @@ export default class QatProblemActions extends Component {
                                                                     var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
                                                                     // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin1).subtract(3, 'months').format('YYYY-MM-DD');
                                                                     var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
-                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate1).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate1).format('YYYY-MM-DD'));
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
 
                                                                     if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length == 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
