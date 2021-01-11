@@ -134,7 +134,10 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: monthDifference,
+            // Commented the CR
+            // monthCount: monthDifference,
+            monthCount:0,
+            // Commented the CR
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -2124,7 +2127,9 @@ export default class WhatIfReportComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
-        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
+        // Commented the CR
+        // localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
+        // Commented the CR
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -3832,7 +3837,9 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Table responsive>
                                     <thead>
                                         <tr>
-                                            <th></th>
+                                            {/* // Commented the CR */}
+                                            {/* <th></th> */}
+                                            {/* // Commented the CR */}
                                             <th className="text-left">{i18n.t('static.whatIf.scenario')}</th>
                                             <th className="text-left">{i18n.t('static.common.startdate')}</th>
                                             <th className="text-left">{i18n.t('static.common.stopdate')}</th>
@@ -3843,7 +3850,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
-                                                    <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td>
+                                                    {/* // Commented the CR */}
+                                                    {/* <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td> */}
+                                                    {/* // Commented the CR */}
                                                     <td>{this.state.rows[idx].scenarioName}</td>
                                                     <td>{moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                     <td>{moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
@@ -4706,7 +4715,8 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <div className=" pl-0">
                             <div className="row">
-                                <FormGroup className="col-md-3">
+                            {/* Commented the CR */}
+                                {/* <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
 
@@ -4722,7 +4732,8 @@ export default class WhatIfReportComponent extends React.Component {
                                             <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
                                         </Picker>
                                     </div>
-                                </FormGroup>
+                                </FormGroup> */}
+                                {/* Commented the CR */}
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
