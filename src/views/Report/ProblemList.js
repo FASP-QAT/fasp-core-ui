@@ -136,6 +136,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
 
+                var needToCalculate = this.props.match.params.calculate;
                 if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                     this.setState({
                         programList: proList.sort(function (a, b) {
@@ -145,7 +146,12 @@ export default class ConsumptionDetails extends React.Component {
                         }),
                         programId: localStorage.getItem("sesProgramId")
                     }, () => {
-                        this.getProblemListAfterCalculation();
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
                     })
 
                 } else if (proList.length == 1) {
@@ -225,18 +231,18 @@ export default class ConsumptionDetails extends React.Component {
                         document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
                         // console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
 
-                        var programIdd = this.props.match.params.programId;
-                        var needToCalculate = this.props.match.params.calculate;
-                        if (programIdd != '' && programIdd != undefined) {
-                            document.getElementById("programId").value = programIdd;
-                            // console.log("value==================>", needToCalculate);
-                            if (needToCalculate == "true") {
-                                // console.log("============>***");
-                                this.getProblemListAfterCalculation();
-                            } else {
-                                this.fetchData();
-                            }
-                        }
+                        // var programIdd = this.props.match.params.programId;
+                        // var needToCalculate = this.props.match.params.calculate;
+                        // if (programIdd != '' && programIdd != undefined) {
+                        //     document.getElementById("programId").value = programIdd;
+                        //     // console.log("value==================>", needToCalculate);
+                        //     if (needToCalculate == "true") {
+                        //         // console.log("============>***");
+                        //         this.getProblemListAfterCalculation();
+                        //     } else {
+                        //         this.fetchData();
+                        //     }
+                        // }
 
                     }.bind(this)
 
