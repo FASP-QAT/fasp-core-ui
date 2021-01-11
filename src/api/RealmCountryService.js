@@ -49,6 +49,11 @@ class RealmCountryService {
         });
     }
 
+    getRealmCountryProgram() {
+        return axios.get(`${API_URL}/api/realmCountry/program`, {
+        });
+    }
+
 
 }
 export default new RealmCountryService();

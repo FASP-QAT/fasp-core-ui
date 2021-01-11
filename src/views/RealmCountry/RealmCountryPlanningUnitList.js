@@ -883,9 +883,11 @@ export default class RealmCountryPlanningUnitList extends Component {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true)
                 if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                    // (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
+                    // (instance.jexcel).setValueFromCoords(0, data[i].y, '', true);
                     (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
+                    // (instance.jexcel).setValueFromCoords(7, data[i].y, document.getElementById("realmCountryId").value, true);
+                    // (instance.jexcel).setValueFromCoords(7, data[i].y, '', true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
@@ -900,7 +902,8 @@ export default class RealmCountryPlanningUnitList extends Component {
         })
         this.setState({
             programValues: programId.map(ele => ele),
-            programLabels: programId.map(ele => ele.label)
+            programLabels: programId.map(ele => ele.label),
+            loading: true
         }, () => {
             this.filterData();
         })
@@ -935,7 +938,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         multiplier: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("6"),
                         realmCountry: {
-                            id: parseInt(map1.get("7"))
+                            id: parseInt(map1.get("0"))
                         },
                         realmCountryPlanningUnitId: parseInt(map1.get("8"))
                     }
@@ -1055,6 +1058,20 @@ export default class RealmCountryPlanningUnitList extends Component {
             var value = this.el.getValueFromCoords(9, y);
             if (parseInt(value) == 1) {
 
+                //Country
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(0, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
                 //Planning Unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
@@ -1166,6 +1183,24 @@ export default class RealmCountryPlanningUnitList extends Component {
 
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
+
+        //Country
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // this.el.setValueFromCoords(2, y, value, true);
+                // var text = this.el.getValueFromCoords(1, y);
+                // var text = this.el.getValue(`B${parseInt(y) + 1}`, true)
+                // console.log("TEXT-------->", text);
+                // this.el.setVaslueFromCoords(2, y, text, true);
+            }
+        }
 
         //Planning Unit
         if (x == 1) {
@@ -1318,7 +1353,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             for (var i = 0; i < planningUnits.length; i++) {
                 var paJson = {
                     name: getLabelText(planningUnits[i].label, this.state.lang),
-                    id: parseInt(planningUnits[i].planningUnitId)
+                    id: parseInt(planningUnits[i].id)
                 }
                 planningUnitArr[i] = paJson
             }
@@ -1714,6 +1749,23 @@ export default class RealmCountryPlanningUnitList extends Component {
             // let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.map(ele => (ele.value).toString());
             console.log("RESP--->", programIds);
+            const { programs } = this.state;
+            let realmCountryList = [];
+            for (var i = 0; i < programIds.length; i++) {
+                for (var j = 0; j < programs.length; j++) {
+                    if (programIds[i] == programs[j].programId) {
+                        let json = {
+                            realmCountryId: programs[j].realmCountry.realmCountryId,
+                            country: programs[j].realmCountry.country,
+                            realm: programs[j].realmCountry.realm
+                        }
+                        realmCountryList.push(json);
+                    }
+                }
+            }
+            console.log("REALM-COUNTRY--->1", realmCountryList);
+            const realmCountrys = [...new Map(realmCountryList.map(item => [item.realmCountryId, item])).values()]
+            console.log("REALM-COUNTRY--->2", realmCountrys);
 
             RealmCountryService.getRealmCountryPlanningUnitByProgramId(programIds)
                 .then(response1 => {
@@ -1721,14 +1773,16 @@ export default class RealmCountryPlanningUnitList extends Component {
                     UnitService.getUnitListAll()
                         .then(response2 => {
                             console.log("RESP--->2", response2.data);
-                            PlanningUnitService.getActivePlanningUnitList()
+                            // PlanningUnitService.getActivePlanningUnitList()
+                            PlanningUnitService.getPlanningUnitByProgramIds(programIds)
                                 .then(response3 => {
                                     console.log("RESP--->3", response3.data);
                                     this.setState({
                                         rows: response1.data,
                                         units: response2.data,
                                         planningUnits: response3.data,
-                                        allowAdd: true
+                                        allowAdd: true,
+                                        realmCountrys
                                     }, () => {
                                         this.buildJexcel();
                                     })
@@ -2479,66 +2533,66 @@ export default class RealmCountryPlanningUnitList extends Component {
 
     componentDidMount() {
 
-        let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
-            .then(response => {
-                console.log("RealmCountryService---->", response.data)
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountrys: (response.data).filter(c => c.active == true), loading: false
-                    },
-                        () => {
-                            // this.buildJexcel()
-                            // this.filterData()
-                        })
-                } else {
-                    this.setState({ message: response.data.messageCode, color: "red", loading: false })
-                }
-            })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            color: "red",
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        // let realmId = AuthenticationService.getRealmId();
+        // RealmCountryService.getRealmCountryrealmIdById(realmId)
+        //     .then(response => {
+        //         console.log("RealmCountryService---->", response.data)
+        //         if (response.status == 200) {
+        //             this.setState({
+        //                 realmCountrys: (response.data).filter(c => c.active == true), loading: false
+        //             },
+        //                 () => {
+        //                     // this.buildJexcel()
+        //                     // this.filterData()
+        //                 })
+        //         } else {
+        //             this.setState({ message: response.data.messageCode, color: "red", loading: false })
+        //         }
+        //     })
+        //     .catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     color: "red",
+        //                     loading: false
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: "red",
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: "red",
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    color: "red",
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             color: "red",
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             color: "red",
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             color: "red",
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
 
         this.getPrograms();
     }
@@ -2546,7 +2600,8 @@ export default class RealmCountryPlanningUnitList extends Component {
     getPrograms = () => {
         ProgramService.getProgramList()
             .then(response => {
-                console.log(JSON.stringify(response.data))
+                // console.log(JSON.stringify(response.data))
+                console.log("Program----->", response.data);
                 this.setState({
                     programs: response.data, loading: false
                 })
