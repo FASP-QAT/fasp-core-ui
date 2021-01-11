@@ -184,6 +184,10 @@ export default class SyncMasterData extends Component {
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
+                            var rebuild = false;
+                            if (response.data.shipmentList.length > 0) {
+                                rebuild = true;
+                            }
                             var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
                             console.log("Min Date shiparray", shipArray);
                             var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
@@ -292,7 +296,7 @@ export default class SyncMasterData extends Component {
                                         dt = "2020-01-01 00:00:00";
                                     }
                                     console.log("M------------------------>", dt);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt, rebuild);
                                 }.bind(this)
                             }.bind(this)
                         } else {
@@ -438,7 +442,7 @@ export default class SyncMasterData extends Component {
                         var programIds = myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
                         });
-                        
+
 
 
                         console.log("Validation", validation);
