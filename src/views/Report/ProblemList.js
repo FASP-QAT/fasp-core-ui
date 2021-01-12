@@ -154,6 +154,22 @@ export default class ConsumptionDetails extends React.Component {
                         }
                     })
 
+                } else if (proList.length == 1) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: proList[0].id
+                    }, () => {
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
+                    })
                 } else {
                     this.setState({
                         programList: proList.sort(function (a, b) {
