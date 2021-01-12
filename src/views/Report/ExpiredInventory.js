@@ -609,7 +609,7 @@ export default class ExpiredInventory extends Component {
                                         planningUnit: pu.planningUnit,
                                         shelfLife: pu.shelfLife,
                                         batchInfo: ele1,
-                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
+                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps,
                                         program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
                                     }
                                     data.push(json)
