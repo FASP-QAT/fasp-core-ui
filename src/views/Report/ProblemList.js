@@ -163,7 +163,12 @@ export default class ConsumptionDetails extends React.Component {
                         }),
                         programId: proList[0].id
                     }, () => {
-                        this.getProblemListAfterCalculation();
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
                     })
                 } else {
                     this.setState({
