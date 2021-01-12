@@ -487,7 +487,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
+                                                // Commented the CR
+                                                // { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
+                                                { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
+                                                // Commented the CR
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                 { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
@@ -1310,7 +1313,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[20].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = (instance).jexcel;
         var json = shipmentInstance.getJson(null, false);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE','AF']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
         var jsonLength;
         if (this.props.shipmentPage == "shipmentDataEntry") {
             if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
@@ -1330,7 +1333,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < jsonLength; i++) {
             console.log("i------------>", i)
             var rowData = shipmentInstance.getRowData(i);
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE','AF']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
                 if (rowData[21].toString() == "true") {
@@ -1395,7 +1398,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     onchangepage(el, pageNo, oldPageNo) {
         var shipmentInstance = el.jexcel;
         var json = shipmentInstance.getJson(null, false);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE','AF']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
         var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
@@ -1408,7 +1411,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var i = start; i < jsonLength; i++) {
             console.log("D--------------->", i, "JsonLength", jsonLength);
             var rowData = shipmentInstance.getRowData(i);
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE','AF']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
                 if (rowData[21].toString() == "true") {
@@ -2006,7 +2009,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 11 || x == 0 || x == 30 || x == 3) {
             console.log("In 20", rowData[3]);
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE','AF']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
                 if (rowData[21].toString() == "true") {
@@ -3087,10 +3090,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var arrivedDate = shipmentDatesJson.arrivedDate != "" && shipmentDatesJson.arrivedDate != "Invalid date" ? shipmentDatesJson.arrivedDate : null;
                         var receivedDate = shipmentDatesJson.receivedDate != "" && shipmentDatesJson.receivedDate != "Invalid date" ? shipmentDatesJson.receivedDate : null;
                         var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate != "" && shipmentDatesJson.expectedDeliveryDate != "Invalid date" ? shipmentDatesJson.expectedDeliveryDate : null;
-                        console.log("D--------------------->planned date",plannedDate);
-                        console.log("D--------------------->Submitted date",submittedDate);
-                        console.log("D--------------------->approved date ",approvedDate);
-                        console.log("D--------------------->shipmentsDate",shipmentDatesJson);
+                        console.log("D--------------------->planned date", plannedDate);
+                        console.log("D--------------------->Submitted date", submittedDate);
+                        console.log("D--------------------->approved date ", approvedDate);
+                        console.log("D--------------------->shipmentsDate", shipmentDatesJson);
                         if (shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             receivedDate = null;
                         }
@@ -3106,7 +3109,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (shipmentStatusId != SUBMITTED_SHIPMENT_STATUS && shipmentStatusId != APPROVED_SHIPMENT_STATUS && shipmentStatusId != SHIPPED_SHIPMENT_STATUS && shipmentStatusId != ARRIVED_SHIPMENT_STATUS && shipmentStatusId != DELIVERED_SHIPMENT_STATUS) {
                             submittedDate = null;
                         }
-                        console.log("D--------------------->Submitted date after",submittedDate);
+                        console.log("D--------------------->Submitted date after", submittedDate);
                         console.log("shipmentDatesJson", shipmentDatesJson);
                         console.log("Received date", receivedDate);
                         console.log("Shipment Received date", shipmentDatesJson.receivedDate);
