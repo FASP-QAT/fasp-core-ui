@@ -80,7 +80,7 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         shelfLife: Yup.number()
             .integer().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .max(31, i18n.t('static.pipeline.shelfLifeValidation'))
+            // .max(31, i18n.t('static.pipeline.shelfLifeValidation'))
             .required((i18n.t('static.pipeline.entershelflife'))).min(0, i18n.t('static.program.validvaluetext')),
 
         arrivedToDeliveredLeadTime: Yup.string()
@@ -553,7 +553,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                                 onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                                 type="number"
                                                 min="0"
-                                                max="31"
+                                                // max="31"
                                                 value={this.props.items.program.shelfLife}
                                                 name="shelfLife" id="shelfLife" />
                                             <FormFeedback className="red">{errors.shelfLife}</FormFeedback>

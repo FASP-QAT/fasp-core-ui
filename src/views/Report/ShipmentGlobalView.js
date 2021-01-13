@@ -395,8 +395,8 @@ class ShipmentGlobalView extends Component {
             table1Headers: [],
             viewby: 1,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            minDate: { year: 2017, month: 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: 12 },
             loading: true,
             programLst:[]
 
@@ -1300,7 +1300,7 @@ class ShipmentGlobalView extends Component {
 
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let fundingSourceProcurementAgentIds = [];
         if (viewby == 1) {
             fundingSourceProcurementAgentIds = fundingSourceIds;

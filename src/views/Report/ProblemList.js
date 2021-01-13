@@ -136,19 +136,8 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
 
-                if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-                    this.setState({
-                        programList: proList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        programId: localStorage.getItem("sesProgramId")
-                    }, () => {
-                        this.getProblemListAfterCalculation();
-                    })
-
-                } else if (proList.length == 1) {
+                var needToCalculate = this.props.match.params.calculate;
+                if (proList.length == 1) {
                     this.setState({
                         programList: proList.sort(function (a, b) {
                             a = a.name.toLowerCase();
@@ -157,8 +146,30 @@ export default class ConsumptionDetails extends React.Component {
                         }),
                         programId: proList[0].id
                     }, () => {
-                        this.getProblemListAfterCalculation();
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
                     })
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramId")
+                    }, () => {
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
+                    })
+
                 } else {
                     this.setState({
                         programList: proList.sort(function (a, b) {
@@ -225,18 +236,18 @@ export default class ConsumptionDetails extends React.Component {
                         document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
                         // console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
 
-                        var programIdd = this.props.match.params.programId;
-                        var needToCalculate = this.props.match.params.calculate;
-                        if (programIdd != '' && programIdd != undefined) {
-                            document.getElementById("programId").value = programIdd;
-                            // console.log("value==================>", needToCalculate);
-                            if (needToCalculate == "true") {
-                                // console.log("============>***");
-                                this.getProblemListAfterCalculation();
-                            } else {
-                                this.fetchData();
-                            }
-                        }
+                        // var programIdd = this.props.match.params.programId;
+                        // var needToCalculate = this.props.match.params.calculate;
+                        // if (programIdd != '' && programIdd != undefined) {
+                        //     document.getElementById("programId").value = programIdd;
+                        //     // console.log("value==================>", needToCalculate);
+                        //     if (needToCalculate == "true") {
+                        //         // console.log("============>***");
+                        //         this.getProblemListAfterCalculation();
+                        //     } else {
+                        //         this.fetchData();
+                        //     }
+                        // }
 
                     }.bind(this)
 

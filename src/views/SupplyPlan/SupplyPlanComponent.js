@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from 'react-dom'
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
@@ -35,6 +36,7 @@ import AuthenticationService from "../Common/AuthenticationService";
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 
+
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
 
@@ -47,6 +49,7 @@ export default class SupplyPlanComponent extends React.Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
+            planningUnitData:[],
             loading: true,
             monthsArray: [],
             programList: [],
@@ -78,7 +81,11 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: monthDifference,
+            // Commented the CR
+            // monthCount: monthDifference,
+            monthCount: 0,
+            // Commented the CR
+
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -519,6 +526,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     exportPDF = () => {
+        //console.log(this.state.bars)
         const addFooters = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
@@ -566,6 +574,11 @@ export default class SupplyPlanComponent extends React.Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
+                    var splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+                    doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
+                    splittext = doc.splitTextToSize(i18n.t('static.user.user')+' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
+                    doc.text( doc.internal.pageSize.width / 8, 60, splittext)
+          
                     doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 10, 80, {
                         align: 'left'
                     })
@@ -664,7 +677,7 @@ export default class SupplyPlanComponent extends React.Component {
 
         doc.setFontSize(8)
         doc.setFont('helvetica', 'bold')
-        var y = doc.autoTableEndPosY() + 20
+        var y = doc.lastAutoTable.finalY + 20
         if (y + 100 > height) {
             doc.addPage();
             y = 80
@@ -764,6 +777,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
         var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
+        var count=0;
         list.map(ele => {
             console.log('export done for', ele.planningUnit.id)
             doc.addPage();
@@ -818,10 +832,23 @@ export default class SupplyPlanComponent extends React.Component {
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...ele.data.unmetDemand]
 
             let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => this.formatterDouble(c)), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+          //  var createCanvas =React.renderComponent( <CreateCanvas/>, document.getElementById('createCanvas') );
+               
+            
+          
+            var canv=  document.getElementById("cool-canvas"+count)
+                 
+           var canvasImg1 = canv.toDataURL("image/png", 1.0);
+        //   console.log(canvasImg1)
+          console.log('count',count, doc.addImage(canvasImg1, 'png', 50, 160, 750, 290,"a"+count ,'CANVAS'));
+          count++
+  
 
+
+          
             let content = {
                 margin: { top: 80, bottom: 70 },
-                startY: 170,
+                startY: height,
                 head: headers,
                 body: data1,
                 styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
@@ -834,7 +861,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             doc.setFontSize(8)
             doc.setFont('helvetica', 'bold')
-            var y = doc.autoTableEndPosY() + 20
+            var y = doc.lastAutoTable.finalY + 20
             if (y + 100 > height) {
                 doc.addPage();
                 y = 80
@@ -949,7 +976,7 @@ export default class SupplyPlanComponent extends React.Component {
 
     tabPane = () => {
 
-        const chartOptions = {
+        var chartOptions = {
             title: {
                 display: true,
                 text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? entityname + " - " + this.state.planningUnit.label : entityname
@@ -1530,7 +1557,12 @@ export default class SupplyPlanComponent extends React.Component {
                                         <div className="col-md-12">
                                             <div className="chart-wrapper chart-graph-report">
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                {/* <CreateCanvas ref="child" chartOptions={chartOptions}/> */}
                                             </div>
+                                            <div id="bars_div">
+                                            {this.state.planningUnitData.filter(c=>c.planningUnit.id!=this.state.planningUnitId).map((ele,index)=> {
+                                               return( <div  className="chart-wrapper chart-graph-report"><Bar  id={"cool-canvas"+index} data={ele.bar} options={ele.chartOptions}  /></div>)})}
+                            </div>
                                         </div>
                                     </div>
                                     <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
@@ -2082,10 +2114,10 @@ export default class SupplyPlanComponent extends React.Component {
                 var programIdd = '';
                 if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
                     programIdd = this.props.match.params.programId;
-                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-                    programIdd = localStorage.getItem("sesProgramId");
                 } else if (proList.length == 1) {
                     programIdd = proList[0].value;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
                 }
                 console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
@@ -2282,7 +2314,9 @@ export default class SupplyPlanComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
-        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
+        // Commented the CR
+        // localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
+        // Commented the CR
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -2500,6 +2534,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     var paColor2 = "";
                                     var paColor3 = "";
                                     var paColor4 = "";
+                                    var paColor1Array = [];
+                                    var paColor2Array = [];
+                                    var paColor3Array = [];
+                                    var paColor4Array = [];
                                     var isEmergencyOrder1 = 0;
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;
@@ -2540,6 +2578,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     isLocalProcurementAgent1 = true;
                                                 }
                                                 sd1.push(shipmentDetail);
+                                                if (paColor1Array.indexOf(paColor1) === -1) {
+                                                    paColor1Array.push(paColor1);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -2563,6 +2604,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd2.push(shipmentDetail);
+                                                if (paColor2Array.indexOf(paColor2) === -1) {
+                                                    paColor2Array.push(paColor2);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder2 = true
                                                 }
@@ -2592,6 +2636,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd3.push(shipmentDetail);
+                                                if (paColor3Array.indexOf(paColor3) === -1) {
+                                                    paColor3Array.push(paColor3);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder3 = true
                                                 }
@@ -2621,6 +2668,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd4.push(shipmentDetail);
+                                                if (paColor4Array.indexOf(paColor4) === -1) {
+                                                    paColor4Array.push(paColor4);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder4 = true
                                                 }
@@ -2633,7 +2683,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor1;
-                                        if (sd1.length > 1) {
+                                        if (paColor1Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -2643,7 +2693,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor2;
-                                        if (sd2.length > 1) {
+                                        if (paColor2Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -2652,8 +2702,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
+                                        console.log("#############Month", jsonList[0].transDate);
+                                        console.log("#############paColor3Array", paColor3Array);
                                         var colour = paColor3;
-                                        if (sd3.length > 1) {
+                                        if (paColor3Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
@@ -2663,7 +2715,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor4;
-                                        if (sd4.length > 1) {
+                                        if (paColor4Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         plannedShipmentsTotalData.push({ qty: Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
@@ -2679,6 +2731,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
+                                    var paColor1Array = [];
+                                    var paColor2Array = [];
+                                    var paColor3Array = [];
+                                    var paColor4Array = [];
                                     var paColor1 = "";
                                     var paColor2 = "";
                                     var paColor3 = "";
@@ -2716,6 +2772,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd1.push(shipmentDetail);
+                                                if (paColor1Array.indexOf(paColor1) === -1) {
+                                                    paColor1Array.push(paColor1);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder1 = true
                                                 }
@@ -2745,6 +2804,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd2.push(shipmentDetail);
+                                                if (paColor2Array.indexOf(paColor2) === -1) {
+                                                    paColor2Array.push(paColor2);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder2 = true
                                                 }
@@ -2774,6 +2836,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd3.push(shipmentDetail);
+                                                if (paColor3Array.indexOf(paColor3) === -1) {
+                                                    paColor3Array.push(paColor3);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder3 = true
                                                 }
@@ -2803,6 +2868,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 sd4.push(shipmentDetail);
+                                                if (paColor4Array.indexOf(paColor4) === -1) {
+                                                    paColor4Array.push(paColor4);
+                                                }
                                                 if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                     isEmergencyOrder4 = true
                                                 }
@@ -2815,7 +2883,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor1;
-                                        if (sd1.length > 1) {
+                                        if (paColor1Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -2825,7 +2893,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor2;
-                                        if (sd2.length > 1) {
+                                        if (paColor2Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -2835,7 +2903,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor3;
-                                        if (sd3.length > 1) {
+                                        if (paColor3Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
@@ -2845,7 +2913,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor4;
-                                        if (sd4.length > 1) {
+                                        if (paColor4Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].submittedErpShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
@@ -3685,7 +3753,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
-                                                    <FormGroup className="col-md-3">
+                                                    {/* // Commented the CR */}
+                                                    {/* <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
 
@@ -3701,7 +3770,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
                                                             </Picker>
                                                         </div>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
+                                                    {/* // Commented the CR */}
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
@@ -4031,6 +4101,81 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
     getDataforExport = (report) => {
+        var chartOptions = {
+            title: {
+                display: true,
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? entityname + " - " + this.state.planningUnit.label : entityname
+            },
+            scales: {
+                yAxes: [{
+                    id: 'A',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'left',
+                },
+                {
+                    id: 'B',
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                        fontColor: 'black'
+                    },
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    },
+                    position: 'right',
+                }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return (tooltipItems.yLabel.toLocaleString());
+                    }
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+        document.getElementById("bars_div").style.display='block';
         this.setState({ loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
@@ -4063,10 +4208,14 @@ export default class SupplyPlanComponent extends React.Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    var planningUnitData = []
+                    var planningUnitData = [];
+                    var selectedPlanningUnitdata={};
+                    var selectedplanningunit=this.state.planningUnitList.filter(c=>c.value==this.state.planningUnitId)
 
+                    var planningunitList=this.state.planningUnitList.filter(c=>c.value!=this.state.planningUnitId)
+                    planningunitList.push(selectedplanningunit[0])
                     var pcnt = 0
-                    this.state.planningUnitList.map(planningUnit => {
+                    planningunitList.map(planningUnit => {
 
                         var planningUnitId = planningUnit.value
                         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];;
@@ -4769,23 +4918,184 @@ export default class SupplyPlanComponent extends React.Component {
                                         loading: false
                                     }
 
+                                    var bar=  {
+
+                                        labels: [...new Set(jsonArrForGraph.map(ele1 => (ele1.month)))],
+                                        datasets: [
+                                            {
+                                                label: i18n.t('static.supplyPlan.planned'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#a7c6ed',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.planned)),
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.ordered'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#205493',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.ordered)),
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.shipped'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#006789',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.shipped)),
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.delivered'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#002f6c',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.delivered)),
+                                            }, {
+                                                label: i18n.t('static.report.stock'),
+                                                stack: 2,
+                                                type: 'line',
+                                                yAxisID: 'A',
+                                                borderColor: '#cfcdc9',
+                                                borderStyle: 'dotted',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                data: jsonArrForGraph.map((item, index) => (item.stock))
+                                            }, {
+                                                label: i18n.t('static.supplyPlan.consumption'),
+                                                type: 'line',
+                                                stack: 3,
+                                                yAxisID: 'A',
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#ba0c2f',
+                                                borderStyle: 'dotted',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                data: jsonArrForGraph.map((item, index) => (item.consumption))
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.monthsOfStock'),
+                                                type: 'line',
+                                                stack: 4,
+                                                yAxisID: 'B',
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#118b70',
+                                                borderStyle: 'dotted',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                data:jsonArrForGraph.map((item, index) => (item.mos))
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.minStockMos'),
+                                                type: 'line',
+                                                stack: 5,
+                                                yAxisID: 'B',
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#59cacc',
+                                                borderStyle: 'dotted',
+                                                borderDash: [10, 10],
+                                                fill: '+1',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                showInLegend: true,
+                                                pointStyle: 'line',
+                                                yValueFormatString: "$#,##0",
+                                                lineTension: 0,
+                                                data:jsonArrForGraph.map((item, index) => (item.minMos))
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.maxStockMos'),
+                                                type: 'line',
+                                                stack: 6,
+                                                yAxisID: 'B',
+                                                backgroundColor: 'rgba(0,0,0,0)',
+                                                borderColor: '#59cacc',
+                                                borderStyle: 'dotted',
+                                                borderDash: [10, 10],
+                                                fill: true,
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                yValueFormatString: "$#,##0",
+                                                data: jsonArrForGraph.map((item, index) => (item.maxMos))
+                                            }
+                                        ]}
+                                        chartOptions.title.text=entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label,this.state.lang)
                                     var planningUnitDataforExport = {
                                         planningUnit: programPlanningUnit.planningUnit,
                                         info: planningUnitInfo,
-                                        data: exportData
+                                        data: exportData,
+                                        bar:bar,
+                                        chartOptions:chartOptions
+                                        
                                     }
-                                    planningUnitData.push(planningUnitDataforExport)
+
+                                        if(this.state.planningUnitId!=programPlanningUnit.planningUnit.id){
+                                            planningUnitData.push(planningUnitDataforExport) 
+                                            // this.setState({
+                                            //     planningUnitData: planningUnitData,
+                                            //         loading: false
+                                            // })
+                                           }
+                                   else{
+                                    selectedPlanningUnitdata=planningUnitDataforExport
+                                   }
                                     pcnt = pcnt + 1
                                     console.log(' length ', pcnt, this.state.planningUnitList.length)
                                     if (pcnt == this.state.planningUnitList.length) {
-
+                                        planningUnitData.push(selectedPlanningUnitdata)
                                         this.setState({
                                             planningUnitData: planningUnitData,
                                             loading: false
-                                        }, () => {
+                                        },()=>{
+                                            setTimeout(() => {
                                             report == 1 ? this.exportPDF() : this.exportCSV()
+                                            document.getElementById("bars_div").style.display='none';
+                                        },2000)
                                         })
-                                    }
+
+                                     
+                                     
+                                    }   
                                     // } else {
                                     //     console.log("In else")
                                     //     this.setState({ loading: false })
@@ -4802,5 +5112,4 @@ export default class SupplyPlanComponent extends React.Component {
         })
 
     }
-
 }

@@ -135,8 +135,8 @@ class Budgets extends Component {
             show: false,
             loading: true,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            minDate: { year: 2017, month: 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: 12 },
             fundingSourceValues: [],
             fundingSourceLabels: [],
             fundingSources: [],
@@ -329,7 +329,7 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundNStr(ele.budgetAmt), this.roundNStr(ele.plannedBudgetAmt), this.roundNStr(ele.orderedBudgetAmt), this.roundNStr((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -416,7 +416,7 @@ class Budgets extends Component {
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundNStr(ele.budgetAmt)), this.formatter(this.roundNStr(ele.plannedBudgetAmt)), this.formatter(this.roundNStr(ele.orderedBudgetAmt)), this.formatter(this.roundNStr(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -518,11 +518,11 @@ class Budgets extends Component {
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
                                     fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
                                     currency: budgetList[l].currency,
-                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd), // 1000000,
+                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd), // 1000000,
                                     startDate: budgetList[l].startDate,
                                     stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt / 1000000
+                                    budgetAmt: budgetList[l].budgetAmt // 1000000
 
                                 }
 
@@ -800,9 +800,18 @@ class Budgets extends Component {
     }
 
 
+    roundNStr = num => {
+        var roundNum = Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
+        console.log('num ' + num + 'roundNum ', roundNum)
+        if (roundNum != 0) {
+            return roundNum + ' ' + i18n.t('static.common.million')
+        } else {
+            return num
+        }
+    }
     roundN = num => {
-        return Number(Math.round(num * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-
+        return Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
+       
     }
     filterVersion = () => {
         // let programId = document.getElementById("programId").value;
@@ -1146,43 +1155,43 @@ class Budgets extends Component {
             },
             {
                 dataField: 'budgetAmt',
-                text: i18n.t('static.budget.budgetamount') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.budget.budgetamount'),// + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN
+                formatter: this.roundNStr
             },
             {
                 dataField: 'plannedBudgetAmt',
-                text: i18n.t('static.report.plannedBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.plannedBudgetAmt'),// + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN,
+                formatter: this.roundNStr,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.orderedBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.orderedBudgetAmt'),// + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN,
+                formatter: this.roundNStr,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.remainingBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.remainingBudgetAmt'),// + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
                 formatter: (cell, row) => {
-                    return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                    return this.roundNStr(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
                 }
             },
 

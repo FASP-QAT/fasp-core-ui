@@ -184,6 +184,10 @@ export default class SyncMasterData extends Component {
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
+                            var rebuild = false;
+                            if (response.data.shipmentList.length > 0) {
+                                rebuild = true;
+                            }
                             var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
                             console.log("Min Date shiparray", shipArray);
                             var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
@@ -292,7 +296,7 @@ export default class SyncMasterData extends Component {
                                         dt = "2020-01-01 00:00:00";
                                     }
                                     console.log("M------------------------>", dt);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt, rebuild);
                                 }.bind(this)
                             }.bind(this)
                         } else {
@@ -438,7 +442,7 @@ export default class SyncMasterData extends Component {
                         var programIds = myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
                         });
-                        
+
 
 
                         console.log("Validation", validation);
@@ -460,7 +464,7 @@ export default class SyncMasterData extends Component {
                                             console.log("M sync country transaction start")
                                             var countryObjectStore = countryTransaction.objectStore('country');
                                             var json = (response.countryList);
-                                            countryObjectStore.delete(0);
+                                            countryObjectStore.clear(); 
                                             for (var i = 0; i < json.length; i++) {
                                                 console.log("M sync in for", i)
                                                 countryObjectStore.put(json[i]);
@@ -687,7 +691,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                             console.log("M sync forecastingUnit transaction start")
                                                                                                                                                                             var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
                                                                                                                                                                             var json = (response.forecastingUnitList);
-                                                                                                                                                                            forecastingUnitObjectStore.delete(0);
+                                                                                                                                                                            forecastingUnitObjectStore.clear(); 
                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                 forecastingUnitObjectStore.put(json[i]);
                                                                                                                                                                             }
@@ -702,7 +706,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                     console.log("M sync planningUnit transaction start")
                                                                                                                                                                                     var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
                                                                                                                                                                                     var json = (response.planningUnitList);
-                                                                                                                                                                                    planningUnitObjectStore.delete(0);
+                                                                                                                                                                                    planningUnitObjectStore.clear(); 
                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                         planningUnitObjectStore.put(json[i]);
                                                                                                                                                                                     }
@@ -717,7 +721,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                             console.log("M sync procurementUnit transaction start")
                                                                                                                                                                                             var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
                                                                                                                                                                                             var json = (response.procurementUnitList);
-                                                                                                                                                                                            procurementUnitObjectStore.delete(0);
+                                                                                                                                                                                            procurementUnitObjectStore.clear(); 
                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                 procurementUnitObjectStore.put(json[i]);
                                                                                                                                                                                             }
@@ -732,7 +736,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                     console.log("M sync realmCountry transaction start")
                                                                                                                                                                                                     var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
                                                                                                                                                                                                     var json = (response.realmCountryList);
-                                                                                                                                                                                                    realmCountryObjectStore.delete(0);
+                                                                                                                                                                                                    realmCountryObjectStore.clear(); 
                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                         realmCountryObjectStore.put(json[i]);
                                                                                                                                                                                                     }
@@ -747,7 +751,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                             console.log("M sync realmCountryPlanningUnit transaction start")
                                                                                                                                                                                                             var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
                                                                                                                                                                                                             var json = (response.realmCountryPlanningUnitList);
-                                                                                                                                                                                                            realmCountryPlanningUnitObjectStore.delete(0);
+                                                                                                                                                                                                            realmCountryPlanningUnitObjectStore.clear(); 
                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                 realmCountryPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                                                             }
@@ -762,7 +766,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                     console.log("M sync procurementAgentPlanningUnit transaction start")
                                                                                                                                                                                                                     var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
                                                                                                                                                                                                                     var json = (response.procurementAgentPlanningUnitList);
-                                                                                                                                                                                                                    procurementAgentPlanningUnitObjectStore.delete(0);
+                                                                                                                                                                                                                    procurementAgentPlanningUnitObjectStore.clear(); 
                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                         procurementAgentPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                                                                     }
@@ -777,7 +781,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                             console.log("M sync procurementAgentProcurementUnit transaction start")
                                                                                                                                                                                                                             var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
                                                                                                                                                                                                                             var json = (response.procurementAgentProcurementUnitList);
-                                                                                                                                                                                                                            procurementAgentProcurementUnitObjectStore.delete(0);
+                                                                                                                                                                                                                            procurementAgentProcurementUnitObjectStore.clear(); 
                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                 procurementAgentProcurementUnitObjectStore.put(json[i]);
                                                                                                                                                                                                                             }
@@ -792,7 +796,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                     console.log("M sync program transaction start")
                                                                                                                                                                                                                                     var programObjectStore = programTransaction.objectStore('program');
                                                                                                                                                                                                                                     var json = (response.programList);
-                                                                                                                                                                                                                                    programObjectStore.delete(0);
+                                                                                                                                                                                                                                    programObjectStore.clear(); 
                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                         programObjectStore.put(json[i]);
                                                                                                                                                                                                                                     }
@@ -807,7 +811,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                             console.log("M sync programPlanningUnit transaction start")
                                                                                                                                                                                                                                             var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                                                                                                                                                                                                                                             var json = (response.programPlanningUnitList);
-                                                                                                                                                                                                                                            programPlanningUnitObjectStore.delete(0);
+                                                                                                                                                                                                                                            programPlanningUnitObjectStore.clear(); 
                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                 programPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                                                                                             }
@@ -822,7 +826,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                     console.log("M sync region transaction start")
                                                                                                                                                                                                                                                     var regionObjectStore = regionTransaction.objectStore('region');
                                                                                                                                                                                                                                                     var json = (response.regionList);
-                                                                                                                                                                                                                                                    regionObjectStore.delete(0);
+                                                                                                                                                                                                                                                    regionObjectStore.clear(); 
                                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                         regionObjectStore.put(json[i]);
                                                                                                                                                                                                                                                     }
@@ -837,7 +841,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                             console.log("M sync budget transaction start")
                                                                                                                                                                                                                                                             var budgetObjectStore = budgetTransaction.objectStore('budget');
                                                                                                                                                                                                                                                             var json = (response.budgetList);
-                                                                                                                                                                                                                                                            budgetObjectStore.delete(0);
+                                                                                                                                                                                                                                                            budgetObjectStore.clear();  
                                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                                 budgetObjectStore.put(json[i]);
                                                                                                                                                                                                                                                             }

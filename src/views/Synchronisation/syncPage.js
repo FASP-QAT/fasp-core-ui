@@ -908,8 +908,16 @@ export default class syncPage extends Component {
         }
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
-
-          if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+          if (proList.length == 1) {
+            this.setState({
+              versionTypeList: response.data,
+              programList: proList,
+              loading: false,
+              programId: proList[0].value
+            }, () => {
+              this.getDataForCompare(proList[0]);
+            })
+          } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
             console.log("value----->1", proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
             this.setState({
               versionTypeList: response.data,
@@ -918,15 +926,6 @@ export default class syncPage extends Component {
               programId: localStorage.getItem("sesProgramId")
             }, () => {
               this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-            })
-          } else if (proList.length == 1) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              loading: false,
-              programId: proList[0].value
-            }, () => {
-              this.getDataForCompare(proList[0]);
             })
           } else {
             this.setState({
