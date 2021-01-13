@@ -905,6 +905,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             programLabels: programId.map(ele => ele.label),
             loading: true
         }, () => {
+            console.log("VALUE--------->", this.state.programValues);
             this.filterData();
         })
     }
@@ -1746,6 +1747,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     filterData() {
 
         if (this.state.programValues.length > 0) {
+            console.log("VALUE--------->IF");
             // let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.map(ele => (ele.value).toString());
             console.log("RESP--->", programIds);
@@ -1906,6 +1908,15 @@ export default class RealmCountryPlanningUnitList extends Component {
                         }
                     }
                 );
+        } else {
+            console.log("VALUE--------->ELSE");
+            this.setState({
+                allowAdd: false,
+            }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            })
+
         }
 
 
