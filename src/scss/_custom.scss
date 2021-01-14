@@ -3901,3 +3901,12 @@ color: #000000!important;
 .selection-cell-header{
   text-align: center;
 }
+
+.jtabs .jtabs-content > div.jtabs-selected {
+  display: grid!important;
+  overflow-x: hidden!important;  
+}
+
+.jexcel_content::-webkit-scrollbar-thumb {
+  background: #c1c1c1!important;
+}

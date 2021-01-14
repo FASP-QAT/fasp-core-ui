@@ -69,9 +69,13 @@ class StockStatusAcrossPlanningUnits extends Component {
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            programId: '',
+            versionId: ''
 
         }
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
     }
 
     getTracerCategoryList() {
@@ -79,6 +83,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         let versionId = document.getElementById("versionId").value;
 
         if (programId > 0 && versionId != 0) {
+            localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
                 const lan = 'en';
                 var db1;
@@ -484,13 +489,28 @@ class StockStatusAcrossPlanningUnits extends Component {
                 }
                 console.log("D---------------->", proList);
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion()
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -501,9 +521,11 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
@@ -576,11 +598,23 @@ class StockStatusAcrossPlanningUnits extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        }),
+                        versionId: localStorage.getItem("sesVersionIdReport")
+                    }, () => {
+                        this.getTracerCategoryList();
                     })
-                })
+                } else {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -659,6 +693,22 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     componentDidMount() {
         this.getPrograms()
+    }
+
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.filterVersion()
+        })
+    }
+
+    setVersionId(event) {
+        this.setState({
+            versionId: event.target.value
+        }, () => {
+            this.getTracerCategoryList()
+        })
     }
 
     buildJExcel() {
@@ -1043,7 +1093,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         var maxDate = moments.length > 0 ? moment.max(moments) : ''
                                         var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
                                         var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
-                                        console.log("D-------------->programPlanningUnitList",this.state.programPlanningUnitList)
+                                        console.log("D-------------->programPlanningUnitList", this.state.programPlanningUnitList)
                                         var pu = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == planningUnit.planningUnitId)[0];
                                         var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
                                         var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
@@ -1488,7 +1538,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.filterVersion(); }}
+                                                            // onChange={(e) => { this.filterVersion(); }}
+                                                            onChange={(e) => { this.setProgramId(e); }}
+                                                            value={this.state.programId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -1506,7 +1558,9 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.getTracerCategoryList(); }}
+                                                            // onChange={(e) => { this.getTracerCategoryList(); }}
+                                                            onChange={(e) => { this.setVersionId(e); }}
+                                                            value={this.state.versionId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}

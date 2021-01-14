@@ -67,7 +67,8 @@ class warehouseCapacity extends Component {
             programLabels: [],
             countryValues: [],
             countryLabels: [],
-            loading: true
+            loading: true,
+            programId: ''
 
         };
         this.getCountrylist = this.getCountrylist.bind(this);
@@ -75,6 +76,16 @@ class warehouseCapacity extends Component {
         this.getPrograms = this.getPrograms.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.handleChangeProgram = this.handleChangeProgram.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+
+    }
+
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.fetchData();
+        })
 
     }
 
@@ -101,17 +112,17 @@ class warehouseCapacity extends Component {
 
         if (navigator.onLine) {
             this.state.countryLabels.map(ele =>
-                csvRow.push('"'+(i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
+                csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
             this.state.programLabels.map(ele =>
-                csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20')+'"'))
+                csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         } else {
-            csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + document.getElementById("programIdOffline").selectedOptions[0].text).replaceAll(' ', '%20')+'"')
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programIdOffline").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         }
 
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.common.youdatastart')).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
         var re;
@@ -152,7 +163,7 @@ class warehouseCapacity extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 20, {
                     align: 'center'
                 })
-                doc.text('Copyright © 2020 '+i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 20, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 20, {
                     align: 'center'
                 })
 
@@ -201,14 +212,14 @@ class warehouseCapacity extends Component {
                     if (navigator.onLine) {
                         var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-                         doc.text(doc.internal.pageSize.width / 8, y, planningText)
+                        doc.text(doc.internal.pageSize.width / 8, y, planningText)
                         for (var i = 0; i < planningText.length; i++) {
                             if (y > doc.internal.pageSize.height - 100) {
                                 doc.addPage();
                                 y = 80;
 
-                            }else{
-                               y=y+10 
+                            } else {
+                                y = y + 10
                             }
                         }
                         // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -249,8 +260,8 @@ class warehouseCapacity extends Component {
         ]
         let data = this.state.data.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), getLabelText(elt.region.label, this.state.lang), (elt.programList.map(ele => { return getLabelText(ele.label, this.state.lang) })).join('\n'), elt.gln == null ? '' : elt.gln, elt.capacityCbm])
         let content = {
-            margin: { top: 80, bottom:120,left:100 },
-            startY: 90+doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4).length*10+doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length*10+20,
+            margin: { top: 80, bottom: 120, left: 100 },
+            startY: 90 + doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4).length * 10 + doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10 + 20,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, cellWidth: 80, halign: 'center' },
@@ -399,7 +410,7 @@ class warehouseCapacity extends Component {
                         this.fetchData()
                     });
                 }
-            }else{
+            } else {
                 this.setState({
                     programLst: []
                 }, () => {
@@ -548,13 +559,29 @@ class warehouseCapacity extends Component {
                         proList[i] = programJson
                     }
                 }
-                this.setState({
-                    offlinePrograms: proList.sort(function (a, b) {
-                        a = a.name.toLowerCase();
-                        b = b.name.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    this.setState({
+                        offlinePrograms: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramId")
+                    }, () => {
+                        this.fetchData();
                     })
-                })
+
+                } else {
+                    this.setState({
+                        offlinePrograms: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
         }.bind(this);
@@ -670,10 +697,12 @@ class warehouseCapacity extends Component {
 
 
         } else {
-            let programId = document.getElementById("programIdOffline").value;
+            // let programId = document.getElementById("programIdOffline").value;
+            let programId = this.state.programId;
             console.log("offline ProgramId---", programId);
 
             if (programId != 0) {
+                localStorage.setItem("sesProgramId", programId);
                 this.setState({ loading: true })
                 var db1;
                 getDatabase();
@@ -984,7 +1013,9 @@ class warehouseCapacity extends Component {
                                                                 name="programIdOffline"
                                                                 id="programIdOffline"
                                                                 bsSize="sm"
-                                                                onChange={(e) => { this.fetchData(e) }}
+                                                                // onChange={(e) => { this.fetchData(e) }}
+                                                                onChange={(e) => { this.setProgramId(e) }}
+                                                                value={this.state.programId}
 
 
                                                             >

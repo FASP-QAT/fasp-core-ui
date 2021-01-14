@@ -57,7 +57,8 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
-            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]
+            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            programId: ''
         }
 
 
@@ -134,13 +135,35 @@ export default class ConsumptionDetails extends React.Component {
                         proList[i] = programJson
                     }
                 }
-                this.setState({
-                    programList: proList.sort(function (a, b) {
-                        a = a.name.toLowerCase();
-                        b = b.name.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                var needToCalculate = this.props.match.params.calculate;
+                if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramId")
+                    }, () => {
+                        if (needToCalculate == "true") {
+                            // console.log("============>***");
+                            this.getProblemListAfterCalculation();
+                        } else {
+                            this.fetchData();
+                        }
                     })
-                })
+
+                } else {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
 
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
@@ -197,18 +220,18 @@ export default class ConsumptionDetails extends React.Component {
                         document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
                         // console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
 
-                        var programIdd = this.props.match.params.programId;
-                        var needToCalculate = this.props.match.params.calculate;
-                        if (programIdd != '' && programIdd != undefined) {
-                            document.getElementById("programId").value = programIdd;
-                            // console.log("value==================>", needToCalculate);
-                            if (needToCalculate == "true") {
-                                // console.log("============>***");
-                                this.getProblemListAfterCalculation();
-                            } else {
-                                this.fetchData();
-                            }
-                        }
+                        // var programIdd = this.props.match.params.programId;
+                        // var needToCalculate = this.props.match.params.calculate;
+                        // if (programIdd != '' && programIdd != undefined) {
+                        //     document.getElementById("programId").value = programIdd;
+                        //     // console.log("value==================>", needToCalculate);
+                        //     if (needToCalculate == "true") {
+                        //         // console.log("============>***");
+                        //         this.getProblemListAfterCalculation();
+                        //     } else {
+                        //         this.fetchData();
+                        //     }
+                        // }
 
                     }.bind(this)
 
@@ -736,6 +759,7 @@ export default class ConsumptionDetails extends React.Component {
         let programId = document.getElementById('programId').value;
         this.setState({ programId: programId });
         if (programId != 0) {
+            localStorage.setItem("sesProgramId", programId);
             this.refs.problemListChild.qatProblemActions(programId);
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });

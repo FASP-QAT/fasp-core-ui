@@ -147,7 +147,9 @@ class StockStatusOverTime extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programId: '',
+            versionId: ''
 
 
         }
@@ -157,6 +159,8 @@ class StockStatusOverTime extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.fetchData = this.fetchData.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
     }
 
     makeText = m => {
@@ -453,13 +457,29 @@ class StockStatusOverTime extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
+                        this.updateMonthsforAMCCalculations()
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -469,7 +489,8 @@ class StockStatusOverTime extends Component {
     }
 
     updateMonthsforAMCCalculations = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
@@ -499,9 +520,11 @@ class StockStatusOverTime extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
@@ -591,11 +614,23 @@ class StockStatusOverTime extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        }),
+                        versionId: localStorage.getItem("sesVersionIdReport")
+                    }, () => {
+                        this.getPlanningUnit();
                     })
-                })
+                } else {
+                    this.setState({
+                        versions: verList.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -609,6 +644,10 @@ class StockStatusOverTime extends Component {
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
+
+        // let programId = this.state.programId;
+        // let versionId = this.state.versionId;
+
         this.setState({
             planningUnits: [],
             planningUnitValues: [],
@@ -618,6 +657,7 @@ class StockStatusOverTime extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
             } else {
+                localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
                     const lan = 'en';
                     var db1;
@@ -640,7 +680,7 @@ class StockStatusOverTime extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -739,6 +779,25 @@ class StockStatusOverTime extends Component {
                 }
             }
         });
+
+    }
+
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.filterVersion();
+            this.updateMonthsforAMCCalculations()
+        })
+
+    }
+
+    setVersionId(event) {
+        this.setState({
+            versionId: event.target.value
+        }, () => {
+            this.getPlanningUnit();
+        })
 
     }
 
@@ -1454,8 +1513,9 @@ class StockStatusOverTime extends Component {
                                                         name="programId"
                                                         id="programId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.filterVersion(); this.updateMonthsforAMCCalculations() }}
-
+                                                        // onChange={(e) => { this.filterVersion(); this.updateMonthsforAMCCalculations() }}
+                                                        onChange={(e) => { this.setProgramId(e); }}
+                                                        value={this.state.programId}
 
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
@@ -1475,7 +1535,9 @@ class StockStatusOverTime extends Component {
                                                         name="versionId"
                                                         id="versionId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.getPlanningUnit(); }}
+                                                        // onChange={(e) => { this.getPlanningUnit(); }}
+                                                        onChange={(e) => { this.setVersionId(e); }}
+                                                        value={this.state.versionId}
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {versionList}

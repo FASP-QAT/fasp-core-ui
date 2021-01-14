@@ -60,7 +60,6 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            monthCount: 0,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -105,8 +104,8 @@ export default class SupplyPlanComponent extends React.Component {
 
         this.adjustmentsDetailsClicked = this.adjustmentsDetailsClicked.bind(this);
 
-        this.leftClicked = this.leftClicked.bind(this);
-        this.rightClicked = this.rightClicked.bind(this);
+        // this.leftClicked = this.leftClicked.bind(this);
+        // this.rightClicked = this.rightClicked.bind(this);
         this.leftClickedConsumption = this.leftClickedConsumption.bind(this);
         this.rightClickedConsumption = this.rightClickedConsumption.bind(this);
 
@@ -186,12 +185,12 @@ export default class SupplyPlanComponent extends React.Component {
 
     exportCSV = () => {
         var csvRow = [];
-        csvRow.push('"'+(i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label)).replaceAll(' ', '%20')+'"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (this.props.items.programSelect.label)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
 
-        csvRow.push( "\""+(i18n.t('static.planningunit.planningunit') + ' : ' + this.props.items.planningUnitName).replaceAll(' ', '%20')+ "\"")
+        csvRow.push("\"" + (i18n.t('static.planningunit.planningunit') + ' : ' + this.props.items.planningUnitName).replaceAll(' ', '%20') + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
@@ -269,7 +268,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatter = value => {
-        if (value!=null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value != '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -280,7 +279,7 @@ export default class SupplyPlanComponent extends React.Component {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        } else if (value!=null && isNaN(Number(value))) {
+        } else if (value != null && isNaN(Number(value))) {
             return value;
         } else {
             return ''
@@ -635,7 +634,7 @@ export default class SupplyPlanComponent extends React.Component {
                             // name: // programJson.regionList[i].regionId,
                             name: getLabelText(programJson.regionList[i].label, this.state.lang),
                             id: programJson.regionList[i].regionId,
-                            label:programJson.regionList[i].label
+                            label: programJson.regionList[i].label
                         }
                         regionList.push(regionJson)
 
@@ -715,7 +714,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
                                 })
-                                this.formSubmit(this.state.monthCount)
+                                this.formSubmit(this.props.items.monthCount)
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
@@ -744,9 +743,10 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(monthCount) {
+        console.log("In form submit compare")
         this.setState({
             planningUnitChange: true,
-            display: 'block'
+            display: 'block',
         })
         this.setState({ loading: true });
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
@@ -1097,10 +1097,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
-                                    var paColor1=""
-                                    var paColor2=""
-                                    var paColor3=""
-                                    var paColor4=""
+                                    var paColor1 = ""
+                                    var paColor2 = ""
+                                    var paColor3 = ""
+                                    var paColor4 = ""
                                     var isEmergencyOrder1 = 0;
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;
@@ -1350,13 +1350,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                             if (noOfActualEntries > 0) {
                                                 if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                    consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 }
                                                 actualFlagForRegion = true;
                                             } else {
-                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                 actualFlagForRegion = false;
                                             }
                                         }
@@ -1558,7 +1558,7 @@ export default class SupplyPlanComponent extends React.Component {
         })
         if (supplyPlanType == 'Consumption') {
             console.log("In consumption");
-            var monthCountConsumption = count - 2;
+            var monthCountConsumption = count != undefined ? this.props.items.monthCount + count - 2 : this.props.items.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -1576,7 +1576,7 @@ export default class SupplyPlanComponent extends React.Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = count - 2;
+            var monthCountAdjustments = count != undefined ? this.props.items.monthCount + count - 2 : this.props.items.monthCount;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments,
@@ -1656,22 +1656,6 @@ export default class SupplyPlanComponent extends React.Component {
         this.props.updateState("color", "red");
         this.props.hideFirstComponent();
         this.toggleLarge(supplyPlanType);
-    }
-
-    leftClicked() {
-        var monthCount = (this.state.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
-        this.setState({
-            monthCount: monthCount
-        })
-        this.formSubmit(monthCount)
-    }
-
-    rightClicked() {
-        var monthCount = (this.state.monthCount) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
-        this.setState({
-            monthCount: monthCount
-        })
-        this.formSubmit(monthCount)
     }
 
     leftClickedConsumption() {
@@ -1845,7 +1829,7 @@ export default class SupplyPlanComponent extends React.Component {
                     c.region.id == region &&
                     moment(c.inventoryDate).format("MMM YY") == month);
                 if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty !=="" && c.actualQty != undefined && c.actualQty != null);
+                    inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
                 } else {
                     inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
                 }
@@ -2110,8 +2094,8 @@ export default class SupplyPlanComponent extends React.Component {
                         </Row>
                         {/* <Row> */}
                         <div className="col-md-12">
-                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                            {/* <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span> */}
+                            {/* <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span> */}
                         </div>
                         {/* </Row> */}
                         <div className="table-scroll">
@@ -2137,7 +2121,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                         <tr bgcolor='#d9d9d9'>
                                             <td className="BorderNoneSupplyPlan"></td>
-                                            <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
+                                            <td align="left" className="sticky-col first-col clone" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
                                                     <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
@@ -2379,7 +2363,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr bgcolor='#d9d9d9'>
                                             <td className="BorderNoneSupplyPlan"></td>
-                                            <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
+                                            <td align="left" className="sticky-col first-col clone"  style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
                                                     return (<td align="right" bgcolor={item1 == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1 == 0 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} />}</td>)
@@ -2433,21 +2417,21 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                        </div>
-                        {
-                                    this.state.jsonArrForGraph.length > 0
-                                    &&
-                                    <div className="row" >
+                            </div>
+                            {
+                                this.state.jsonArrForGraph.length > 0
+                                &&
+                                <div className="row" >
 
-                                        <div className="graphwidth">
+                                    <div className="graphwidth">
                                         <div className="col-md-12">
                                             <div className="chart-wrapper chart-graph-report">
                                                 <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
                                             </div>
-                                            </div>
                                         </div>
-                                        <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
-                                    </div>}
+                                    </div>
+                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                </div>}
 
                         </div>
                     </div>
@@ -2858,7 +2842,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty>0?item.expiredQty:item.openingBalance} /></td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                             </tr>
                                         )
                                         )

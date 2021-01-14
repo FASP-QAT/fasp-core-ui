@@ -624,7 +624,7 @@ class EditBudgetComponent extends Component {
                                                             id="startDate"
                                                             name="startDate"
                                                             bsSize="sm"
-                                                            //minDate={this.addMonths(new Date(), -6)}
+                                                            minDate={this.addMonths(new Date(), -6)}
                                                             selected={this.state.budget.startDate}
                                                             // onChange={(date) => { this.dataChangeDate(date) }}
                                                             onChange={(date) => {
