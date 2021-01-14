@@ -1912,6 +1912,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             console.log("VALUE--------->ELSE");
             this.setState({
                 allowAdd: false,
+                loading: false
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 this.el.destroy();
