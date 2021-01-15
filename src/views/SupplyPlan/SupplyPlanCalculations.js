@@ -177,7 +177,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
 
-                            var remainingBatches = (programJsonForStoringTheResult.batchInfoList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.createdDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && moment(c.expiryDate).format("YYYY-MM")==moment(startDate).add(programPlanningUnitList[ppL].shelfLife,'months').format("YYYY-MM"));
+                            var remainingBatches = (programJsonForStoringTheResult.batchInfoList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.createdDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && moment(c.expiryDate).format("YYYY-MM") == moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM"));
                             for (var rb = 0; rb < remainingBatches.length; rb++) {
                                 var indexForRemainingBatch = myArray.findIndex(c => c.batchNo == remainingBatches[rb].batchNo && moment(remainingBatches[rb].expiryDate).format("YYYY-MM") == moment(c.expiryDate).format("YYYY-MM"));
                                 if (indexForRemainingBatch == -1) {
@@ -560,7 +560,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             for (var a = 0; a < myArray.length; a++) {
                                 var tempCB = Number(myArray[a].openingBalance) - Number(myArray[a].expiredQty) + Number(myArray[a].shipment) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                                 myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
-                                if (Number(tempCB) >= Number(unallocatedFEFO)) {
+                                if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                     myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
                                     myArray[a].calculatedFEFO = Number(unallocatedFEFO);
                                     unallocatedFEFO = 0;
@@ -594,7 +594,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             for (var a = 0; a < myArray.length; a++) {
                                 var tempCB = Number(myArray[a].openingBalanceWps) - Number(myArray[a].expiredQtyWps) + Number(myArray[a].shipmentWps) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                                 myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                                if (Number(tempCB) >= Number(unallocatedFEFOWps)) {
+                                if (Number(tempCB) >= Number(unallocatedFEFOWps)  && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                     myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
                                     myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
                                     unallocatedFEFOWps = 0;
