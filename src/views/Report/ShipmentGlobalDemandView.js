@@ -1803,7 +1803,6 @@ class ShipmentGlobalDemandView extends Component {
             }
             else {
                 // AuthenticationService.setupAxiosInterceptors();
-<<<<<<< HEAD
                 // let productCategoryId = document.getElementById("productCategoryId").value;
                 // var lang = this.state.lang
                 // if (productCategoryId != -1) {
@@ -1876,28 +1875,6 @@ class ShipmentGlobalDemandView extends Component {
                                 // (response.data).sort(function (a, b) {
                                 //     return getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang)); //using String.prototype.localCompare()
                                 // });
-=======
-                let productCategoryId = document.getElementById("productCategoryId").value;
-                // AuthenticationService.setupAxiosInterceptors();
-                var lang = this.state.lang
-                if (productCategoryId != -1) {
-                    PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                        // console.log("PLANNING-UNIT--->", response.data);
-                        (response.data).sort(function (a, b) {
-                            return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
-                        });
-                        this.setState({
-                            planningUnits: response.data,
-                        }, () => {
-                            this.fetchData()
-                        });
-                    }).catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
->>>>>>> QAT-428
                                 this.setState({
                                     planningUnits: response.data,
                                 }, () => {
