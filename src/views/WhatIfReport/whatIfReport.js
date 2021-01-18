@@ -59,7 +59,6 @@ const validationSchema = function (values, t) {
 
                 },
                 then: Yup.string()
-                    .matches(PERCENTAGE_REGEX, i18n.t('static.common.percentageregex'))
                     .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
                     .required(i18n.t('static.whatIf.validpercentage'))
                 ,
