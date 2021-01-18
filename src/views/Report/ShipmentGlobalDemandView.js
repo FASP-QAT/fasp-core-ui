@@ -269,8 +269,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('')
             this.state.programLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
+            // csvRow.push('')
+            // csvRow.push('"' + (i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
             csvRow.push('')
             this.state.planningUnitLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
@@ -426,10 +426,10 @@ class ShipmentGlobalDemandView extends Component {
             doc.text(doc.internal.pageSize.width / 8, len, planningText)
             len = len + 10 + planningText.length * 10
 
-            doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
-                align: 'left'
-            })
-            len = len + 20
+            // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
+            //     align: 'left'
+            // })
+            // len = len + 20
 
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -570,7 +570,7 @@ class ShipmentGlobalDemandView extends Component {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
-            let productCategoryId = document.getElementById("productCategoryId").value;
+            // let productCategoryId = document.getElementById("productCategoryId").value;
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
             let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
@@ -580,7 +580,8 @@ class ShipmentGlobalDemandView extends Component {
             let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
 
-            if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
+            // if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
+            if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: '', loading: true
                 })
@@ -682,16 +683,18 @@ class ShipmentGlobalDemandView extends Component {
                     procurementAgentSplit: [],
                     table1Headers: []
                 });
-            } else if (productCategoryId == -1) {
-                this.setState({
-                    message: i18n.t('static.product.productcategorytext'),
-                    data: [],
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: []
-                });
-            } else if (this.state.planningUnitValues.length == 0) {
+            }
+            // else if (productCategoryId == -1) {
+            //     this.setState({
+            //         message: i18n.t('static.product.productcategorytext'),
+            //         data: [],
+            //         fundingSourceSplit: [],
+            //         planningUnitSplit: [],
+            //         procurementAgentSplit: [],
+            //         table1Headers: []
+            //     });
+            // } 
+            else if (this.state.planningUnitValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
                     data: [],
@@ -1034,7 +1037,7 @@ class ShipmentGlobalDemandView extends Component {
             this.getCountrys();
             this.getPrograms();
             //this.getRelamList();
-            this.getProductCategories();
+            // this.getProductCategories();
             this.getFundingSource();
             this.getShipmentStatusList();
         } else {
@@ -1164,7 +1167,8 @@ class ShipmentGlobalDemandView extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
 
-            this.fetchData()
+            this.fetchData();
+            this.getPlanningUnit();
         })
 
     }
@@ -1773,7 +1777,7 @@ class ShipmentGlobalDemandView extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active==true) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -1790,87 +1794,128 @@ class ShipmentGlobalDemandView extends Component {
             }
             else {
                 // AuthenticationService.setupAxiosInterceptors();
-                let productCategoryId = document.getElementById("productCategoryId").value;
-                // AuthenticationService.setupAxiosInterceptors();
-               var lang=this.state.lang
-                if (productCategoryId != -1) {
-                    PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                        // console.log("PLANNING-UNIT--->", response.data);
-                         (response.data).sort(function (a, b) {
-                    return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
-                  });
-                        this.setState({
-                            planningUnits: response.data,
-                        }, () => {
-                            this.fetchData()
-                        });
-                    }).catch(
-                        error => {
-                            this.setState({
-                                planningUnits: [],
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
+                // let productCategoryId = document.getElementById("productCategoryId").value;
+                // var lang = this.state.lang
+                // if (productCategoryId != -1) {
+                //     PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
+                //         // console.log("PLANNING-UNIT--->", response.data);
+                //         (response.data).sort(function (a, b) {
+                //             return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
+                //         });
+                //         this.setState({
+                //             planningUnits: response.data,
+                //         }, () => {
+                //             this.fetchData()
+                //         });
+                //     }).catch(
+                //         error => {
+                //             this.setState({
+                //                 planningUnits: [],
+                //             })
+                //             if (error.message === "Network Error") {
+                //                 this.setState({
+                //                     message: 'static.unkownError',
+                //                     loading: false
+                //                 });
+                //             } else {
+                //                 switch (error.response ? error.response.status : "") {
 
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
+                //                     case 401:
+                //                         this.props.history.push(`/login/static.message.sessionExpired`)
+                //                         break;
+                //                     case 403:
+                //                         this.props.history.push(`/accessDenied`)
+                //                         break;
+                //                     case 500:
+                //                     case 404:
+                //                     case 406:
+                //                         this.setState({
+                //                             message: error.response.data.messageCode,
+                //                             loading: false
+                //                         });
+                //                         break;
+                //                     case 412:
+                //                         this.setState({
+                //                             message: error.response.data.messageCode,
+                //                             loading: false
+                //                         });
+                //                         break;
+                //                     default:
+                //                         this.setState({
+                //                             message: 'static.unkownError',
+                //                             loading: false
+                //                         });
+                //                         break;
+                //                 }
+                //             }
+                //         }
+                //     );
+                // }
+
+
+                let programValues = this.state.programValues;
+                // console.log("programValues----->", programValues);
+                this.setState({
+                    planningUnits: [],
+                    planningUnitValues: [],
+                    planningUnitLabels: []
+                }, () => {
+                    if (programValues.length > 0) {
+                        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
+                            .then(response => {
+                                // (response.data).sort(function (a, b) {
+                                //     return getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang)); //using String.prototype.localCompare()
+                                // });
+                                this.setState({
+                                    planningUnits: response.data,
+                                }, () => {
+                                    this.fetchData()
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        planningUnits: [],
+                                    })
+                                    if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false
                                         });
-                                        break;
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    );
-                    // .catch(
-                    //     error => {
-                    //         this.setState({
-                    //             planningUnits: [],
-                    //         })
-                    //         if (error.message === "Network Error") {
-                    //             this.setState({ message: error.message });
-                    //         } else {
-                    //             switch (error.response ? error.response.status : "") {
-                    //                 case 500:
-                    //                 case 401:
-                    //                 case 404:
-                    //                 case 406:
-                    //                 case 412:
-                    //                     //  this.setState({ message: error.response.data.messageCode });
-                    //                     break;
-                    //                 default:
-                    //                     this.setState({ message: 'static.unkownError' });
-                    //                     break;
-                    //             }
-                    //         }
-                    //     }
-                    // );
-                }
+                            );
+                    }
+                })
 
             }
         });
@@ -1981,20 +2026,31 @@ class ShipmentGlobalDemandView extends Component {
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 
-        const { productCategories } = this.state;
+        // const { productCategories } = this.state;
+
+        // const { planningUnits } = this.state;
+        // let planningUnitList = planningUnits.length > 0
+        //     && planningUnits.map((item, i) => {
+        //         if (navigator.onLine) {
+        //             return (
+        //                 { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+        //             )
+        //         } else {
+        //             return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+        //         }
+
+
+        //     }, this);
 
         const { planningUnits } = this.state;
-        let planningUnitList = planningUnits.length > 0
+        let planningUnitList = [];
+        planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                if (navigator.onLine) {
-                    return (
-                        { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
-                    )
-                } else {
-                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
-                }
+                return (
 
+                    { label: getLabelText(item.label, this.state.lang), value: item.id }
 
+                )
             }, this);
 
 
@@ -2211,7 +2267,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                         </FormGroup>
 
-                                        <Online>
+                                        {/* <Online>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                                 <div className="controls ">
@@ -2237,7 +2293,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
 
                                             </FormGroup>
-                                        </Online>
+                                        </Online> */}
                                         <Offline>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
