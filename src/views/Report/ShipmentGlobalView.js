@@ -1300,7 +1300,7 @@ class ShipmentGlobalView extends Component {
 
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let fundingSourceProcurementAgentIds = [];
         if (viewby == 1) {
             fundingSourceProcurementAgentIds = fundingSourceIds;
