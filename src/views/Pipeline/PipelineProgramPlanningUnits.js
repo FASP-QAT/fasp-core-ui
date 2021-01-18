@@ -9,7 +9,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../Common
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PIPELINE_CONVERSION_FACTOR } from '../../Constants.js';
 export default class PipelineProgramPlanningUnits extends Component {
     constructor(props) {
         super(props);
@@ -162,9 +162,11 @@ export default class PipelineProgramPlanningUnits extends Component {
             console.log("adasdasda==>", value);
             //var reg = /^[0-9\b]+$/;
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-            var reg = JEXCEL_DECIMAL_LEAD_TIME;
+            // var reg = JEXCEL_DECIMAL_LEAD_TIME;
+            var reg = JEXCEL_PIPELINE_CONVERSION_FACTOR;
             var col = ("E").concat(parseInt(y) + 1);
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            console.log("VALUE==>", value);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -373,7 +375,8 @@ export default class PipelineProgramPlanningUnits extends Component {
             var col = ("E").concat(parseInt(y) + 1);
             // var value = this.el.getValueFromCoords(4, y);
             var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_LEAD_TIME;
+            // var reg = JEXCEL_DECIMAL_LEAD_TIME;
+            var reg = JEXCEL_PIPELINE_CONVERSION_FACTOR;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -740,9 +743,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        // title: i18n.t('static.unit.multiplier'),
-                                                        title: i18n.t('static.pipeline.productToPlanningUnit'),
-                                                        type: 'numeric', mask: '#,##.00', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
+                                                        title: i18n.t('static.unit.multiplier'),
+                                                        type: 'numeric', mask: '#,##.000000', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
 
                                                     },
                                                     {
