@@ -743,7 +743,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                         filter: this.dropdownFilter
                                                     },
                                                     {
-                                                        title: i18n.t('static.unit.multiplier'),
+                                                        // title: i18n.t('static.unit.multiplier'),
+                                                        title: i18n.t('static.pipeline.productToPlanningUnit'),
                                                         type: 'numeric', mask: '#,##.000000', disabledMaskOnEdition: true, textEditor: true, decimal: '.'
 
                                                     },
