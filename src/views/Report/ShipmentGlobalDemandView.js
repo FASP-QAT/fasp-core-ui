@@ -154,7 +154,16 @@ const optionsPie = {
         //   labels: {
         //     boxWidth: 10
         //   }
-    }
+    },
+    tooltips: {
+        callbacks: {
+            label: function (tooltipItems, data) {
+                return data.labels[tooltipItems.index] +
+                    " : " + " $ " +
+                    data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index];
+            }
+        }
+    },
 }
 
 // var bar_chart = new Chart(bar_ctx, {
@@ -1773,7 +1782,7 @@ class ShipmentGlobalDemandView extends Component {
                         var proList = []
                         // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active==true) {
+                            if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                 proList[i] = myResult[i]
                             }
@@ -1792,13 +1801,13 @@ class ShipmentGlobalDemandView extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 let productCategoryId = document.getElementById("productCategoryId").value;
                 // AuthenticationService.setupAxiosInterceptors();
-               var lang=this.state.lang
+                var lang = this.state.lang
                 if (productCategoryId != -1) {
                     PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
                         // console.log("PLANNING-UNIT--->", response.data);
-                         (response.data).sort(function (a, b) {
-                    return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
-                  });
+                        (response.data).sort(function (a, b) {
+                            return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
+                        });
                         this.setState({
                             planningUnits: response.data,
                         }, () => {
@@ -2409,6 +2418,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
                                                 /><br />
                                             </div>
+                                            <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                         </Col>
                                     }
                                 </div>
