@@ -154,7 +154,16 @@ const optionsPie = {
         //   labels: {
         //     boxWidth: 10
         //   }
-    }
+    },
+    tooltips: {
+        callbacks: {
+            label: function (tooltipItems, data) {
+                return data.labels[tooltipItems.index] +
+                    " : " + " $ " +
+                    data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index];
+            }
+        }
+    },
 }
 
 // var bar_chart = new Chart(bar_ctx, {
@@ -2465,6 +2474,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
                                                 /><br />
                                             </div>
+                                            <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                         </Col>
                                     }
                                 </div>
