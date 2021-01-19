@@ -59,7 +59,6 @@ const validationSchema = function (values, t) {
 
                 },
                 then: Yup.string()
-                    .matches(PERCENTAGE_REGEX, i18n.t('static.common.percentageregex'))
                     .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
                     .required(i18n.t('static.whatIf.validpercentage'))
                 ,
@@ -2862,8 +2861,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                     monthsOfStockArray.push("")
                                     amcTotalData.push("");
-                                    minStockMoS.push("");
-                                    maxStockMoS.push("")
+                                    minStockMoS.push(minStockMoSQty);
+                                    maxStockMoS.push(maxStockMoSQty)
                                     unmetDemand.push("");
                                     closingBalanceArray.push(lastClosingBalance);
                                     for (var i = 0; i < this.state.regionListFiltered.length; i++) {
@@ -2883,8 +2882,8 @@ export default class WhatIfReportComponent extends React.Component {
                                         shipped: 0,
                                         ordered: 0,
                                         mos: "",
-                                        minMos: "",
-                                        maxMos: ""
+                                        minMos: minStockMoSQty,
+                                        maxMos: maxStockMoSQty
                                     }
                                     jsonArrForGraph.push(json);
                                 }

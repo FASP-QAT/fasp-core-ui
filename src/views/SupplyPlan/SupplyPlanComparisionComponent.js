@@ -1439,8 +1439,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                     monthsOfStockArray.push("")
                                     amcTotalData.push("");
-                                    minStockMoS.push("");
-                                    maxStockMoS.push("")
+                                    minStockMoS.push(minStockMoSQty);
+                                    maxStockMoS.push(maxStockMoSQty)
                                     unmetDemand.push("");
                                     closingBalanceArray.push(lastClosingBalance);
                                     for (var i = 0; i < this.state.regionListFiltered.length; i++) {
@@ -1460,8 +1460,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         shipped: 0,
                                         ordered: 0,
                                         mos: "",
-                                        minMos: "",
-                                        maxMos: ""
+                                        minMos: minStockMoSQty,
+                                        maxMos: maxStockMoSQty
                                     }
                                     jsonArrForGraph.push(json);
                                 }

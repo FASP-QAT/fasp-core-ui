@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT,DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 
 import i18n from '../../i18n';
@@ -853,8 +853,12 @@ export default class ManualTagging extends Component {
 
     formatDate(cell, row) {
         if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
-            return modifiedDate;
+            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            console.log("date-----",date);
+var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
+console.log("dateMonthAsWord-----",dateMonthAsWord);
+            return dateMonthAsWord;
         } else {
             return "";
         }
