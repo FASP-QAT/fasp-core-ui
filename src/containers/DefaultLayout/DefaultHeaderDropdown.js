@@ -18,6 +18,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
+import { polling } from '../../Constants';
 
 
 const propTypes = {
@@ -81,14 +82,14 @@ class DefaultHeaderDropdown extends Component {
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (navigator.onLine) {
-console.log("Going to change online")
+      console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {
           console.log("Going to change language api success---", lang)
           i18n.changeLanguage(lang)
           console.log("Going to change language reload location reload---")
-         
+
           var url = window.location.href;
           if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
             // "The specific word exists";
@@ -238,10 +239,10 @@ console.log("Going to change online")
 
           <div className="avatar">
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            <Online>
+            <Online polling={polling} ref="onlineRef" >
               <span className="avatar-status badge-success" title="Online"></span>
             </Online>
-            <Offline>
+            <Offline polling={polling}>
               <span className="avatar-status badge-danger" title="Offline"></span>
             </Offline>
           </div>
@@ -264,7 +265,7 @@ console.log("Going to change online")
           </DropdownItem>
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}><i className="flag-icon flag-icon-us"></i>
-            {localStorage.getItem('lang')==null||localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
+            {localStorage.getItem('lang') == null || localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
           </DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i>{localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
