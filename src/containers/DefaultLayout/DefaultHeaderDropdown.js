@@ -70,7 +70,14 @@ class DefaultHeaderDropdown extends Component {
     // this.togglechangeadditional = this.togglechangeadditional.bind(this);
     // this.togglechangemaster = this.togglechangemaster.bind(this);
     this.dashboard = this.dashboard.bind(this);
+    this.sessionChanged = this.sessionChanged.bind(this);
   }
+
+  sessionChanged() {
+    var sesType = localStorage.getItem("sesType");
+    localStorage.setItem("sesType", sesType.toString() == "true" ? false : true);
+  }
+
   dashboard() {
     this.props.history.push(`/ApplicationDashboard/`)
   }
@@ -239,7 +246,7 @@ class DefaultHeaderDropdown extends Component {
 
           <div className="avatar">
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            <Online polling={polling} ref="onlineRef" >
+            <Online polling={polling} ref="onlineRef" onChange={this.sessionChanged}>
               <span className="avatar-status badge-success" title="Online"></span>
             </Online>
             <Offline polling={polling}>
