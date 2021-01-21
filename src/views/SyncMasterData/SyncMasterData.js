@@ -219,7 +219,7 @@ export default class SyncMasterData extends Component {
                             console.log("Shipment data updated", shipmentDataList);
 
                             for (var j = 0; j < batchArray.length; j++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo)
+                                var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
                                 if (index == -1) {
                                     batchInfoList.push(batchArray[j]);
                                 } else {
