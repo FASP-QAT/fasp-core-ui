@@ -387,6 +387,7 @@
     "static.dashboard.realm": "Realms",
     "static.organisation.realmcountry": "Country",
     "static.currency.conversionrateNumber": "Enter positive integer or decimal number",
+    "static.budget.usedUSDAmount": "Used Amount",
     "static.common.editEntity": "Update {{entityname}}",
     "static.program.monthpastamc": "Months in the past for AMC",
     "static.dashboard.supplyPlan": "Supply Planning",
