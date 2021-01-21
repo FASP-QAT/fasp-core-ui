@@ -1082,6 +1082,7 @@
     "static.report.shelfLife": "Vida útil (meses)",
     "static.common.active": "Ativo",
     "static.manualTagging.erpShipment": "Remessa de Planejamento de Recursos Empresariais (ERP)",
+    "static.report.fundingSourceUsdAmount": "* O valor da fonte de financiamento é em USD",
     "static.supplyPlan.nonPsmShipments": "Remessas não PSM",
     "static.shipment.qty": "Quantidade",
     "static.message.user.passwordSame": "A nova senha não pode ser igual à senha atual",

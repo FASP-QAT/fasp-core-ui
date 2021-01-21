@@ -1082,6 +1082,7 @@
     "static.report.shelfLife": "Vida útil (meses)",
     "static.common.active": "Activo",
     "static.manualTagging.erpShipment": "Pedido del sistema de planificación de recursos empresariales (ERP)",
+    "static.report.fundingSourceUsdAmount": "* El monto de la fuente de financiamiento está en USD",
     "static.supplyPlan.nonPsmShipments": "Pedidos no comprados por PSM",
     "static.shipment.qty": "Cantidad",
     "static.message.user.passwordSame": "La nueva contraseña no puede ser la misma que la contraseña actual",

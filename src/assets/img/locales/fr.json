@@ -1082,6 +1082,7 @@
     "static.report.shelfLife": "Durée de vie (mois)",
     "static.common.active": "Actif",
     "static.manualTagging.erpShipment": "Expédition du progiciel (PGI)",
+    "static.report.fundingSourceUsdAmount": "* Le montant de la source de financement est en USD",
     "static.supplyPlan.nonPsmShipments": "Envois non PSM",
     "static.shipment.qty": "Quantité",
     "static.message.user.passwordSame": "Le nouveau mot de passe ne peut pas être le même que le mot de passe actuel",

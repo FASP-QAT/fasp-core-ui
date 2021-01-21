@@ -588,7 +588,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                                     // Add shipment batch info
                                                     var rowData = obj.getRowData(y);
-                                                    var expectedDeliveryDate = moment(rowData[4]).format("YYYY-MM-DD");
+                                                    var expectedDeliveryDate = moment(rowData[4]).add(1,'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                     if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
                                                         items.push({
