@@ -251,7 +251,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 // Adding total shipment qty
                                 shipmentTotalQty += Number((shipmentArr[j].shipmentQty));
                                 // Adding total shipment qty wps
-                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                     shipmentTotalQtyWps += Number((shipmentArr[j].shipmentQty));
                                 }
                                 // Adding manual shipments
@@ -302,7 +302,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if (bd.length > 0) {
                                             bd = bd[0];
                                             var shipmentQtyWps = 0;
-                                            if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                            if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                                 shipmentQtyWps = batchListForShipments[b].shipmentQty;
                                             }
                                             var json = {
@@ -325,14 +325,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     } else {
                                         myArray[index].shipment = Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
-                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                             myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
                                         }
                                     }
                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
                                     if (index != -1) {
                                         shipmentBatchQtyTotal += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
-                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                             shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
                                         }
                                     }

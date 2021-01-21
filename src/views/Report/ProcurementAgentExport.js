@@ -1178,7 +1178,7 @@ class ProcurementAgentExport extends Component {
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
                                 this.state.procurementAgentValues.map(p => {
@@ -1483,7 +1483,7 @@ class ProcurementAgentExport extends Component {
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
                                 this.state.fundingSourceValues.map(f => {
@@ -1787,7 +1787,7 @@ class ProcurementAgentExport extends Component {
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
 
                                 // const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
