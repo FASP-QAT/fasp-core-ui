@@ -18,7 +18,6 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
-import { polling } from '../../Constants';
 
 
 const propTypes = {
@@ -70,12 +69,6 @@ class DefaultHeaderDropdown extends Component {
     // this.togglechangeadditional = this.togglechangeadditional.bind(this);
     // this.togglechangemaster = this.togglechangemaster.bind(this);
     this.dashboard = this.dashboard.bind(this);
-    this.sessionChanged = this.sessionChanged.bind(this);
-  }
-
-  sessionChanged() {
-    var sesType = localStorage.getItem("sesType");
-    localStorage.setItem("sesType", sesType.toString() == "true" ? false : true);
   }
 
   dashboard() {
@@ -246,12 +239,12 @@ class DefaultHeaderDropdown extends Component {
 
           <div className="avatar">
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            <Online polling={polling} ref="onlineRef" onChange={this.sessionChanged}>
+            {localStorage.getItem("sesType").toString() == "true" &&
               <span className="avatar-status badge-success" title="Online"></span>
-            </Online>
-            <Offline polling={polling}>
+            }
+            {localStorage.getItem("sesType").toString() == "false" &&
               <span className="avatar-status badge-danger" title="Offline"></span>
-            </Offline>
+            }
           </div>
 
           {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
@@ -277,7 +270,7 @@ class DefaultHeaderDropdown extends Component {
           <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i>{localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem>
-          <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
+          {localStorage.getItem("sesType").toString() == "true" && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
           {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>

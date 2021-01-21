@@ -11,7 +11,7 @@ import IdleTimer from 'react-idle-timer';
 import moment from 'moment';
 import CryptoJS from 'crypto-js';
 import {
-  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME
+  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -628,7 +628,15 @@ class DefaultLayout extends Component {
     this.getProgramData = this.getProgramData.bind(this);
     this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
+    this.sessionChanged = this.sessionChanged.bind(this);
   }
+
+  sessionChanged() {
+    if (this.refs.onlineRef != undefined) {
+      localStorage.setItem("sesType", !this.refs.onlineRef.state.online);
+    }
+  }
+
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
@@ -770,7 +778,7 @@ class DefaultLayout extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson1 = JSON.parse(programData);
-           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
+            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
             let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
             let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
             let pmax = moment.max(cmax, imax, smax)
@@ -848,7 +856,7 @@ class DefaultLayout extends Component {
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
-        console.log("P***proList downloaded program data---",proList)
+        console.log("P***proList downloaded program data---", proList)
         this.setState({
           downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
         }, () => {
@@ -902,7 +910,7 @@ class DefaultLayout extends Component {
     return (
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
-
+        <Online polling={polling} ref="onlineRef" onChange={this.sessionChanged}></Online>
         <IdleTimer
           ref={ref => { this.idleTimer = ref }}
           element={document}
@@ -925,7 +933,7 @@ class DefaultLayout extends Component {
             <AppSidebarForm />
             <Suspense>
 
-              <Online>
+              {localStorage.getItem("sesType").toString() == "true" &&
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -2052,8 +2060,8 @@ class DefaultLayout extends Component {
                     ]
 
                 }} {...this.props} />
-              </Online>
-              <Offline>
+              }
+              {localStorage.getItem("sesType").toString() == "false" &&
                 <AppSidebarNav navConfig={{
                   items:
                     [
@@ -2536,7 +2544,7 @@ class DefaultLayout extends Component {
 
                     ]
                 }} {...this.props} />
-              </Offline>
+              }
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />
@@ -2552,11 +2560,11 @@ class DefaultLayout extends Component {
                         key={idx}
                         path={route.path}
                         exact={route.exact}
-                        name={route.name!=undefined?(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name):''}
+                        name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name!=undefined?((route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)):'')} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '')} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )
