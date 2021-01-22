@@ -1687,27 +1687,27 @@ class AccessControlComponent extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false
                                     },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
                                     },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
                                     },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
                                     break;
                             }
                         }
@@ -1724,30 +1724,54 @@ class AccessControlComponent extends Component {
         RealmCountryService.getRealmCountryListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmCountryList: response.data,
-                        selRealmCountry: response.data
+                        realmCountryList: listArray,
+                        selRealmCountry: listArray
                     })
                     OrganisationService.getOrganisationList()
                         .then(response => {
                             if (response.status == "200") {
+                                var listArray = response.data;
+                                listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 this.setState({
-                                    organisations: response.data,
-                                    selOrganisation: response.data
+                                    organisations: listArray,
+                                    selOrganisation: listArray
                                 });
                                 HealthAreaService.getHealthAreaList()
                                     .then(response => {
                                         if (response.status == "200") {
+                                            var listArray = response.data;
+                                            listArray.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
+                                            });
                                             this.setState({
-                                                healthAreas: response.data,
-                                                selHealthArea: response.data
+                                                healthAreas: listArray,
+                                                selHealthArea: listArray
                                             });
                                             ProgramService.getProgramList()
                                                 .then(response => {
                                                     if (response.status == "200") {
+                                                        var listArray = response.data;
+                                                        listArray.sort((a, b) => {
+                                                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                            return itemLabelA > itemLabelB ? 1 : -1;
+                                                        });
                                                         this.setState({
-                                                            programs: response.data,
-                                                            selProgram: response.data
+                                                            programs: listArray,
+                                                            selProgram: listArray
                                                         });
                                                         UserService.getUserByUserId(this.props.match.params.userId)
                                                             .then(response => {
@@ -2170,7 +2194,7 @@ class AccessControlComponent extends Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-        &nbsp;
+                                &nbsp;
 </FormGroup>
                         </CardFooter>
                     </Card>
