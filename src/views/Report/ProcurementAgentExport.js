@@ -1309,7 +1309,7 @@ class ProcurementAgentExport extends Component {
                                 data: response.data
                             }, () => {
                                 // this.consolidatedProgramList();
-                                this.consolidatedProcurementAgentList();
+                                // this.consolidatedProcurementAgentList();
                                 this.buildJExcel();
                             })
                         }).catch(
