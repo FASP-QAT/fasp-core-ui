@@ -940,8 +940,14 @@ class ListBudgetComponent extends Component {
     ProgramService.getProgramList()
       .then(response => {
         if (response.status == 200) {
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            programs: response.data, loading: false
+            programs: listArray, loading: false
           })
         }
 
@@ -1066,8 +1072,15 @@ class ListBudgetComponent extends Component {
           // this.setState({
           //   fundingSourceList: response.data
           // })
+          var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            fundingSourceList: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+            // fundingSourceList: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+            fundingSourceList: listArray
           })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })

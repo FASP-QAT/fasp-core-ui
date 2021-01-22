@@ -398,7 +398,7 @@ class ShipmentGlobalView extends Component {
             minDate: { year: 2017, month: 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: 12 },
             loading: true,
-            programLst:[]
+            programLst: []
 
 
         };
@@ -412,7 +412,7 @@ class ShipmentGlobalView extends Component {
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.getProductCategories = this.getProductCategories.bind(this)
-        this.filterProgram=this.filterProgram.bind(this);
+        this.filterProgram = this.filterProgram.bind(this);
     }
 
     makeText = m => {
@@ -729,7 +729,7 @@ class ShipmentGlobalView extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
-            
+
             this.fetchData()
         })
 
@@ -754,8 +754,15 @@ class ShipmentGlobalView extends Component {
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
+                var listArray = response.data.map(ele => ele.realmCountry);
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    countrys: response.data.map(ele => ele.realmCountry)
+                    // countrys: response.data.map(ele => ele.realmCountry)
+                    countrys: listArray
                 }, () => { this.fetchData(); })
             }).catch(
                 error => {
@@ -807,12 +814,12 @@ class ShipmentGlobalView extends Component {
 
         let productCategoryId = document.getElementById("productCategoryId").value;
         // AuthenticationService.setupAxiosInterceptors();
-       var lang=this.state.lang
+        var lang = this.state.lang
         if (productCategoryId != -1) {
             PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                  (response.data).sort(function (a, b) {
+                (response.data).sort(function (a, b) {
                     return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
-                  });
+                });
                 this.setState({
                     planningUnits: response.data,
                 }, () => {
@@ -932,8 +939,14 @@ class ShipmentGlobalView extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    programs: response.data, loading: false
+                    programs: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1065,8 +1078,14 @@ class ShipmentGlobalView extends Component {
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    procurementAgents: response.data, loading: false
+                    procurementAgents: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1099,8 +1118,14 @@ class ShipmentGlobalView extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    fundingSources: response.data, loading: false
+                    fundingSources: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1178,6 +1203,11 @@ class ShipmentGlobalView extends Component {
                 // console.log(response.data)
                 // var list = response.data.slice(1);
                 var list = response.data;
+                list.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
                     productCategories: list, loading: false
                 })

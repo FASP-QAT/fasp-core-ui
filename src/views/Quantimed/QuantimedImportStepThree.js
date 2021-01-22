@@ -13,6 +13,7 @@ import 'chartjs-plugin-annotation';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import moment from "moment";
+import getLabelText from '../../CommonComponent/getLabelText';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY } from '../../Constants';
@@ -38,11 +39,11 @@ const validationSchemaThree = function (values) {
         regionConversionFactor: Yup.string()
             // .moreThan(0, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
             // .lessThan(101, i18n.t('static.quantimed.regionPercentagevalidation')) .typeError(i18n.t('static.quantimed.regionPercentagevalidation'))
-            .matches(/^((\d?[1-9]|[1-9]0)|(\d?[1-9]|[1-9]0)\.(\d?[0-9])|100)$/m, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))            
+            .matches(/^((\d?[1-9]|[1-9]0)|(\d?[1-9]|[1-9]0)\.(\d?[0-9])|100)$/m, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             // .min(0, i18n.t("static.procurementUnit.validValueText"))
             // .max(100, "Maximum 100%")
-            .required(i18n.t('static.currency.conversionrateMin'))                        
-            ,
+            .required(i18n.t('static.currency.conversionrateMin'))
+        ,
         // .max(100, i18n.t('static.program.validvaluetext'))
     })
 }
@@ -150,6 +151,11 @@ class QuantimedImportStepThree extends Component {
 
                 var regList = programJson.regionList;
 
+                regList.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
 
                 this.setState({
                     regionList: regList,
@@ -187,10 +193,10 @@ class QuantimedImportStepThree extends Component {
 
     componentDidMount() {
 
-        this.state.region.regionConversionFactor = '100'       
+        this.state.region.regionConversionFactor = '100'
         initialValuesThree = {
-            regionConversionFactor : '100'
-        } 
+            regionConversionFactor: '100'
+        }
         // this.loadRegionList();
 
     }
@@ -344,11 +350,11 @@ class QuantimedImportStepThree extends Component {
                                                 <FormGroup>
 
                                                     <Button color="success" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
+                                                    &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
+                                                    &nbsp;
                                         </FormGroup>
-                                        &nbsp;
+                                                &nbsp;
                                     {/* </CardFooter> */}
                                             </CardBody>
                                         </Form>

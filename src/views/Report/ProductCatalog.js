@@ -249,8 +249,14 @@ class ProductCatalog extends Component {
                 TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            tracerCategories: response.data
+                            tracerCategories: listArray
                         })
                     }
 
@@ -414,9 +420,15 @@ class ProductCatalog extends Component {
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     console.log("sesProgramIdReport----->", localStorage.getItem("sesProgramIdReport"));
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                         this.setState({
-                            programs: response.data, loading: false,
+                            programs: listArray, loading: false,
                             programId: localStorage.getItem("sesProgramIdReport")
                         }, () => {
                             this.fetchData();
@@ -425,7 +437,7 @@ class ProductCatalog extends Component {
                         })
                     } else {
                         this.setState({
-                            programs: response.data, loading: false
+                            programs: listArray, loading: false
                         }, () => { })
                     }
 
@@ -595,6 +607,11 @@ class ProductCatalog extends Component {
                         console.log(response.data);
                         // var list = response.data.slice(1);
                         var list = response.data;
+                        list.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         console.log("my list=======", list);
 
                         this.setState({

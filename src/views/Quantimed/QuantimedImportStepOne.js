@@ -172,6 +172,11 @@ class QuantimedImportStepOne extends Component {
                     }
                 }
 
+                proList.sort((a, b) => {
+                    var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
                     programs: proList,
                     loading: false

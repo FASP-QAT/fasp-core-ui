@@ -571,7 +571,7 @@ export default class ShipmentDetails extends React.Component {
                                                         <div className="controls edit">
 
                                                             <Picker
-                                                              //  years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                //  years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                 ref={this.pickRange}
                                                                 value={rangeValue}
                                                                 lang={pickerLang}
@@ -618,7 +618,7 @@ export default class ShipmentDetails extends React.Component {
                                                                 id="shipmentType"
                                                                 bsSize="sm"
                                                                 multi
-                                                                options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
+                                                                options={[{ value: 2, label: i18n.t('static.shipment.erpShipment') }, { value: 1, label: i18n.t('static.shipment.manualShipments') }]}
                                                                 value={this.state.shipmentType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
                                                             />
