@@ -12,6 +12,7 @@ import {
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import ProcurementUnitService from "../../api/ProcurementUnitService";
+import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -573,8 +574,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             ProcurementUnitService.getProcurementUnitList().then(response => {
                                 if (response.status == 200) {
                                     // console.log("third ffff---->", response.data);
-
-                                    for (var k = 0; k < (response.data).length; k++) {
+                                    var listArray = response.data;
+                                    listArray.sort((a, b) => {
+                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                        return itemLabelA > itemLabelB ? 1 : -1;
+                                    });
+                                    for (var k = 0; k < (listArray).length; k++) {
                                         var procurementUnitListJson = {
                                             name: response.data[k].label.label_en,
                                             id: response.data[k].procurementUnitId,
@@ -584,7 +590,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     }
 
                                     this.setState({
-                                        procurementUnitList: response.data,
+                                        procurementUnitList: listArray,
                                         procurmentUnitListJexcel: procurmentUnitListJexcel
                                     });
 
