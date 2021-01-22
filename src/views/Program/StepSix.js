@@ -171,8 +171,14 @@ export default class StepSix extends Component {
         ProgramService.getProgramManagerList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programManagerList: response.data
+                        programManagerList: listArray
                     })
                 } else {
                     this.setState({

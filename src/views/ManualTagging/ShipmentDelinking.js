@@ -858,6 +858,12 @@ export default class ShipmentDelinking extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     if (response.data.length == 1) {
                         this.setState({
                             programs: response.data,
@@ -868,7 +874,7 @@ export default class ShipmentDelinking extends Component {
                         })
                     } else {
                         this.setState({
-                            programs: response.data, loading: false
+                            programs: listArray, loading: false
                         })
                     }
 
@@ -934,8 +940,14 @@ export default class ShipmentDelinking extends Component {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data
+                            planningUnits: listArray
                         })
                     }
                     else {

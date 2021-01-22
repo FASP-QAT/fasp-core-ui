@@ -762,8 +762,14 @@ export default class DataSourceListComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }
 
@@ -822,8 +828,14 @@ export default class DataSourceListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: listArray, loading: false
                     })
                 } else {
                     this.setState({ message: response.data.messageCode, loading: false })
@@ -872,8 +884,14 @@ export default class DataSourceListComponent extends Component {
 
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             console.log(response.data)
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                dataSourceTypes: response.data, loading: false
+                dataSourceTypes: listArray, loading: false
 
             })
         })

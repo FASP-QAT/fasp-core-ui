@@ -439,8 +439,14 @@ export default class PlanningUnitCapacityList extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getAllPlanningUnitList().then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                planningUnits: response.data
+                planningUnits: listArray
             })
         }).catch(
             error => {

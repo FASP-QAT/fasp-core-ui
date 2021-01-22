@@ -616,7 +616,7 @@ export default class ShipmentDetails extends React.Component {
                                                                 name="shipmentType"
                                                                 id="shipmentType"
                                                                 bsSize="sm"
-                                                                options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
+                                                                options={[{ value: 2, label: i18n.t('static.shipment.erpShipment') }, { value: 1, label: i18n.t('static.shipment.manualShipments') }]}
                                                                 value={this.state.shipmentType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
                                                             />

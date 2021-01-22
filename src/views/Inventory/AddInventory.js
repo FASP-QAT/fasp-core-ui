@@ -586,7 +586,7 @@ export default class AddInventory extends Component {
                                                                 name="inventoryDataType"
                                                                 id="inventoryDataType"
                                                                 bsSize="sm"
-                                                                options={[{ value: 1, label: i18n.t('static.inventory.inventory') }, { value: 2, label: i18n.t('static.inventoryType.adjustment') }]}
+                                                                options={[ { value: 2, label: i18n.t('static.inventoryType.adjustment') },{ value: 1, label: i18n.t('static.inventory.inventory') }]}
                                                                 value={this.state.inventoryDataType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
                                                             />

@@ -407,7 +407,7 @@ export default class HealthAreaListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [0,100, 200, 100,100,100,100],
+            colWidths: [0, 100, 200, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -522,8 +522,14 @@ export default class HealthAreaListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data
+                        realms: listArray
                     },
                         () => { })
                 } else {

@@ -252,8 +252,14 @@ class ProcurementAgentExport extends Component {
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        procurementAgents: response.data, loading: false
+                        procurementAgents: listArray, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
@@ -1301,7 +1307,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.consolidatedProcurementAgentList();
                                 this.buildJExcel();
                             })
@@ -1310,7 +1316,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -1603,7 +1609,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.consolidatedFundingSourceList();
                                 this.buildJExcel();
                             })
@@ -1612,7 +1618,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -1897,7 +1903,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.buildJExcel();
                             })
                         }).catch(
@@ -1905,7 +1911,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
