@@ -752,7 +752,7 @@ export default class PlanningUnitListComponent extends Component {
             data[1] = getLabelText(planningUnitList[j].label, this.state.lang)
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang)
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
-            data[4] = planningUnitList[j].multiplier;
+            data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[5] = planningUnitList[j].lastModifiedBy.username;
             data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = planningUnitList[j].active;

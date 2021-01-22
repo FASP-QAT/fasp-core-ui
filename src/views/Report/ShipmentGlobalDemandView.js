@@ -160,7 +160,7 @@ const optionsPie = {
             label: function (tooltipItems, data) {
                 return data.labels[tooltipItems.index] +
                     " : " + " $ " +
-                    data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index];
+                    (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
             }
         }
     },
