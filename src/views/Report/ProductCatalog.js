@@ -868,6 +868,9 @@ class ProductCatalog extends Component {
 
         if (programId > 0) {
             localStorage.setItem("sesProgramIdReport", programId);
+            this.setState({
+                programId: programId
+            })
             if (navigator.onLine) {
 
                 this.setState({ loading: true })
