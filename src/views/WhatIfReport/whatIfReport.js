@@ -135,7 +135,7 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryChangedFlag: 0,
             // Commented the CR
             // monthCount: monthDifference,
-            monthCount:0,
+            monthCount: 0,
             // Commented the CR
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
@@ -890,7 +890,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     putRequest1.onsuccess = function (event) {
-                        document.getElementById("saveScenarioDiv").style.display='none'
+                        document.getElementById("saveScenarioDiv").style.display = 'none'
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
@@ -1912,9 +1912,9 @@ export default class WhatIfReportComponent extends React.Component {
                 var programIdd = '';
                 if (proList.length == 1) {
                     programIdd = proList[0].value;
-                } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                     //from session
-                    programIdd = localStorage.getItem("sesProgramIdReport");
+                    programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -1944,7 +1944,7 @@ export default class WhatIfReportComponent extends React.Component {
         })
         var programId = value != "" && value != undefined ? value.value : 0;
         if (programId != 0) {
-            localStorage.setItem("sesProgramIdReport", programId);
+            localStorage.setItem("sesProgramId", programId);
             var db1;
             var storeOS;
             getDatabase();
@@ -2095,7 +2095,10 @@ export default class WhatIfReportComponent extends React.Component {
                                     })
 
                                     let planningUnitIdProp = '';
-                                    if (proList.length == 1) {
+
+                                    if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                    } else if (proList.length == 1) {
                                         planningUnitIdProp = proList[0].value;
                                     }
                                     if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
@@ -2168,6 +2171,7 @@ export default class WhatIfReportComponent extends React.Component {
         var planningUnitName = "";
         if (planningUnitId != 0) {
             planningUnitName = value.label;
+            localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
@@ -4750,7 +4754,7 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <div className=" pl-0">
                             <div className="row">
-                            {/* Commented the CR */}
+                                {/* Commented the CR */}
                                 {/* <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
