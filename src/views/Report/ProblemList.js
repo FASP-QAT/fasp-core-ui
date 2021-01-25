@@ -146,11 +146,12 @@ export default class ConsumptionDetails extends React.Component {
                         }),
                         programId: proList[0].id
                     }, () => {
-                        if (needToCalculate == "true") {
-                            // console.log("============>***");
-                            this.getProblemListAfterCalculation();
-                        } else {
-                            this.fetchData();
+                        if (this.state.programId != '' && this.state.programId != undefined) {
+                            if (needToCalculate == "false") {
+                                this.fetchData();
+                            } else {
+                                this.getProblemListAfterCalculation();
+                            }
                         }
                     })
                 } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
@@ -162,11 +163,13 @@ export default class ConsumptionDetails extends React.Component {
                         }),
                         programId: localStorage.getItem("sesProgramId")
                     }, () => {
-                        if (needToCalculate == "true") {
-                            // console.log("============>***");
-                            this.getProblemListAfterCalculation();
-                        } else {
-                            this.fetchData();
+                        if (this.state.programId != '' && this.state.programId != undefined) {
+                            if (needToCalculate == "false") {
+                                this.fetchData();
+                            } else {
+                                this.getProblemListAfterCalculation();
+
+                            }
                         }
                     })
 
