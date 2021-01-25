@@ -168,8 +168,14 @@ export default class AddForecastingUnitComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    units: response.data, loading: false
+                    units: listArray, loading: false
                 })
             }).catch(
                 error => {
