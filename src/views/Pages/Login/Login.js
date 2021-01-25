@@ -87,6 +87,7 @@ class Login extends Component {
   changeLanguage(lang, icon, staticLabel) {
     // localStorage.setItem('lang', lang);
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
+    localStorage.setItem('lastLoggedInUsersLanguageChanged', true);
     this.setState({ icon, staticLabel })
     i18n.changeLanguage(lang)
     window.location.reload();
@@ -249,9 +250,13 @@ class Login extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                           var emailId = values.emailId;
                           var password = values.password;
+                          
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
                           if (navigator.onLine) {
-                            LoginService.authenticate(emailId, password)
+                            var languageCode = AuthenticationService.getDefaultUserLanguage();
+                          var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
+                            console.log("Language change flag---",lastLoggedInUsersLanguageChanged);
+                            LoginService.authenticate(emailId, password,languageCode,lastLoggedInUsersLanguageChanged)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
                                 // console.log("decoded token---", decoded);
@@ -269,6 +274,7 @@ class Login extends Component {
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
+                                AuthenticationService.setLanguageChangeFlag();
                                 i18n.changeLanguage(decoded.user.language.languageCode);
 
 
