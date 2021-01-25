@@ -1255,6 +1255,11 @@ class AuthenticationService {
             return "en";
         }
     }
+
+    setLanguageChangeFlag(){
+        localStorage.setItem('lastLoggedInUsersLanguageChanged', false);
+    }
+
     setRecordCount(count) {
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
