@@ -8,6 +8,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import i18n from '../../i18n';
 import UnitService from '../../api/UnitService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SPACE_REGEX } from '../../Constants.js';
 
@@ -172,14 +173,26 @@ export default class AddPlanningUnit extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        units: response.data, loading: false
+                        units: listArray, loading: false
                     })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
                         console.log(response.data)
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            forecastingUnits: response.data, loading: false
+                            forecastingUnits: listArray, loading: false
                         })
                     }).catch(
                         error => {

@@ -826,8 +826,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                     .then(response => {
                                         // console.log(response.data.data);
                                         if (response.status == 200) {
+                                            var listArray = response.data;
+                                            listArray.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
+                                            });
                                             this.setState({
-                                                planningUnitList: response.data
+                                                planningUnitList: listArray
                                             },
                                                 () => {
                                                     //jexcel start

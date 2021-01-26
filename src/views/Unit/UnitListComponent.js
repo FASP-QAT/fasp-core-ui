@@ -579,8 +579,14 @@ export default class UnitListComponent extends Component {
         this.hideFirstComponent();
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    dimensions: response.data
+                    dimensions: listArray
                 })
             } else {
                 this.setState({

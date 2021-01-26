@@ -352,8 +352,15 @@ class SupplyPlanVersionAndReview extends Component {
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
+                var listArray = response.data.map(ele => ele.realmCountry);
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    countries: response.data.map(ele => ele.realmCountry), loading: false
+                    // countries: response.data.map(ele => ele.realmCountry), loading: false
+                    countries: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -445,8 +452,14 @@ class SupplyPlanVersionAndReview extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    programs: response.data, loading: false
+                    programs: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -526,8 +539,14 @@ class SupplyPlanVersionAndReview extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
             console.log('**' + JSON.stringify(response.data))
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                versionTypeList: response.data, loading: false
+                versionTypeList: listArray, loading: false
             }, () => {
                 document.getElementById("versionTypeId").value = 2;
             })
@@ -576,8 +595,14 @@ class SupplyPlanVersionAndReview extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
             console.log('**' + JSON.stringify(response.data))
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                statuses: response.data, loading: false
+                statuses: listArray, loading: false
             }, () => {
                 this.fetchData()
             })

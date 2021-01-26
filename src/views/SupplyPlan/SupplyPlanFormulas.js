@@ -287,6 +287,7 @@ class SupplyPlanFormulas extends Component {
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}<br></br>
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>

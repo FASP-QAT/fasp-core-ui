@@ -262,7 +262,13 @@ class AddFundingSourceComponent extends Component {
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
-          this.setState({ realms: response.data, loading: false })
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState({ realms: listArray, loading: false })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })
         }

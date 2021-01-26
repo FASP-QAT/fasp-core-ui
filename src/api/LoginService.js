@@ -5,8 +5,8 @@ class LoginService {
 
 
 
-    authenticate(username, password) {
-        return axios.post(`${API_URL}/authenticate`, { username, password }, {});
+    authenticate(username, password,languageCode,languageChanged) {
+        return axios.post(`${API_URL}/authenticate`, { username, password,languageCode,languageChanged }, {});
     }
 
     getApiVersion() {

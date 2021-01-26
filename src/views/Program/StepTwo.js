@@ -90,9 +90,15 @@ export default class Steptwo extends Component {
         ProgramService.getRealmCountryList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
-                    var realmCountries = response.data.filter(c => c.active == true );
+                    // var realmCountries = response.data.filter(c => c.active == true );
+                    var listArray = response.data.filter(c => c.active == true);
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmCountryList: realmCountries
+                        realmCountryList: listArray
                     })
                 } else {
                     this.setState({
