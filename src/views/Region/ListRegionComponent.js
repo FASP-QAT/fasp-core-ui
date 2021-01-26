@@ -751,8 +751,15 @@ class RegionListComponent extends Component {
             .then(response => {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
+                    var listArray = response.data.map(ele => ele.realmCountry);
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmCountryList: response.data.map(ele => ele.realmCountry)
+                        // realmCountryList: response.data.map(ele => ele.realmCountry)
+                        realmCountryList: listArray
                     },
                         () => { })
                 } else {

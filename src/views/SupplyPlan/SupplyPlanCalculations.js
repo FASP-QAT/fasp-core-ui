@@ -251,7 +251,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 // Adding total shipment qty
                                 shipmentTotalQty += Number((shipmentArr[j].shipmentQty));
                                 // Adding total shipment qty wps
-                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                     shipmentTotalQtyWps += Number((shipmentArr[j].shipmentQty));
                                 }
                                 // Adding manual shipments
@@ -302,7 +302,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if (bd.length > 0) {
                                             bd = bd[0];
                                             var shipmentQtyWps = 0;
-                                            if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                            if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                                 shipmentQtyWps = batchListForShipments[b].shipmentQty;
                                             }
                                             var json = {
@@ -325,14 +325,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     } else {
                                         myArray[index].shipment = Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
-                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                             myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
                                         }
                                     }
                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
                                     if (index != -1) {
                                         shipmentBatchQtyTotal += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
-                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS && shipmentArr[j].shipmentStatus.id != SUBMITTED_SHIPMENT_STATUS) {
+                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
                                             shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
                                         }
                                     }
@@ -594,7 +594,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             for (var a = 0; a < myArray.length; a++) {
                                 var tempCB = Number(myArray[a].openingBalanceWps) - Number(myArray[a].expiredQtyWps) + Number(myArray[a].shipmentWps) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                                 myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                                if (Number(tempCB) >= Number(unallocatedFEFOWps)  && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                     myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
                                     myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
                                     unallocatedFEFOWps = 0;
@@ -625,7 +625,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
 
-                            if (Number(unallocatedFEFO) != 0 || Number(unallocatedFEFOWps) != 0) {
+                            if (Number(unallocatedFEFO) < 0 || Number(unallocatedFEFOWps) < 0) {
                                 var batchNo = (BATCH_PREFIX).concat(programJsonForStoringTheResult.programId).concat(programPlanningUnitList[ppL].planningUnit.id).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                 var json = {
                                     batchId: 0,
@@ -645,14 +645,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     createdDate: moment(startDate).format("YYYY-MM-DD"),
                                     openingBalance: 0,
                                     openingBalanceWps: 0,
-                                    unallocatedFEFO: Number(unallocatedFEFO),
-                                    calculatedFEFO: Number(unallocatedFEFO),
-                                    unallocatedFEFOWps: Number(unallocatedFEFOWps),
-                                    calculatedFEFOWps: Number(unallocatedFEFOWps),
-                                    closingBalance: 0 - Number(unallocatedFEFO),
-                                    closingBalanceWps: 0 - Number(unallocatedFEFOWps),
-                                    qty: 0 - Number(unallocatedFEFO),
-                                    qtyWps: 0 - Number(unallocatedFEFOWps),
+                                    unallocatedFEFO: Number(unallocatedFEFO) < 0 ? Number(unallocatedFEFO) : 0,
+                                    calculatedFEFO: Number(unallocatedFEFO) < 0 ? Number(unallocatedFEFO) : 0,
+                                    unallocatedFEFOWps: Number(unallocatedFEFOWps) < 0 ? Number(unallocatedFEFOWps) : 0,
+                                    calculatedFEFOWps: Number(unallocatedFEFOWps) < 0 ? Number(unallocatedFEFOWps) : 0,
+                                    closingBalance: Number(unallocatedFEFO) < 0 ? 0 - Number(unallocatedFEFO) : 0,
+                                    closingBalanceWps: Number(unallocatedFEFOWps) < 0 ? 0 - Number(unallocatedFEFOWps) : 0,
+                                    qty: Number(unallocatedFEFO) < 0 ? 0 - Number(unallocatedFEFO) : 0,
+                                    qtyWps: Number(unallocatedFEFOWps) < 0 ? 0 - Number(unallocatedFEFOWps) : 0,
                                 }
                                 myArray.push(json);
                                 var coreBatch = {

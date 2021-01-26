@@ -218,14 +218,14 @@ class AddUserComponent extends Component {
     roleChange(roleId) {
         var selectedArray = [];
         for (var p = 0; p < roleId.length; p++) {
-          selectedArray.push(roleId[p].value);
+            selectedArray.push(roleId[p].value);
         }
         if (selectedArray.includes("-1")) {
             this.setState({ roleId: [] });
             var list = this.state.roleList.filter(c => c.value != -1)
             this.setState({ roleId: list });
             var roleId = list;
-        }else{
+        } else {
             this.setState({ roleId: roleId });
             var roleId = roleId;
         }
@@ -313,8 +313,14 @@ class AddUserComponent extends Component {
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.languageName.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.languageName.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        languages: response.data, loading: false
+                        languages: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -369,8 +375,14 @@ class AddUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -425,12 +437,18 @@ class AddUserComponent extends Component {
         UserService.getRoleList()
             .then(response => {
                 if (response.status == 200) {
-                    var roleList = [{ value: "-1", label: i18n.t("static.common.all")  }];
+                    var roleList = [{ value: "-1", label: i18n.t("static.common.all") }];
                     for (var i = 0; i < response.data.length; i++) {
                         roleList[i + 1] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    var listArray = roleList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        roleList,
+                        roleList: listArray,
                         loading: false
                     })
                 } else {

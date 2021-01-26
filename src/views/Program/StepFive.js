@@ -95,9 +95,15 @@ export default class StepFive extends Component {
                     for (var i = 0; i < json.length; i++) {
                         regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
                     }
+                    var listArray = regList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         regionId: '',
-                        regionList: regList
+                        regionList: listArray
                     })
                 } else {
                     this.setState({

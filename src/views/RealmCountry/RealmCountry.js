@@ -124,13 +124,25 @@ class RealmCountry extends Component {
                             .then(response => {
                                 if (response.status == 200) {
                                     console.log("CountryService--------", response.data)
+                                    var listArray = response.data;
+                                    listArray.sort((a, b) => {
+                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                        return itemLabelA > itemLabelB ? 1 : -1;
+                                    });
                                     this.setState({
-                                        countries: response.data
+                                        countries: listArray
                                     })
                                     CurrencyService.getCurrencyListActive().then(response => {
                                         if (response.status == 200) {
+                                            var listArray = response.data;
+                                            listArray.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
+                                            });
                                             this.setState({
-                                                currencies: response.data
+                                                currencies: listArray
                                             })
                                             const { countries } = this.state;
                                             const { currencies } = this.state;

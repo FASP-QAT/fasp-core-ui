@@ -64,7 +64,7 @@ class ForgotPasswordComponent extends Component {
 
 
     cancelClicked() {
-        this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/login/` + i18n.t('static.actionCancelled'))
     }
 
     touchAll(setTouched, errors) {

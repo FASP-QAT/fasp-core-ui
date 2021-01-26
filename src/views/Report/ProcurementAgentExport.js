@@ -252,8 +252,14 @@ class ProcurementAgentExport extends Component {
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        procurementAgents: response.data, loading: false
+                        procurementAgents: listArray, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
@@ -1177,7 +1183,7 @@ class ProcurementAgentExport extends Component {
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
                                 this.state.procurementAgentValues.map(p => {
@@ -1301,8 +1307,8 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
-                                this.consolidatedProcurementAgentList();
+                                // this.consolidatedProgramList();
+                                // this.consolidatedProcurementAgentList();
                                 this.buildJExcel();
                             })
                         }).catch(
@@ -1310,7 +1316,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -1482,7 +1488,7 @@ class ProcurementAgentExport extends Component {
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
                                 this.state.fundingSourceValues.map(f => {
@@ -1603,7 +1609,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.consolidatedFundingSourceList();
                                 this.buildJExcel();
                             })
@@ -1612,7 +1618,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -1786,7 +1792,7 @@ class ProcurementAgentExport extends Component {
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
 
                                 // const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
@@ -1897,7 +1903,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.buildJExcel();
                             })
                         }).catch(
@@ -1905,7 +1911,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
