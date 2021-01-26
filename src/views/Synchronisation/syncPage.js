@@ -907,6 +907,13 @@ export default class syncPage extends Component {
             proList.push(programJson)
           }
         }
+
+        proList.sort((a, b) => {
+          var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
+
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
           if (proList.length == 1) {
@@ -1026,7 +1033,7 @@ export default class syncPage extends Component {
 
 
             AuthenticationService.setupAxiosInterceptors();
-            var programRequestJson1 = { programId: (programId.split("_"))[0], versionId:programVersion  }
+            var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
             ProgramService.getProgramData(programRequestJson1)
               .then(response1 => {
                 if (response1.status == 200) {

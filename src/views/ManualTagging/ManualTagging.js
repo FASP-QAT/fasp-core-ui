@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT,DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 
 import i18n from '../../i18n';
@@ -522,6 +522,12 @@ export default class ManualTagging extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
 
                     if (response.data.length == 1) {
                         this.setState({
@@ -533,7 +539,7 @@ export default class ManualTagging extends Component {
                         })
                     } else {
                         this.setState({
-                            programs: response.data,
+                            programs: listArray,
                             loading: false
                         })
                     }
@@ -755,8 +761,14 @@ export default class ManualTagging extends Component {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data
+                            planningUnits: listArray
                         })
                     }
                     else {
@@ -855,9 +867,9 @@ export default class ManualTagging extends Component {
         if (cell != null && cell != "") {
             // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
-            console.log("date-----",date);
-var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-console.log("dateMonthAsWord-----",dateMonthAsWord);
+            console.log("date-----", date);
+            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
+            console.log("dateMonthAsWord-----", dateMonthAsWord);
             return dateMonthAsWord;
         } else {
             return "";

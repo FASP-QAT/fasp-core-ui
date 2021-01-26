@@ -285,8 +285,14 @@ class AddBudgetComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }
                 else {
@@ -342,9 +348,15 @@ class AddBudgetComponent extends Component {
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
+                var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    // fundingSources: response.data
-                    fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+                    // fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+                    fundingSources: listArray
                     , loading: false
                 })
             }).catch(
@@ -390,8 +402,14 @@ class AddBudgetComponent extends Component {
 
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    currencyList: response.data, loading: false
+                    currencyList: listArray, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode, loading: false })
@@ -825,7 +843,7 @@ class AddBudgetComponent extends Component {
                                                             onBlur={() => setFieldTouched("stopDate", true)}
                                                             placeholderText={DATE_PLACEHOLDER_TEXT}
                                                             // className="form-control-sm form-control date-color"
-                                                            className={classNames('form-control', 'd-block', 'w-100', 
+                                                            className={classNames('form-control', 'd-block', 'w-100',
                                                                 { 'is-valid': !errors.stopDate && this.state.budget.stopDate != '' },
                                                                 { 'is-invalid': (touched.stopDate && !!errors.stopDate) }
                                                             )}

@@ -706,8 +706,14 @@ export default class ProgramList extends Component {
       .then(response => {
         console.log("RealmCountryService---->", response.data)
         if (response.status == 200) {
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            countryList: response.data, loading: false
+            countryList: listArray, loading: false
           })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })

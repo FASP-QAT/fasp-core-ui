@@ -430,7 +430,7 @@ export default class ListProcurementUnit extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [0,150, 150, 80, 60, 100, 100,100,100,100],
+      colWidths: [0, 150, 150, 80, 60, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -610,8 +610,14 @@ export default class ListProcurementUnit extends Component {
     PlanningUnitService.getActivePlanningUnitList().then(response => {
       if (response.status == 200) {
         console.log("response--->", response.data);
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          planningUnitList: response.data,
+          planningUnitList: listArray,
         })
       } else {
         this.setState({ message: response.data.messageCode, loading: false })

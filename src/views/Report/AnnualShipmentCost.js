@@ -947,7 +947,7 @@ class AnnualShipmentCost extends Component {
                 }
 
                 console.log(verList)
-                
+
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
                     this.setState({
                         versions: verList.filter(function (x, i, a) {
@@ -1108,6 +1108,12 @@ class AnnualShipmentCost extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         fundingSources: response.data
                     })
@@ -1174,8 +1180,14 @@ class AnnualShipmentCost extends Component {
 
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        procurementAgents: response.data
+                        procurementAgents: listArray
                     })
                 }).catch(
                     error => {
@@ -1236,8 +1248,14 @@ class AnnualShipmentCost extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        shipmentStatuses: response.data
+                        shipmentStatuses: listArray
                     })
                 }).catch(
                     error => {

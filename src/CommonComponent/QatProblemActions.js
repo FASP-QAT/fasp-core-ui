@@ -744,6 +744,21 @@ export default class QatProblemActions extends Component {
                                                                     var myStartDateFuture1 = moment(probObj.dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                                     var myEndDateFuture1 = moment(probObj.dt).add(numberOfMonthsInFunture, 'months').endOf('month').format("YYYY-MM-DD");
                                                                     var filteredConsumptionListTwo1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDateFuture1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDateFuture1 && c.actualFlag.toString() == "false" && c.active == true);
+
+                                                                    var monthsWithForecastedConsumption1 = [];
+                                                                    for (var fcm1 = 0; fcm1 < filteredConsumptionListTwo1.length; fcm1++) {
+                                                                        monthsWithForecastedConsumption1.push(moment(filteredConsumptionListTwo1[fcm1].consumptionDate).format("MMM-YY"));
+                                                                    }
+                                                                    // console.log("monthsWithForecastedConsumption+++",monthsWithForecastedConsumption1);
+                                                                    var eighteenmonthsArray1 = [];
+                                                                    for (var ema1 = 1; ema1 <= numberOfMonthsInFunture; ema1++) {
+                                                                        eighteenmonthsArray1.push(moment(Date.now()).add(ema1, 'months').format("MMM-YY"));
+                                                                    }
+                                                                    // console.log("eighteenmonthsArray+++",eighteenmonthsArray1);
+                                                                    var monthWithNoForecastedConsumption1 = eighteenmonthsArray1.filter(function (obj) { return monthsWithForecastedConsumption1.indexOf(obj) == -1; });
+                                                                    // console.log("monthWithNoForecastedConsumption+++",monthWithNoForecastedConsumption1);
+
+
                                                                     var index1 = problemActionList.findIndex(
                                                                         c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                             && c.region.id == regionList[r].regionId
@@ -760,10 +775,27 @@ export default class QatProblemActions extends Component {
                                                                         if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
+
+                                                                        problemActionList[index1].data5 = monthWithNoForecastedConsumption1.toString();
                                                                     }
                                                                     // }
                                                                 });
-                                                                // index1 logic----------------
+                                                                // index1 logic end----------------
+
+                                                                var monthsWithForecastedConsumption = [];
+                                                                for (var fcm = 0; fcm < filteredConsumptionListTwo.length; fcm++) {
+                                                                    monthsWithForecastedConsumption.push(moment(filteredConsumptionListTwo[fcm].consumptionDate).format("MMM-YY"));
+                                                                }
+                                                                // console.log("monthsWithForecastedConsumption+++",monthsWithForecastedConsumption);
+                                                                var eighteenmonthsArray = [];
+                                                                for (var ema = 1; ema <= numberOfMonthsInFunture; ema++) {
+                                                                    eighteenmonthsArray.push(moment(Date.now()).add(ema, 'months').format("MMM-YY"));
+                                                                }
+                                                                // console.log("eighteenmonthsArray+++",eighteenmonthsArray);
+                                                                var monthWithNoForecastedConsumption = eighteenmonthsArray.filter(function (obj) { return monthsWithForecastedConsumption.indexOf(obj) == -1; });
+                                                                // console.log("monthWithNoForecastedConsumption+++",monthWithNoForecastedConsumption);
+
+
                                                                 if (filteredConsumptionListTwo.length != 18) {
                                                                     if (index == -1) {
                                                                         var json = {
@@ -787,7 +819,7 @@ export default class QatProblemActions extends Component {
 
                                                                             },
                                                                             shipmentId: '',
-                                                                            data5: '',
+                                                                            data5: monthWithNoForecastedConsumption.toString(),
                                                                             planningUnitActive: true,
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
@@ -850,6 +882,7 @@ export default class QatProblemActions extends Component {
                                                                         if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
+                                                                        problemActionList[index].data5 = monthWithNoForecastedConsumption.toString();
                                                                     }
 
                                                                 } else {
@@ -2589,7 +2622,8 @@ export default class QatProblemActions extends Component {
                                                                 //console.log("no months with MOS less then min ===#########");
                                                                 //console.log("index*************>", index);
                                                                 //console.log("versionId************", versionID);
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -2840,7 +2874,8 @@ export default class QatProblemActions extends Component {
                                                                 // }
                                                             } else {
                                                                 // //console.log("no months with MOS greater then max ===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -2890,7 +2925,7 @@ export default class QatProblemActions extends Component {
                                                                     });
 
                                                             }
-                                                            // console.log("######planningUnitId====>", planningUnitId);
+                                                            // console.log("+++planningUnitId====>", planningUnitId);
                                                             // console.log("######mosArray==========>", mosArray);
                                                             // for loop on array mosArray
                                                             var monthWithMosLessThenMin = '';
@@ -2908,6 +2943,7 @@ export default class QatProblemActions extends Component {
                                                                 } else {
                                                                 }
                                                             }
+                                                            // console.log("+++monthWithMosLessThenMin====>", monthWithMosLessThenMin);
                                                             var index = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                                     // && c.region.id == regionList[r].regionId
@@ -3092,8 +3128,10 @@ export default class QatProblemActions extends Component {
                                                                 //     //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
                                                                 // }
                                                             } else {
-                                                                //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                console.log("+++no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    console.log("+++change status to incompliance");
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
@@ -3342,7 +3380,8 @@ export default class QatProblemActions extends Component {
                                                                 // }
                                                             } else {
                                                                 //console.log("no months with MOS less then min ===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                     //console.log("//////at this point resolve the problem.");
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
@@ -3596,7 +3635,8 @@ export default class QatProblemActions extends Component {
                                                                 // }
                                                             } else {
                                                                 //console.log("no months with MOS greater then max ===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                     //console.log("//////at this point resolve the problem. ###########");
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
@@ -3849,7 +3889,8 @@ export default class QatProblemActions extends Component {
                                                                 // }
                                                             } else {
                                                                 //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                     //console.log("//////at this point resolve the problem.");
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
