@@ -1301,8 +1301,8 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
-                                this.consolidatedProcurementAgentList();
+                                // this.consolidatedProgramList();
+                                // this.consolidatedProcurementAgentList();
                                 this.buildJExcel();
                             })
                         }).catch(
