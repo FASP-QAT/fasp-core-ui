@@ -61,7 +61,8 @@ class ResetPasswordComponent extends Component {
             message: '',
             emailId: this.props.match.params.emailId,
             token: this.props.match.params.token,
-            display: 1
+            display: 1,
+            buttonClicked: false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -125,12 +126,13 @@ class ResetPasswordComponent extends Component {
         this.hideFirstComponent();
         UserService.confirmForgotPasswordToken(this.state.emailId, this.state.token)
             .then(response => {
+                console.log("Reset password 1---", response)
                 this.setState({
                     message: response.data.messageCode
                 })
             }).catch(
                 error => {
-                    console.log("error---", error)
+                    console.log("Reset password 1 error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -142,6 +144,7 @@ class ResetPasswordComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
+                                console.log("Reset password 1 error 2---", error.response.data.messageCode)
                                 this.setState({ message: error.response.data.messageCode });
                                 break;
                             default:
@@ -165,7 +168,7 @@ class ResetPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
-                                <h4 style={{ color: "red",fontSize:"18px" }} id="div1" className="mx-4 text-center">{i18n.t(this.state.message)}</h4>
+                                <h4 style={{ color: "red", fontSize: "18px" }} id="div1" className="mx-4 text-center">{i18n.t(this.state.message)}</h4>
                                 {this.state.display == 1 && <Card className="mx-4">
                                     <CardHeader>
                                         <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
@@ -178,55 +181,71 @@ class ResetPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                                            console.log("Reset password on submit called 1---", values)
                                             if (navigator.onLine) {
-                                                UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
-                                                    .then(response => {
-                                                        if (response.status == 200) {
-                                                            this.props.history.push(`/login/static.message.user.passwordSuccess`)
-                                                        } else {
-                                                            this.setState({
-                                                                message: response.data.message
-                                                            });
-                                                            document.getElementById('div1').style.display = 'block';
-                                                            this.hideFirstComponent();
-                                                        }
-                                                    })
-                                                    .catch(
-                                                        error => {
-                                                            if (error.message === "Network Error") {
-                                                                this.setState({ message: error.message });
+                                                console.log("Reset password on submit email id---", this.state.emailId)
+                                                console.log("Reset password on submit token---", this.state.token)
+                                                console.log("Reset password on submit newPassword---", values.newPassword)
+                                                console.log("button clicked value---",this.state.buttonClicked);
+                                                if (!this.state.buttonClicked) {
+                                                    console.log("button inside if")
+                                                    UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
+                                                        .then(response => {
+                                                            console.log("Reset password on submit response---", response)
+                                                            if (response.status == 200) {
+                                                                this.setState({
+                                                                    buttonClicked: true
+                                                                });
+                                                                this.props.history.push(`/login/static.message.user.passwordSuccess`)
+                                                            } else {
+                                                                this.setState({
+                                                                    message: response.data.message
+                                                                });
                                                                 document.getElementById('div1').style.display = 'block';
                                                                 this.hideFirstComponent();
-                                                            } else {
-                                                                switch (error.response ? error.response.status : "") {
-                                                                    case 404:
-                                                                        this.props.history.push(`/login/${error.response.data.messageCode}`)
-                                                                        break;
-                                                                    case 500:
-                                                                    case 401:
-                                                                    case 403:
-                                                                    case 406:
-                                                                    case 412:
-                                                                        this.setState({ message: error.response.data.messageCode },
-                                                                            () => {
-                                                                                console.log("inside412");
-                                                                                document.getElementById('div1').style.display = 'block';
-                                                                                this.hideFirstComponent();
-                                                                            });
+                                                            }
+                                                        })
+                                                        .catch(
+                                                            error => {
+                                                                this.setState({
+                                                                    buttonClicked: false
+                                                                });
+                                                                console.log("Reset password error---", error)
+                                                                if (error.message === "Network Error") {
+                                                                    this.setState({ message: error.message });
+                                                                    document.getElementById('div1').style.display = 'block';
+                                                                    this.hideFirstComponent();
+                                                                } else {
+                                                                    switch (error.response ? error.response.status : "") {
+                                                                        case 404:
+                                                                            this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                                                            break;
+                                                                        case 500:
+                                                                        case 401:
+                                                                        case 403:
+                                                                        case 406:
+                                                                        case 412:
+                                                                            console.log("Reset password error 2 ---", error.response.data.messageCode);
+                                                                            this.setState({ message: error.response.data.messageCode },
+                                                                                () => {
+                                                                                    console.log("inside412");
+                                                                                    document.getElementById('div1').style.display = 'block';
+                                                                                    this.hideFirstComponent();
+                                                                                });
 
 
-                                                                        break;
-                                                                    case 403:
-                                                                    default:
-                                                                        this.setState({ message: 'static.unkownError' });
-                                                                        document.getElementById('div1').style.display = 'block';
-                                                                        this.hideFirstComponent();
-                                                                        break;
+                                                                            break;
+                                                                        case 403:
+                                                                        default:
+                                                                            this.setState({ message: 'static.unkownError' });
+                                                                            document.getElementById('div1').style.display = 'block';
+                                                                            this.hideFirstComponent();
+                                                                            break;
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                    );
+                                                        );
+                                                }
 
                                             } else {
                                                 this.setState({
