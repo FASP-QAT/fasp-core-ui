@@ -502,29 +502,47 @@ export default class PlanningUnitListComponent extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log("product category list---", JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        productCategories: response.data,
-                        productCategoryListAll: response.data
+                        productCategories: listArray,
+                        productCategoryListAll: listArray
                     })
                     TracerCategoryService.getTracerCategoryByRealmId(realmId)
                         .then(response => {
                             if (response.status == 200) {
+                                var listArray = response.data;
+                                listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 this.setState({
-                                    tracerCategories: response.data,
-                                    tracerCategoryListAll: response.data
+                                    tracerCategories: listArray,
+                                    tracerCategoryListAll: listArray
                                     // loading: false
                                 })
                                 ForecastingUnitService.getForcastingUnitByRealmId(realmId)
                                     .then(response => {
                                         if (response.status == 200) {
-                                            var forecastingUnits = response.data;
+                                            // var forecastingUnits = response.data;
+                                            var listArray = response.data;
+                                            listArray.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
+                                            });
                                             PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
                                                 console.log(response.data)
                                                 this.setState({
                                                     planningUnitList: response.data,
                                                     selSource: response.data,
-                                                    forecastingUnits: forecastingUnits,
-                                                    forecastingUnitListAll: forecastingUnits,
+                                                    forecastingUnits: listArray,
+                                                    forecastingUnitListAll: listArray,
                                                 }, () => {
                                                     this.buildJExcel();
                                                 });
@@ -889,8 +907,14 @@ export default class PlanningUnitListComponent extends Component {
             RealmService.getRealmListAll()
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            realms: response.data,
+                            realms: listArray,
                             loading: false
                         })
                     } else {

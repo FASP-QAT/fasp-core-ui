@@ -204,6 +204,11 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         proList[i] = Json
                     }
+                    proList.sort((a, b) => {
+                        var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         problemStatusList: proList
                     })
@@ -230,6 +235,11 @@ export default class ConsumptionDetails extends React.Component {
                             }
                             procList[i] = Json
                         }
+                        procList.sort((a, b) => {
+                            var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
                             problemCategoryList: procList
                         })

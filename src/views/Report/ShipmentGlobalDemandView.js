@@ -1064,8 +1064,15 @@ class ShipmentGlobalDemandView extends Component {
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
+                var listArray = response.data.map(ele => ele.realmCountry);
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    countrys: response.data.map(ele => ele.realmCountry)
+                    // countrys: response.data.map(ele => ele.realmCountry)
+                    countrys: listArray
                 }, () => { this.fetchData(); })
             }).catch(
                 error => {
@@ -1264,8 +1271,14 @@ class ShipmentGlobalDemandView extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        shipmentStatuses: response.data, loading: false
+                        shipmentStatuses: listArray, loading: false
                     })
                 }).catch(
                     error => {
@@ -1476,6 +1489,11 @@ class ShipmentGlobalDemandView extends Component {
                     }
 
                 }
+                proList.sort((a, b) => {
+                    var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
 
                 this.setState({
                     fundingSources: proList
@@ -1496,8 +1514,14 @@ class ShipmentGlobalDemandView extends Component {
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }).catch(
                     error => {
@@ -1583,7 +1607,11 @@ class ShipmentGlobalDemandView extends Component {
 
                     }
                 }
-
+                proList.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
                     programs: proList
                 })
