@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { API_URL } from '../Constants.js';
 
@@ -65,6 +66,8 @@ class UserService {
         return axios.post(`${API_URL}/api/forgotPassword/`, { emailId });
     }
     confirmForgotPasswordToken(emailId, token) {
+console.log("reset password url-email id---",emailId)
+        console.log("reset password url-token---",token)
         return axios.post(`${API_URL}/api/confirmForgotPasswordToken/`, { emailId, token }, {});
     }
     updatePassword(emailId, token, password) {
