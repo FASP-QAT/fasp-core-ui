@@ -37,7 +37,8 @@ export default class syncPage extends Component {
       versionTypeList: [],
       isChanged: false,
       conflictsCount: 0,
-      loading: true
+      loading: true,
+      versionType: 1
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -74,8 +75,15 @@ export default class syncPage extends Component {
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.fetchData = this.fetchData.bind(this)
+    this.versionTypeChanged = this.versionTypeChanged.bind(this);
 
     // this.checkValidations = this.checkValidations.bind(this);
+  }
+
+  versionTypeChanged(event) {
+    this.setState({
+      versionType: event.target.value
+    })
   }
 
   hideFirstComponent() {
@@ -2451,7 +2459,7 @@ export default class syncPage extends Component {
                             <InputGroup>
                               <Input type="select"
                                 bsSize="sm"
-                                name="versionType" id="versionType">
+                                name="versionType" id="versionType" onChange={this.versionTypeChanged}>
                                 {versionTypes}
                               </Input>
                             </InputGroup>
@@ -2469,7 +2477,7 @@ export default class syncPage extends Component {
                         </FormGroup>
                         <FormGroup className="tab-ml-1 mt-4">
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || this.state.versionType == 2) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                           &nbsp;
                 </FormGroup>
                       </div>
