@@ -663,7 +663,7 @@ export default class DataSourceTypeListComponent extends Component {
 
     addNewDataSourceType() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/dataSourceType/addDataSourceType`)
         } else {
             alert(i18n.t('static.common.online'))

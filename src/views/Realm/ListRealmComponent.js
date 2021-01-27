@@ -565,7 +565,7 @@ export default class ReactListComponent extends Component {
     }
 
     addNewRealm() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/realm/addRealm`)
         } else {
             alert("You must be Online.")

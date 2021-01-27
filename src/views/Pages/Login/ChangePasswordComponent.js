@@ -161,7 +161,7 @@ loading:false
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    if (navigator.onLine) {
+                                    if (localStorage.getItem("sesType") == "true") {
                                         // AuthenticationService.setupAxiosInterceptors();
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {

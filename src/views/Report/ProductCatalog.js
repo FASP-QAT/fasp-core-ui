@@ -245,7 +245,7 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            if (navigator.onLine) {
+            if (localStorage.getItem("sesType") == "true") {
                 TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
                     if (response.status == 200) {
@@ -409,7 +409,7 @@ class ProductCatalog extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -589,7 +589,7 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            if (navigator.onLine) {
+            if (localStorage.getItem("sesType") == "true") {
                 ProductService.getProductCategoryListByProgram(realmId, programId)
                     .then(response => {
                         console.log(response.data);
@@ -851,7 +851,7 @@ class ProductCatalog extends Component {
 
         if (programId > 0) {
             localStorage.setItem("sesProgramIdReport", programId);
-            if (navigator.onLine) {
+            if (localStorage.getItem("sesType") == "true") {
 
                 this.setState({ loading: true })
                 console.log("json---", json);
@@ -1350,7 +1350,7 @@ class ProductCatalog extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <Online>
+                                {localStorage.getItem("sesType") == "true" &&
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1378,8 +1378,8 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Online>
-                                <Offline>
+                                }
+                                {localStorage.getItem("sesType") == "false" &&
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1408,7 +1408,7 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Offline>
+                                }
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">

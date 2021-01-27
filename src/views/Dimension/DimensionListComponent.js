@@ -492,7 +492,7 @@ export default class DimensionListComponent extends Component {
     }.bind(this);
 
     addNewDimension() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/diamension/addDiamension`)
         } else {
             alert("You must be Online.")

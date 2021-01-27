@@ -996,7 +996,7 @@ export default class DataSourceListComponent extends Component {
     }.bind(this);
     addNewDataSource() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/dataSource/addDataSource`)
         } else {
             alert(i18n.t('static.common.online'))

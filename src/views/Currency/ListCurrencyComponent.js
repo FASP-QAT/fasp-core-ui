@@ -555,7 +555,7 @@ export default class CurrencyListComponent extends Component {
 
     addNewCurrency() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/currency/addCurrency`)
         } else {
             alert("You must be Online.")

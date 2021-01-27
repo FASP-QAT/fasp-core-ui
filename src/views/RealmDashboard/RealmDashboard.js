@@ -213,7 +213,7 @@ class RealmDashboard extends Component {
   }
 
   componentDidMount() {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       DashboardService.realmLevelDashboard(this.state.realmId)
         .then(response => {
           console.log("dashboard response===", response);
@@ -338,7 +338,7 @@ class RealmDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <Online>
+        {localStorage.getItem("sesType") == "true" &&
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
@@ -581,7 +581,7 @@ class RealmDashboard extends Component {
 
 
           </Row>
-        </Online>
+        }
 
         {/* <Row>
             <Col md="12">

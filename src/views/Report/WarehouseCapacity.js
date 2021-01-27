@@ -91,7 +91,7 @@ class warehouseCapacity extends Component {
 
     componentDidMount() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             this.getCountrylist();
             this.getPrograms();
@@ -110,7 +110,7 @@ class warehouseCapacity extends Component {
 
         var csvRow = [];
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
@@ -209,7 +209,7 @@ class warehouseCapacity extends Component {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
 
-                    if (navigator.onLine) {
+                    if (localStorage.getItem("sesType") == "true") {
                         var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, y, planningText)
@@ -448,7 +448,7 @@ class warehouseCapacity extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -588,7 +588,7 @@ class warehouseCapacity extends Component {
     }
 
     fetchData(e) {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
 
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
@@ -937,7 +937,7 @@ class warehouseCapacity extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <Online>
+                                            {localStorage.getItem("sesType") == "true" &&
                                                 <FormGroup className="col-md-3 ">
                                                     <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -959,10 +959,9 @@ class warehouseCapacity extends Component {
                                                     </div>
 
                                                 </FormGroup>
-                                            </Online>
-                                            <Online>
+                                            }
 
-                                                {/* <FormGroup className="col-md-3">
+                                            {/* <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
                                                         <InputGroup>
@@ -982,6 +981,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup> */}
+                                            {localStorage.getItem("sesType") == "true" &&
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1001,9 +1001,9 @@ class warehouseCapacity extends Component {
                                                         )}
 
                                                 </FormGroup>
-                                            </Online>
+                                            }
 
-                                            <Offline>
+                                            {localStorage.getItem("sesType") == "false" &&
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
@@ -1033,7 +1033,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
-                                            </Offline>
+                                            }
 
                                         </div>
                                     </div>

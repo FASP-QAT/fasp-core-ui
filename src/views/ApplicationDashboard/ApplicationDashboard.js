@@ -294,7 +294,7 @@ class ApplicationDashboard extends Component {
   }
   checkNewerVersions(programs) {
     console.log("T***going to call check newer versions dashboard---", programs)
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
@@ -370,7 +370,7 @@ class ApplicationDashboard extends Component {
   }
 
   componentDidMount() {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
           .then(response => {
@@ -859,8 +859,8 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        <Online>
-          {this.state.id == 1 &&
+        {localStorage.getItem("sesType") == "true" && 
+          this.state.id == 1 &&
             <Row className="mt-2">
 
               <Col xs="12" sm="6" lg="3">
@@ -979,7 +979,7 @@ class ApplicationDashboard extends Component {
 
             </Row>
           }
-          {this.state.id == 2 &&
+          {localStorage.getItem("sesType") == "true" && this.state.id == 2 &&
             <Row className="mt-2">
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1292,7 +1292,6 @@ class ApplicationDashboard extends Component {
             </Col>
 
           </Row>
-        </Online>
         {/* <Row className="mt-2">
           <Col md="12">
             <Card>

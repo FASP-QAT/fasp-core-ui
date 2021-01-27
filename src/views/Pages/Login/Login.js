@@ -16,7 +16,7 @@ import image3 from '../../../assets/img/PEPFAR-logo.png';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
-import { SECRET_KEY, APP_VERSION_REACT, JEXCEL_DEFAULT_PAGINATION } from '../../../Constants.js';
+import { SECRET_KEY, APP_VERSION_REACT, JEXCEL_DEFAULT_PAGINATION, polling } from '../../../Constants.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
 import axios from 'axios';
@@ -121,7 +121,7 @@ class Login extends Component {
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
-    if (navigator.onLine) {
+    if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
       LoginService.getApiVersion()
         .then(response => {
           // console.log("--------version api success----------->", response)
@@ -143,7 +143,7 @@ class Login extends Component {
   }
 
   forgotPassword() {
-    if (navigator.onLine) {
+    if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
       this.props.history.push(`/forgotPassword`)
     } else {
       confirmAlert({
@@ -250,7 +250,7 @@ class Login extends Component {
                           var emailId = values.emailId;
                           var password = values.password;
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
-                          if (navigator.onLine) {
+                          if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
                             LoginService.authenticate(emailId, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
@@ -430,7 +430,7 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online>{this.state.apiVersion}</Online><Offline>Offline</Offline></h5>
+                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online polling={polling}  ref="onlineRef">{this.state.apiVersion}</Online><Offline polling={polling}>Offline</Offline></h5>
               </Col>
 
 

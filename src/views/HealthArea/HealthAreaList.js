@@ -782,7 +782,7 @@ export default class HealthAreaListComponent extends Component {
         }
     }.bind(this);
     addHealthArea() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/healthArea/addHealthArea`);
         } else {
             alert("You must be Online.")

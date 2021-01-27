@@ -272,7 +272,7 @@ class ShipmentGlobalDemandView extends Component {
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
@@ -425,7 +425,7 @@ class ShipmentGlobalDemandView extends Component {
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
         var len = 120
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
 
             var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
@@ -457,7 +457,7 @@ class ShipmentGlobalDemandView extends Component {
 
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-        let y = navigator.onLine ? len : 150
+        let y = localStorage.getItem("sesType") == "true" ? len : 150
         console.log(doc.internal.pageSize.height)
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
@@ -575,7 +575,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
     fetchData = () => {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
@@ -1042,7 +1042,7 @@ class ShipmentGlobalDemandView extends Component {
 
     componentDidMount() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.getCountrys();
             this.getPrograms();
             //this.getRelamList();
@@ -1260,7 +1260,7 @@ class ShipmentGlobalDemandView extends Component {
 
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
@@ -1357,7 +1357,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getFundingSource = () => {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -1492,7 +1492,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -1598,7 +1598,7 @@ class ShipmentGlobalDemandView extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             // console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (localStorage.getItem("sesType") == "true") {
                     this.setState({
                         versions: []
                     }, () => {
@@ -1762,7 +1762,7 @@ class ShipmentGlobalDemandView extends Component {
             planningUnits: [],
             planningUnitValues: []
         }, () => {
-            if (!navigator.onLine) {
+            if (localStorage.getItem("sesType") == "false") {
                 let programId = document.getElementById("programId").value;
                 let versionId = document.getElementById("versionId").value;
                 const lan = 'en';
@@ -2303,7 +2303,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </FormGroup>
                                         </Online> */}
-                                        <Offline>
+                                        {localStorage.getItem("sesType") == "false" &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
@@ -2330,8 +2330,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                        </Offline>
-                                        <Offline>
+                                        }
+                                        {localStorage.getItem("sesType") == "false" &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
@@ -2350,7 +2350,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                        </Offline>
+                                        }
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>

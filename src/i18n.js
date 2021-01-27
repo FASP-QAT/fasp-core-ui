@@ -26,7 +26,7 @@ i18n
     backend: {
       /* translation file path */
       // loadPath: '/locales/{{lng}}.json',
-      loadPath: navigator.onLine ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
+      loadPath: localStorage.getItem("sesType") == "true" ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
       crossDomain: true
     },
     fallbackLng: 'en',

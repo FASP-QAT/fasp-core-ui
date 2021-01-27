@@ -678,7 +678,7 @@ class GlobalConsumption extends Component {
   }
 
   getCountrys() {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
 
       let realmId = AuthenticationService.getRealmId();
       // let realmId = document.getElementById('realmId').value

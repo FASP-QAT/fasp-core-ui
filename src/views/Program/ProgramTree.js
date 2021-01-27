@@ -141,7 +141,7 @@ class Program extends Component {
     }
     checkNewerVersions(programs) {
         // console.log("T***going to call check newer versions")
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
                 .then(response => {
@@ -854,7 +854,7 @@ class Program extends Component {
             var programThenCount = 0;
             // for (var i = 0; i < checkboxesChecked.length; i++) {
             // var version = (checkboxesChecked[i]).versionId;
-            if (navigator.onLine) {
+            if (localStorage.getItem("sesType") == "true") {
                 // AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {

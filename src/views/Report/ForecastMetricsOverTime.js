@@ -440,7 +440,7 @@ class ForcastMatrixOverTime extends Component {
       doc.save('canvas.pdf');*/
   }
   getPrograms = () => {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -607,7 +607,7 @@ class ForcastMatrixOverTime extends Component {
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
           this.setState({
             versions: [],
             planningUnits: []

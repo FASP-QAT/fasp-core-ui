@@ -36,7 +36,7 @@ export default class AuthenticationServiceComponent extends Component {
         console.log("result----" + result);
         if (result != "") {
             this.props.history.push(result)
-        } else if (navigator.onLine) {
+        } else if (localStorage.getItem("sesType") == "true") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
             let basicAuthHeader = 'Bearer ' + decryptedToken

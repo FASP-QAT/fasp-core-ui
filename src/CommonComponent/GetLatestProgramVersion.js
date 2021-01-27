@@ -28,7 +28,7 @@ export default class GetLatestProgramVersion extends Component {
 
     checkNewerVersions() {
         console.log("T***going to call check newer versions")
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(this.state.programs)
                 .then(response => {

@@ -365,7 +365,7 @@ class AnnualShipmentCost extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -872,7 +872,7 @@ class AnnualShipmentCost extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (localStorage.getItem("sesType") == "true") {
                     this.setState({
                         versions: [],
 
@@ -1104,7 +1104,7 @@ class AnnualShipmentCost extends Component {
 
     getFundingSourceList() {
         const { fundingSources } = this.state
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -1169,7 +1169,7 @@ class AnnualShipmentCost extends Component {
     }
     getProcurementAgentList() {
         const { procurementAgents } = this.state
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
 
             ProcurementAgentService.getProcurementAgentListAll()
@@ -1232,7 +1232,7 @@ class AnnualShipmentCost extends Component {
     }
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {

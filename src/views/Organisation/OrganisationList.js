@@ -764,7 +764,7 @@ export default class OrganisationListComponent extends Component {
     }.bind(this);
 
     addOrganisation() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/organisation/addOrganisation`);
         } else {
             alert("You must be Online.")

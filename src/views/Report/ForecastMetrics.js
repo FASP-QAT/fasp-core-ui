@@ -754,7 +754,7 @@ class ForecastMetrics extends Component {
   }
 
   getCountrys() {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
       RealmCountryService.getRealmCountryForProgram(realmId)

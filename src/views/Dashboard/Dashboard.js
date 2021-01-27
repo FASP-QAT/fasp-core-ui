@@ -26,7 +26,7 @@ hideSecondComponent() {
     console.log("COLOR===",this.props.match.params.color);
     console.log("MESSAGE===",this.props.match.params.message);
     this.hideFirstComponent();
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       // AuthenticationService.setupAxiosInterceptors();
     }
   }

@@ -583,7 +583,7 @@ class SupplierLeadTimes extends Component {
 
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -740,7 +740,7 @@ class SupplierLeadTimes extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (localStorage.getItem("sesType") == "true") {
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -832,7 +832,7 @@ class SupplierLeadTimes extends Component {
 
             }, () => {
                 // if (versionId.includes('Local')) {
-                if (!navigator.onLine) {
+                if (localStorage.getItem("sesType") == "false") {
                     const lan = 'en';
                     var db1;
                     var storeOS;
@@ -968,7 +968,7 @@ class SupplierLeadTimes extends Component {
     }
 
     getProcurementAgent = () => {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
@@ -1118,7 +1118,7 @@ class SupplierLeadTimes extends Component {
 
 
         if (programId > 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgenttValues.length > 0) {
-            if (navigator.onLine) {
+            if (localStorage.getItem("sesType") == "true") {
                 this.setState({ loading: true })
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),

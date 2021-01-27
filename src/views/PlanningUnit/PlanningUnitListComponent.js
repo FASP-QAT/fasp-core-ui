@@ -960,7 +960,7 @@ export default class PlanningUnitListComponent extends Component {
 
     addNewPlanningUnit() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/planningUnit/addPlanningUnit`)
         } else {
             alert(i18n.t('static.common.online'))

@@ -533,7 +533,7 @@ class AggregateShipmentByProduct extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -672,7 +672,7 @@ class AggregateShipmentByProduct extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (localStorage.getItem("sesType") == "true") {
                     this.setState({
                         versions: []
                     }, () => {
@@ -1196,7 +1196,7 @@ class AggregateShipmentByProduct extends Component {
         console.log("planningUnits---", planningUnits);
 
         let bar = "";
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             bar = {
 
                 labels: this.state.consumptions.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
@@ -1233,7 +1233,7 @@ class AggregateShipmentByProduct extends Component {
 
             }
         }
-        if (!navigator.onLine) {
+        if (localStorage.getItem("sesType") == "false") {
             bar = {
 
                 labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
@@ -1584,7 +1584,7 @@ class AggregateShipmentByProduct extends Component {
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <Online>
+                                        {/* <Online> */}
                                             {/* {
                                                 this.state.consumptions.length > 0
                                                 && */}
@@ -1609,8 +1609,8 @@ class AggregateShipmentByProduct extends Component {
 
 
 
-                                        </Online>
-                                        <Offline>
+                                        {/* </Online> */}
+                                        {/* <Offline> */}
                                             {/* {
                                                 this.state.offlineConsumptionList.length > 0
                                                 &&
@@ -1628,7 +1628,7 @@ class AggregateShipmentByProduct extends Component {
                                             {/* </div> */}
                                             {/* </div>} */}
 
-                                        </Offline>
+                                        {/* </Offline> */}
                                     </div>
                                     {/* <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">

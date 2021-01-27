@@ -9,7 +9,7 @@ import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
 import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
-import { SECRET_KEY } from '../../../Constants.js'
+import { SECRET_KEY, polling } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import moment from 'moment';
 import i18n from '../../../i18n'
@@ -131,6 +131,7 @@ class UpdateExpiredPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
+                <Online polling={polling} ref="onlineRef"></Online>
                 <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center">
@@ -154,7 +155,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            if (navigator.onLine) {
+                                            if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
                                                 console.log("Update expired password email id on submit method--->" + this.props.location.state.emailId)
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {

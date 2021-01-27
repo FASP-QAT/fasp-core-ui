@@ -723,7 +723,7 @@ class DefaultLayout extends Component {
   }
   goToCommitProgram(e) {
     e.preventDefault();
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       this.props.history.push(`/program/syncPage/`)
     } else {
       confirmAlert({

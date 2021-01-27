@@ -15,13 +15,14 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+import { Online } from 'react-detect-offline';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncMasterData extends Component {
@@ -102,6 +103,7 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <Online polling={polling} ref="onlineRef"></Online>
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
@@ -164,7 +166,7 @@ export default class SyncMasterData extends Component {
         for (var i = 0; i < programList.length; i++) {
             AuthenticationService.setupAxiosInterceptors();
             // this.refs.problemListChild.qatProblemActions(programList[i].id);
-            if (navigator.onLine) {
+            if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
                 //Code to Sync Country list
                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
                     .then(response => {
@@ -381,7 +383,7 @@ export default class SyncMasterData extends Component {
 
     syncMasters() {
         this.setState({ loading: false })
-        if (navigator.onLine) {
+        if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
             var db1;
             var storeOS;
             getDatabase();
@@ -448,7 +450,7 @@ export default class SyncMasterData extends Component {
                         console.log("Validation", validation);
                         if (validation) {
                             AuthenticationService.setupAxiosInterceptors();
-                            if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                            if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
 
 
                                 MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)

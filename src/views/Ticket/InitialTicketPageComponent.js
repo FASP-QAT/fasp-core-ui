@@ -132,7 +132,7 @@ export default class InitialTicketPageComponent extends Component {
   }
 
   togglehelp() {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       this.setState({        
         help: !this.state.help,
         initialPage: 1,

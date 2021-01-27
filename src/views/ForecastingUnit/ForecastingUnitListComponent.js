@@ -1200,7 +1200,7 @@ export default class ForecastingUnitListComponent extends Component {
 
     addNewForecastingUnit() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/forecastingUnit/addForecastingUnit`)
         } else {
             alert(i18n.t('static.common.online'))

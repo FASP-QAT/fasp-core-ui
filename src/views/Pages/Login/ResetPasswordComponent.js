@@ -9,6 +9,7 @@ import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
+import { polling } from '../../../Constants';
 
 
 const validationSchema = function (values) {
@@ -156,6 +157,7 @@ class ResetPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
+                <Online polling={polling} ref="onlineRef"></Online>
                 <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center">
@@ -179,7 +181,7 @@ class ResetPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                            if (navigator.onLine) {
+                                            if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
                                                 UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
                                                     .then(response => {
                                                         if (response.status == 200) {

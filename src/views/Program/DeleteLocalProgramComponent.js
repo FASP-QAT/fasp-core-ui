@@ -38,9 +38,9 @@ class DeleteLocalProgramComponent extends Component {
 
   }
   checkNewerVersions(programs) {
-    if (navigator.onLine) {
+    if (localStorage.getItem("sesType") == "true") {
       console.log("T***going to call check newer versions")
-      if (navigator.onLine) {
+      if (localStorage.getItem("sesType") == "true") {
         AuthenticationService.setupAxiosInterceptors()
         ProgramService.checkNewerVersions(programs)
           .then(response => {

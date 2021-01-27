@@ -436,7 +436,7 @@ export default class UnitListComponent extends Component {
     }.bind(this);
 
     addUnit() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/unit/addUnit`)
         } else {
             alert(i18n.t('static.common.online'))

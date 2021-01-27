@@ -403,7 +403,7 @@ export default class CountryListComponent extends Component {
 
 
     addNewCountry() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/country/addCountry`)
         } else {
             alert("You must be Online.")

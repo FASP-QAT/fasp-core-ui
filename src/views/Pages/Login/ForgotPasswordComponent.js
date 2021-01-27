@@ -11,6 +11,8 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
+import { polling } from '../../../Constants';
+import { Online } from 'react-detect-offline';
 
 const initialValues = {
     emailId: ""
@@ -101,6 +103,7 @@ class ForgotPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
+                <Online polling={polling} ref="onlineRef"></Online>
                 <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center ">
@@ -120,7 +123,7 @@ class ForgotPasswordComponent extends Component {
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            if (navigator.onLine) {
+                                            if (this.refs.onlineRef != undefined && this.refs.onlineRef.state.online) {
                                                 UserService.forgotPassword(values.emailId)
                                                     .then(response => {
                                                         if (response.status == 200) {

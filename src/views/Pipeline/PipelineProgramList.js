@@ -455,7 +455,7 @@ export default class PipelineProgramList extends Component {
 
     importNewProgram() {
 
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/pipeline/pipelineProgramImport`)
         } else {
             alert("You must be Online.")

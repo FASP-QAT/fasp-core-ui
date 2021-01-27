@@ -332,7 +332,7 @@ export default class LanguageListComponent extends Component {
     }
 
     addLanguage() {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             this.props.history.push(`/language/addLanguage`)
         } else {
             alert(i18n.t('static.common.online'))

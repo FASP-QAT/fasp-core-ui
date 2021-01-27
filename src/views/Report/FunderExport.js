@@ -72,7 +72,7 @@ class FunderExport extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -210,7 +210,7 @@ class FunderExport extends Component {
     }
 
     getFundingSource = () => {
-        if (navigator.onLine) {
+        if (localStorage.getItem("sesType") == "true") {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -347,7 +347,7 @@ class FunderExport extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (localStorage.getItem("sesType") == "true") {
                     this.setState({
                         versions: []
                     }, () => {
@@ -1157,18 +1157,6 @@ class FunderExport extends Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                         </div> */}
-                        <Online>
-                            {
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                </div>
-                            }
-                        </Online>
-                        <Offline>
                             {
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
@@ -1178,7 +1166,6 @@ class FunderExport extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>
                             }
-                        </Offline>
                     </div>
                     <CardBody className="pb-lg-2 mt-3">
 
