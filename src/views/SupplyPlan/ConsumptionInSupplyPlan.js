@@ -1094,6 +1094,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         // var adjustmentsQty = 0;
         // var openingBalance = 0;
         // var consumptionQty = 0;
+        console.log("A--------------------> JSON----------")
         for (var y = 0; y < json.length; y++) {
             console.log("y---->", y);
             var map = new Map(Object.entries(json[y]));
@@ -1146,8 +1147,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 this.props.hideSecondComponent();
             } else {
                 var rowData = elInstance.getRowData(y);
-
-                if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                console.log("A--------------------> Row Data", rowData[12]);
+                if (rowData[12] !== "" && rowData[12] != undefined) {
                     var lastEditableDate = "";
                     if (rowData[2] == 1) {
                         lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
@@ -1165,14 +1166,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
                         var rowData = elInstance.getRowData(y);
                         var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
+                        console.log("A-------------------->", validation);
                         if (validation == false) {
+                            console.log("A--------------------> in if");
                             valid = false;
                             elInstance.setValueFromCoords(14, y, 1, true);
                         } else {
+                            console.log("A--------------------> in else");
                             if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
+                                console.log("A--------------------> in else if 1");
                                 inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                                 valid = false;
                             } else {
+                                console.log("A--------------------> in else else 2");
                                 positiveValidation("C", y, elInstance);
                             }
                         }
@@ -1235,14 +1241,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         }
 
                         validation = checkValidtion("text", "C", y, rowData[2], elInstance);
+                        console.log("A--------------------> Validation 2", validation);
                         if (validation == false) {
+                            console.log("A--------------------> in if 2");
                             valid = false;
                             elInstance.setValueFromCoords(14, y, 1, true);
                         } else {
+                            console.log("A--------------------> in else 2");
                             if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
+                                console.log("A--------------------> in else if 2");
                                 inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                                 valid = false;
                             } else {
+                                console.log("A--------------------> in else else 2");
                                 positiveValidation("C", y, elInstance);
                             }
                         }
