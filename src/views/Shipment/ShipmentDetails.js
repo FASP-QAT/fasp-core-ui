@@ -19,6 +19,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from "react-detect-offline";
+import { Prompt } from 'react-router'
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -113,7 +114,6 @@ export default class ShipmentDetails extends React.Component {
             }, () => {
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
                 if (document.getElementById("addRowButtonId") != null) {
-                    console.log("In if");
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
                 if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
@@ -160,6 +160,15 @@ export default class ShipmentDetails extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag==1 || this.state.shipmentQtyChangedFlag) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     componentDidMount = function () {
@@ -225,7 +234,6 @@ export default class ShipmentDetails extends React.Component {
                 } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
-                console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -295,10 +303,7 @@ export default class ShipmentDetails extends React.Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
-                        console.log("myResult", myResult);
                         var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        console.log('programId----->>>', programId)
-                        console.log(myResult);
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -309,7 +314,6 @@ export default class ShipmentDetails extends React.Component {
                                 proList.push(productJson)
                             }
                         }
-                        console.log("proList---" + proList);
                         this.setState({
                             planningUnitList: proList.sort(function (a, b) {
                                 a = a.label.toLowerCase();
@@ -328,7 +332,6 @@ export default class ShipmentDetails extends React.Component {
                         } else if (proList.length == 1) {
                             planningUnitIdProp = proList[0].value;
                         }
-                        console.log("planningUnitIdProp===>", planningUnitIdProp);
                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                             var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                             this.setState({
@@ -372,17 +375,13 @@ export default class ShipmentDetails extends React.Component {
                 localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
-                    console.log("In if");
                     if ((this.state.shipmentTypeIds).includes(1)) {
-                        console.log("in if 1")
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
-                        console.log("RoleList------------>", roleList);
                         if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {
-                        console.log("in else")
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }
@@ -413,7 +412,6 @@ export default class ShipmentDetails extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
-                        console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
                         var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
                         var shipmentListUnFiltered = programJson.shipmentList;
                         this.setState({
@@ -426,7 +424,6 @@ export default class ShipmentDetails extends React.Component {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
                         }
                         shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
-                        console.log("Shipment list", shipmentList);
                         this.setState({
                             shelfLife: programPlanningUnit.shelfLife,
                             catalogPrice: programPlanningUnit.catalogPrice,
@@ -522,7 +519,6 @@ export default class ShipmentDetails extends React.Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
         this.setState({
             [parameterName]: value
         })
@@ -542,6 +538,10 @@ export default class ShipmentDetails extends React.Component {
         }
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag==1 || this.state.shipmentQtyChangedFlag}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
@@ -714,7 +714,6 @@ export default class ShipmentDetails extends React.Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 }
