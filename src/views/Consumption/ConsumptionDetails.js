@@ -5,6 +5,7 @@ import {
     Label, Input, FormGroup,
     CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody
 } from 'reactstrap';
+import { Prompt } from 'react-router'
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, API_URL } from '../../Constants.js'
@@ -110,11 +111,19 @@ export default class ConsumptionDetails extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     toggleLarge(method) {
         var cont = false;
-        console.log("this.state.consumptionBatchInfoChangedFlag", this.state.consumptionBatchInfoChangedFlag);
         if (method != "submit" && this.state.consumptionBatchInfoChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
@@ -306,7 +315,6 @@ export default class ConsumptionDetails extends React.Component {
                                     proList.push(productJson)
                                 }
                             }
-                            console.log("RegionList", regionList)
                             this.setState({
                                 planningUnitList: proList.sort(function (a, b) {
                                     a = a.label.toLowerCase();
@@ -366,8 +374,6 @@ export default class ConsumptionDetails extends React.Component {
             this.setState({ loading: true, consumptionChangedFlag: 0, regionId: document.getElementById("regionId").value, consumptionType: document.getElementById("consumptionType").value, showActive: document.getElementById("showActive").value })
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            console.log("startDate", startDate);
-            console.log("Stop Date", stopDate);
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
             var planningUnitId = value != "" && value != undefined ? value.value : 0;
@@ -381,7 +387,6 @@ export default class ConsumptionDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    console.log("RoleList------------>", roleList);
                     if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
@@ -435,8 +440,6 @@ export default class ConsumptionDetails extends React.Component {
                             c.region != null && c.region.id != 0 &&
                             moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
                         if (regionId != "") {
-                            console.log("consumptionList", consumptionList)
-                            console.log("regionId", regionId);
                             consumptionList = consumptionList.filter(c => c.region.id == regionId);
                         }
                         if (consumptionType != "") {
@@ -477,7 +480,6 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     updateState(parameterName, value) {
-        console.log("Updated state", parameterName, "Value------->", value);
         this.setState({
             [parameterName]: value
         })
@@ -547,6 +549,10 @@ export default class ConsumptionDetails extends React.Component {
         }, this);
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
@@ -731,7 +737,6 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 }
