@@ -135,7 +135,7 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryChangedFlag: 0,
             // Commented the CR
             // monthCount: monthDifference,
-            monthCount:0,
+            monthCount: 0,
             // Commented the CR
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
@@ -890,7 +890,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     putRequest1.onsuccess = function (event) {
-                        document.getElementById("saveScenarioDiv").style.display='none'
+                        document.getElementById("saveScenarioDiv").style.display = 'none'
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
@@ -3506,7 +3506,10 @@ export default class WhatIfReportComponent extends React.Component {
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -4714,7 +4717,7 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <div className=" pl-0">
                             <div className="row">
-                            {/* Commented the CR */}
+                                {/* Commented the CR */}
                                 {/* <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">

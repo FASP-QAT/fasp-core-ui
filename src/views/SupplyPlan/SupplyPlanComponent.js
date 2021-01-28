@@ -989,7 +989,10 @@ export default class SupplyPlanComponent extends React.Component {
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor: 'black',
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
