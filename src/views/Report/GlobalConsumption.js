@@ -74,8 +74,8 @@ let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const options = {
   title: {
     display: true,
-    // text: i18n.t('static.dashboard.globalconsumption'),
-    fontColor: 'black'
+    text: i18n.t('static.dashboard.globalconsumption'),
+    // fontColor: 'black'
   },
   scales: {
     yAxes: [{

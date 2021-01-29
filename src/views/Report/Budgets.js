@@ -41,6 +41,10 @@ const pickerLang = {
 }
 const chartoptions =
 {
+    title: {
+        display: true,
+        text: i18n.t('static.dashboard.budget')
+    },
     scales: {
 
         yAxes: [{

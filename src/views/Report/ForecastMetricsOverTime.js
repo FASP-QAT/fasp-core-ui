@@ -69,114 +69,7 @@ const pickerLang = {
 }
 
 
-const options = {
-  title: {
-    display: true,
-    fontColor: 'black',
-    fontStyle: "normal",
-    fontSize: "12"
-  },
-  scales: {
-    yAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: i18n.t('static.report.error'),
-          fontColor: 'black',
-          fontStyle: "normal",
-          fontSize: "12"
-        },
-        ticks: {
-          yValueFormatString: "$#####%",
-          beginAtZero: true,
-          Max: 900,
-          callback: function (value) {
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2 + "%";
-          }
-        }
-      }
-    ], xAxes: [{
 
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.report.month'),
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
-      },
-      ticks: {
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
-      }
-    }]
-  },
-  hover: {
-    animationDuration: 0
-  },
-  animation: {
-    onComplete: function () {
-      const chartInstance = this.chart,
-        ctx = chartInstance.ctx;
-
-
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
-      this.data.datasets.forEach(function (dataset, i) {
-        const meta = chartInstance.controller.getDatasetMeta(i);
-        meta.data.forEach(function (bar, index) {
-          const data = dataset.data[index];
-          ctx.fillStyle = "#000";
-          ctx.fillText(data, bar._model.x, bar._model.y - 2);
-        });
-      });
-    }
-  },
-  tooltips: {
-    mode: 'index',
-    callbacks: {
-      label: function (tooltipItem, data) {
-
-        let label = data.labels[tooltipItem.index];
-        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }
-    },
-    enabled: true,
-    //    custom: CustomTooltips
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-      fontColor: 'black',
-      fontStyle: "normal",
-      fontSize: "12"
-    }
-  },
-
-}
 
 
 
@@ -225,7 +118,8 @@ class ForcastMatrixOverTime extends Component {
       minDate: { year: 2017, month: 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: 12 },
       programId: '',
-      versionId: ''
+      versionId: '',
+      planningUnitLabel: ''
 
 
 
@@ -982,6 +876,9 @@ class ForcastMatrixOverTime extends Component {
                 }
               }
               monthstartfrom = 1
+              this.setState({
+                planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+              })
 
             }
 
@@ -996,7 +893,9 @@ class ForcastMatrixOverTime extends Component {
             console.log(JSON.stringify(response.data));
             this.setState({
               matricsList: response.data,
-              message: '', loading: false
+              message: '', loading: false,
+              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+
             })
           }).catch(
             error => {
@@ -1074,7 +973,7 @@ class ForcastMatrixOverTime extends Component {
       this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [], planningUnitLabel: '' });
 
     }
     /*   this.setState({
@@ -1160,6 +1059,116 @@ class ForcastMatrixOverTime extends Component {
           </option>
         )
       }, this);
+
+    const options = {
+      title: {
+        display: true,
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? i18n.t('static.report.forecasterrorovertime') + " - " + this.state.planningUnitLabel : i18n.t('static.report.forecasterrorovertime')
+        // fontColor: 'black',
+        // fontStyle: "normal",
+        // fontSize: "12"
+      },
+      scales: {
+        yAxes: [
+          {
+            scaleLabel: {
+              display: true,
+              labelString: i18n.t('static.report.error'),
+              fontColor: 'black',
+              fontStyle: "normal",
+              fontSize: "12"
+            },
+            ticks: {
+              yValueFormatString: "$#####%",
+              beginAtZero: true,
+              Max: 900,
+              callback: function (value) {
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return x1 + x2 + "%";
+              }
+            }
+          }
+        ], xAxes: [{
+
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.report.month'),
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          ticks: {
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          }
+        }]
+      },
+      hover: {
+        animationDuration: 0
+      },
+      animation: {
+        onComplete: function () {
+          const chartInstance = this.chart,
+            ctx = chartInstance.ctx;
+
+
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+          this.data.datasets.forEach(function (dataset, i) {
+            const meta = chartInstance.controller.getDatasetMeta(i);
+            meta.data.forEach(function (bar, index) {
+              const data = dataset.data[index];
+              ctx.fillStyle = "#000";
+              ctx.fillText(data, bar._model.x, bar._model.y - 2);
+            });
+          });
+        }
+      },
+      tooltips: {
+        mode: 'index',
+        callbacks: {
+          label: function (tooltipItem, data) {
+
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        },
+        enabled: true,
+        //    custom: CustomTooltips
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black',
+          fontStyle: "normal",
+          fontSize: "12"
+        }
+      },
+
+    }
 
     const bar = {
 
