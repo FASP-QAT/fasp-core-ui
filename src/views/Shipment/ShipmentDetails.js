@@ -164,7 +164,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     componentDidUpdate = () => {
-        if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag==1 || this.state.shipmentQtyChangedFlag) {
+        if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -539,7 +539,7 @@ export default class ShipmentDetails extends React.Component {
         return (
             <div className="animated fadeIn">
                 <Prompt
-                    when={this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag==1 || this.state.shipmentQtyChangedFlag}
+                    when={this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <AuthenticationServiceComponent history={this.props.history} />
