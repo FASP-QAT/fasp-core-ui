@@ -557,8 +557,74 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                             var unallocatedFEFOWps = Number(consumptionQty) - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
                             var unallocatedLEFOWps = 0 - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+
                             for (var a = 0; a < myArray.length; a++) {
-                                var tempCB = Number(myArray[a].openingBalance) - Number(myArray[a].expiredQty) + Number(myArray[a].shipment) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                                var bd = myArray[a];
+                                var tempOB = Number(myArray[a].openingBalance)
+                                    - Number(myArray[a].expiredQty)
+                                    + Number(myArray[a].shipment);
+                                var consumption = Number(myArray[a].consumption);
+                                var adjustment = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                                if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                    if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                        unallocatedFEFO += Number(adjustment);
+                                    } else {
+                                        unallocatedFEFO -= Number(tempOB);
+                                    }
+                                } else {
+                                    if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                        unallocatedLEFO += Number(adjustment);
+                                    } else {
+                                        unallocatedLEFO -= Number(tempOB);
+                                    }
+                                }
+
+                                if ((Number(tempOB) - Number(consumption) + Number(adjustment)) >= 0) {
+                                    unallocatedFEFO -= Number(consumption);
+                                } else {
+                                    unallocatedFEFO -= (Number(tempOB) + Number(adjustment)) > 0 ? Number(tempOB) + Number(adjustment) : 0;
+                                }
+
+                                if ((Number(tempOB) - Number(consumption) + Number(adjustment)) > 0) {
+                                    myArray[a].closingBalance = (Number(tempOB) - Number(consumption) + Number(adjustment));
+                                } else {
+                                    myArray[a].closingBalance = 0;
+                                }
+
+                                //WPS Calculations
+                                var tempOBWps = Number(myArray[a].openingBalanceWps)
+                                    - Number(myArray[a].expiredQtyWps)
+                                    + Number(myArray[a].shipmentWps);
+                                var consumptionWps = Number(myArray[a].consumption);
+                                var adjustmentWps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                                if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                    if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                        unallocatedFEFOWps += Number(adjustmentWps);
+                                    } else {
+                                        unallocatedFEFOWps -= Number(tempOBWps);
+                                    }
+                                } else {
+                                    if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                        unallocatedLEFOWps += Number(adjustmentWps);
+                                    } else {
+                                        unallocatedLEFOWps -= Number(tempOBWps);
+                                    }
+                                }
+
+                                if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) >= 0) {
+                                    unallocatedFEFOWps -= Number(consumptionWps);
+                                } else {
+                                    unallocatedFEFOWps -= (Number(tempOBWps) + Number(adjustmentWps)) > 0 ? Number(tempOBWps) + Number(adjustmentWps) : 0;
+                                }
+
+                                if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) > 0) {
+                                    myArray[a].closingBalanceWps = (Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps));
+                                } else {
+                                    myArray[a].closingBalanceWps = 0;
+                                }
+                            }
+                            for (var a = 0; a < myArray.length; a++) {
+                                var tempCB = Number(myArray[a].closingBalance);
                                 myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
                                 if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                     myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
@@ -592,7 +658,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
 
                             for (var a = 0; a < myArray.length; a++) {
-                                var tempCB = Number(myArray[a].openingBalanceWps) - Number(myArray[a].expiredQtyWps) + Number(myArray[a].shipmentWps) - Number(myArray[a].consumption) + (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                                var tempCB = Number(myArray[a].closingBalanceWps);
                                 myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
                                 if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                     myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
