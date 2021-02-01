@@ -139,6 +139,7 @@ class Login extends Component {
       console.log("############## Offline so can't fetch version #####################");
     }
     AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
+    console.log("timeout going to change language")
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
   }
 
