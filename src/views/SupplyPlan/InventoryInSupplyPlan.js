@@ -441,7 +441,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             var inventoryBatchEditable = inventoryEditable;
                                             var lastEditableDate = "";
                                             lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1) {
                                                 inventoryBatchEditable = false;
                                             }
                                             if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
@@ -1368,7 +1368,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var rowData = elInstance.getRowData(y);
                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                 if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
-                }else{
+                } else {
                     // var colArr = ['D'];
                     // for (var c = 0; c < colArr.length; c++) {
                     //     positiveValidation(colArr[c], y, elInstance);
@@ -1470,26 +1470,26 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             }
                         }
                     }
-    
+
                     var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     }
-    
+
                     var validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     }
-    
-    
+
+
                     var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
                     }
-    
+
                     if (rowData[4] == 2) {
                         var validation = checkValidtion("number", "F", y, elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, 0, 0);
                         if (validation == false) {
@@ -1523,8 +1523,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             positiveValidation("K", y, elInstance);
                         }
                     }
-    
-    
+
+
                     if (rowData[4] == 1) {
                         var validation = checkValidtion("number", "G", y, elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                         if (validation == false) {
