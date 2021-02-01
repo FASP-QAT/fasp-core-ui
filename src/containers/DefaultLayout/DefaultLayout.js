@@ -651,6 +651,7 @@ class DefaultLayout extends Component {
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
       console.log("user timed out")
+      localStorage.setItem("sessionTimedOut",1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
       this.setState({ showModal: true })

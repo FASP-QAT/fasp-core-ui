@@ -251,6 +251,7 @@ class Login extends Component {
                           var emailId = values.emailId;
                           var password = values.password;
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
+                          localStorage.setItem("sessionTimedOut",0);
                           if (navigator.onLine) {
                             LoginService.authenticate(emailId, password)
                               .then(response => {

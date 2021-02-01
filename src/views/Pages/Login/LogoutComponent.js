@@ -46,7 +46,12 @@ class LogoutComponent extends Component {
                 this.props.history.push(`/login/${this.props.match.params.message}`)
             }
         } else {
+            console.log("logout access denied error-------------");
+            if(localStorage.getItem("sessionTimedOut")==1){
+                this.props.history.push(`/login/static.message.sessionExpired`)
+            }else{
             this.props.history.push(`/login/static.accessDenied`)
+            }
         }
 
     }
