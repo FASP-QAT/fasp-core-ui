@@ -60,6 +60,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 (instance.jexcel).setValueFromCoords(21, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 (instance.jexcel).setValueFromCoords(18, data[i].y, `=ROUND(ROUND(K${parseInt(data[i].y) + 1}*P${parseInt(data[i].y) + 1},2)+R${parseInt(data[i].y) + 1},2)`, true);
+                if (data[i].x == 17 || data[i].x == 15 || data[i].x == 11 || data[i].x == 7) {
+                    (instance.jexcel).setValueFromCoords(data[i].x, data[i].y, data[i].value, true);
+                }
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(22, data[i].y, false, true);
                     (instance.jexcel).setValueFromCoords(23, data[i].y, "", true);
@@ -588,7 +591,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                                     // Add shipment batch info
                                                     var rowData = obj.getRowData(y);
-                                                    var expectedDeliveryDate = moment(rowData[4]).add(1,'months').format("YYYY-MM-DD");
+                                                    var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                     if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
                                                         items.push({
@@ -1629,6 +1632,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     shipmentChanged = function (instance, cell, x, y, value) {
+        console.log("D--------------------------> on change")
         var elInstance = instance.jexcel;
         console.log("El instance------------>", elInstance)
         var rowData = elInstance.getRowData(y);
