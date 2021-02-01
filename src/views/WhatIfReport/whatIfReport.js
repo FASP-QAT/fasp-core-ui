@@ -3083,13 +3083,14 @@ export default class WhatIfReportComponent extends React.Component {
                 qtyCalculatorValidationError: "",
                 showShipments: 0,
                 showInventory: 0,
+                showConsumption: 0,
                 loading: false
 
             },
                 () => {
-                    this.hideFirstComponent()
+                    this.hideFirstComponent();
+                    this.toggleLarge(supplyPlanType);
                 })
-            this.toggleLarge(supplyPlanType);
         }
     }
 
