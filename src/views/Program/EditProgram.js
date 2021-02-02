@@ -347,8 +347,8 @@ export default class EditProgram extends Component {
                             regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                         }
                         regList.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
