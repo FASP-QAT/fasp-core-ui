@@ -45,14 +45,14 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-// const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
-// { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
-// { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-// { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
-const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
-{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+{ text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+// const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+// { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+// { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+// { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },];
 
 class StockStatusAcrossPlanningUnits extends Component {
     constructor(props) {

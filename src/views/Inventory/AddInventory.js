@@ -19,6 +19,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from 'react-detect-offline';
+import { Prompt } from 'react-router'
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
@@ -104,6 +105,15 @@ export default class AddInventory extends Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     toggleLarge(method) {
@@ -193,7 +203,6 @@ export default class AddInventory extends Component {
                 } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
-                console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -289,10 +298,7 @@ export default class AddInventory extends Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
-                            console.log("myResult", myResult);
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                            console.log('programId----->>>', programId)
-                            console.log(myResult);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -303,7 +309,6 @@ export default class AddInventory extends Component {
                                     proList.push(productJson)
                                 }
                             }
-                            console.log("proList---" + proList);
                             this.setState({
                                 planningUnitList: proList.sort(function (a, b) {
                                     a = a.label.toLowerCase();
@@ -328,7 +333,6 @@ export default class AddInventory extends Component {
                             } else if (proList.length == 1) {
                                 planningUnitIdProp = proList[0].value;
                             }
-                            console.log("planningUnitIdProp===>", planningUnitIdProp);
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                 this.setState({
@@ -364,7 +368,6 @@ export default class AddInventory extends Component {
         if (cont == true) {
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            console.log("In form submit");
             this.setState({ loading: true, inventoryChangedFlag: 0 })
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
@@ -377,7 +380,6 @@ export default class AddInventory extends Component {
                     document.getElementById("addRowButtonId").style.display = "block";
                     var roleList = AuthenticationService.getLoggedInUserRole();
                     if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
-                        console.log("In if");
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }
@@ -409,7 +411,6 @@ export default class AddInventory extends Component {
                         var programJson = JSON.parse(programData);
                         var batchList = []
                         var batchInfoList = programJson.batchInfoList;
-                        console.log("Batch info list from program json", batchInfoList);
 
                         var batchList = [];
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
@@ -463,7 +464,6 @@ export default class AddInventory extends Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
         this.setState({
             [parameterName]: value
         })
@@ -511,6 +511,10 @@ export default class AddInventory extends Component {
         }
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
@@ -671,7 +675,6 @@ export default class AddInventory extends Component {
         if (cont == true) {
             let id = AuthenticationService.displayDashboardBasedOnRole();
             var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
-            console.log("Entity name", entityname)
             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
         }
     }
@@ -702,7 +705,6 @@ export default class AddInventory extends Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 }
