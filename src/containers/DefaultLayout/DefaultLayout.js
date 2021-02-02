@@ -611,9 +611,9 @@ class DefaultLayout extends Component {
       // 15 min
       // timeout: 1000 * 450 * 1,
       // 5 min
-      timeout: 1000 * 150 * 1,
+      // timeout: 1000 * 150 * 1,
       // 1 hr
-      // timeout: 1000 * 1800 * 1,
+      timeout: 1000 * 1800 * 1,
       showModal: false,
       userLoggedIn: false,
       isTimedOut: false,
