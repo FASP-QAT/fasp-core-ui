@@ -140,6 +140,7 @@ class Login extends Component {
       console.log("############## Offline so can't fetch version #####################");
     }
     AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
+    console.log("timeout going to change language")
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
   }
 
@@ -252,6 +253,7 @@ class Login extends Component {
                           var password = values.password;
                           
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
+                          localStorage.setItem("sessionTimedOut",0);
                           if (navigator.onLine) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
                           var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');

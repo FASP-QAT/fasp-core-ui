@@ -492,7 +492,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/language/addLanguage":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE1")) {
                         return true;
                     }
                     break;
@@ -1239,6 +1239,7 @@ class AuthenticationService {
         }
     }
     clearUserDetails() {
+        console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed","sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];

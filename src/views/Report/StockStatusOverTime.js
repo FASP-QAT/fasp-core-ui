@@ -32,9 +32,10 @@ import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 const options = {
     title: {
         display: true,
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
+        // fontColor: 'black',
+        // fontStyle: "normal",
+        // fontSize: "12",
+        text: i18n.t('static.dashboard.stockstatusovertime')
     },
     scales: {
         yAxes: [

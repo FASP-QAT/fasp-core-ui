@@ -10,8 +10,8 @@ import PlanningUnitService from '../../api/PlanningUnitService'
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js'
 import RealmCountryService from '../../api/RealmCountryService'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX,JEXCEL_NEGATIVE_INTEGER_NO_REGEX_LONG,JEXCEL_INTEGER_REGEX_LONG, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
+import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_LONG, JEXCEL_INTEGER_REGEX_LONG, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY } from '../../Constants.js';
 export default class PipelineProgramInventory extends Component {
 
     constructor(props) {
@@ -115,9 +115,9 @@ export default class PipelineProgramInventory extends Component {
             }
 
 
-            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_LONG;
+            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
             var col = ("H").concat(parseInt(y) + 1);
-            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
             // value = value.toString().replaceAll("\,", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -204,9 +204,9 @@ export default class PipelineProgramInventory extends Component {
 
         if (x == 7) {
 
-            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_LONG;
+            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
             var col = ("H").concat(parseInt(y) + 1);
-            value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
