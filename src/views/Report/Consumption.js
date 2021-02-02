@@ -61,79 +61,6 @@ const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
 
-const options = {
-  title: {
-    display: true,
-    // text: i18n.t('static.dashboard.consumption'),
-    fontColor: 'black'
-  },
-
-  scales: {
-
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.dashboard.consumption'),
-        fontColor: 'black'
-      },
-      ticks: {
-        beginAtZero: true,
-        fontColor: 'black',
-        callback: function (value) {
-          var cell1 = value
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-
-        }
-      }
-    }],
-    xAxes: [{
-      ticks: {
-        fontColor: 'black'
-      }
-    }]
-  },
-
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips,
-    callbacks: {
-      label: function (tooltipItem, data) {
-
-        let label = data.labels[tooltipItem.index];
-        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }
-    }
-
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-      fontColor: "black"
-    }
-  }
-}
 
 
 
@@ -189,7 +116,8 @@ class Consumption extends Component {
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true,
       programId: '',
-      versionId: ''
+      versionId: '',
+      planningUnitLabel: ''
 
 
     };
@@ -248,6 +176,7 @@ class Consumption extends Component {
                 console.log("RESP-----", response.data)
                 this.setState({
                   multiplier: response.data.multiplier,
+                  planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
                 },
                   () => {
                     this.filterData()
@@ -363,6 +292,7 @@ class Consumption extends Component {
             let productFilter = myResult.filter(c => (c.planningUnitId == productId));
             this.setState({
               multiplier: productFilter[0].multiplier,
+              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
             },
               () => {
                 this.filterData()
@@ -836,7 +766,7 @@ class Consumption extends Component {
       this.setState({ message: i18n.t('static.program.validversion'), consumptions: [], offlineConsumptionList: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [], offlineConsumptionList: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [], offlineConsumptionList: [], planningUnitLabel: '' });
 
     }
   }
@@ -1335,6 +1265,80 @@ class Consumption extends Component {
         )
       }, this);
 
+    const options = {
+      title: {
+        display: true,
+        // text: i18n.t('static.dashboard.consumption'),
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? i18n.t('static.dashboard.consumption') + " - " + this.state.planningUnitLabel : i18n.t('static.dashboard.consumption'),
+        // fontColor: 'black'
+      },
+
+      scales: {
+
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.dashboard.consumption'),
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+
+            }
+          }
+        }],
+        xAxes: [{
+          ticks: {
+            fontColor: 'black'
+          }
+        }]
+      },
+
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: "black"
+        }
+      }
+    }
 
 
     let bar = "";
