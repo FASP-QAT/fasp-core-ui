@@ -416,7 +416,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             var consumptionBatchEditable = consumptionEditable;
                                             var lastEditableDate = "";
                                             lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[12] != -1) {
                                                 consumptionBatchEditable = false;
                                             }
                                             if (document.getElementById("showConsumptionBatchInfoButtonsDiv") != null) {
