@@ -2966,7 +2966,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
             }
         }
-        if (negativeBudget > 0) {
+        console.log("Negative budget", negativeBudget, "Valid", valid);
+        if (negativeBudget > 0 && valid == true) {
             var cf = window.confirm(i18n.t("static.shipmentDetails.warningBudget"));
             if (cf == true) {
                 return valid;
@@ -3407,7 +3408,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var programId = (document.getElementById("programId").value)
                         var planningUnitId = (document.getElementById("planningUnitId").value)
                         var objectStore = "";
-                        if (this.props.consumptionPage == "whatIf") {
+                        if (this.props.shipmentPage == "whatIf") {
                             objectStore = 'whatIfProgramData';
                         } else {
                             objectStore = 'programData';

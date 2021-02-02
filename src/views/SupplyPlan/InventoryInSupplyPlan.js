@@ -1632,7 +1632,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         var programId = (document.getElementById("programId").value)
                         var planningUnitId = (document.getElementById("planningUnitId").value)
                         var objectStore = "";
-                        if (this.props.consumptionPage == "whatIf") {
+                        if (this.props.inventoryPage == "whatIf") {
                             objectStore = 'whatIfProgramData';
                         } else {
                             objectStore = 'programData';
