@@ -650,7 +650,8 @@ class DefaultLayout extends Component {
     // console.log('user is idle', e)
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      // console.log("user timed out")
+      console.log("user timed out")
+      localStorage.setItem("sessionTimedOut",1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
       this.setState({ showModal: true })
@@ -672,6 +673,7 @@ class DefaultLayout extends Component {
     }
   }
   componentDidMount() {
+    console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
