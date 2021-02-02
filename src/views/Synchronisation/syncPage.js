@@ -244,21 +244,17 @@ export default class syncPage extends Component {
     var resolveConflictsInstance = this.state.resolveConflict;
     var consumptionInstance = this.state.mergedConsumptionJexcel;
     var index = document.getElementById("index").value;
-    console.log("D------------>Index----------->", index)
     consumptionInstance.options.editable = true;
     consumptionInstance.setRowData(index, resolveConflictsInstance.getRowData(0));
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     for (var j = 0; j < 13; j++) {
       var col = (colArr[j]).concat(parseInt(index) + 1);
-      console.log("D--------->Col", col);
       var valueToCompare = (jsonData[0])[j];
       var valueToCompareWith = (jsonData[1])[j];
-      console.log("D----------->", valueToCompare, "D-------->", valueToCompareWith);
       if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
         consumptionInstance.setStyle(col, "background-color", "transparent");
       } else {
-        console.log("D-----------> in else");
         consumptionInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
         consumptionInstance.setValueFromCoords(18, index, 2, true);
       }
@@ -928,17 +924,16 @@ export default class syncPage extends Component {
             this.setState({
               versionTypeList: response.data,
               programList: proList,
-              loading: false,
+              // loading: false,
               programId: proList[0].value
             }, () => {
               this.getDataForCompare(proList[0]);
             })
           } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-            console.log("value----->1", proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
             this.setState({
               versionTypeList: response.data,
               programList: proList,
-              loading: false,
+              // loading: false,
               programId: localStorage.getItem("sesProgramId")
             }, () => {
               this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
@@ -951,11 +946,11 @@ export default class syncPage extends Component {
             })
           }
 
-          this.setState({
-            versionTypeList: response.data,
-            programList: proList,
-            loading: false
-          })
+          // this.setState({
+          //   versionTypeList: response.data,
+          //   programList: proList,
+          //   loading: false
+          // })
         })
           .catch(
             error => {
@@ -1098,7 +1093,6 @@ export default class syncPage extends Component {
                       //   var dProgramDataBytes = CryptoJS.AES.decrypt(dProgramRequest.result.programData, SECRET_KEY);
                       //   var dProgramData = dProgramDataBytes.toString(CryptoJS.enc.Utf8);
                       //   var dProgramJson = JSON.parse(dProgramData);
-                      //   console.log("dProgramJson----------->", dProgramJson);
                       var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                       var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                       var rcpuRequest = rcpuOs.getAll();
@@ -1308,9 +1302,6 @@ export default class syncPage extends Component {
                                       var latestProgramDataConsumption = latestProgramData.consumptionList;
                                       var oldProgramDataConsumption = oldProgramData.consumptionList;
                                       var downloadedProgramDataConsumption = downloadedProgramData.consumptionList;
-                                      console.log("Latest program data", latestProgramData);
-                                      console.log("Old data json", oldProgramData);
-                                      console.log("Downloaded Program json", downloadedProgramData);
                                       var mergedConsumptionData = [];
                                       var existingConsumptionId = [];
                                       for (var c = 0; c < oldProgramDataConsumption.length; c++) {
@@ -1483,8 +1474,6 @@ export default class syncPage extends Component {
                                           existingInventoryId.push(oldProgramDataInventory[c].inventoryId);
                                         } else {
                                           // If 0 check whether that exists in latest version or not
-                                          console.log("oldProgramDataInventory[c].actualQty", oldProgramDataInventory[c].actualQty);
-                                          console.log("Katest program data inventory", latestProgramDataInventory);
                                           var index = 0;
                                           if (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) {
                                             index = latestProgramDataInventory.findIndex(f =>
@@ -1497,7 +1486,6 @@ export default class syncPage extends Component {
                                           } else {
                                             index = -1;
                                           }
-                                          console.log("Inventory date", oldProgramDataInventory[c].inventoryDate, "index------>", index);
                                           if (index == -1) { // Does not exists
                                             mergedInventoryData.push(oldProgramDataInventory[c]);
                                           } else { // Exists
@@ -1659,7 +1647,6 @@ export default class syncPage extends Component {
                                       mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
                                       var data = [];
                                       var mergedShipmentJexcel = [];
-                                      console.log("mergedShipmentData", mergedShipmentData)
                                       for (var cd = 0; cd < mergedShipmentData.length; cd++) {
                                         data = [];
                                         data[0] = mergedShipmentData[cd].shipmentId;
@@ -1814,7 +1801,6 @@ export default class syncPage extends Component {
                                         latestProgramData: latestProgramData,
                                         oldProgramData: oldProgramData,
                                         downloadedProgramData: downloadedProgramData,
-                                        loading: false
                                       }, () => {
                                         // Problem list
                                         this.refs.problemListChild.qatProblemActions((this.state.programId).value);
@@ -2048,8 +2034,6 @@ export default class syncPage extends Component {
     jExcelLoadedFunction(instance, 1);
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
-    console.log("json data", jsonData);
-    console.log("El instanmce", elInstance);
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     elInstance.options.editable = true;
@@ -2065,7 +2049,6 @@ export default class syncPage extends Component {
           isChanged: true
         })
       } else if ((jsonData[c])[16] == "") {
-        console.log("in else if", colArr.length);
 
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2195,7 +2178,6 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            console.log("old-->", oldData[j], "Downloaded---->", downloadedData[j], "Latest--->", latestData[j])
             if ((jsonData[c])[32] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2276,7 +2258,6 @@ export default class syncPage extends Component {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
-      console.log("jsonData[c])[18]=====>", (jsonData[c])[18]);
       if ((jsonData[c])[18] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2309,10 +2290,6 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            console.log("OldData[j", oldData[j]);
-            console.log("DownloadedDara[j", downloadedData[j]);
-            console.log("Latest data[j]", latestData[j]);
-            console.log("jsonData[c])[19]=====>", (jsonData[c])[19]);
             if ((jsonData[c])[19] != "" && oldData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setValueFromCoords(j, c, latestData[j], true);
@@ -2321,8 +2298,6 @@ export default class syncPage extends Component {
               elInstance.setValueFromCoords(20, c, 3, true);
               (jsonData[c])[20] = 3;
             } else if ((jsonData[c])[19] != "" && latestData[j] == downloadedData[j]) {
-              console.log("latestData[j]", latestData[j]);
-              console.log("downloaded", downloadedData[j])
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
@@ -2678,7 +2653,6 @@ export default class syncPage extends Component {
   //       enteredBudgetAmt = enteredBudgetAmt.toFixed(2);
 
   //       var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
-  //       console.log("BudgetId", map.get("6"), "Entered amount", enteredBudgetAmt, "total budget", totalBudget, "Available budget", availableBudgetAmount, "Condition", enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0);
   //       if (enteredBudgetAmt > availableBudgetAmount || availableBudgetAmount < 0) {
   //         valid = false;
   //         inValidWithColor("G", y, i18n.t('static.label.noFundsAvailable'), elInstance, "red");
@@ -2792,14 +2766,6 @@ export default class syncPage extends Component {
             }
             problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
             problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
-            console.log("Planning unit list", planningUnitList);
-            console.log("Consumption data", consumptionData);
-            console.log("InventoryData", inventoryData);
-            console.log("ShipmentData", shipmentData);
-            console.log("Program Report Data", problemReportList);
-            console.log("ProgramId", (this.state.programId).value);
-            console.log("VersionType", document.getElementById("versionType").value);
-            console.log("notes", document.getElementById("notes").value);
             programJson.consumptionList = consumptionData;
             programJson.inventoryList = inventoryData;
             programJson.shipmentList = shipmentData;
@@ -2808,9 +2774,7 @@ export default class syncPage extends Component {
             programJson.versionType = { id: document.getElementById("versionType").value };
             programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
             programJson.notes = document.getElementById("notes").value;
-            console.log("Program json", programJson);
             ProgramService.saveProgramData(programJson).then(response => {
-              console.log("Response", response);
               if (response.status == 200) {
                 var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                 var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -2828,7 +2792,6 @@ export default class syncPage extends Component {
                 programRequest2.onsuccess = function (e) {
 
                   var json = response.data;
-                  console.log("JSON-------------------->", json);
                   var version = json.requestedProgramVersion;
                   if (version == -1) {
                     version = json.currentVersion.versionId
@@ -2851,7 +2814,6 @@ export default class syncPage extends Component {
                     programData: encryptedText.toString(),
                     userId: userId
                   };
-                  console.log("Item------------>", item);
                   var putRequest = programSaveData.put(item);
                   var putRequest1 = downloadedProgramSaveData.put(item);
 
@@ -2868,7 +2830,6 @@ export default class syncPage extends Component {
             })
               .catch(
                 error => {
-                  console.log("Error--->", error);
                   if (error.message === "Network Error") {
                     this.setState({
                       message: 'static.unkownError',
@@ -2923,7 +2884,6 @@ export default class syncPage extends Component {
         }.bind(this)
       }
     } else {
-      console.log("in else");
       this.setState({ "noFundsBudgetError": i18n.t('static.label.noFundsAvailable'), loading: false });
       this.hideSecondComponent();
     }
@@ -2941,7 +2901,6 @@ export default class syncPage extends Component {
   }
 
   updateState(parameterName, value) {
-    console.log("in update state")
     this.setState({
       [parameterName]: value
     })
@@ -2963,7 +2922,6 @@ export default class syncPage extends Component {
       var programDataTransaction = db1.transaction(['programData'], 'readwrite');
       var programDataOs = programDataTransaction.objectStore('programData');
       var value = (this.state.programId);
-      console.log("Value------------>", value);
       var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
       programRequest.onerror = function (event) {
         this.setState({
@@ -2980,9 +2938,6 @@ export default class syncPage extends Component {
         var latestProgramDataProblemList = this.state.latestProgramData.problemReportList;
         var oldProgramDataProblemList = oldProgramData.problemReportList;
         var downloadedProgramDataProblemList = this.state.downloadedProgramData.problemReportList;
-        console.log("downloadedProgramDataProblemList------>", downloadedProgramDataProblemList);
-        console.log("oldProgramDataProblemList--------------------------->", oldProgramDataProblemList);
-        console.log("latestProgramDataProblemList--------------------------->", latestProgramDataProblemList);
         var mergedProblemListData = [];
         var existingProblemReportId = [];
         for (var c = 0; c < oldProgramDataProblemList.length; c++) {
@@ -3012,7 +2967,6 @@ export default class syncPage extends Component {
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
             }
-            console.log("Index-------------->", index);
             // var index = -1;
             if (index == -1) {
               mergedProblemListData.push(oldProgramDataProblemList[c]);
@@ -3023,7 +2977,6 @@ export default class syncPage extends Component {
             }
           }
         }
-        console.log("Existing problem report id", existingProblemReportId);
         // Getting other entries of latest problemList data
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
@@ -3057,7 +3010,6 @@ export default class syncPage extends Component {
           }
           data[17] = oldData;//Old data
           var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
-          console.log("Latest data list", latestDataList);
           var latestData = ""
           if (latestDataList.length > 0) {
             latestData = [latestDataList[0].problemReportId, 1, latestDataList[0].program.code, 1, (latestDataList[0].region.label != null) ? (getLabelText(latestDataList[0].region.label, this.state.lang)) : '', getLabelText(latestDataList[0].planningUnit.label, this.state.lang), (latestDataList[0].dt != null) ? (moment(latestDataList[0].dt).format('MMM-YY')) : '', moment(latestDataList[0].createdDate).format('MMM-YY'), getProblemDesc(latestDataList[0], this.state.lang), getSuggestion(latestDataList[0], this.state.lang), getLabelText(latestDataList[0].problemStatus.label, this.state.lang), this.getNote(latestDataList[0], this.state.lang), latestDataList[0].problemStatus.id, latestDataList[0].planningUnit.id, latestDataList[0].realmProblem.problem.problemId, latestDataList[0].realmProblem.problem.actionUrl, latestDataList[0].realmProblem.criticality.id, "", "", "", 4];
@@ -3072,7 +3024,6 @@ export default class syncPage extends Component {
           data[20] = 4;
           mergedProblemListJexcel.push(data);
         }
-        console.log("MergedProblem list jexcel", mergedProblemListJexcel);
         var options = {
           data: mergedProblemListJexcel,
           columnDrag: true,
@@ -3203,6 +3154,7 @@ export default class syncPage extends Component {
           oldProgramDataProblemList: oldProgramDataProblemList,
           latestProgramDataProblemList: latestProgramDataProblemList,
           mergedProblemListData: mergedProblemListData,
+          loading:false
         })
       }.bind(this)
     }.bind(this)
