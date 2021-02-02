@@ -3546,7 +3546,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var programId = (document.getElementById("programId").value)
                         var planningUnitId = (document.getElementById("planningUnitId").value)
                         var objectStore = "";
-                        if (this.props.consumptionPage == "whatIf") {
+                        if (this.props.shipmentPage == "whatIf") {
                             objectStore = 'whatIfProgramData';
                         } else {
                             objectStore = 'programData';
