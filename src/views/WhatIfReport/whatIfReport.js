@@ -37,6 +37,7 @@ import AuthenticationService from "../Common/AuthenticationService";
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 // import SupplyPlanFormulas from "./SupplyPlanFormulas";
+import { Prompt } from 'react-router'
 
 const entityname = i18n.t('static.dashboard.whatIf')
 
@@ -46,7 +47,6 @@ let initialValues = {
 }
 
 const validationSchema = function (values, t) {
-    console.log("made by us schema--->", values)
     return Yup.object().shape({
         scenarioId: Yup.string()
             .required(i18n.t('static.whatIf.validScenario')),
@@ -54,7 +54,6 @@ const validationSchema = function (values, t) {
         percentage: Yup.string()
             .when("needPercentageValidation", {
                 is: val => {
-                    console.log("Need percentage validation", document.getElementById("needPercentageValidation").value)
                     return document.getElementById("needPercentageValidation").value === "true";
 
                 },
@@ -241,7 +240,6 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     _handleClickRangeBox1(e) {
-        console.log("Thuis.refs", this);
         this.pickRange1.current.show()
     }
 
@@ -263,13 +261,11 @@ export default class WhatIfReportComponent extends React.Component {
         //
     }
     handleRangeDissmis(value) {
-        console.log("Value-------------------->", value)
         this.setState({ rangeValue: value })
         this.formSubmit(this.state.planningUnit, value);
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 
@@ -310,6 +306,15 @@ export default class WhatIfReportComponent extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1 || this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     roundN = num => {
@@ -359,8 +364,6 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     updateFieldData(value) {
-        console.log("Value", value);
-        // console.log(event.value)
         this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, rows: [] });
 
     }
@@ -583,10 +586,8 @@ export default class WhatIfReportComponent extends React.Component {
                 // var shipmentList=programJson.shipmentList;
                 var rows = this.state.rows;
                 var minimumDate = moment(Date.now()).format("YYYY-MM-DD");
-                console.log("Rows---------------------->", rows);
                 for (var r = 0; r < rows.length; r++) {
                     if (rows[r].scenarioChecked) {
-                        console.log("In scenario Checked---------------------->");
                         if (rows[r].scenarioId == 3) {
                             // var rangeValue = this.state.rangeValue;
                             let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
@@ -597,7 +598,6 @@ export default class WhatIfReportComponent extends React.Component {
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
                                 minimumDate = minDate;
                             }
-                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                             for (var i = 0; i < shipmentUnFundedList.length; i++) {
                                 var index = 0;
                                 if (shipmentUnFundedList[i].shipmentId > 0) {
@@ -609,11 +609,8 @@ export default class WhatIfReportComponent extends React.Component {
                             }
                             programJson.shipmentList = shipmentList;
                         } else if (rows[r].scenarioId == 1) {
-                            console.log("In scenario Checked 1---------------------->", r);
                             let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                             let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
-                            console.log("In scenario Checked 1---------------------->startDate", startDate);
-                            console.log("In scenario Checked 1---------------------->stop date", stopDate);
 
                             var consumptionList = programJson.consumptionList;
                             var consumptionFiltered = consumptionList.filter(c => c.active == true
@@ -622,7 +619,6 @@ export default class WhatIfReportComponent extends React.Component {
                                 && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
                                 && (c.actualFlag).toString() == "false"
                             );
-                            console.log("In scenario Checked 1---------------------->", r, " Consumption filteered", consumptionFiltered);
                             var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
                                 minimumDate = minDate;
@@ -641,7 +637,6 @@ export default class WhatIfReportComponent extends React.Component {
                                 }
                                 consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
                                 consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
-                                console.log("In scenario Checked 1---------------------->", Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty)))))
                             }
                             programJson.consumptionList = consumptionList;
                         } else if (rows[r].scenarioId == 2) {
@@ -659,7 +654,6 @@ export default class WhatIfReportComponent extends React.Component {
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
                                 minimumDate = minDate;
                             }
-                            console.log("Consumption List", consumptionFiltered);
                             for (var i = 0; i < consumptionFiltered.length; i++) {
                                 var index = 0;
                                 if (consumptionFiltered[i].consumptionId > 0) {
@@ -674,7 +668,6 @@ export default class WhatIfReportComponent extends React.Component {
                                 }
                                 consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
                                 consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
-                                console.log("In scenario Checked 1---------------------->2 ", Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty)))))
                             }
                             programJson.consumptionList = consumptionList;
                         } else if (rows[r].scenarioId == 4) {
@@ -684,7 +677,6 @@ export default class WhatIfReportComponent extends React.Component {
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
                                 minimumDate = minDate;
                             }
-                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                             for (var i = 0; i < shipmentUnFundedList.length; i++) {
                                 var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
                                 var plannedDate = shipmentUnFundedList[i].plannedDate;
@@ -741,7 +733,6 @@ export default class WhatIfReportComponent extends React.Component {
                         } else if (rows[r].scenarioId == 5) {
                             var shipmentList = programJson.shipmentList;
                             var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                             var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
                                 minimumDate = minDate;
@@ -800,7 +791,6 @@ export default class WhatIfReportComponent extends React.Component {
                             }
                             programJson.shipmentList = shipmentList;
                         } else if (rows[r].scenarioId == 6) {
-                            console.log("In6")
                             var shipmentList = programJson.shipmentList;
                             // var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                             var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
@@ -808,7 +798,6 @@ export default class WhatIfReportComponent extends React.Component {
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
                                 minimumDate = minDate;
                             }
-                            console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                             for (var i = 0; i < shipmentUnFundedList.length; i++) {
                                 var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
                                 var plannedDate = shipmentUnFundedList[i].plannedDate;
@@ -938,7 +927,6 @@ export default class WhatIfReportComponent extends React.Component {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var index = 0;
                         if (shipmentUnFundedList[i].shipmentId > 0) {
@@ -987,7 +975,6 @@ export default class WhatIfReportComponent extends React.Component {
                         && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
                         && (c.actualFlag).toString() == "false"
                     );
-                    console.log("Consumption List", consumptionFiltered);
                     var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
                     for (var i = 0; i < consumptionFiltered.length; i++) {
                         var index = 0;
@@ -1028,7 +1015,6 @@ export default class WhatIfReportComponent extends React.Component {
                         dt.setMonth(dt.getMonth() - 10);
                         this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' },
                             () => {
-                                console.log("D--------------->", this.state.rangeValue);
                             })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
@@ -1047,7 +1033,6 @@ export default class WhatIfReportComponent extends React.Component {
                         && (c.actualFlag).toString() == "false"
                     );
                     var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
-                    console.log("Consumption List", consumptionFiltered);
                     for (var i = 0; i < consumptionFiltered.length; i++) {
                         var index = 0;
                         if (consumptionFiltered[i].consumptionId > 0) {
@@ -1095,7 +1080,6 @@ export default class WhatIfReportComponent extends React.Component {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
                         var plannedDate = shipmentUnFundedList[i].plannedDate;
@@ -1178,7 +1162,6 @@ export default class WhatIfReportComponent extends React.Component {
                 } else if (this.state.scenarioId == 5) {
                     var shipmentList = programJson.shipmentList;
                     var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
@@ -1260,12 +1243,10 @@ export default class WhatIfReportComponent extends React.Component {
 
                     }.bind(this)
                 } else if (this.state.scenarioId == 6) {
-                    console.log("In6")
                     var shipmentList = programJson.shipmentList;
                     // var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                     var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    console.log("Shipment un funded shipment", shipmentUnFundedList, "Min Date", minDate);
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
                         var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
                         var plannedDate = shipmentUnFundedList[i].plannedDate;
@@ -2251,7 +2232,6 @@ export default class WhatIfReportComponent extends React.Component {
                     var maxForMonths = 0;
                     var realm = realmRequest.result;
                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                    console.log("realm.minMosMaxGaurdrail", realm.minMosMaxGaurdrail);
                     var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
                     if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnit.minMonthsOfStock) {
                         maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
@@ -2269,13 +2249,9 @@ export default class WhatIfReportComponent extends React.Component {
                         minForMonths = (maxForMonths + programPlanningUnit.reorderFrequencyInMonths);
                     }
                     var maxStockMoSQty = parseInt(minForMonths);
-                    console.log("maxStockMoSQty-------->", maxStockMoSQty);
-                    console.log("DEFAULT_MIN_MAX_MONTHS_OF_STOCK------------->", DEFAULT_MIN_MAX_MONTHS_OF_STOCK)
                     if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                         maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                     }
-                    console.log("Min Stock MoS", minStockMoSQty);
-                    console.log("Min Stock MoS", maxStockMoSQty);
                     this.setState({
                         shelfLife: programPlanningUnit.shelfLife,
                         versionId: programJson.currentVersion.versionId,
@@ -2321,7 +2297,6 @@ export default class WhatIfReportComponent extends React.Component {
                             this.setState({
                                 procurementAgentListForWhatIf: papuResult
                             })
-                            console.log("ProgramJson", programJson);
                             var supplyPlanData = [];
                             if (programJson.supplyPlan != undefined) {
                                 supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
@@ -2501,7 +2476,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd3.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData)+Number(jsonList[0].submittedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                        orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
                                     } else {
                                         orderedShipmentsTotalData.push("")
                                     }
@@ -2511,7 +2486,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedShipmentsTotalData.push({ qty:  Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                        plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                     } else {
                                         plannedShipmentsTotalData.push("")
                                     }
@@ -2684,7 +2659,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd3.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData)+Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                        orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
                                     } else {
                                         orderedErpShipmentsTotalData.push("")
                                     }
@@ -2694,7 +2669,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         if (sd4.length > 1) {
                                             colour = "#d9ead3";
                                         }
-                                        plannedErpShipmentsTotalData.push({ qty:  Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                        plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                     } else {
                                         plannedErpShipmentsTotalData.push("")
                                     }
@@ -2823,7 +2798,6 @@ export default class WhatIfReportComponent extends React.Component {
                                     }
                                     consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
                                     var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
-                                    console.log("project Inventory", projectedInventoryForRegion);
                                     if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                         totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                     }
@@ -2892,8 +2866,6 @@ export default class WhatIfReportComponent extends React.Component {
                                     jsonArrForGraph.push(json);
                                 }
                             }
-                            // console.log("supplyPlan", supplyPlan);
-                            console.log("consumptionTotalData", consumptionTotalData);
                             this.setState({
                                 openingBalanceArray: openingBalanceArray,
                                 consumptionTotalData: consumptionTotalData,
@@ -3003,7 +2975,6 @@ export default class WhatIfReportComponent extends React.Component {
                 this.formSubmit(this.state.planningUnit, monthCountConsumption);
             } else if (supplyPlanType == 'SuggestedShipments') {
                 var roleList = AuthenticationService.getLoggedInUserRole();
-                console.log("RoleList------------>", roleList);
                 if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
                 } else {
                     this.setState({
@@ -3027,7 +2998,6 @@ export default class WhatIfReportComponent extends React.Component {
             } else if (supplyPlanType == 'expiredStock') {
                 this.setState({ loading: true });
                 var details = (this.state.expiredStockArr).filter(c => moment(c.month.startDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"))
-                console.log("startDate", startDate)
                 if (startDate != undefined) {
                     this.setState({
                         expiredStockModal: !this.state.expiredStockModal,
@@ -3113,13 +3083,14 @@ export default class WhatIfReportComponent extends React.Component {
                 qtyCalculatorValidationError: "",
                 showShipments: 0,
                 showInventory: 0,
+                showConsumption: 0,
                 loading: false
 
             },
                 () => {
-                    this.hideFirstComponent()
+                    this.hideFirstComponent();
+                    this.toggleLarge(supplyPlanType);
                 })
-            this.toggleLarge(supplyPlanType);
         }
     }
 
@@ -3227,7 +3198,6 @@ export default class WhatIfReportComponent extends React.Component {
 
                     var batchList = [];
                     var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                    console.log("Shipment list=============>", shipmentList);
                     for (var sl = 0; sl < shipmentList.length; sl++) {
                         var bdl = shipmentList[sl].batchInfoList;
                         for (var bd = 0; bd < bdl.length; bd++) {
@@ -3240,7 +3210,6 @@ export default class WhatIfReportComponent extends React.Component {
                             }
                         }
                     }
-                    console.log("Btach List============>", batchList);
                     var consumptionListUnFiltered = (programJson.consumptionList);
                     var consumptionList = consumptionListUnFiltered.filter(con =>
                         con.planningUnit.id == planningUnitId
@@ -3445,7 +3414,6 @@ export default class WhatIfReportComponent extends React.Component {
                     }
                 }
                 shipmentList.push(json);
-                console.log("Shipment list", shipmentList);
                 this.setState({
                     shipmentListUnFiltered: programJson.shipmentList,
                     programJson: programJson,
@@ -3461,7 +3429,6 @@ export default class WhatIfReportComponent extends React.Component {
     filterBatchInfoForExistingData = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[3];
-        console.log("Value", value);
         if (value != 0) {
             mylist = this.state.batchInfoList.filter(c => c.id != -1);
         } else {
@@ -4702,6 +4669,10 @@ export default class WhatIfReportComponent extends React.Component {
         }
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1 || this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1 || this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.suggestedShipmentChangedFlag == 1}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
@@ -4894,7 +4865,7 @@ export default class WhatIfReportComponent extends React.Component {
                         document.getElementById("addRowId").style.display = "block"
                     }
                 } else if (supplyPlanType == 'orderedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS  || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                     if (document.getElementById("addRowId") != null) {
                         document.getElementById("addRowId").style.display = "block"
                     }
@@ -4945,7 +4916,6 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
         this.setState({
             [parameterName]: value
         })
