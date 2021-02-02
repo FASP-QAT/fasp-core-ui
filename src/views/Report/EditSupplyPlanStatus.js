@@ -1383,7 +1383,7 @@ class EditSupplyPlanStatus extends Component {
                                 var amc = Math.round(parseFloat(jsonList[0].amc));
                                 if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
                                     var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
-                                    if (suggestedOrd == 0) {
+                                    if (suggestedOrd <= 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                             parseFloat(programJson.arrivedToDeliveredLeadTime);
