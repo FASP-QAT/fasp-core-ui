@@ -38,7 +38,11 @@ class LogoutComponent extends Component {
                         error => {
                             console.log("logout component error");
                             keysToRemove.forEach(k => localStorage.removeItem(k));
+                            if(localStorage.getItem("sessionTimedOut")==1){
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                            }else{
                             this.props.history.push(`/login/static.logoutError`)
+                            }
                         }
                     );
             } else {
