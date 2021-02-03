@@ -2908,6 +2908,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
             }
         }
+        console.log("Negative budget", negativeBudget, "Valid", valid);
         if (negativeBudget > 0 && valid == true) {
             var cf = window.confirm(i18n.t("static.shipmentDetails.warningBudget"));
             if (cf == true) {

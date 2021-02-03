@@ -1115,9 +1115,12 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent3 = true;
                                             }
                                             sd3.push(shipmentDetail);
+<<<<<<< HEAD
                                             if (paColor3Array.indexOf(paColor3) === -1) {
                                                 paColor3Array.push(paColor3);
                                             }
+=======
+>>>>>>> QAT-519
                                         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -1179,7 +1182,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData)+parseInt(jsonList[0].approvedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                    orderedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].approvedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
@@ -1189,7 +1192,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedShipmentsTotalData.push({ qty:  parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                    plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                 } else {
                                     plannedShipmentsTotalData.push("")
                                 }
@@ -1214,10 +1217,13 @@ class EditSupplyPlanStatus extends Component {
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
+<<<<<<< HEAD
                                 var paColor1Array = [];
                                     var paColor2Array = [];
                                     var paColor3Array = [];
                                     var paColor4Array = [];
+=======
+>>>>>>> QAT-519
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1377,7 +1383,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].approvedErpShipmentsTotalData)+parseInt(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                    orderedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].approvedErpShipmentsTotalData) + parseInt(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
                                 } else {
                                     orderedErpShipmentsTotalData.push("")
                                 }
@@ -3203,8 +3209,8 @@ class EditSupplyPlanStatus extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
-                    type: 'text',
-                    width: 120
+                    type: !this.state.editable ? 'hidden' : 'text',
+                    width: 120,
                 },
 
                 {
