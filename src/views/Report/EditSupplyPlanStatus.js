@@ -1115,12 +1115,9 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent3 = true;
                                             }
                                             sd3.push(shipmentDetail);
-<<<<<<< HEAD
                                             if (paColor3Array.indexOf(paColor3) === -1) {
                                                 paColor3Array.push(paColor3);
                                             }
-=======
->>>>>>> QAT-519
                                         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -1217,13 +1214,10 @@ class EditSupplyPlanStatus extends Component {
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
-<<<<<<< HEAD
                                 var paColor1Array = [];
                                     var paColor2Array = [];
                                     var paColor3Array = [];
                                     var paColor4Array = [];
-=======
->>>>>>> QAT-519
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
