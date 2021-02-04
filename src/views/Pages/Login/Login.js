@@ -75,7 +75,6 @@ class Login extends Component {
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
 
     }
-    localStorage.setItem("sesType", true);
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
     this.logoutMessagehide = this.logoutMessagehide.bind(this);
@@ -118,6 +117,7 @@ class Login extends Component {
 
   componentDidMount() {
     // console.log("############## Login component did mount #####################");
+    localStorage.setItem("sesType", true);
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
