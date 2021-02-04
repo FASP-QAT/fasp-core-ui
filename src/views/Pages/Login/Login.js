@@ -117,6 +117,7 @@ class Login extends Component {
 
   componentDidMount() {
     // console.log("############## Login component did mount #####################");
+    localStorage.setItem("sesType", true);
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
@@ -430,7 +431,7 @@ class Login extends Component {
                   </div>
 
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online polling={polling}  ref="onlineRef">{this.state.apiVersion}</Online><Offline polling={polling}>Offline</Offline></h5>
+                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | <Online polling={polling} ref="onlineRef">{this.state.apiVersion}</Online><Offline polling={polling}>Offline</Offline></h5>
               </Col>
 
 
@@ -445,8 +446,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                  official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                  Agency for International Development or the U.S. government.
+                                                                                                                                                                    official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                                    Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
