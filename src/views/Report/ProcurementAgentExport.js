@@ -69,8 +69,8 @@ class ProcurementAgentExport extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: 2017, month: 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: 12 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
             programId: '',
             versionId: ''
