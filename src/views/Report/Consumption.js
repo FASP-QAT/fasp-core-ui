@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -50,6 +50,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -164,7 +165,8 @@ class Consumption extends Component {
 
     let productId = document.getElementById("planningUnitId").value;
     if (productId != 0) {
-      if (navigator.onLine) {
+      isSiteOnline(function (found) {
+        if(found){
         RealmService.getRealmListAll()
           .then(response => {
             if (response.status == 200) {
@@ -301,6 +303,7 @@ class Consumption extends Component {
           }.bind(this);
         }.bind(this)
       }
+    }.bind(this))
     }
   }
 
@@ -348,18 +351,20 @@ class Consumption extends Component {
     csvRow.push('')
     var re;
 
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       re = this.state.consumptions
     } else {
       re = this.state.offlineConsumptionList
     }
-
+  }.bind(this))
     let head = [];
     let head1 = [];
     let row1 = [];
     let row2 = [];
     let row3 = [];
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       let consumptionArray = this.state.consumptions;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
@@ -380,6 +385,7 @@ class Consumption extends Component {
         row2.push(consumptionArray[i].actualConsumption == null ? '' : consumptionArray[i].actualConsumption);
       }
     }
+  }.bind(this))
     var A = [];
     A[0] = this.addDoubleQuoteToRowContent(head);
     A[1] = this.addDoubleQuoteToRowContent(row1);
@@ -478,13 +484,14 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
+    const data = isSiteOnline(function (found) { found ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)])}.bind(this));
     let head = [];
     let head1 = [];
     let row1 = [];
     let row2 = [];
     let row3 = [];
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       let consumptionArray = this.state.consumptions;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
@@ -505,6 +512,7 @@ class Consumption extends Component {
         row2.push(this.formatter(consumptionArray[i].actualConsumption));
       }
     }
+  }.bind(this))
     head1[0] = head;
     row3[0] = row1;
     row3[1] = row2;
@@ -773,7 +781,8 @@ class Consumption extends Component {
 
 
   getPrograms() {
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -852,6 +861,7 @@ class Consumption extends Component {
       this.consolidatedProgramList()
       this.setState({ loading: false })
     }
+  }.bind(this))
   }
 
   consolidatedProgramList = () => {
@@ -1085,7 +1095,8 @@ class Consumption extends Component {
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+          if(found){
           this.setState({
             versions: [],
             planningUnits: [],
@@ -1108,6 +1119,7 @@ class Consumption extends Component {
             planningUnitLabels: []
           }, () => { this.consolidatedVersionList(programId) })
         }
+      }.bind(this))
       } else {
 
         this.setState({
@@ -1342,7 +1354,8 @@ class Consumption extends Component {
 
 
     let bar = "";
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       bar = {
 
         labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
@@ -1380,7 +1393,9 @@ class Consumption extends Component {
 
       }
     }
-    if (!navigator.onLine) {
+  }.bind(this))
+    isSiteOnline(function (found) {
+      if(!found){
 
       bar = {
 
@@ -1415,6 +1430,7 @@ class Consumption extends Component {
         ],
       }
     }
+  }.bind(this))
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
       from: 'From', to: 'To',
@@ -1434,7 +1450,7 @@ class Consumption extends Component {
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
-            <Online>
+            <Online polling={polling}>
               {
                 this.state.consumptions.length > 0 &&
                 <div className="card-header-actions">
@@ -1448,7 +1464,7 @@ class Consumption extends Component {
                 </div>
               }
             </Online>
-            <Offline>
+            <Offline polling={polling}>
               {
                 this.state.offlineConsumptionList.length > 0 &&
                 <div className="card-header-actions">
@@ -1532,7 +1548,7 @@ class Consumption extends Component {
                       </FormGroup>
 
 
-                      <Online>
+                      <Online polling={polling}>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
@@ -1560,7 +1576,7 @@ class Consumption extends Component {
                           </div>
                         </FormGroup>
                       </Online>
-                      <Offline>
+                      <Offline polling={polling}>
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
@@ -1614,7 +1630,7 @@ class Consumption extends Component {
 
                 <Col md="12 pl-0">
                   <div className="row">
-                    <Online>
+                    <Online polling={polling}>
                       {
                         this.state.consumptions.length > 0
                         &&
@@ -1638,7 +1654,7 @@ class Consumption extends Component {
 
 
                     </Online>
-                    <Offline>
+                    <Offline polling={polling}>
                       {
                         this.state.offlineConsumptionList.length > 0
                         &&
@@ -1663,7 +1679,7 @@ class Consumption extends Component {
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                      <Online>
+                      <Online polling={polling}>
                         {this.state.show && this.state.consumptions.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
@@ -1712,7 +1728,7 @@ class Consumption extends Component {
 
                           </Table>}
                       </Online>
-                      <Offline>
+                      <Offline polling={polling}>
                         {this.state.show && this.state.offlineConsumptionList.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 

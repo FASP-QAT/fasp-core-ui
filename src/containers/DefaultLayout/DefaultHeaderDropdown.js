@@ -18,6 +18,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
+import { polling } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const propTypes = {
@@ -80,7 +82,8 @@ class DefaultHeaderDropdown extends Component {
     localStorage.removeItem('lastLoggedInUsersLanguage');
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
     AuthenticationService.updateUserLanguage(lang);
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
 console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
@@ -125,6 +128,7 @@ console.log("Going to change online")
       console.log("Going to change language reload location reload---")
       window.location.reload();
     }
+  }.bind(this))
     // console.log("Going to change language call changeLanguage function---")
     // i18n.changeLanguage(lang)
     // console.log("Going to change language reload location reload---")
@@ -238,10 +242,10 @@ console.log("Going to change online")
 
           <div className="avatar">
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            <Online>
+            <Online polling={polling}>
               <span className="avatar-status badge-success" title="Online"></span>
             </Online>
-            <Offline>
+            <Offline polling={polling}>
               <span className="avatar-status badge-danger" title="Offline"></span>
             </Offline>
           </div>
@@ -269,7 +273,7 @@ console.log("Going to change online")
           <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem>
-          <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
+          <Online polling={polling}><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
           {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>

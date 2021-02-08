@@ -345,6 +345,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 const entityname = i18n.t('static.organisation.organisation');
 
@@ -770,11 +771,13 @@ export default class OrganisationListComponent extends Component {
     }.bind(this);
 
     addOrganisation() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.props.history.push(`/organisation/addOrganisation`);
         } else {
             alert("You must be Online.")
         }
+    }.bind(this))
     }
 
 }

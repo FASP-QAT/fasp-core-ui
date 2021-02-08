@@ -30,6 +30,7 @@ import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
 import MultiSelect from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
+import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -587,7 +588,8 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   getPrograms = () => {
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -666,7 +668,7 @@ export default class StockStatusMatrix extends React.Component {
       this.setState({ loading: false })
       this.consolidatedProgramList()
     }
-
+  }.bind(this))
   }
   consolidatedProgramList = () => {
     const lan = 'en';
@@ -754,7 +756,8 @@ export default class StockStatusMatrix extends React.Component {
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+          if(found){
           this.setState({
             versions: []
           }, () => {
@@ -771,6 +774,7 @@ export default class StockStatusMatrix extends React.Component {
             versions: []
           }, () => { this.consolidatedVersionList(programId) })
         }
+      }.bind(this))
       } else {
 
         this.setState({

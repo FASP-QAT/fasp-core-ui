@@ -30,6 +30,7 @@ import {
 import ReportService from '../../api/ReportService';
 
 import MultiSelect from 'react-multi-select-component';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -365,7 +366,8 @@ class AnnualShipmentCost extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -401,7 +403,7 @@ class AnnualShipmentCost extends Component {
             console.log('offline')
             this.consolidatedProgramList()
         }
-
+    }.bind(this))
 
     }
     consolidatedProgramList = () => {
@@ -872,7 +874,8 @@ class AnnualShipmentCost extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: [],
 
@@ -894,6 +897,7 @@ class AnnualShipmentCost extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({
@@ -1104,7 +1108,8 @@ class AnnualShipmentCost extends Component {
 
     getFundingSourceList() {
         const { fundingSources } = this.state
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -1171,11 +1176,12 @@ class AnnualShipmentCost extends Component {
 
 
         }
-
+    }.bind(this))
     }
     getProcurementAgentList() {
         const { procurementAgents } = this.state
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
 
             ProcurementAgentService.getProcurementAgentListAll()
@@ -1241,10 +1247,12 @@ class AnnualShipmentCost extends Component {
             }.bind(this)
 
         }
+    }.bind(this))
     }
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
@@ -1303,6 +1311,7 @@ class AnnualShipmentCost extends Component {
 
 
         }
+    }.bind(this))
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {

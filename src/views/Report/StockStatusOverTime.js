@@ -28,6 +28,7 @@ import {
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const options = {
     title: {
@@ -332,7 +333,8 @@ class StockStatusOverTime extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -411,7 +413,7 @@ class StockStatusOverTime extends Component {
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
-
+    }.bind(this))
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -529,7 +531,8 @@ class StockStatusOverTime extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -557,6 +560,7 @@ class StockStatusOverTime extends Component {
                         this.consolidatedVersionList(programId)
                     })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({

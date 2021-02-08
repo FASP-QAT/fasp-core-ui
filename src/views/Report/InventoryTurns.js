@@ -29,6 +29,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 export const PSM_PROCUREMENT_AGENT_ID = 1
 export const CANCELLED_SHIPMENT_STATUS = 8
 
@@ -85,7 +86,8 @@ export default class InventoryTurns extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -165,7 +167,7 @@ export default class InventoryTurns extends Component {
             this.setState({ loading: false })
             this.consolidatedProgramList()
         }
-
+    }.bind(this))
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -257,7 +259,8 @@ export default class InventoryTurns extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         costOfInventoryInput,
                         versions: []
@@ -277,6 +280,7 @@ export default class InventoryTurns extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({

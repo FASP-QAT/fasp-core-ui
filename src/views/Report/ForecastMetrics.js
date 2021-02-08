@@ -61,7 +61,7 @@ import MultiSelect from "react-multi-select-component";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -754,7 +754,8 @@ class ForecastMetrics extends Component {
   }
 
   getCountrys() {
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
       RealmCountryService.getRealmCountryForProgram(realmId)
@@ -881,7 +882,7 @@ class ForecastMetrics extends Component {
       }
 
     }
-
+  }.bind(this))
 
   }
   getPlanningUnit() {

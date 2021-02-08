@@ -250,6 +250,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import i18n from '../../i18n';
 import moment from 'moment';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const entityname = i18n.t('static.dimension.dimension');
 export default class DimensionListComponent extends Component {
 
@@ -492,12 +493,13 @@ export default class DimensionListComponent extends Component {
     }.bind(this);
 
     addNewDimension() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.props.history.push(`/diamension/addDiamension`)
         } else {
             alert("You must be Online.")
         }
-
+    }.bind(this))
     }
 
     formatLabel(cell, row) {

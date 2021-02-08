@@ -33,6 +33,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -583,7 +584,8 @@ class SupplierLeadTimes extends Component {
 
 
     getPrograms() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -662,6 +664,7 @@ class SupplierLeadTimes extends Component {
             this.setState({ loading: false })
             this.consolidatedProgramList()
         }
+    }.bind(this))
     }
 
     consolidatedProgramList = () => {
@@ -740,7 +743,8 @@ class SupplierLeadTimes extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -758,6 +762,7 @@ class SupplierLeadTimes extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({
@@ -832,7 +837,8 @@ class SupplierLeadTimes extends Component {
 
             }, () => {
                 // if (versionId.includes('Local')) {
-                if (!navigator.onLine) {
+                    isSiteOnline(function (found) {
+                        if(!found){
                     const lan = 'en';
                     var db1;
                     var storeOS;
@@ -959,6 +965,7 @@ class SupplierLeadTimes extends Component {
                     //     }
                     // );
                 }
+            }.bind(this))
             });
         } else {
             this.setState({
@@ -973,7 +980,8 @@ class SupplierLeadTimes extends Component {
     }
 
     getProcurementAgent = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
@@ -1055,7 +1063,7 @@ class SupplierLeadTimes extends Component {
             this.setState({ loading: false })
             this.consolidatedProcurementAgentList()
         }
-
+    }.bind(this))
     }
 
     consolidatedProcurementAgentList = () => {
@@ -1123,7 +1131,8 @@ class SupplierLeadTimes extends Component {
 
 
         if (programId > 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgenttValues.length > 0) {
-            if (navigator.onLine) {
+            isSiteOnline(function (found) {
+                if(found){
                 this.setState({ loading: true })
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),
@@ -1494,7 +1503,7 @@ class SupplierLeadTimes extends Component {
                     }.bind(this)
                 }.bind(this)
             }
-
+        }.bind(this))
         } else if (programId == 0) {
             console.log("inside destroy");
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] },

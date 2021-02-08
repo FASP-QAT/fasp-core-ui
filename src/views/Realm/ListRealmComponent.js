@@ -302,6 +302,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.realm.realm');
 export default class ReactListComponent extends Component {
@@ -565,11 +566,13 @@ export default class ReactListComponent extends Component {
     }
 
     addNewRealm() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.props.history.push(`/realm/addRealm`)
         } else {
             alert("You must be Online.")
         }
+    }.bind(this))
 
     }
     RealmCountry(event, row) {

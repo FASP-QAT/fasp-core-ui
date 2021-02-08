@@ -24,7 +24,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -41,6 +41,7 @@ import { Online, Offline } from "react-detect-offline";
 import MultiSelect from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Multiselect } from 'multiselect-react-dropdown';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 const ref = React.createRef();
 
@@ -272,7 +273,8 @@ class ShipmentGlobalDemandView extends Component {
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
@@ -308,7 +310,7 @@ class ShipmentGlobalDemandView extends Component {
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         }
-
+    }.bind(this))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -425,7 +427,8 @@ class ShipmentGlobalDemandView extends Component {
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
         var len = 120
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
 
             var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
@@ -452,12 +455,15 @@ class ShipmentGlobalDemandView extends Component {
             var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
 
         }
+    }.bind(this))
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
 
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
-        let y = navigator.onLine ? len : 150
+        isSiteOnline(function (found) {
+        let y = 
+            found==true ? len : 150
         console.log(doc.internal.pageSize.height)
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
@@ -496,6 +502,7 @@ class ShipmentGlobalDemandView extends Component {
             y = y + 10;
             console.log(y)
         }
+    
         doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
             align: 'left'
         })
@@ -571,11 +578,13 @@ class ShipmentGlobalDemandView extends Component {
           doc.setFontSize(20);
           doc.text(15, 15, "Cool Chart");
           doc.save('canvas.pdf');*/
+        }.bind(this))
     }
 
 
     fetchData = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
@@ -1036,13 +1045,14 @@ class ShipmentGlobalDemandView extends Component {
 
 
         }
-
+    }.bind(this))
 
     }
 
     componentDidMount() {
 
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.getCountrys();
             this.getPrograms();
             //this.getRelamList();
@@ -1056,7 +1066,7 @@ class ShipmentGlobalDemandView extends Component {
             this.getShipmentStatusList();
 
         }
-
+    }.bind(this))
     }
     getCountrys = () => {
 
@@ -1267,7 +1277,8 @@ class ShipmentGlobalDemandView extends Component {
 
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
@@ -1367,10 +1378,12 @@ class ShipmentGlobalDemandView extends Component {
 
             }.bind(this)
         }
+    }.bind(this))
     }
 
     getFundingSource = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -1449,7 +1462,7 @@ class ShipmentGlobalDemandView extends Component {
             console.log('offline')
             this.consolidatedFundingSourceList()
         }
-
+    }.bind(this))
     }
 
     consolidatedFundingSourceList = () => {
@@ -1510,7 +1523,8 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -1571,6 +1585,7 @@ class ShipmentGlobalDemandView extends Component {
             console.log('offline')
             this.consolidatedProgramList()
         }
+    }.bind(this))
     }
 
     consolidatedProgramList = () => {
@@ -1626,7 +1641,8 @@ class ShipmentGlobalDemandView extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             // console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: []
                     }, () => {
@@ -1643,6 +1659,7 @@ class ShipmentGlobalDemandView extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({
@@ -1790,7 +1807,8 @@ class ShipmentGlobalDemandView extends Component {
             planningUnits: [],
             planningUnitValues: []
         }, () => {
-            if (!navigator.onLine) {
+            isSiteOnline(function (found) {
+                if(!found){
                 let programId = document.getElementById("programId").value;
                 let versionId = document.getElementById("versionId").value;
                 const lan = 'en';
@@ -1955,6 +1973,7 @@ class ShipmentGlobalDemandView extends Component {
                 })
 
             }
+        }.bind(this))
         });
 
     }
@@ -2331,7 +2350,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </FormGroup>
                                         </Online> */}
-                                        <Offline>
+                                        <Offline polling={polling}>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
@@ -2359,7 +2378,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </FormGroup>
                                         </Offline>
-                                        <Offline>
+                                        <Offline polling={polling}>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">

@@ -529,6 +529,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -1218,11 +1219,13 @@ export default class ForecastingUnitListComponent extends Component {
 
     addNewForecastingUnit() {
 
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.props.history.push(`/forecastingUnit/addForecastingUnit`)
         } else {
             alert(i18n.t('static.common.online'))
         }
+    }.bind(this))
     }
     render() {
         const { realms } = this.state;

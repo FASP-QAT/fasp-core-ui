@@ -53,6 +53,7 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 
@@ -668,7 +669,8 @@ class StockStatus extends Component {
   }
 
   getPrograms = () => {
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -749,7 +751,7 @@ class StockStatus extends Component {
       this.setState({ loading: false })
       this.consolidatedProgramList()
     }
-
+  }.bind(this))
   }
   consolidatedProgramList = () => {
     const lan = 'en';
@@ -851,7 +853,8 @@ class StockStatus extends Component {
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+          if(found){
           this.setState({
             versions: []
           }, () => {
@@ -868,6 +871,7 @@ class StockStatus extends Component {
             versions: []
           }, () => { this.consolidatedVersionList(programId) })
         }
+      }.bind(this))
       } else {
 
         this.setState({

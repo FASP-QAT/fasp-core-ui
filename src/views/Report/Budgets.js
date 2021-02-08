@@ -33,6 +33,7 @@ import csvicon from '../../assets/img/csv.png';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const entityname = i18n.t('static.dashboard.budget');
 const pickerLang = {
@@ -179,7 +180,8 @@ class Budgets extends Component {
     }
 
     getFundingSource = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -216,7 +218,7 @@ class Budgets extends Component {
             this.consolidatedFundingSourceList()
             this.setState({ loading: false })
         }
-
+    }.bind(this))
     }
 
     consolidatedFundingSourceList = () => {
@@ -645,7 +647,8 @@ class Budgets extends Component {
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -725,7 +728,7 @@ class Budgets extends Component {
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
-
+    }.bind(this))
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -818,7 +821,8 @@ class Budgets extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: []
                     }, () => {
@@ -835,6 +839,7 @@ class Budgets extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({

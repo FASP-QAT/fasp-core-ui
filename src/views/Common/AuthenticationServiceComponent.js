@@ -6,6 +6,7 @@ import axios from 'axios'
 import LogoutService from "../../api/LogoutService";
 import moment from 'moment';
 import i18n from '../../i18n'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 export default class AuthenticationServiceComponent extends Component {
     constructor(props) {
@@ -34,9 +35,10 @@ export default class AuthenticationServiceComponent extends Component {
         console.log("Common component component did mount called-------------");
         var result = AuthenticationService.validateRequest();
         console.log("result----" + result);
+        isSiteOnline(function (found) {
         if (result != "") {
             this.props.history.push(result)
-        } else if (navigator.onLine) {
+        } else if (found) {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
             let basicAuthHeader = 'Bearer ' + decryptedToken
@@ -110,7 +112,7 @@ export default class AuthenticationServiceComponent extends Component {
             //     }
             // });
         }
-
+    }.bind(this))
     }
     render() {
         return (

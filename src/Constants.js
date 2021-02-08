@@ -119,3 +119,5 @@ export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = "5e95b3262b755a0c091b38a1"
 export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = "5f1af96c4be9da001d844be3"
 export const JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST = "Change Request"
 export const JEXCEL_PIPELINE_CONVERSION_FACTOR = /^\d{0,10}(\.\d{1,6})?$/
+export const polling = {url: API_URL}
+export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"

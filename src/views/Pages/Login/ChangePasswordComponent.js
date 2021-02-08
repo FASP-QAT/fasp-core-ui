@@ -14,6 +14,7 @@ import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 
 
 
@@ -161,7 +162,8 @@ loading:false
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    if (navigator.onLine) {
+                                    isSiteOnline(function (found) {
+                                        if(found){
                                         // AuthenticationService.setupAxiosInterceptors();
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
@@ -221,6 +223,7 @@ loading:false
                                                 this.hideFirstComponent();
                                             });
                                     }
+                                }.bind(this))
                                 }}
                                 render={
                                     ({

@@ -14,6 +14,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService"
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 
 class DeleteLocalProgramComponent extends Component {
@@ -38,17 +39,17 @@ class DeleteLocalProgramComponent extends Component {
 
   }
   checkNewerVersions(programs) {
-    if (navigator.onLine) {
       console.log("T***going to call check newer versions")
-      if (navigator.onLine) {
+      isSiteOnline(function (found) {
+        if(found){
         AuthenticationService.setupAxiosInterceptors()
         ProgramService.checkNewerVersions(programs)
           .then(response => {
             localStorage.removeItem("sesLatestProgram");
             localStorage.setItem("sesLatestProgram", response.data);
           })
-      }
     }
+  }.bind(this))
   }
 
   confirmDeleteLocalProgram = () => {

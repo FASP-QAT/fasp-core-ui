@@ -402,6 +402,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ProductService from '../../api/ProductService';
 import moment from 'moment';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -984,12 +985,13 @@ export default class PlanningUnitListComponent extends Component {
 
     addNewPlanningUnit() {
 
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.props.history.push(`/planningUnit/addPlanningUnit`)
         } else {
             alert(i18n.t('static.common.online'))
         }
-
+    }.bind(this))
     }
 
     formatLabel(cell, row) {

@@ -10,6 +10,7 @@ import pr from '../src/assets/img/locales/pr.json';
 import sp from '../src/assets/img/locales/sp.json';
 
 import { initReactI18next } from 'react-i18next';
+import { isSiteOnline } from './CommonComponent/JavascriptCommonFunctions.js';
 //import moment from 'moment';
 var lang = localStorage.getItem('lang');
 if (lang == null) {
@@ -17,16 +18,19 @@ if (lang == null) {
   localStorage.setItem('lang', lang);
 
 }
+isSiteOnline(function (found) {
 i18n
   .use(LanguageDetector)
   .use(Backend)
   .use(initReactI18next)
   .init({
+    
     lng: lang,
     backend: {
       /* translation file path */
       // loadPath: '/locales/{{lng}}.json',
-      loadPath: navigator.onLine ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
+      loadPath: 
+        found ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
       crossDomain: true
     },
     fallbackLng: 'en',
@@ -43,12 +47,13 @@ i18n
       wait: true
     }, debug: true,
     useSuspense: true,
-    wait:          true,
+    wait: true,
   }, (err, t) => {
     if (err) return console.log('something went wrong loading', err);
     t('key'); // -> same as i18next.t
   }
   )
+}.bind(this))
 i18n.loadNamespaces('translations', (err, t) => { console.log('something went wrong loading', err); /* ... */ });
 i18n.on('languageChanged initialized', () => {
   if (!i18n.isInitialized) return;

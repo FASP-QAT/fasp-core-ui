@@ -39,6 +39,8 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import AuthenticationService from '../Common/AuthenticationService';
 import i18n from '../../i18n'
+import { polling } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -213,7 +215,8 @@ class RealmDashboard extends Component {
   }
 
   componentDidMount() {
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       DashboardService.realmLevelDashboard(this.state.realmId)
         .then(response => {
           console.log("dashboard response===", response);
@@ -307,6 +310,7 @@ class RealmDashboard extends Component {
           }
         );
     }
+  }.bind(this))
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
@@ -338,7 +342,7 @@ class RealmDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <Online>
+        <Online polling={polling}>
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">

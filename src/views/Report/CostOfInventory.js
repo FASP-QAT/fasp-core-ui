@@ -30,6 +30,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.dashboard.costOfInventory');
@@ -81,7 +82,8 @@ export default class CostOfInventory extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             //let realmId = AuthenticationService.getRealmId();
             ProgramService.getProgramList()
@@ -162,7 +164,7 @@ export default class CostOfInventory extends Component {
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
-
+    }.bind(this))
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -256,7 +258,8 @@ export default class CostOfInventory extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         costOfInventoryInput,
                         versions: []
@@ -276,6 +279,7 @@ export default class CostOfInventory extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({

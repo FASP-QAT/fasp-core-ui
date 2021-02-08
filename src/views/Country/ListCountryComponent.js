@@ -335,6 +335,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import i18n from '../../i18n';
 import { boolean } from 'yup';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 
 
@@ -403,12 +404,13 @@ export default class CountryListComponent extends Component {
 
 
     addNewCountry() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             this.props.history.push(`/country/addCountry`)
         } else {
             alert("You must be Online.")
         }
-
+        }.bind(this))
     }
     editCountry(country) {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {

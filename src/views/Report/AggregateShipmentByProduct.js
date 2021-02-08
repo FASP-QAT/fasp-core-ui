@@ -27,7 +27,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -38,6 +38,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -533,7 +534,8 @@ class AggregateShipmentByProduct extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -612,6 +614,7 @@ class AggregateShipmentByProduct extends Component {
             console.log('offline')
             this.consolidatedProgramList()
         }
+    }.bind(this))
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -672,7 +675,8 @@ class AggregateShipmentByProduct extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: []
                     }, () => {
@@ -689,6 +693,7 @@ class AggregateShipmentByProduct extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({
@@ -1196,7 +1201,8 @@ class AggregateShipmentByProduct extends Component {
         console.log("planningUnits---", planningUnits);
 
         let bar = "";
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             bar = {
 
                 labels: this.state.consumptions.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
@@ -1233,7 +1239,9 @@ class AggregateShipmentByProduct extends Component {
 
             }
         }
-        if (!navigator.onLine) {
+    }.bind(this))
+        isSiteOnline(function (found) {
+            if(!found){
             bar = {
 
                 labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.consumption_date, 'MM-YYYY').format('MMM YYYY'))),
@@ -1266,6 +1274,7 @@ class AggregateShipmentByProduct extends Component {
 
             }
         }
+    }.bind(this))
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
@@ -1584,7 +1593,7 @@ class AggregateShipmentByProduct extends Component {
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <Online>
+                                        <Online polling={polling}>
                                             {/* {
                                                 this.state.consumptions.length > 0
                                                 && */}
@@ -1610,7 +1619,7 @@ class AggregateShipmentByProduct extends Component {
 
 
                                         </Online>
-                                        <Offline>
+                                        <Offline polling={polling}>
                                             {/* {
                                                 this.state.offlineConsumptionList.length > 0
                                                 &&

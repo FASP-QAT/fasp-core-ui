@@ -11,6 +11,7 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
+import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 
 const initialValues = {
     emailId: ""
@@ -120,7 +121,8 @@ class ForgotPasswordComponent extends Component {
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            if (navigator.onLine) {
+                                            isSiteOnline(function (found) {
+                                                if(found){
                                                 UserService.forgotPassword(values.emailId)
                                                     .then(response => {
                                                         if (response.status == 200) {
@@ -170,6 +172,7 @@ class ForgotPasswordComponent extends Component {
                                                         this.hideMessage();
                                                     })
                                             }
+                                        }.bind(this))
                                         }}
                                         render={
                                             ({

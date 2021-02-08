@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -29,6 +29,7 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService';
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -72,7 +73,8 @@ class FunderExport extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -151,7 +153,7 @@ class FunderExport extends Component {
             console.log('offline')
             this.consolidatedProgramList()
         }
-
+    }.bind(this))
     }
     consolidatedProgramList = () => {
         const lan = 'en';
@@ -210,7 +212,8 @@ class FunderExport extends Component {
     }
 
     getFundingSource = () => {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -289,7 +292,7 @@ class FunderExport extends Component {
             console.log('offline')
             this.consolidatedFundingSourceList()
         }
-
+    }.bind(this))
     }
 
     consolidatedFundingSourceList = () => {
@@ -347,7 +350,8 @@ class FunderExport extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                isSiteOnline(function (found) {
+                    if(found){
                     this.setState({
                         versions: []
                     }, () => {
@@ -364,6 +368,7 @@ class FunderExport extends Component {
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
+            }.bind(this))
             } else {
 
                 this.setState({
@@ -1157,7 +1162,7 @@ class FunderExport extends Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                         </div> */}
-                        <Online>
+                        <Online polling={polling}>
                             {
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
@@ -1168,7 +1173,7 @@ class FunderExport extends Component {
                                 </div>
                             }
                         </Online>
-                        <Offline>
+                        <Offline polling={polling}>
                             {
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">

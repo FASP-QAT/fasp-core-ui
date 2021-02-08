@@ -13,6 +13,7 @@ import CryptoJS from 'crypto-js';
 import ProgramService from '../api/ProgramService';
 
 import React, { Component } from "react";
+import { isSiteOnline } from "./JavascriptCommonFunctions";
 // import openProblem from '../CommonComponent/openProblem.js';
 
 export default class GetLatestProgramVersion extends Component {
@@ -28,14 +29,16 @@ export default class GetLatestProgramVersion extends Component {
 
     checkNewerVersions() {
         console.log("T***going to call check newer versions")
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+            if(found){
             AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(this.state.programs)
                 .then(response => {
                     localStorage.removeItem("sesLatestProgram");
                     localStorage.setItem("sesLatestProgram", response.data);
                 })
-        }
+            }
+        })
     }
     componentDidMount() {
 

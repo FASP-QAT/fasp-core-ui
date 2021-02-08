@@ -53,6 +53,7 @@ import RealmCountryService from '../../api/RealmCountryService';
 import ReportService from '../../api/ReportService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -334,7 +335,8 @@ class ForcastMatrixOverTime extends Component {
       doc.save('canvas.pdf');*/
   }
   getPrograms = () => {
-    if (navigator.onLine) {
+    isSiteOnline(function (found) {
+      if(found){
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -414,7 +416,7 @@ class ForcastMatrixOverTime extends Component {
       this.consolidatedProgramList()
       this.setState({ loading: false })
     }
-
+  }.bind(this))
   }
   consolidatedProgramList = () => {
     const lan = 'en';
@@ -501,7 +503,8 @@ class ForcastMatrixOverTime extends Component {
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        isSiteOnline(function (found) {
+          if(found){
           this.setState({
             versions: [],
             planningUnits: []
@@ -520,6 +523,7 @@ class ForcastMatrixOverTime extends Component {
             planningUnits: []
           }, () => { this.consolidatedVersionList(programId) })
         }
+      }.bind(this))
       } else {
 
         this.setState({
