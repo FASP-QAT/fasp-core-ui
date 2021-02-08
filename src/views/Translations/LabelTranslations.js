@@ -24,7 +24,8 @@ export default class DatabaseTranslations extends React.Component {
             changedFlag: [],
             labelList: [],
             rowId: 1,
-            loading: true
+            loading: true,
+            color: ''
         }
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -32,6 +33,7 @@ export default class DatabaseTranslations extends React.Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -105,7 +107,9 @@ export default class DatabaseTranslations extends React.Component {
                 })
             } else {
                 this.setState({
-                    message: response.data.messageCode
+                    message: response.data.messageCode,
+                    loading: false,
+                    color: 'red'
                 },
                     () => {
                         this.hideSecondComponent();
@@ -116,7 +120,8 @@ export default class DatabaseTranslations extends React.Component {
                 if (error.message === "Network Error") {
                     this.setState({
                         message: 'static.unkownError',
-                        loading: false
+                        loading: false,
+                        color: 'red'
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
@@ -132,19 +137,22 @@ export default class DatabaseTranslations extends React.Component {
                         case 406:
                             this.setState({
                                 message: error.response.data.messageCode,
-                                loading: false
+                                loading: false,
+                                color: 'red'
                             });
                             break;
                         case 412:
                             this.setState({
                                 message: error.response.data.messageCode,
-                                loading: false
+                                loading: false,
+                                color: 'red'
                             });
                             break;
                         default:
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
+                                loading: false,
+                                color: 'red'
                             });
                             break;
                     }
@@ -182,10 +190,19 @@ export default class DatabaseTranslations extends React.Component {
             LabelsService.saveStaticLabels(json).then(response => {
                 if (response.status == 200) {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
-                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
+                    // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
+                    this.setState({
+                        message: i18n.t(response.data.messageCode),
+                        color: 'green'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.setState({
-                        message: response.data.messageCode
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: 'red'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -196,7 +213,8 @@ export default class DatabaseTranslations extends React.Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false
+                            loading: false,
+                            color: 'red'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -212,19 +230,22 @@ export default class DatabaseTranslations extends React.Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
+                                    loading: false,
+                                    color: 'red'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
+                                    loading: false,
+                                    color: 'red'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
+                                    loading: false,
+                                    color: 'red'
                                 });
                                 break;
                         }
@@ -240,7 +261,8 @@ export default class DatabaseTranslations extends React.Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
+                <h5 style={{ color: this.state.color }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col xs="12" sm="12">
                         <Card>
