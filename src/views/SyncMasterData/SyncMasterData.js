@@ -280,6 +280,9 @@ export default class SyncMasterData extends Component {
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
                                 console.log("D--------------------------->in 1")
+                                if(document.getElementById('div1')!=null){
+                                    document.getElementById('div1').style.display = 'none';
+                                  }
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 },
@@ -375,6 +378,9 @@ export default class SyncMasterData extends Component {
             })
         } else {
             console.log("D--------------------------->in 7")
+            if(document.getElementById('div1')!=null){
+                document.getElementById('div1').style.display = 'none';
+              }
             document.getElementById("retryButtonDiv").style.display = "block";
             this.setState({
                 message: 'static.common.onlinealerttext'
@@ -1077,6 +1083,9 @@ export default class SyncMasterData extends Component {
                                         }
                                     })
                             } else {
+                                if(document.getElementById('div1')!=null){
+                                    document.getElementById('div1').style.display = 'none';
+                                  }
                                 document.getElementById("retryButtonDiv").style.display = "block";
                                 this.setState({
                                     message: 'static.common.onlinealerttext'
@@ -1091,6 +1100,9 @@ export default class SyncMasterData extends Component {
                 }.bind(this)
             }.bind(this)
         } else {
+            if(document.getElementById('div1')!=null){
+                document.getElementById('div1').style.display = 'none';
+              }
             this.setState({
                 message: 'static.common.onlinealerttext'
             },
