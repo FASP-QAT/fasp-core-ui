@@ -15,7 +15,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
@@ -180,6 +180,7 @@ export default class SyncMasterData extends Component {
                             var programJson = JSON.parse(programData);
                             var shipmentDataList = (programJson.shipmentList);
                             var batchInfoList = (programJson.batchInfoList);
+                            var actionList = programJson.actionList;
                             var problemReportList = programJson.problemReportList;
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
@@ -260,8 +261,16 @@ export default class SyncMasterData extends Component {
                                     problemReportList[index].problemReportTransList = problemReportTransList;
                                 }
                             }
+                            for (var p = 0; p < planningUnitList.length; p++) {
+                                actionList.push({
+                                    planningUnitId: planningUnitList[p],
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
 
+                                })
+                            }
                             programJson.shipmentList = shipmentDataList;
+                            programJson.actionList = actionList;
                             programJson.batchInfoList = batchInfoList;
                             programJson.problemReportList = problemReportList;
                             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
