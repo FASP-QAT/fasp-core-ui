@@ -187,13 +187,17 @@ export default class DatabaseTranslations extends React.Component {
         if (JSON.stringify(this.el.getComments()).length == 2 || this.el.getComments() == null) {
             // AuthenticationService.setupAxiosInterceptors();
             var json = this.state.labelList;
+            this.setState({
+                loading: true
+            })
             LabelsService.saveStaticLabels(json).then(response => {
                 if (response.status == 200) {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
                     // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t(response.data.messageCode))
                     this.setState({
                         message: i18n.t(response.data.messageCode),
-                        color: 'green'
+                        color: 'green',
+                        loading: false
                     },
                         () => {
                             this.hideSecondComponent();
