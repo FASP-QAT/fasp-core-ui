@@ -81,12 +81,14 @@ const options = {
                 labelString: i18n.t('static.shipment.qty'),
                 fontColor: 'black',
                 fontStyle: "normal",
-                fontSize: "12"
+                fontSize: "12",
+                
             },
             ticks: {
                 beginAtZero: true,
                 fontColor: 'black',
                 callback: function (value) {
+                
                     var cell1 = value
                     cell1 += '';
                     var x = cell1.split('.');
@@ -97,7 +99,7 @@ const options = {
                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
                     }
                     return x1 + x2;
-
+                    
                 }
             },
             gridLines: {
@@ -107,7 +109,16 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: i18n.t('static.common.product')
+            labelString: i18n.t('static.common.product'),
+
+            ticks:{
+                callback: function (value) {
+                    var maxLabelLength = 20;
+                  if (value.length > maxLabelLength) return value.substr(0, maxLabelLength) + '...';
+                  else return value;
+                }
+                
+            }
         }],
     },
     tooltips: {
@@ -129,6 +140,7 @@ const options = {
                     x1 = x1.replace(rgx, '$1' + ',' + '$2');
                 }
                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                // return data.labels[tooltipItem.index] + ' : ' + x1 + x2;
             }
         }
     },
@@ -2165,11 +2177,14 @@ class ShipmentGlobalDemandView extends Component {
             // ]
 
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
+            // labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang)).length>20?(getLabelText(ele.planningUnit.label, this.state.lang)).substring(0, 20) + " ...":(getLabelText(ele.planningUnit.label, this.state.lang))))],
+            
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
                 backgroundColor: '#6a82a8',
-                borderWidth: 0
+                borderWidth: 0,
+               
 
             },
             {
@@ -2179,6 +2194,19 @@ class ShipmentGlobalDemandView extends Component {
                 borderWidth: 0,
             }
             ]
+            
+           
+    //     options: {
+    //         scales: {
+    //         xAxes: {
+    //             //labelAutoFit: true, //false by default.
+    //             //labelWrap: false, // true by default.
+    //             labelMaxWidth: 100,
+    //             prefix: "This is a very long label "
+    //         }
+    //     },
+    // }
+    
         };
         const chartDataForPie = {
             // labels: [...new Set(this.state.fundingSourceSplit.map(ele => (getLabelText(ele.fundingSource.label, this.state.lang))))],
