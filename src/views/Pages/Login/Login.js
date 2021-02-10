@@ -118,6 +118,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
+    console.log("@@@is site online",isSiteOnline())
     // console.log("############## Login component did mount #####################");
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();

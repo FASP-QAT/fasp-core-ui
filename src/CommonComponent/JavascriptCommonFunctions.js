@@ -1,4 +1,4 @@
-import { APPLICATION_STATUS_URL } from "../Constants";
+import { APPLICATION_STATUS_URL, API_URL } from "../Constants";
 
 export function paddingZero(string, padStr, len) {
   var str = string.toString();
@@ -52,27 +52,19 @@ export function contrast(colorHex, threshold = 128) {
   return rgbToYIQ(rgb) >= threshold ? '#000' : '#fff';
 }
 
-export function isSiteOnline(callback) {
+export function isSiteOnline() {
   let url = APPLICATION_STATUS_URL;
   let request = new XMLHttpRequest;
-  request.open('GET', url, true);
-  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-  request.setRequestHeader('Accept', '*/*');
-  request.onprogress = function (event) {
-    let status = event.target.status;
-    let statusFirstNumber = (status).toString()[0];
-    switch (statusFirstNumber) {
-      case '2':
-        request.abort();
-        return callback(true);
-      default:
-        request.abort();
-        return callback(false);
-    };
-  };
-  request.onerror = function (event) {
-    request.abort();
-    return callback(false);
+  request.open('GET', url, false);
+  try {
+    request.send('');
+    console.log("@@@request.status",request.status)
+    if (request.status === 200) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e) {
+    return false;
   }
-  request.send('');
 }

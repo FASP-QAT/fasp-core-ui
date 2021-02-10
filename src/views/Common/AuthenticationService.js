@@ -128,8 +128,7 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        isSiteOnline(function (found) {
-        if ((typeOfSession === 'Online' && found) || (typeOfSession === 'Offline' && !found)) {
+        if ((typeOfSession === 'Online' && isSiteOnline()) || (typeOfSession === 'Offline' && !isSiteOnline())) {
             return true;
         } else {
             return false;
@@ -137,7 +136,6 @@ class AuthenticationService {
 
 
         }
-    }.bind(this))
     }
 
     checkIfDifferentUserIsLoggedIn(newUsername) {
@@ -447,12 +445,10 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             console.log("cur user available");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            isSiteOnline(function (found) {
-            if (found && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+            if (isSiteOnline() && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
                 return true;
             }
-        }.bind(this))
             // console.log("going to check bf functions");
             var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
             // console.log("route bfunction--->", bfunction);
@@ -1203,8 +1199,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (this.checkTypeOfSession()) {
-                isSiteOnline(function (found) {
-                    if(found){
+                if (isSiteOnline()) {
                     if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                         // if (this.checkLastActionTaken()) {
                         //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -1227,7 +1222,6 @@ class AuthenticationService {
                 } else {
                     return "";
                 }
-            }.bind(this))
                 // else {
                 //     console.log("common component user is offline");
                 //     if (this.checkLastActionTaken()) {

@@ -18,7 +18,7 @@ if (lang == null) {
   localStorage.setItem('lang', lang);
 
 }
-isSiteOnline(function (found) {
+// isSiteOnline(function (found) {
 i18n
   .use(LanguageDetector)
   .use(Backend)
@@ -30,7 +30,7 @@ i18n
       /* translation file path */
       // loadPath: '/locales/{{lng}}.json',
       loadPath: 
-        found ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
+        navigator.onLine ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
       crossDomain: true
     },
     fallbackLng: 'en',
@@ -53,7 +53,7 @@ i18n
     t('key'); // -> same as i18next.t
   }
   )
-}.bind(this))
+// }.bind(this))
 i18n.loadNamespaces('translations', (err, t) => { console.log('something went wrong loading', err); /* ... */ });
 i18n.on('languageChanged initialized', () => {
   if (!i18n.isInitialized) return;
