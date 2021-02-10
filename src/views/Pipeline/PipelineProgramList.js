@@ -245,6 +245,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 
 const entityname = i18n.t('static.dashboard.pipelineProgramImport');
@@ -455,7 +456,7 @@ export default class PipelineProgramList extends Component {
 
     importNewProgram() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/pipeline/pipelineProgramImport`)
         } else {
             alert("You must be Online.")

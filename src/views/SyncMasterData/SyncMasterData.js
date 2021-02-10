@@ -22,6 +22,7 @@ import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncMasterData extends Component {
@@ -173,7 +174,7 @@ export default class SyncMasterData extends Component {
         for (var i = 0; i < programList.length; i++) {
             AuthenticationService.setupAxiosInterceptors();
             // this.refs.problemListChild.qatProblemActions(programList[i].id);
-            if (navigator.onLine) {
+            if (isSiteOnline) {
                 //Code to Sync Country list
                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
                     .then(response => {
@@ -396,7 +397,7 @@ export default class SyncMasterData extends Component {
 
     syncMasters() {
         this.setState({ loading: false })
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             var db1;
             var storeOS;
             getDatabase();
@@ -463,7 +464,7 @@ export default class SyncMasterData extends Component {
                         console.log("Validation", validation);
                         if (validation) {
                             AuthenticationService.setupAxiosInterceptors();
-                            if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                            if (isSiteOnline() && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
 
 
                                 MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)

@@ -15,7 +15,7 @@ import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
 import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
 import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
 import iconsDownarrowRed from '../../assets/img/icons-downarrow-red.png';
-import { API_URL } from '../../Constants';
+import { API_URL, polling } from '../../Constants';
 
 const propTypes = {
   children: PropTypes.node,
@@ -97,7 +97,7 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          <Online>
+          <Online polling={polling}>
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&

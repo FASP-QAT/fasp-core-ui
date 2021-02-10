@@ -9,7 +9,7 @@ import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { DATE_FORMAT_CAP, QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../Constants.js';
+import { DATE_FORMAT_CAP, QAT_HELPDESK_CUSTOMER_PORTAL_URL, polling } from '../../Constants.js';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { Online, Offline } from "react-detect-offline";
@@ -55,6 +55,7 @@ import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 import imageHelp from '../../assets/img/help-icon.png';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -294,7 +295,7 @@ class ApplicationDashboard extends Component {
   }
   checkNewerVersions(programs) {
     console.log("T***going to call check newer versions dashboard---", programs)
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
@@ -370,7 +371,7 @@ class ApplicationDashboard extends Component {
   }
 
   componentDidMount() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
           .then(response => {
@@ -859,7 +860,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        <Online>
+        <Online polling={polling}>
           {this.state.id == 1 &&
             <Row className="mt-2">
 

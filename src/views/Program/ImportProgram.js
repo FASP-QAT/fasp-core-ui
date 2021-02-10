@@ -25,6 +25,7 @@ import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import ProgramService from "../../api/ProgramService"
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const initialValues = {
     programId: ''
@@ -149,7 +150,7 @@ export default class ImportProgram extends Component {
     }
     checkNewerVersions(programs) {
         console.log("T***going to call check newer versions import program---", programs)
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
                 .then(response => {

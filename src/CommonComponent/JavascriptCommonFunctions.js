@@ -1,3 +1,5 @@
+import { APPLICATION_STATUS_URL } from "../Constants";
+
 export function paddingZero(string, padStr, len) {
     var str = string.toString();
     console.log("str.length", str.length)
@@ -48,4 +50,21 @@ function rgbToYIQ({r, g, b}) {
     }
 
     return rgbToYIQ(rgb) >= threshold ? '#000' : '#fff';
+  }
+
+  export function isSiteOnline() {
+    let url = APPLICATION_STATUS_URL;
+    let request = new XMLHttpRequest;
+    request.open('GET', url, false);
+    try {
+      request.send('');
+      console.log("@@@request.status",request.status)
+      if (request.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }

@@ -9,6 +9,7 @@ import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
+import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 
 
 const validationSchema = function (values) {
@@ -182,7 +183,7 @@ class ResetPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             console.log("Reset password on submit called 1---", values)
-                                            if (navigator.onLine) {
+                                            if (isSiteOnline()) {
                                                 console.log("Reset password on submit email id---", this.state.emailId)
                                                 console.log("Reset password on submit token---", this.state.token)
                                                 console.log("Reset password on submit newPassword---", values.newPassword)
