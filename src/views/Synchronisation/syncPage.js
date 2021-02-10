@@ -76,7 +76,7 @@ export default class syncPage extends Component {
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.fetchData = this.fetchData.bind(this)
     this.versionTypeChanged = this.versionTypeChanged.bind(this);
-
+    this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
     // this.checkValidations = this.checkValidations.bind(this);
   }
 
@@ -271,6 +271,10 @@ export default class syncPage extends Component {
     }
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     consumptionInstance.orderBy(18, 0);
     consumptionInstance.options.editable = false;
@@ -312,6 +316,10 @@ export default class syncPage extends Component {
     consumptionInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLarge('', '', 0, '');
     this.setState({ loading: false })
@@ -444,6 +452,10 @@ export default class syncPage extends Component {
     inventoryInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLargeInventory('', '', 0, '');
     this.setState({ loading: false })
@@ -483,6 +495,10 @@ export default class syncPage extends Component {
     inventoryInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLargeInventory('', '', 0, '');
     this.setState({ loading: false })
@@ -744,6 +760,10 @@ export default class syncPage extends Component {
     shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLargeShipment('', '', 0, '');
     this.setState({ loading: false })
@@ -783,6 +803,10 @@ export default class syncPage extends Component {
     shipmentInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLargeShipment('', '', 0, '');
     this.setState({ loading: false })
@@ -834,6 +858,10 @@ export default class syncPage extends Component {
     problemInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLargeProblem('', '', 0, '');
     this.setState({ loading: false })
@@ -863,9 +891,100 @@ export default class syncPage extends Component {
     problemInstance.options.editable = false;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1
+    }, () => {
+      if (this.state.conflictsCount == 0) {
+        this.generateDataAfterResolveConflictsForQPL();
+      }
     })
     this.toggleLargeProblem('', '', 0, '');
     this.setState({ loading: false })
+  }
+
+  generateDataAfterResolveConflictsForQPL() {
+    var db1;
+    var storeOS;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        supplyPlanError: i18n.t('static.program.errortext')
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+      var programDataOs = programDataTransaction.objectStore('programData');
+      var programRequest = programDataOs.get((this.state.programId).value);
+      programRequest.onerror = function (event) {
+        this.setState({
+          supplyPlanError: i18n.t('static.program.errortext')
+        })
+      }.bind(this);
+      programRequest.onsuccess = function (e) {
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        var programJson = JSON.parse(programData);
+        var planningUnitList = [];
+        var consumptionData = [];
+        var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+        var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+        var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+        for (var c = 0; c < consumptionJson.length; c++) {
+          if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+            consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+          } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+            consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+          }
+        }
+        consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+
+        var inventoryData = [];
+        var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+        var oldProgramDataInventory = this.state.oldProgramDataInventory;
+        var latestProgramDataInventory = this.state.latestProgramDataInventory;
+        for (var c = 0; c < inventoryJson.length; c++) {
+          if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+            inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+          } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+            inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+          }
+        }
+        inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+
+        var shipmentData = [];
+        var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+        var oldProgramDataShipment = this.state.oldProgramDataShipment;
+        var latestProgramDataShipment = this.state.latestProgramDataShipment;
+        for (var c = 0; c < shipmentJson.length; c++) {
+          if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+            shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+          } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+            shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+          }
+        }
+        shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+
+        programJson.consumptionList = consumptionData;
+        programJson.inventoryList = inventoryData;
+        programJson.shipmentList = shipmentData;
+        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+
+        var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+        var programOs = programTransaction.objectStore('whatIfProgramData');
+
+        var putRequest = programOs.put(programRequest.result);
+
+        putRequest.onerror = function (event) {
+          this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+          this.props.updateState("color", "red");
+          this.props.hideFirstComponent();
+        }.bind(this);
+        putRequest.onsuccess = function (event) {
+          this.refs.problemListChild.qatProblemActions((this.state.programId).value);
+        }.bind(this);
+      }.bind(this);
+    }.bind(this);
   }
 
   componentDidMount() {
@@ -1803,7 +1922,9 @@ export default class syncPage extends Component {
                                         downloadedProgramData: downloadedProgramData,
                                       }, () => {
                                         // Problem list
-                                        this.refs.problemListChild.qatProblemActions((this.state.programId).value);
+                                        if (this.state.conflictsCount == 0) {
+                                          this.generateDataAfterResolveConflictsForQPL();
+                                        }
                                       })
                                     }.bind(this)
                                   }.bind(this)
@@ -2386,7 +2507,7 @@ export default class syncPage extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" />
+        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="whatIfProgramData" />
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2919,8 +3040,8 @@ export default class syncPage extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-      var programDataOs = programDataTransaction.objectStore('programData');
+      var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+      var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
       var value = (this.state.programId);
       var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
       programRequest.onerror = function (event) {
@@ -3154,7 +3275,7 @@ export default class syncPage extends Component {
           oldProgramDataProblemList: oldProgramDataProblemList,
           latestProgramDataProblemList: latestProgramDataProblemList,
           mergedProblemListData: mergedProblemListData,
-          loading:false
+          loading: false
         })
       }.bind(this)
     }.bind(this)
