@@ -1453,10 +1453,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     budgetDropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[12];
-        var receiveDate = (instance.jexcel.getJson(null, false)[r])[4];
         if (value != "") {
             var budgetList = this.state.budgetListAll;
-            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true" && moment(b.startDate).format("YYYY-MM-DD") <= moment(receiveDate).format("YYYY-MM-DD") && moment(b.stopDate).format("YYYY-MM-DD") >= moment(receiveDate).format("YYYY-MM-DD"));
+            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true");
             mylist.push({ id: '', name: i18n.t('static.common.select') })
         }
         return mylist.sort(function (a, b) {
@@ -1799,7 +1798,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 var budgetList = this.state.budgetListAll;
                 var receiveDate = rowData[4]
-                var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true" && moment(b.startDate).format("YYYY-MM-DD") <= moment(receiveDate).format("YYYY-MM-DD") && moment(b.stopDate).format("YYYY-MM-DD") >= moment(receiveDate).format("YYYY-MM-DD"));
+                var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true");
                 if (mylist.length == 1) {
                     elInstance.setValueFromCoords(13, y, mylist[0].id, true);
                 } else if (mylist.length == 0) {
