@@ -796,7 +796,7 @@ export default class QatProblemActions extends Component {
                                                                 // console.log("monthWithNoForecastedConsumption+++",monthWithNoForecastedConsumption);
 
 
-                                                                if (filteredConsumptionListTwo.length != 18) {
+                                                                if (filteredConsumptionListTwo.length < 18) {
                                                                     if (index == -1) {
                                                                         var json = {
                                                                             problemReportId: 0,
