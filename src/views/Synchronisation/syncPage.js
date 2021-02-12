@@ -23,6 +23,7 @@ import getSuggestion from '../../CommonComponent/getSuggestion';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 
 const entityname = i18n.t('static.dashboard.commitVersion')
 
@@ -2380,7 +2381,8 @@ export default class syncPage extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" />
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
+        {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" /> */}
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2941,26 +2943,37 @@ export default class syncPage extends Component {
           } else {
             // If 0 check whether that exists in latest version or not
             var index = 0;
-            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 21 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 22) {
+            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15) {
               index = latestProgramDataProblemList.findIndex(
-                f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
-                  && f.region.id == oldProgramDataProblemList[c].region.id
+                f =>
+                  // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
+                  f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
               index = -1;
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 3 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 4 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 5 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 6 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 7) {
               index = latestProgramDataProblemList.findIndex(
-                f => f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
-                  && oldProgramDataProblemList[c].newAdded != true
+                f =>
+                  // f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id &&
+                  f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
+                  // && oldProgramDataProblemList[c].newAdded != true
                   && f.shipmentId == oldProgramDataProblemList[c].shipmentId);
-            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
+            } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 23 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 24) {
               index = latestProgramDataProblemList.findIndex(
-                f => moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
-                  && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+                f =>
+                  f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+
             }
+            // else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
+            //   index = latestProgramDataProblemList.findIndex(
+            //     f => 
+            //       moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
+            //       && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
+            //       && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+            // }
+            console.log("Index-------------->", index);
             // var index = -1;
             if (index == -1) {
               mergedProblemListData.push(oldProgramDataProblemList[c]);
