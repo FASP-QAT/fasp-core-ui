@@ -455,8 +455,15 @@ export default class ShipmentDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            this.setState({
+                shipmentChangedFlag:0,
+                shipmentBatchInfoChangedFlag:0,
+                shipmentQtyChangedFlag:0,
+                shipmentDatesChangedFlag:0
+            },()=>{
+                let id = AuthenticationService.displayDashboardBasedOnRole();
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })            
         }
     }
 
