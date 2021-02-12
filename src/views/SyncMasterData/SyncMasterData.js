@@ -39,11 +39,19 @@ export default class SyncMasterData extends Component {
         this.retryClicked = this.retryClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.syncProgramData = this.syncProgramData.bind(this);
+        this.hideFirstComponent=this.hideFirstComponent.bind(this);
     }
+
+    hideFirstComponent() {
+        this.timeout = setTimeout(function () {
+          document.getElementById('div1').style.display = 'none';
+        }, 8000);
+      }
+
     hideSecondComponent() {
-        // setTimeout(function () {
-        //     document.getElementById('div2').style.display = 'none';
-        // }, 8000);
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
@@ -62,6 +70,7 @@ export default class SyncMasterData extends Component {
             }.bind(this), 500)
 
         })
+        this.hideFirstComponent();
 
 
         // confirmAlert({
@@ -105,7 +114,7 @@ export default class SyncMasterData extends Component {
                 <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
-                <h6 className="mt-success" style={{ color: this.props.match.params.color }}>{i18n.t(this.props.match.params.message)}</h6>
+                <h6 className="mt-success" style={{ color: this.props.match.params.color }} id="div1">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col xs="12" sm="12">
@@ -280,6 +289,9 @@ export default class SyncMasterData extends Component {
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
                                 console.log("D--------------------------->in 1")
+                                if(document.getElementById('div1')!=null){
+                                    document.getElementById('div1').style.display = 'none';
+                                  }
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 },
@@ -310,23 +322,23 @@ export default class SyncMasterData extends Component {
                             }.bind(this)
                         } else {
                             console.log("D--------------------------->in 2")
-                            this.setState({
-                                message: response.data.messageCode
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                            document.getElementById("retryButtonDiv").style.display = "block";
+                            // this.setState({
+                            //     message: response.data.messageCode
+                            // },
+                            //     () => {
+                            //         this.hideSecondComponent();
+                            //     })
+                            // document.getElementById("retryButtonDiv").style.display = "block";
                             valid = false;
                         }
                     }).catch(error => {
                         console.log("D------------------------> 3 error", error);
                         if (error.message === "Network Error") {
                             console.log("D--------------------------->in 3")
-                            this.setState({ message: error.message },
-                                () => {
-                                    this.hideSecondComponent();
-                                });
+                            // this.setState({ message: error.message },
+                            //     () => {
+                            //         this.hideSecondComponent();
+                            //     });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -335,32 +347,32 @@ export default class SyncMasterData extends Component {
                                 case 406:
                                 case 412:
                                     console.log("D--------------------------->in 4")
-                                    this.setState({ message: error.response.data.messageCode },
-                                        () => {
-                                            this.hideSecondComponent();
-                                        });
+                                    // this.setState({ message: error.response.data.messageCode },
+                                    //     () => {
+                                    //         this.hideSecondComponent();
+                                    //     });
                                     break;
                                 default:
                                     console.log("D--------------------------->in 5")
-                                    this.setState({ message: 'static.unkownError' },
-                                        () => {
-                                            this.hideSecondComponent();
-                                        });
+                                    // this.setState({ message: 'static.unkownError' },
+                                    //     () => {
+                                    //         this.hideSecondComponent();
+                                    //     });
                                     break;
                             }
                         }
-                        document.getElementById("retryButtonDiv").style.display = "block";
-                        valid = false;
+                        // document.getElementById("retryButtonDiv").style.display = "block";
+                        // valid = false;
                     });
             } else {
                 console.log("D--------------------------->in 6")
-                document.getElementById("retryButtonDiv").style.display = "block";
-                this.setState({
-                    message: 'static.common.onlinealerttext'
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
+                // document.getElementById("retryButtonDiv").style.display = "block";
+                // this.setState({
+                //     message: 'static.common.onlinealerttext'
+                // },
+                //     () => {
+                //         this.hideSecondComponent();
+                //     })
                 valid = false;
             }
         }
@@ -375,6 +387,9 @@ export default class SyncMasterData extends Component {
             })
         } else {
             console.log("D--------------------------->in 7")
+            if(document.getElementById('div1')!=null){
+                document.getElementById('div1').style.display = 'none';
+              }
             document.getElementById("retryButtonDiv").style.display = "block";
             this.setState({
                 message: 'static.common.onlinealerttext'
@@ -1077,6 +1092,9 @@ export default class SyncMasterData extends Component {
                                         }
                                     })
                             } else {
+                                if(document.getElementById('div1')!=null){
+                                    document.getElementById('div1').style.display = 'none';
+                                  }
                                 document.getElementById("retryButtonDiv").style.display = "block";
                                 this.setState({
                                     message: 'static.common.onlinealerttext'
@@ -1091,6 +1109,9 @@ export default class SyncMasterData extends Component {
                 }.bind(this)
             }.bind(this)
         } else {
+            if(document.getElementById('div1')!=null){
+                document.getElementById('div1').style.display = 'none';
+              }
             this.setState({
                 message: 'static.common.onlinealerttext'
             },

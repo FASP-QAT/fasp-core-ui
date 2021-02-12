@@ -984,7 +984,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/procurementAgentExport":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_COST_DETAILS_REPORT")) {
                         return true;
                     }
                     break;
@@ -994,7 +994,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/shipmentGlobalDemandView":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_OVERVIEW_REPORT")) {
                         return true;
                     }
                     break;
@@ -1009,7 +1009,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/warehouseCapacity":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_WAREHOUSE_CAPACITY_REPORT")) {
                         return true;
                     }
                     break;
@@ -1019,7 +1019,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/stockAdjustment":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_STOCK_ADJUSTMENT_REPORT")) {
                         return true;
                     }
                     break;
@@ -1074,7 +1074,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/budgets":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_BUDGET_REPORT")) {
                         return true;
                     }
                     break;
@@ -1087,12 +1087,12 @@ class AuthenticationService {
                     break;
                 case "/report/shipmentSummery":
                 case "/report/shipmentSummery/:message":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_DETAILS_REPORT")) {
                         return true;
                     }
                     break;
                 case "/report/expiredInventory":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_EXPIRIES_REPORT")) {
                         return true;
                     }
                     break;
