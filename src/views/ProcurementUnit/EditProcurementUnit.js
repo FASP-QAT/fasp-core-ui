@@ -771,35 +771,35 @@ const validationSchema = function (values) {
             // // .matches(DECIMAL_NO_REGEX, i18n.t('static.realm.decimalNotAllow'))
             // .decimal(i18n.t('static.realm.decimalNotAllow'))
             // .min(0, i18n.t('static.program.validvaluetext')),
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         lengthQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             // .decimal(i18n.t('static.realm.decimalNotAllow'))
             // .min(0, i18n.t('static.program.validvaluetext')),
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         widthQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             // .decimal(i18n.t('static.realm.decimalNotAllow'))
             // .min(0, i18n.t('static.program.validvaluetext')),
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         weightQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             // .decimal(i18n.t('static.realm.decimalNotAllow'))
             // .min(0, i18n.t('static.program.validvaluetext')),
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         volumeQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             // .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             // .decimal(i18n.t('static.realm.decimalNotAllow'))
             // .min(0, i18n.t('static.program.validvaluetext')),
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         unitsPerCase: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
