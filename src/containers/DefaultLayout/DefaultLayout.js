@@ -928,7 +928,7 @@ class DefaultLayout extends Component {
             <AppSidebarForm />
             <Suspense>
 
-              <Online polling={polling}>
+              {isSiteOnline() && 
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -2055,8 +2055,8 @@ class DefaultLayout extends Component {
                     ]
 
                 }} {...this.props} />
-              </Online>
-              <Offline polling={polling}>
+  }
+              {!isSiteOnline() && 
                 <AppSidebarNav navConfig={{
                   items:
                     [
@@ -2539,7 +2539,7 @@ class DefaultLayout extends Component {
 
                     ]
                 }} {...this.props} />
-              </Offline>
+              }
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />

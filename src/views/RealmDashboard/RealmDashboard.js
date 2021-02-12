@@ -340,7 +340,7 @@ class RealmDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <Online polling={polling}>
+        {isSiteOnline() && 
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
@@ -583,7 +583,7 @@ class RealmDashboard extends Component {
 
 
           </Row>
-        </Online>
+  }
 
         {/* <Row>
             <Col md="12">

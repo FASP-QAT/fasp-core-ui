@@ -2332,7 +2332,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </FormGroup>
                                         </Online> */}
-                                        <Offline polling={polling}>
+                                        {!isSiteOnline() && 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
@@ -2359,8 +2359,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                        </Offline>
-                                        <Offline polling={polling}>
+                                        }
+                                        {!isSiteOnline() && 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
@@ -2379,7 +2379,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                        </Offline>
+                                        }
 
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>

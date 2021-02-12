@@ -1371,7 +1371,7 @@ class ProductCatalog extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <Online polling={polling}>
+                                {isSiteOnline() && 
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1399,8 +1399,8 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Online>
-                                <Offline polling={polling}>
+    }
+                                {!isSiteOnline() && 
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1429,7 +1429,7 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Offline>
+    }
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">

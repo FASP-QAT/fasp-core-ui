@@ -21,6 +21,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from "react-detect-offline";
+import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -557,7 +558,7 @@ export default class ConsumptionDetails extends React.Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Online polling={polling}>
+                {isSiteOnline() && 
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -568,7 +569,7 @@ export default class ConsumptionDetails extends React.Component {
                                 </div>
                             </div>
                         </div>
-                    </Online>
+    }
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={

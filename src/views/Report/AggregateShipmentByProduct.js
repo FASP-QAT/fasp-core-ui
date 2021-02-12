@@ -1585,7 +1585,6 @@ class AggregateShipmentByProduct extends Component {
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                        <Online polling={polling}>
                                             {/* {
                                                 this.state.consumptions.length > 0
                                                 && */}
@@ -1610,8 +1609,6 @@ class AggregateShipmentByProduct extends Component {
 
 
 
-                                        </Online>
-                                        <Offline polling={polling}>
                                             {/* {
                                                 this.state.offlineConsumptionList.length > 0
                                                 &&
@@ -1629,7 +1626,6 @@ class AggregateShipmentByProduct extends Component {
                                             {/* </div> */}
                                             {/* </div>} */}
 
-                                        </Offline>
                                     </div>
                                     {/* <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">

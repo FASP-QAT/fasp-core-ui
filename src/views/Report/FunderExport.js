@@ -1158,8 +1158,7 @@ class FunderExport extends Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                         </div> */}
-                        <Online polling={polling}>
-                            {
+                        {isSiteOnline() && 
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
@@ -1168,9 +1167,7 @@ class FunderExport extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>
                             }
-                        </Online>
-                        <Offline polling={polling}>
-                            {
+                        {!isSiteOnline() && 
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
@@ -1179,7 +1176,6 @@ class FunderExport extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>
                             }
-                        </Offline>
                     </div>
                     <CardBody className="pb-lg-2 mt-3">
 

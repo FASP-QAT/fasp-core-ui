@@ -951,7 +951,7 @@ class warehouseCapacity extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <Online polling={polling}>
+                                        {isSiteOnline() && 
                                                 <FormGroup className="col-md-3 ">
                                                     <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -973,8 +973,8 @@ class warehouseCapacity extends Component {
                                                     </div>
 
                                                 </FormGroup>
-                                            </Online>
-                                            <Online polling={polling}>
+    }
+                                            
 
                                                 {/* <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -996,6 +996,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup> */}
+                                                {isSiteOnline() && 
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1015,9 +1016,9 @@ class warehouseCapacity extends Component {
                                                         )}
 
                                                 </FormGroup>
-                                            </Online>
+    }
 
-                                            <Offline polling={polling}>
+                                            {!isSiteOnline() && 
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
@@ -1047,7 +1048,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
-                                            </Offline>
+                                            }
 
                                         </div>
                                     </div>

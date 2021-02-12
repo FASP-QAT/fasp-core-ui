@@ -860,8 +860,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        <Online polling={polling}>
-          {this.state.id == 1 &&
+          {isSiteOnline() && this.state.id == 1 &&
             <Row className="mt-2">
 
               <Col xs="12" sm="6" lg="3">
@@ -980,7 +979,7 @@ class ApplicationDashboard extends Component {
 
             </Row>
           }
-          {this.state.id == 2 &&
+          {isSiteOnline() && this.state.id == 2 &&
             <Row className="mt-2">
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1262,7 +1261,7 @@ class ApplicationDashboard extends Component {
                 </Card>
               </Col>
             }
-
+{isSiteOnline() && 
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">
@@ -1291,9 +1290,8 @@ class ApplicationDashboard extends Component {
                 </CardBody>
               </Card>
             </Col>
-
+  }
           </Row>
-        </Online>
         {/* <Row className="mt-2">
           <Col md="12">
             <Card>

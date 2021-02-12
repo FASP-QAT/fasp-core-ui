@@ -1435,8 +1435,7 @@ class Consumption extends Component {
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
-            <Online  polling={polling}>
-              {
+          {isSiteOnline() && 
                 this.state.consumptions.length > 0 &&
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1448,9 +1447,7 @@ class Consumption extends Component {
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
               }
-            </Online>
-            <Offline polling={polling}>
-              {
+            {!isSiteOnline() && 
                 this.state.offlineConsumptionList.length > 0 &&
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1461,7 +1458,7 @@ class Consumption extends Component {
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
               }
-            </Offline>
+            }
           </div>
           <CardBody className="pb-lg-2 pt-lg-0 ">
             <div className="TableCust" >
@@ -1533,7 +1530,7 @@ class Consumption extends Component {
                       </FormGroup>
 
 
-                      <Online polling={polling}>
+                      {isSiteOnline() && 
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
@@ -1560,8 +1557,8 @@ class Consumption extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-                      </Online>
-                      <Offline polling={polling}>
+  }
+                      {!isSiteOnline() && 
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
@@ -1587,7 +1584,7 @@ class Consumption extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-                      </Offline>
+                      }
 
 
                       <FormGroup className="col-md-3">
@@ -1615,8 +1612,7 @@ class Consumption extends Component {
 
                 <Col md="12 pl-0">
                   <div className="row">
-                    <Online polling={polling}>
-                      {
+                  {isSiteOnline() && 
                         this.state.consumptions.length > 0
                         &&
                         <div className="col-md-12 p-0">
@@ -1638,9 +1634,7 @@ class Consumption extends Component {
 
 
 
-                    </Online>
-                    <Offline polling={polling}>
-                      {
+                        {!isSiteOnline() && 
                         this.state.offlineConsumptionList.length > 0
                         &&
                         <div className="col-md-12 p-0">
@@ -1657,15 +1651,14 @@ class Consumption extends Component {
                           </div>
                         </div>}
 
-                    </Offline>
+                    }
                   </div>
 
 
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                      <Online polling={polling}>
-                        {this.state.show && this.state.consumptions.length > 0 &&
+                    {isSiteOnline() && this.state.show && this.state.consumptions.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -1712,9 +1705,7 @@ class Consumption extends Component {
                             </tbody>
 
                           </Table>}
-                      </Online>
-                      <Offline polling={polling}>
-                        {this.state.show && this.state.offlineConsumptionList.length > 0 &&
+                          {!isSiteOnline() && this.state.show && this.state.offlineConsumptionList.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -1761,7 +1752,6 @@ class Consumption extends Component {
                             </tbody>
 
                           </Table>}
-                      </Offline>
                     </div>
                   </div>
 
