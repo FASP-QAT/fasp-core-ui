@@ -633,7 +633,7 @@ export default class QatProblemActionNew extends Component {
                                                                         tracerArray.push(parseInt(tracerSplit[t]));
                                                                     }
                                                                 }
-                                                                
+
                                                                 if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
                                                                     var consumptionList = programList[pp].consumptionList;
                                                                     var myStartDate = moment(curDate).add(1, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1040,10 +1040,16 @@ export default class QatProblemActionNew extends Component {
                                         var paList = problemActionList.filter(c => c.program.id == programList[pp].programId)
                                         programList[pp].problemReportList = paList;
                                         // console.log("paList+++",paList);
+                                        var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
+                                        var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                        console.log("open+++", openCount, "addressed+++", addressedCount);
+                                        programRequestList[pp].openCount=openCount;
+                                        programRequestList[pp].addressedCount=addressedCount;
                                         console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                         programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
                                         console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                         var putRequest = problemOs.put(programRequestList[pp]);
+
                                         putRequest.onerror = function (event) {
                                             this.setState({
                                                 message: i18n.t('static.program.errortext'),

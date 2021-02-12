@@ -437,18 +437,18 @@ class ApplicationDashboard extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        let username = decryptedUser.username;
+        // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // let username = decryptedUser.username;
 
         for (var i = 0; i < getRequest.result.length; i++) {
           // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
           if (getRequest.result[i].userId == userId) {
-            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
+            // var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
             // console.log("QPA 2====>", programJson);
-            programList.push(programJson);
+            programList.push({ openCount: getRequest.result[i].openCount, addressedCount: getRequest.result[i].addressedCount, programCode: getRequest.result[i].programCode, programVersion: getRequest.result[i].version });
             // programRequestList.push(getRequest.result[i]);
             // versionIDs.push(getRequest.result[i].version);
           }
@@ -827,8 +827,10 @@ class ApplicationDashboard extends Component {
     });
 
     const programSlides = this.state.programList.map((item) => {
-      var numberOfProblemsOpen = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 1);
-      var numberOfProblemsAddressed = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 3);
+      // var numberOfProblemsOpen = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 1);
+      // var numberOfProblemsAddressed = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 3);
+      var numberOfProblemsOpen = item.openCount;
+      var numberOfProblemsAddressed = item.addressedCount;
       return (
         <CarouselItem
           onExiting={this.onExiting}
@@ -844,8 +846,8 @@ class ApplicationDashboard extends Component {
               <CarouselCaption captionHeader={item.programCode + "~v" + item.currentVersion.versionId} captionText={numberOfProblems.length} />
             </div> */}
             <div className='TextCont'>
-              <CarouselCaption captionHeader={item.programCode + "~v" + item.currentVersion.versionId} className='mb-5 pb-2 mt-2' />
-              <CarouselCaption captionText={<p><div className="TextTittle ">{i18n.t("static.problemReport.open")}: {numberOfProblemsOpen.length}</div><div className="TextTittle pb-0">{i18n.t("static.problemReport.addressed")}: {numberOfProblemsAddressed.length}</div></p>} />
+              <CarouselCaption captionHeader={item.programCode + "~v" + item.programVersion} className='mb-5 pb-2 mt-2' />
+              <CarouselCaption captionText={<p><div className="TextTittle ">{i18n.t("static.problemReport.open")}: {numberOfProblemsOpen}</div><div className="TextTittle pb-0">{i18n.t("static.problemReport.addressed")}: {numberOfProblemsAddressed}</div></p>} />
             </div>
           </div>
         </CarouselItem>

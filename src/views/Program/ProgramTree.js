@@ -929,7 +929,10 @@ class Program extends Component {
                                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                                     for (var r = 0; r < json.length; r++) {
-                                                        json[r].actionList=[];
+                                                        json[r].actionList = [];
+                                                        json[r].openCount = 0;
+                                                        json[r].addressedCount = 0;
+                                                        json[r].programCode = json[r].programCode;
                                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -1011,7 +1014,10 @@ class Program extends Component {
                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {
-                                        json[r].actionList=[];
+                                        json[r].actionList = [];
+                                        json[r].openCount = 0;
+                                        json[r].addressedCount = 0;
+                                        json[r].programCode = json[r].programCode;
                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
