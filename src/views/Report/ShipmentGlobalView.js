@@ -647,7 +647,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700 / displaylabel.length, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 550 / displaylabel.length, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -1369,7 +1369,7 @@ class ShipmentGlobalView extends Component {
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
                     console.log("RESP------", response.data);
-                    if (response.data.shipmentList.length != 0) {
+                    if (response.data.countrySplitList.length != 0) {
                         var table1Headers = [];
                         var lab = [];
                         var val = [];
@@ -1801,18 +1801,19 @@ class ShipmentGlobalView extends Component {
         }
 
         // let displaylabel = Object.keys(this.state.dateSplitList[0].amount);
-        let displaylabel = [];
-        if (this.state.viewby == 1) {
-            displaylabel = this.state.fundingSourceValues.map(ele => ele.label)
-        }
-        else {
-            displaylabel = this.state.procurementAgentValues.map(ele => ele.label)
-        }//this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
+        // let displaylabel = [];
+        // if (this.state.viewby == 1) {
+        //     displaylabel = this.state.fundingSourceValues.map(ele => ele.label)
+        // }
+        // else {
+        //     displaylabel = this.state.procurementAgentValues.map(ele => ele.label)
+        // }
+        //this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
         // if (displaylabel.length > 0) {
         //     displaylabel = displaylabel[0];
         // }
         // displaylabel = displaylabel[0];
-
+        let displaylabel = (this.state.dateSplitList.length > 0 ? Object.keys(this.state.dateSplitList[0].amount) : []);
         console.log("displaylabel------->>>>", displaylabel);
         let dateSplitList = this.state.dateSplitList;
         let displayObject = [];
