@@ -20,7 +20,8 @@ import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import QatProblemActions from '../../CommonComponent/QatProblemActions' ;
+import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
@@ -102,7 +103,8 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions>
+                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActionNew>
+                {/* <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions> */}
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
                 <h6 className="mt-success" style={{ color: this.props.match.params.color }}>{i18n.t(this.props.match.params.message)}</h6>
