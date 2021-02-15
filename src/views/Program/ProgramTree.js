@@ -930,9 +930,9 @@ class Program extends Component {
                                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                                     for (var r = 0; r < json.length; r++) {
                                                         json[r].actionList = [];
-                                                        json[r].openCount = 0;
-                                                        json[r].addressedCount = 0;
-                                                        json[r].programCode = json[r].programCode;
+                                                        // json[r].openCount = 0;
+                                                        // json[r].addressedCount = 0;
+                                                        // json[r].programCode = json[r].programCode;
                                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -946,7 +946,10 @@ class Program extends Component {
                                                             version: version,
                                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                                             programData: encryptedText.toString(),
-                                                            userId: userId
+                                                            userId: userId,
+                                                            programCode: json[r].programCode,
+                                                            openCount: 0,
+                                                            addressedCount: 0
                                                         };
                                                         // console.log("Item------------>", item);
                                                         var putRequest = programSaveData.put(item);
@@ -1015,9 +1018,9 @@ class Program extends Component {
                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {
                                         json[r].actionList = [];
-                                        json[r].openCount = 0;
-                                        json[r].addressedCount = 0;
-                                        json[r].programCode = json[r].programCode;
+                                        // json[r].openCount = 0;
+                                        // json[r].addressedCount = 0;
+                                        // json[r].programCode = json[r].programCode;
                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -1031,7 +1034,10 @@ class Program extends Component {
                                             version: version,
                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                             programData: encryptedText.toString(),
-                                            userId: userId
+                                            userId: userId,
+                                            programCode: json[r].programCode,
+                                            openCount: 0,
+                                            addressedCount: 0
                                         };
                                         // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);

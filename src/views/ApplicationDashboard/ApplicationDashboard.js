@@ -418,14 +418,18 @@ class ApplicationDashboard extends Component {
 
     var db1;
     var storeOS;
+    console.log("time bfor getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
     getDatabase();
+    console.log("time after getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
+      console.log("time for openRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
       var programList = [];
       db1 = e.target.result;
       var transaction = db1.transaction(['programData'], 'readwrite');
       var program = transaction.objectStore('programData');
       var getRequest = program.getAll();
+      console.log("time for getAllprogram+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
       getRequest.onerror = function (event) {
         this.setState({
           // supplyPlanError: i18n.t('static.program.errortext')
@@ -433,28 +437,35 @@ class ApplicationDashboard extends Component {
 
       };
       getRequest.onsuccess = function (event) {
-
+        console.log("time taken for getRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-
+        console.log("time takem for userDecrypt+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         // let username = decryptedUser.username;
 
-        for (var i = 0; i < getRequest.result.length; i++) {
+        var filteredGetRequestList = getRequest.result.filter(c => c.userId == userId)
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
           // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
-          if (getRequest.result[i].userId == userId) {
+          // if (getRequest.result[i].userId == userId) {
             // var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
             // console.log("QPA 2====>", programJson);
-            programList.push({ openCount: getRequest.result[i].openCount, addressedCount: getRequest.result[i].addressedCount, programCode: getRequest.result[i].programCode, programVersion: getRequest.result[i].version });
+            programList.push({
+              openCount: filteredGetRequestList[i].openCount,
+              addressedCount: filteredGetRequestList[i].addressedCount,
+              programCode: filteredGetRequestList[i].programCode,
+              programVersion: filteredGetRequestList[i].version
+            });
             // programRequestList.push(getRequest.result[i]);
             // versionIDs.push(getRequest.result[i].version);
-          }
+          // }
 
         }
-        console.log("program list in application dashboard===>", programList);
+        console.log("time taken to create program list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+        console.log("program list in application dashboard+++", programList);
         this.setState({ programList: programList });
       }.bind(this)
     }.bind(this)
