@@ -979,19 +979,35 @@ class Program extends Component {
 
                                                         }
                                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                                            this.setState({
-                                                                message: 'static.program.downloadsuccess',
-                                                                color: 'green',
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideFirstComponent()
-                                                            })
-                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                                            this.setState({ loading: false })
-                                                            // this.refs.programListChild.checkNewerVersions();
-                                                            this.getPrograms();
-                                                            this.getLocalPrograms();
-                                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                            for (var r = 0; r < json.length; r++) {
+                                                                var programQPLDetailsJson = {
+                                                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                                    programId: json[r].programId,
+                                                                    version: version,
+                                                                    userId: userId,
+                                                                    programCode: json[r].programCode,
+                                                                    openCount: 0,
+                                                                    addressedCount: 0
+                                                                };
+                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                            }
+                                                            programQPLDetailsTransaction.oncomplete = function (event) {
+                                                                this.setState({
+                                                                    message: 'static.program.downloadsuccess',
+                                                                    color: 'green',
+                                                                    loading: false
+                                                                }, () => {
+                                                                    this.hideFirstComponent()
+                                                                })
+                                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                                this.setState({ loading: false })
+                                                                // this.refs.programListChild.checkNewerVersions();
+                                                                this.getPrograms();
+                                                                this.getLocalPrograms();
+                                                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                                            }.bind(this)
                                                         }.bind(this)
                                                     }.bind(this)
                                                 }
@@ -1067,18 +1083,34 @@ class Program extends Component {
 
                                         }
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                            this.setState({
-                                                message: 'static.program.downloadsuccess',
-                                                color: 'green',
-                                                loading: false
-                                            })
-                                            this.hideFirstComponent();
-                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                            this.setState({ loading: false })
-                                            // this.refs.programListChild.checkNewerVersions();
-                                            this.getPrograms();
-                                            this.getLocalPrograms();
-                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                            for (var r = 0; r < json.length; r++) {
+                                                var programQPLDetailsJson = {
+                                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                    programId: json[r].programId,
+                                                    version: version,
+                                                    userId: userId,
+                                                    programCode: json[r].programCode,
+                                                    openCount: 0,
+                                                    addressedCount: 0
+                                                };
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                            }
+                                            programQPLDetailsTransaction.oncomplete = function (event) {
+                                                this.setState({
+                                                    message: 'static.program.downloadsuccess',
+                                                    color: 'green',
+                                                    loading: false
+                                                })
+                                                this.hideFirstComponent();
+                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                this.setState({ loading: false })
+                                                // this.refs.programListChild.checkNewerVersions();
+                                                this.getPrograms();
+                                                this.getLocalPrograms();
+                                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                            }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
                                 }

@@ -1042,9 +1042,18 @@ export default class QatProblemActionNew extends Component {
                                         // console.log("paList+++",paList);
                                         var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
                                         var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                        var programQPLDetailsJson = {
+                                            id: programRequestList[pp].id,
+                                            openCount: openCount,
+                                            addressedCount: addressedCount,
+                                            programCode: programList[pp].programCode,
+                                            version: programList[pp].version,
+                                            userId: programList[pp].userId,
+                                            programId:programList[pp].programId
+                                        }
                                         console.log("open+++", openCount, "addressed+++", addressedCount);
-                                        programRequestList[pp].openCount=openCount;
-                                        programRequestList[pp].addressedCount=addressedCount;
+                                        // programRequestList[pp].openCount=openCount;
+                                        // programRequestList[pp].addressedCount=addressedCount;
                                         console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                         programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
                                         console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
@@ -1060,11 +1069,16 @@ export default class QatProblemActionNew extends Component {
                                             }
                                         }.bind(this);
                                         putRequest.onsuccess = function (event) {
-                                            if (this.props.updateState != undefined) {
-                                                this.props.updateState(false);
-                                                this.props.fetchData();
-                                            }
+                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                            var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                            programQPLDetailsRequest.onsuccess = function (event) {
+                                                if (this.props.updateState != undefined) {
+                                                    this.props.updateState(false);
+                                                    this.props.fetchData();
+                                                }
 
+                                            }.bind(this);
                                         }.bind(this);
                                         //console.log("problemList for each program=====>", problemActionList);
                                         console.log("new logic ends+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
