@@ -9,7 +9,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-// import moment from 'moment';
+import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
@@ -73,7 +73,7 @@ class EditBudgetComponent extends Component {
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
             loading: true,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: "",
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             // budget: this.props.location.state.budget,
@@ -137,6 +137,7 @@ class EditBudgetComponent extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
     }
 
     _handleClickRangeBox(e) {
@@ -211,9 +212,12 @@ class EditBudgetComponent extends Component {
                     // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                     // response.data.budgetAmt = getBudgetAmount;
 
+                    var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
+                    var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
+
                     this.setState({
                         budget: response.data, loading: false,
-                        rangeValue:{ from: { year: new Date(response.data.startDate).getFullYear(), month: new Date(response.data.startDate).getMonth() }, to: { year: new Date(response.data.endDate).getFullYear(), month: new Date(response.data.endDate).getMonth() } }
+                        rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth()+1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth()+1 } }
                     });
                 }
                 else {
@@ -600,8 +604,8 @@ class EditBudgetComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    {this.state.rangeValue!="" && <FormGroup>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -615,7 +619,7 @@ class EditBudgetComponent extends Component {
                                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                             </Picker>
                                                         </div>
-                                                    </FormGroup>
+                                                    </FormGroup>}
                                                     <FormGroup>
 
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -711,9 +715,11 @@ class EditBudgetComponent extends Component {
 
                 // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 // response.data.budgetAmt = getBudgetAmount;
+                var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
+                var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                 this.setState({
                     budget: response.data,
-                    rangeValue:{ from: { year: new Date(response.data.startDate).getFullYear(), month: new Date(response.data.startDate).getMonth() }, to: { year: new Date(response.data.endDate).getFullYear(), month: new Date(response.data.endDate).getMonth() } }
+                    rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth()+1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth()+1 } }
                 });
             }).catch(
                 error => {
