@@ -173,12 +173,13 @@ export default class ImportProgram extends Component {
     formSubmit() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
-            if (document.querySelector('input[type=file]').files[0] == undefined) {
+            var selectedPrgArr = this.state.programId;
+            console.log("@@@selectedPrgArr",selectedPrgArr)
+            if (selectedPrgArr==undefined || selectedPrgArr.length == 0) {
                 this.setState({ loading: false })
-                alert(i18n.t('static.program.selectfile'));
+                alert(i18n.t('static.budget.programtext'));
             } else {
                 var file = document.querySelector('input[type=file]').files[0];
-                var selectedPrgArr = this.state.programId;
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -585,6 +586,9 @@ export default class ImportProgram extends Component {
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             if (document.querySelector('input[type=file]').files[0] == undefined) {
                 alert(i18n.t('static.program.selectfile'));
+                this.setState({
+                    loading: false
+                })
             } else {
                 var file = document.querySelector('input[type=file]').files[0];
                 var fileName = file.name;
