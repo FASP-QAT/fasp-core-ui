@@ -1458,7 +1458,6 @@ class Consumption extends Component {
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
               }
-            }
           </div>
           <CardBody className="pb-lg-2 pt-lg-0 ">
             <div className="TableCust" >
@@ -1651,7 +1650,6 @@ class Consumption extends Component {
                           </div>
                         </div>}
 
-                    }
                   </div>
 
 
