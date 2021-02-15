@@ -673,9 +673,14 @@ export default class AddInventory extends Component {
             cont = true;
         }
         if (cont == true) {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.setState({
+                inventoryChangedFlag:0,
+                inventoryBatchInfoChangedFlag:0
+            },()=>{
+                let id = AuthenticationService.displayDashboardBasedOnRole();
             var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })
         }
     }
 
