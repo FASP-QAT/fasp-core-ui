@@ -9,21 +9,19 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-// import moment from 'moment';
+import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import DatePicker from 'react-datepicker';
-import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
 
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
     budgetName: '',
     budgetAmt: '',
-    budgetCode: '',
-    startDate: '',
-    stopDate: ''
+    budgetCode: ''
 }
 
 const validationSchema = function (values) {
@@ -37,10 +35,6 @@ const validationSchema = function (values) {
             .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
-        startDate: Yup.string()
-            .required(i18n.t('static.budget.startdatetext')).nullable().default(undefined),
-        stopDate: Yup.string()
-            .required(i18n.t('static.budget.stopdatetext')).nullable().default(undefined),
         budgetCode: Yup.string()
             // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
             // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
@@ -75,8 +69,13 @@ const getErrorsFromValidationError = (validationError) => {
 class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             loading: true,
+            rangeValue: "",
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             // budget: this.props.location.state.budget,
             budget: {
                 label: {
@@ -135,7 +134,23 @@ class EditBudgetComponent extends Component {
         this.addMonths = this.addMonths.bind(this);
         this.CommaFormatted = this.CommaFormatted.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
     }
+
+    _handleClickRangeBox(e) {
+        this.pickRange.current.show()
+    }
+
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
+    }
+
     changeLoading(loading) {
         this.setState({ loading: loading })
     }
@@ -188,17 +203,21 @@ class EditBudgetComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     console.log("(response.data.startDate)--", new Date(response.data.startDate));
-                    if (response.data.startDate != null && response.data.startDate != "") {
-                        response.data.startDate = new Date(response.data.startDate);
-                    }
-                    if (response.data.stopDate != null && response.data.stopDate != "") {
-                        response.data.stopDate = new Date(response.data.stopDate);
-                    }
+                    // if (response.data.startDate != null && response.data.startDate != "") {
+                    //     response.data.startDate = new Date(response.data.startDate);
+                    // }
+                    // if (response.data.stopDate != null && response.data.stopDate != "") {
+                    //     response.data.stopDate = new Date(response.data.stopDate);
+                    // }
                     // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                     // response.data.budgetAmt = getBudgetAmount;
 
+                    var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
+                    var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
+
                     this.setState({
-                        budget: response.data, loading: false
+                        budget: response.data, loading: false,
+                        rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth()+1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth()+1 } }
                     });
                 }
                 else {
@@ -308,9 +327,7 @@ class EditBudgetComponent extends Component {
         setTouched({
             budgetName: true,
             budgetAmt: true,
-            budgetCode: true,
-            startDate: true,
-            stopDate: true
+            budgetCode: true
         });
         this.validateForm(errors)
     }
@@ -330,6 +347,16 @@ class EditBudgetComponent extends Component {
     }
 
     render() {
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -359,17 +386,23 @@ class EditBudgetComponent extends Component {
                                     // var amount = this.state.budget.budgetAmt.replace(/,/g, '');
                                     // budget.budgetAmt = amount;
                                     budget.budgetAmt = this.state.budget.budgetAmt;
+                                    let rangeValue = this.state.rangeValue;
+                                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                    budget.startDate = startDate;
 
+                                    // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
+                                    budget.stopDate = stopDate;
                                     // var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
                                     // budget.startDate = startDate;
 
                                     // var stopDate = moment(this.state.budget.stopDate).format("YYYY-MM-DD");
                                     // budget.stopDate = stopDate;
-                                    var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
-                                    budget.startDate = new Date(startDateString);
+                                    // var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
+                                    // budget.startDate = new Date(startDateString);
 
-                                    var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
-                                    budget.stopDate = new Date(stopDateString);
+                                    // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
+                                    // budget.stopDate = new Date(stopDateString);
                                     console.log("this.state.budget----->", budget);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
@@ -571,107 +604,22 @@ class EditBudgetComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        {/* <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-
-                                                        <Input
-                                                            className="fa fa-calendar Fa-right"
-                                                            name="startDate"
-                                                            id="startDate" */}
-                                                        {/* // bsSize="sm" */}
-                                                        {/* // valid={!errors.startDate} */}
-                                                        {/* // invalid={touched.startDate && !!errors.startDate} */}
-                                                        {/* onChange={(e) => { */}
-                                                        {/* // handleChange(e);  */}
-                                                        {/* this.dataChange(e) */}
-                                                        {/* }} */}
-                                                        {/* // onBlur={handleBlur}
-                                                            type="date"
-                                                            min={this.currentDate()}
-                                                            value={this.state.budget.startDate}
-                                                            placeholder="{i18n.t('static.budget.budgetstartdate')}"
-                                                        /> */}
-
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        {/* <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-
-                                                        <Input
-                                                            className="fa fa-calendar Fa-right"
-                                                            name="stopDate"
-                                                            id="stopDate" */}
-                                                        {/* // bsSize="sm"
-                                                            // valid={!errors.stopDate}
-                                                            // invalid={touched.stopDate && !!errors.stopDate}
-                                                            onChange={(e) => { */}
-                                                        {/* // handleChange(e); 
-                                                                this.dataChange(e)
-                                                            }}
-                                                            // onBlur={handleBlur}
-                                                            type="date"
-                                                            min={this.state.budget.startDate}
-                                                            value={this.state.budget.stopDate}
-                                                            placeholder="{i18n.t('static.budget.budgetstopdate')}"
-                                                        /> */}
-
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span className="red Reqasterisk">*</span></Label>
-                                                        <DatePicker
-                                                            id="startDate"
-                                                            name="startDate"
-                                                            bsSize="sm"
-                                                            // minDate={this.addMonths(new Date(), -6)}
-                                                            selected={this.state.budget.startDate}
-                                                            // onChange={(date) => { this.dataChangeDate(date) }}
-                                                            onChange={(date) => {
-                                                                handleChange(date);
-                                                                setFieldValue("startDate", date);
-                                                                this.dataChangeDate(date)
-                                                            }}
-                                                            onBlur={() => setFieldTouched("startDate", true)}
-                                                            className={classNames('form-control', 'd-block', 'w-100',
-                                                                { 'is-valid': !errors.startDate },
-                                                                { 'is-invalid': (touched.startDate && !!errors.startDate || !!errors.startDate) }
-                                                            )}
-                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            // className="form-control-sm form-control date-color"
-                                                            disabledKeyboardNavigation
-                                                            autoComplete={"off"}
-                                                            dateFormat={DATE_FORMAT_SM}
-                                                        />
-                                                        <div className="red">{(touched.startDate && !!errors.startDate || !!errors.startDate ? errors.startDate : '')}</div>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
-                                                        <DatePicker
-                                                            id="stopDate"
-                                                            name="stopDate"
-                                                            bsSize="sm"
-                                                            minDate={this.state.budget.startDate}
-                                                            selected={this.state.budget.stopDate}
-                                                            // onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                            onChange={(date) => {
-                                                                handleChange(date);
-                                                                setFieldValue("stopDate", date);
-                                                                this.dataChangeEndDate(date)
-                                                            }}
-                                                            onBlur={() => setFieldTouched("stopDate", true)}
-                                                            className={classNames('form-control', 'd-block', 'w-100',
-                                                                { 'is-valid': !errors.stopDate },
-                                                                { 'is-invalid': (touched.stopDate && !!errors.stopDate || !!errors.stopDate) }
-                                                            )}
-                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            // className="form-control-sm form-control date-color"
-                                                            disabledKeyboardNavigation
-                                                            autoComplete={"off"}
-                                                            dateFormat={DATE_FORMAT_SM}
-                                                        />
-                                                        <div className="red">{(touched.stopDate && !!errors.stopDate || !!errors.stopDate ? errors.stopDate : '')}</div>
-                                                    </FormGroup>
+                                                    {this.state.rangeValue!="" && <FormGroup>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
+                                                        <div className="controls edit">
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>}
                                                     <FormGroup>
 
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -764,16 +712,14 @@ class EditBudgetComponent extends Component {
     resetClicked() {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
-                if (response.data.startDate != null && response.data.startDate != "") {
-                    response.data.startDate = new Date(response.data.startDate);
-                }
-                if (response.data.stopDate != null && response.data.stopDate != "") {
-                    response.data.stopDate = new Date(response.data.stopDate);
-                }
+
                 // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 // response.data.budgetAmt = getBudgetAmount;
+                var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
+                var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                 this.setState({
-                    budget: response.data
+                    budget: response.data,
+                    rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth()+1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth()+1 } }
                 });
             }).catch(
                 error => {
