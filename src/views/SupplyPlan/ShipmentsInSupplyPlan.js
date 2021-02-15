@@ -54,7 +54,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`Y${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`Y${parseInt(data[i].y) + 1}`, true);
                 (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
                 (instance.jexcel).setValueFromCoords(21, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
@@ -71,8 +71,33 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(30, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(32, data[i].y, 1, true);
-                    z = data[i].y;
                 }
+                z = data[i].y;
+            }
+            console.log("Before if @@@", data[i].x)
+            if (data[i].x == 15 && data[i].value == "") {
+                var rowData = (instance.jexcel).getRowData(data[i].y);
+                var pricePerUnit = "";
+                var planningUnitId = document.getElementById("planningUnitId").value;
+                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+                // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
+                //     elInstance.setValueFromCoords(8, y, "", true);
+                // }
+                // if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
+                if (procurementAgentPlanningUnit.length > 0) {
+                    pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                } else {
+                    pricePerUnit = this.props.items.catalogPrice
+                }
+                if (rowData[14] != "") {
+                    var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
+                    pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
+                }
+                // }
+                (instance.jexcel).setValueFromCoords(15, data[i].y, pricePerUnit, true);
+            }
+            if (data[i].x == 17 && data[i].value != "") {
+                (instance.jexcel).setValueFromCoords(17, data[i].y, data[i].value, true);
             }
         }
     }
@@ -1689,7 +1714,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     positiveValidation("G", y, elInstance);
                     positiveValidation("M", y, elInstance);
                 }
-                if (rowData[24] == -1 && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
+                if ((rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
 
@@ -1746,7 +1771,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 //     elInstance.setValueFromCoords(8, y, "", true);
                 // }
                 var pricePerUnit = elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-                if (rowData[24] == -1) {
+                if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                     if (procurementAgentPlanningUnit.length > 0) {
                         pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
                     } else {
@@ -1758,7 +1783,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(15, y, pricePerUnit, true);
                     }
                 }
-                if (rowData[24] == -1 && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
+                if ((rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -1837,7 +1862,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "F", y, rowData[5], elInstance);
             if (valid == true) {
                 var rate = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-                if (rowData[24] == -1) {
+                if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                     var freightCost = 0;
                     if (rowData[5] == 1) {
                         var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
@@ -1849,7 +1874,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     }
                 }
-                if (rowData[24] == -1 && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
+                if ((rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
             } else {
@@ -1859,7 +1884,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 16) {
             var rate = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
-            if (rowData[24] == -1) {
+            if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                 var freightCost = 0;
                 if (rowData[5] == 1) {
                     var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
