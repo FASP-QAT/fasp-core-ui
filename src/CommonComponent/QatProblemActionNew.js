@@ -983,13 +983,13 @@ export default class QatProblemActionNew extends Component {
                                                             // console.log("shipments in 1-6 months+++", filteredShipmentListWithin6Months.length);
                                                             // console.log("shipments in 7-18 months+++", filteredShipmentListWithin7to18Months.length);
                                                             var cause = {};
-                                                            cause["stockoutsWithing6months"] = stockoutsWithing6months.length > 0 ? stockoutsWithing6months.toString() : "No months";
-                                                            cause["stockoutsWithing7to18months"] = stockoutsWithing7to18months.length > 0 ? stockoutsWithing7to18months.toString() : "No months";
+                                                            cause["stockoutsWithing6months"] = stockoutsWithing6months.length > 0 ? stockoutsWithing6months.toString() : i18n.t('static.qpl.noMonths');
+                                                            cause["stockoutsWithing7to18months"] = stockoutsWithing7to18months.length > 0 ? stockoutsWithing7to18months.toString() : i18n.t('static.qpl.noMonths');
                                                             cause["shipmentListWithin6Months"] = filteredShipmentListWithin6Months.length;
                                                             cause["shipmentListWithin7to18Months"] = filteredShipmentListWithin7to18Months.length;
                                                             cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data1), "months").format('MMM-YY');
                                                             cause["range7to18months"] = moment(curDate).add(parseInt(problemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data2), "months").format('MMM-YY');
-                                                            console.log("cause+++", cause);
+                                                            // console.log("cause+++", cause);
 
                                                             var index = problemActionList.findIndex(
                                                                 c =>

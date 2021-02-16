@@ -1,6 +1,7 @@
 import getLabelText from '../CommonComponent/getLabelText';
 import moment from "moment";
 import { compareSync } from 'bcryptjs';
+import i18n from '../i18n';
 
 export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 1) {
@@ -26,16 +27,16 @@ export default function getSuggestion(row, lang) {
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : "not present").split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : "not present").split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : "not present").split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : "not present").split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_pr = result_pr;
         }
 
