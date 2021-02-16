@@ -1047,9 +1047,9 @@ export default class QatProblemActionNew extends Component {
                                             openCount: openCount,
                                             addressedCount: addressedCount,
                                             programCode: programList[pp].programCode,
-                                            version: programList[pp].version,
-                                            userId: programList[pp].userId,
-                                            programId:programList[pp].programId
+                                            version: programRequestList[pp].version,
+                                            userId: programRequestList[pp].userId,
+                                            programId: programList[pp].programId
                                         }
                                         console.log("open+++", openCount, "addressed+++", addressedCount);
                                         // programRequestList[pp].openCount=openCount;

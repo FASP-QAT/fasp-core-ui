@@ -948,8 +948,8 @@ class Program extends Component {
                                                             programData: encryptedText.toString(),
                                                             userId: userId,
                                                             programCode: json[r].programCode,
-                                                            openCount: 0,
-                                                            addressedCount: 0
+                                                            // openCount: 0,
+                                                            // addressedCount: 0
                                                         };
                                                         // console.log("Item------------>", item);
                                                         var putRequest = programSaveData.put(item);
@@ -1052,8 +1052,8 @@ class Program extends Component {
                                             programData: encryptedText.toString(),
                                             userId: userId,
                                             programCode: json[r].programCode,
-                                            openCount: 0,
-                                            addressedCount: 0
+                                            // openCount: 0,
+                                            // addressedCount: 0
                                         };
                                         // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);

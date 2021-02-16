@@ -2804,10 +2804,16 @@ export default class syncPage extends Component {
 
                   var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                   var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+
+                  var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+                  var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
                   // for (var i = 0; i < json.length; i++) {
                   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
                   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                   var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1)).length;
+                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3)).length;
+
                   var item = {
                     id: json.programId + "_v" + version + "_uId_" + userId,
                     programId: json.programId,
@@ -2816,8 +2822,18 @@ export default class syncPage extends Component {
                     programData: encryptedText.toString(),
                     userId: userId
                   };
+                  var programQPLDetails = {
+                    id: json.programId + "_v" + version + "_uId_" + userId,
+                    programId: json.programId,
+                    version: version,
+                    userId: userId,
+                    programCode: json.programCode,
+                    openCount: openCount,
+                    addressedCount: addressedCount
+                  }
                   var putRequest = programSaveData.put(item);
                   var putRequest1 = downloadedProgramSaveData.put(item);
+                  var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
                   this.redirectToDashbaord();
                 }.bind(this)
@@ -3167,7 +3183,7 @@ export default class syncPage extends Component {
           oldProgramDataProblemList: oldProgramDataProblemList,
           latestProgramDataProblemList: latestProgramDataProblemList,
           mergedProblemListData: mergedProblemListData,
-          loading:false
+          loading: false
         })
       }.bind(this)
     }.bind(this)
