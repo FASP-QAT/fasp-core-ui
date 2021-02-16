@@ -128,12 +128,12 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        if ((typeOfSession === 'Online' && isSiteOnline()) || (typeOfSession === 'Offline' && !isSiteOnline())) {
+        if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
+            console.log("offline to online return true");
             return true;
         } else {
+            console.log("offline to online false");
             return false;
-
-
 
         }
     }
@@ -1233,10 +1233,16 @@ class AuthenticationService {
                 //     }
                 // }
             } else {
-                return "/logout/static.message.sessionChange";
+                localStorage.setItem("sessionChanged",1)
+                return "/login/static.message.sessionChange";
             }
         } else {
+            console.log("offline to online ");
+            if(localStorage.getItem("sessionChanged")==1){
+                return "/login/static.message.sessionChange";
+            }else{
             return "/accessDenied";
+            }
         }
     }
     clearUserDetails() {

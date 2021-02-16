@@ -255,6 +255,7 @@ class Login extends Component {
                           
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
                           localStorage.setItem("sessionTimedOut",0);
+                          localStorage.setItem("sessionChanged",0)
                           if (isSiteOnline()) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
                           var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
