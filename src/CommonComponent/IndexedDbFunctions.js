@@ -142,12 +142,6 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('problemCategory')) {
             storeOS = db1.createObjectStore('problemCategory', { keyPath: 'id', autoIncrement: true });
         }
-        if (!db1.objectStoreNames.contains('dashboardProblemCount')) {
-            storeOS = db1.createObjectStore('dashboardProblemCount', { keyPath: 'id', autoIncrement: true });
-        }
-        if (!db1.objectStoreNames.contains('commitVersionProgramData')) {
-            storeOS = db1.createObjectStore('commitVersionProgramData', { keyPath: 'id', autoIncrement: true });
-        }
         console.log("indexed db completed----------------------")
     };
 }

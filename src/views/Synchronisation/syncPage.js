@@ -970,8 +970,8 @@ export default class syncPage extends Component {
         programJson.shipmentList = shipmentData;
         programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
 
-        var programTransaction = db1.transaction(['commitVersionProgramData'], 'readwrite');
-        var programOs = programTransaction.objectStore('commitVersionProgramData');
+        var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+        var programOs = programTransaction.objectStore('whatIfProgramData');
 
         var putRequest = programOs.put(programRequest.result);
 
@@ -2443,64 +2443,30 @@ export default class syncPage extends Component {
         //   }
         // }
 
-        if ((oldData[11] == latestData[11]) || (oldData[11] == "" && latestData[11] == null) || (oldData[11] == null && latestData[11] == "")) {
-          var col = ("L").concat(parseInt(c) + 1);
+        if ((oldData[10] == latestData[10]) || (oldData[10] == "" && latestData[10] == null) || (oldData[10] == null && latestData[10] == "")) {
+          var col = ("K").concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
         } else {
           this.setState({
             isChanged: true
           })
-          if ((jsonData[c])[19] != "" && oldData[11] == downloadedData[11]) {
-            var col = ("L").concat(parseInt(c) + 1);
-            elInstance.setValueFromCoords(11, c, latestData[11], true);
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-            elInstance.setValueFromCoords(20, c, 3, true);
-            (jsonData[c])[20] = 3;
-          } else if ((jsonData[c])[19] != "" && latestData[11] == downloadedData[11]) {
-            var col = ("L").concat(parseInt(c) + 1);
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-            elInstance.setValueFromCoords(20, c, 2, true);
-            (jsonData[c])[20] = 2;
-          } else {
-            this.setState({
-              conflictsCount: this.state.conflictsCount + 1
-            })
-            elInstance.setValueFromCoords(20, c, 1, true);
-            (jsonData[c])[20] = 1;
-            for (var j = 0; j < colArr.length; j++) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", "yellow");
-            }
-          }
-        }
-
-        if ((oldData[12] == latestData[12]) || (oldData[12] == "" && latestData[12] == null) || (oldData[12] == null && latestData[12] == "")) {
-          var col = ("M").concat(parseInt(c) + 1);
-          elInstance.setStyle(col, "background-color", "transparent");
-        } else {
-          this.setState({
-            isChanged: true
-          })
-          if ((jsonData[c])[19] != "" && oldData[12] == downloadedData[12]) {
+          if ((jsonData[c])[19] != "" && oldData[10] == downloadedData[10]) {
             if (latestData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
-              var col = ("M").concat(parseInt(c) + 1);
-              elInstance.setValueFromCoords(12, c, latestData[12], true);
+              var col = ("K").concat(parseInt(c) + 1);
+              elInstance.setValueFromCoords(10, c, latestData[10], true);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 3, true);
               (jsonData[c])[20] = 3;
             } else {
-              var col = ("M").concat(parseInt(c) + 1);
+              var col = ("K").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 2, true);
               (jsonData[c])[20] = 2;
             }
-          } else if ((jsonData[c])[19] != "" && latestData[12] == downloadedData[12]) {
-            var col = ("M").concat(parseInt(c) + 1);
+          } else if ((jsonData[c])[19] != "" && latestData[10] == downloadedData[10]) {
+            var col = ("K").concat(parseInt(c) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
             elInstance.setValueFromCoords(20, c, 2, true);
@@ -2518,7 +2484,7 @@ export default class syncPage extends Component {
                 elInstance.setStyle(col, "background-color", "yellow");
               }
             } else {
-              var col = ("M").concat(parseInt(c) + 1);
+              var col = ("K").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(20, c, 2, true);
@@ -2595,7 +2561,7 @@ export default class syncPage extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="commitVersionProgramData" />
+        <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="whatIfProgramData" />
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2910,8 +2876,8 @@ export default class syncPage extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
-          var programDataTransaction = db1.transaction(['commitVersionProgramData'], 'readwrite');
-          var programDataOs = programDataTransaction.objectStore('commitVersionProgramData');
+          var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+          var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
           var programRequest = programDataOs.get((this.state.programId).value);
           programRequest.onerror = function (event) {
             this.setState({
@@ -3128,8 +3094,8 @@ export default class syncPage extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var programDataTransaction = db1.transaction(['commitVersionProgramData'], 'readwrite');
-      var programDataOs = programDataTransaction.objectStore('commitVersionProgramData');
+      var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+      var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
       var value = (this.state.programId);
       var programRequest = programDataOs.get(value != "" && value != undefined ? value.value : 0);
       programRequest.onerror = function (event) {
@@ -3241,7 +3207,7 @@ export default class syncPage extends Component {
           columns: [
             {
               title: i18n.t('static.commitVersion.problemReportId'),
-              type: 'hidden',
+              type: 'text',
             },
             {
               title: 'problemActionIndex',
