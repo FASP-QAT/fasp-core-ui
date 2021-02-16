@@ -11,7 +11,7 @@ import IdleTimer from 'react-idle-timer';
 import moment from 'moment';
 import CryptoJS from 'crypto-js';
 import {
-  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME
+  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -20,6 +20,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 // routes config
 //import routes from '../../routes';
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
@@ -717,7 +718,7 @@ class DefaultLayout extends Component {
   }
   goToCommitProgram(e) {
     e.preventDefault();
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       this.props.history.push(`/program/syncPage/`)
     } else {
       confirmAlert({
@@ -927,7 +928,7 @@ class DefaultLayout extends Component {
             <AppSidebarForm />
             <Suspense>
 
-              <Online>
+              {isSiteOnline() && 
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -2054,8 +2055,8 @@ class DefaultLayout extends Component {
                     ]
 
                 }} {...this.props} />
-              </Online>
-              <Offline>
+  }
+              {!isSiteOnline() && 
                 <AppSidebarNav navConfig={{
                   items:
                     [
@@ -2538,7 +2539,7 @@ class DefaultLayout extends Component {
 
                     ]
                 }} {...this.props} />
-              </Offline>
+              }
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />

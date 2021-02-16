@@ -15,7 +15,8 @@ import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
 import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
 import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
 import iconsDownarrowRed from '../../assets/img/icons-downarrow-red.png';
-import { API_URL } from '../../Constants';
+import { API_URL, polling } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const propTypes = {
   children: PropTypes.node,
@@ -97,7 +98,7 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          <Online>
+          {isSiteOnline() &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
@@ -109,7 +110,7 @@ class DefaultHeader extends Component {
                 {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#20a8d8' }} ></i>}
               </NavLink>
             </NavItem>
-          </Online>
+  }
           {/* <Online> */}
           <NavItem className="">
             <NavLink to="#" className="nav-link">

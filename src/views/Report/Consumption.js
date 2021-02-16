@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -50,6 +50,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -164,7 +165,7 @@ class Consumption extends Component {
 
     let productId = document.getElementById("planningUnitId").value;
     if (productId != 0) {
-      if (navigator.onLine) {
+      if (isSiteOnline()) {
         RealmService.getRealmListAll()
           .then(response => {
             if (response.status == 200) {
@@ -348,7 +349,7 @@ class Consumption extends Component {
     csvRow.push('')
     var re;
 
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       re = this.state.consumptions
     } else {
       re = this.state.offlineConsumptionList
@@ -359,7 +360,7 @@ class Consumption extends Component {
     let row1 = [];
     let row2 = [];
     let row3 = [];
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       let consumptionArray = this.state.consumptions;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
@@ -478,13 +479,13 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = navigator.onLine ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
+    const data = isSiteOnline() ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption)]);
     let head = [];
     let head1 = [];
     let row1 = [];
     let row2 = [];
     let row3 = [];
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       let consumptionArray = this.state.consumptions;
       head.push('');
       row1.push(i18n.t('static.report.forecasted'));
@@ -773,7 +774,7 @@ class Consumption extends Component {
 
 
   getPrograms() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -1085,7 +1086,7 @@ class Consumption extends Component {
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
           this.setState({
             versions: [],
             planningUnits: [],
@@ -1342,7 +1343,7 @@ class Consumption extends Component {
 
 
     let bar = "";
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       bar = {
 
         labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
@@ -1380,7 +1381,7 @@ class Consumption extends Component {
 
       }
     }
-    if (!navigator.onLine) {
+    if (!isSiteOnline()) {
 
       bar = {
 
@@ -1434,8 +1435,7 @@ class Consumption extends Component {
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
-            <Online>
-              {
+          {isSiteOnline() && 
                 this.state.consumptions.length > 0 &&
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1447,9 +1447,7 @@ class Consumption extends Component {
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
               }
-            </Online>
-            <Offline>
-              {
+            {!isSiteOnline() && 
                 this.state.offlineConsumptionList.length > 0 &&
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1460,7 +1458,6 @@ class Consumption extends Component {
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
               }
-            </Offline>
           </div>
           <CardBody className="pb-lg-2 pt-lg-0 ">
             <div className="TableCust" >
@@ -1532,7 +1529,7 @@ class Consumption extends Component {
                       </FormGroup>
 
 
-                      <Online>
+                      {isSiteOnline() && 
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
@@ -1559,8 +1556,8 @@ class Consumption extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-                      </Online>
-                      <Offline>
+  }
+                      {!isSiteOnline() && 
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
@@ -1586,7 +1583,7 @@ class Consumption extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-                      </Offline>
+                      }
 
 
                       <FormGroup className="col-md-3">
@@ -1614,8 +1611,7 @@ class Consumption extends Component {
 
                 <Col md="12 pl-0">
                   <div className="row">
-                    <Online>
-                      {
+                  {isSiteOnline() && 
                         this.state.consumptions.length > 0
                         &&
                         <div className="col-md-12 p-0">
@@ -1637,9 +1633,7 @@ class Consumption extends Component {
 
 
 
-                    </Online>
-                    <Offline>
-                      {
+                        {!isSiteOnline() && 
                         this.state.offlineConsumptionList.length > 0
                         &&
                         <div className="col-md-12 p-0">
@@ -1656,15 +1650,13 @@ class Consumption extends Component {
                           </div>
                         </div>}
 
-                    </Offline>
                   </div>
 
 
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                      <Online>
-                        {this.state.show && this.state.consumptions.length > 0 &&
+                    {isSiteOnline() && this.state.show && this.state.consumptions.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -1711,9 +1703,7 @@ class Consumption extends Component {
                             </tbody>
 
                           </Table>}
-                      </Online>
-                      <Offline>
-                        {this.state.show && this.state.offlineConsumptionList.length > 0 &&
+                          {!isSiteOnline() && this.state.show && this.state.offlineConsumptionList.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -1760,7 +1750,6 @@ class Consumption extends Component {
                             </tbody>
 
                           </Table>}
-                      </Offline>
                     </div>
                   </div>
 

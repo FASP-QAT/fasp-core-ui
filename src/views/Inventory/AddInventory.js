@@ -8,7 +8,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL, polling } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -20,6 +20,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from 'react-detect-offline';
 import { Prompt } from 'react-router'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
@@ -519,7 +520,7 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Online>
+                {isSiteOnline() && 
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -530,7 +531,7 @@ export default class AddInventory extends Component {
                                 </div>
                             </div>
                         </div>
-                    </Online>
+    }
                     <CardBody className="pb-lg-2 pt-lg-2" >
                         <Formik
                             render={

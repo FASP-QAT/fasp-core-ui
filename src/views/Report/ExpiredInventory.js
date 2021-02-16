@@ -44,6 +44,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -116,7 +117,7 @@ export default class ExpiredInventory extends Component {
         return '?'
     }
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -284,7 +285,7 @@ export default class ExpiredInventory extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: []
                     }, () => {
