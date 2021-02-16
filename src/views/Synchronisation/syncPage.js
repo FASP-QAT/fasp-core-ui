@@ -819,19 +819,19 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
-    for (var j = 0; j < 17; j++) {
-      var col = (colArr[j]).concat(1);
-      var col1 = (colArr[j]).concat(2);
-      var valueToCompare = (jsonData[0])[j];
-      var valueToCompareWith = (jsonData[1])[j];
-      if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-        elInstance.setStyle(col, "background-color", "transparent");
-        elInstance.setStyle(col1, "background-color", "transparent");
-      } else {
-        elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-        elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
-      }
+    // for (var j = 0; j < 17; j++) {
+    var col = (colArr[10]).concat(1);
+    var col1 = (colArr[10]).concat(2);
+    var valueToCompare = (jsonData[0])[10];
+    var valueToCompareWith = (jsonData[1])[10];
+    if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+      elInstance.setStyle(col, "background-color", "transparent");
+      elInstance.setStyle(col1, "background-color", "transparent");
+    } else {
+      elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+      elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
     }
+    // }
   }
 
   acceptCurrentChangesProblem() {
@@ -844,14 +844,19 @@ export default class syncPage extends Component {
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
-      var col = (colArr[j]).concat(parseInt(index) + 1);
-      var valueToCompare = (jsonData[0])[j];
-      var valueToCompareWith = (jsonData[1])[j];
-      if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-        problemInstance.setStyle(col, "background-color", "transparent");
+      if (j == 10) {
+        var col = ("K").concat(parseInt(index) + 1);
+        var valueToCompare = (jsonData[0])[10];
+        var valueToCompareWith = (jsonData[1])[10];
+        if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+          problemInstance.setStyle(col, "background-color", "transparent");
+        } else {
+          problemInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+          problemInstance.setValueFromCoords(20, index, 2, true);
+        }
       } else {
-        problemInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-        problemInstance.setValueFromCoords(20, index, 2, true);
+        var col = (colArr[j]).concat(parseInt(index) + 1);
+        problemInstance.setStyle(col, "background-color", "transparent");
       }
     }
 
@@ -861,7 +866,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
-        this.generateDataAfterResolveConflictsForQPL();
+        // this.generateDataAfterResolveConflictsForQPL();
       }
     })
     this.toggleLargeProblem('', '', 0, '');
@@ -874,18 +879,29 @@ export default class syncPage extends Component {
     var problemInstance = this.state.mergedProblemListJexcel;
     var index = document.getElementById("indexProblem").value;
     problemInstance.options.editable = true;
-    problemInstance.setRowData(index, resolveConflictsInstance.getRowData(1));
+    var oldRowData = resolveConflictsInstance.getRowData(0);
+    var latestRowData = resolveConflictsInstance.getRowData(1);
+    oldRowData[10] = latestRowData[10];
+    oldRowData[11] = latestRowData[11];
+    oldRowData[12] = latestRowData[12];
+    console.log("OldRowData@@@", oldRowData)
+    problemInstance.setRowData(index, oldRowData);
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
-      var col = (colArr[j]).concat(parseInt(index) + 1);
-      var valueToCompare = (jsonData[0])[j];
-      var valueToCompareWith = (jsonData[1])[j];
-      if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-        problemInstance.setStyle(col, "background-color", "transparent");
+      if (j == 10) {
+        var col = (colArr[j]).concat(parseInt(index) + 1);
+        var valueToCompare = (jsonData[0])[j];
+        var valueToCompareWith = (jsonData[1])[j];
+        if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+          problemInstance.setStyle(col, "background-color", "transparent");
+        } else {
+          problemInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+          problemInstance.setValueFromCoords(20, (index), 3, true);
+        }
       } else {
-        problemInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-        problemInstance.setValueFromCoords(20, (index), 3, true);
+        var col = (colArr[j]).concat(parseInt(index) + 1);
+        problemInstance.setStyle(col, "background-color", "transparent");
       }
     }
     problemInstance.orderBy(20, 0);
@@ -894,7 +910,7 @@ export default class syncPage extends Component {
       conflictsCount: this.state.conflictsCount - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
-        this.generateDataAfterResolveConflictsForQPL();
+        // this.generateDataAfterResolveConflictsForQPL();
       }
     })
     this.toggleLargeProblem('', '', 0, '');
@@ -902,6 +918,7 @@ export default class syncPage extends Component {
   }
 
   generateDataAfterResolveConflictsForQPL() {
+    this.setState({ loading: true });
     var db1;
     var storeOS;
     getDatabase();
@@ -1139,6 +1156,8 @@ export default class syncPage extends Component {
     }
 
     var programId = value != "" && value != undefined ? value.value : 0;
+    console.log("@@@ProgramId", programId);
+    console.log("@@@this.state.programList", this.state.programList);
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
     if (programId != 0) {
       localStorage.setItem("sesProgramId", programId);
@@ -1915,6 +1934,7 @@ export default class syncPage extends Component {
                                         latestProgramData: latestProgramData,
                                         oldProgramData: oldProgramData,
                                         downloadedProgramData: downloadedProgramData,
+                                        loading: false
                                       }, () => {
                                         // Problem list
                                         if (this.state.conflictsCount == 0) {
@@ -2467,7 +2487,7 @@ export default class syncPage extends Component {
             elInstance.setValueFromCoords(20, c, 2, true);
             (jsonData[c])[20] = 2;
           } else {
-            if (oldData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
+            if (oldData[12] != PROBLEM_STATUS_IN_COMPLIANCE && latestData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1
               })
