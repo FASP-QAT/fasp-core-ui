@@ -324,7 +324,7 @@ class ApplicationDashboard extends Component {
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      var proList = []
+      var programList = [];
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -340,26 +340,32 @@ class ApplicationDashboard extends Component {
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            // var programJson1 = JSON.parse(programData);
-            // console.log("programData---", programData);
-            var programJson = {
-              programId: myResult[i].programId,
-              versionId: myResult[i].version
-            }
-            proList.push(programJson)
-          }
+        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
+
+          // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+          // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+          // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+          // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          // var programJson1 = JSON.parse(programData);
+          // console.log("programData---", programData);
+          programList.push({
+            openCount: myResult[i].openCount,
+            addressedCount: myResult[i].addressedCount,
+            programCode: myResult[i].programCode,
+            programVersion: myResult[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version
+          });
+          // }
         }
-        console.log("T***proList dashboard---", proList)
+        this.setState({
+          programList:programList
+        })
         // this.setState({
         //     programs: proList
         // })
-        this.checkNewerVersions(proList);
+        this.checkNewerVersions(programList);
         // if (this.props.updateState != undefined) {
         //     this.props.updateState(false);
         //     this.props.fetchData();
@@ -416,59 +422,59 @@ class ApplicationDashboard extends Component {
     this.hideFirstComponent();
     console.log("====== in application dasboard =======");
 
-    var db1;
-    var storeOS;
-    console.log("time bfor getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-    getDatabase();
-    console.log("time after getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      console.log("time for openRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-      var programList = [];
-      db1 = e.target.result;
-      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-      var program = transaction.objectStore('programQPLDetails');
-      var getRequest = program.getAll();
-      console.log("time for getAllprogram+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-      getRequest.onerror = function (event) {
-        this.setState({
-          // supplyPlanError: i18n.t('static.program.errortext')
-        });
+    // var db1;
+    // var storeOS;
+    // console.log("time bfor getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    // getDatabase();
+    // console.log("time after getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    // openRequest.onsuccess = function (e) {
+    //   console.log("time for openRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //   var programList = [];
+    //   db1 = e.target.result;
+    //   var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+    //   var program = transaction.objectStore('programQPLDetails');
+    //   var getRequest = program.getAll();
+    //   console.log("time for getAllprogram+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //   getRequest.onerror = function (event) {
+    //     this.setState({
+    //       // supplyPlanError: i18n.t('static.program.errortext')
+    //     });
 
-      };
-      getRequest.onsuccess = function (event) {
-        console.log("time taken for getRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        console.log("time takem for userDecrypt+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-        // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        // let username = decryptedUser.username;
+    //   };
+    //   getRequest.onsuccess = function (event) {
+    //     console.log("time taken for getRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //     console.log("time takem for userDecrypt+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //     // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+    //     // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    //     // let username = decryptedUser.username;
 
-        var filteredGetRequestList = getRequest.result.filter(c => c.userId == userId)
-        for (var i = 0; i < filteredGetRequestList.length; i++) {
-          // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
-          // if (getRequest.result[i].userId == userId) {
-          // var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
-          // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          // var programJson = JSON.parse(programData);
-          // console.log("QPA 2====>", programJson);
-          programList.push({
-            openCount: filteredGetRequestList[i].openCount,
-            addressedCount: filteredGetRequestList[i].addressedCount,
-            programCode: filteredGetRequestList[i].programCode,
-            programVersion: filteredGetRequestList[i].version
-          });
-          // programRequestList.push(getRequest.result[i]);
-          // versionIDs.push(getRequest.result[i].version);
-          // }
+    //     var filteredGetRequestList = getRequest.result.filter(c => c.userId == userId)
+    //     for (var i = 0; i < filteredGetRequestList.length; i++) {
+    //       // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
+    //       // if (getRequest.result[i].userId == userId) {
+    //       // var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+    //       // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+    //       // var programJson = JSON.parse(programData);
+    //       // console.log("QPA 2====>", programJson);
+    //       programList.push({
+    //         openCount: filteredGetRequestList[i].openCount,
+    //         addressedCount: filteredGetRequestList[i].addressedCount,
+    //         programCode: filteredGetRequestList[i].programCode,
+    //         programVersion: filteredGetRequestList[i].version
+    //       });
+    //       // programRequestList.push(getRequest.result[i]);
+    //       // versionIDs.push(getRequest.result[i].version);
+    //       // }
 
-        }
-        console.log("time taken to create program list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-        console.log("program list in application dashboard+++", programList);
-        this.setState({ programList: programList });
-      }.bind(this)
-    }.bind(this)
+    //     }
+    //     console.log("time taken to create program list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //     console.log("program list in application dashboard+++", programList);
+    //     this.setState({ programList: programList });
+    //   }.bind(this)
+    // }.bind(this)
 
     // var problemActionList = [];
     // var db1;
