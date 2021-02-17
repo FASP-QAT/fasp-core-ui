@@ -3411,6 +3411,10 @@ export default class WhatIfReportComponent extends React.Component {
                     currency: {
                         currencyId: USD_CURRENCY_ID,
                         conversionRateToUsd: 1
+                    },
+                    expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
+                    planningUnit: {
+                        id: document.getElementById("planningUnitId").value
                     }
                 }
                 shipmentList.push(json);
