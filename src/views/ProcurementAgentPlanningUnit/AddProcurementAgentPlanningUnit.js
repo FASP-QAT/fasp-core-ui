@@ -22,7 +22,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
-import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { JEXCEL_DECIMAL_NO_REGEX_NEW, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 
@@ -921,6 +921,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             data[11] = papuList[j].procurementAgentPlanningUnitId;
                                                             data[12] = 0;
                                                             papuDataArr[count] = data;
+                                                            console.log("data---",papuList[j].volume)
                                                             count++;
 
 
@@ -1016,7 +1017,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'numeric',
                                                                 decimal: '.',
                                                                 textEditor: true,
-                                                                mask: '#,##.00',
+                                                                mask: '#,##.000000',
                                                                 disabledMaskOnEdition: true
 
                                                             },
@@ -1025,7 +1026,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'numeric',
                                                                 textEditor: true,
                                                                 decimal: '.',
-                                                                mask: '#,##.00',
+                                                                mask: '#,##.000000',
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
@@ -1736,7 +1737,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //volume
         if (x == 8) {
-            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
             var col = ("I").concat(parseInt(y) + 1);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
@@ -1759,7 +1760,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //weight
         if (x == 9) {
-            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
             var col = ("J").concat(parseInt(y) + 1);
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
@@ -1962,7 +1963,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //volume
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
@@ -1998,7 +1999,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //weight
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
