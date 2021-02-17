@@ -1,35 +1,42 @@
 import getLabelText from '../CommonComponent/getLabelText';
 import moment from "moment";
 import { compareSync } from 'bcryptjs';
+import i18n from '../i18n';
 
 export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 1) {
         // console.log("lang====>", lang);
-        // Please provide Actual consumption for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
-        var numberOfMonths = parseInt(row.realmProblem.data1);
+        // Please ensure you have recent actual consumption data in region <%REGION%>. 
+        // The last actual consumption data in QAT is month/year <%CONSUMPTIONMONTH%> there is no actual consumption for the month of <%NOCONSUMPTIONMONTHS%>
+        // var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
-        for (var m = numberOfMonths; m >= 0; m--) {
-            var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
-            monthString = monthString.concat(curMonth + ",");
-        }
+        // for (var m = numberOfMonths; m > 0; m--) {
+        //     var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
+        //     monthString = monthString.concat(curMonth + ",");
+        // }
+        var obj = JSON.parse(row.data5);
+        var res = [];
+        for (var i in obj)
+            res.push(obj[i]);
+        // console.log("[]][]][][][][]+++", res);
+        monthString = res[1].noActualConsumptionMonth + "," + res[2].noActualConsumptionMonth + "," + res[3].noActualConsumptionMonth;
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
         var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
-
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%CONSUMPTIONMONTH%>').join(res[0].actualConsumptionMonth != "" ? res[0].actualConsumptionMonth : i18n.t('static.qpl.notPresent')).split('<%NOCONSUMPTIONMONTHS%>').join(monthString);
             label.label_pr = result_pr;
         }
 
@@ -37,34 +44,37 @@ export default function getSuggestion(row, lang) {
     }
     if (row.realmProblem.problem.problemId == 2) {
         // Please provide Stock count for <%PLANNING_UNIT%> in <%REGION%> region for the month of <%DT%>
-        var numberOfMonths = parseInt(row.realmProblem.data1);
+        // var numberOfMonths = parseInt(row.realmProblem.data1);
         var monthString = '';
-        for (var m = numberOfMonths; m >= 0; m--) {
-            var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
-            monthString = monthString.concat(curMonth + ",");
-        }
+        // for (var m = numberOfMonths; m >= 0; m--) {
+        //     var curMonth = moment(row.dt).subtract(m, 'months').startOf('month').format("MMM-YY");
+        //     monthString = monthString.concat(curMonth + ",");
+        // }
+        var obj = JSON.parse(row.data5);
+        var res = [];
+        for (var i in obj)
+            res.push(obj[i]);
+        monthString = res[1].noInventoryMonth + "," + res[2].noInventoryMonth + "," + res[3].noInventoryMonth;
 
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
         var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
-
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%INVENTORYMONTH%>').join(res[0].inventoryMonth != "" ? res[0].inventoryMonth : "not present").split('<%NOINVENTORYMONTHS%>').join(monthString);
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%INVENTORYMONTH%>').join(res[0].inventoryMonth != "" ? res[0].inventoryMonth : "not present").split('<%NOINVENTORYMONTHS%>').join(monthString);
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%INVENTORYMONTH%>').join(res[0].inventoryMonth != "" ? res[0].inventoryMonth : "not present").split('<%NOINVENTORYMONTHS%>').join(monthString);
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(monthString.replace(/,\s*$/, ""));
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%INVENTORYMONTH%>').join(res[0].inventoryMonth != "" ? res[0].inventoryMonth : "not present").split('<%NOINVENTORYMONTHS%>').join(monthString);
             label.label_pr = result_pr;
         }
-
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 3) {
@@ -215,16 +225,16 @@ export default function getSuggestion(row, lang) {
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(row.data5).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(row.data5).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(row.data5).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(row.data5).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
             label.label_pr = result_pr;
         }
 
@@ -242,6 +252,18 @@ export default function getSuggestion(row, lang) {
         // var label = row.realmProblem.problem.label;
         // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
         // return getLabelText(label, lang);
+
+        var obj = JSON.parse(row.data5);
+        var res = [];
+        for (var i in obj)
+            res.push(obj[i]);
+        // console.log("res+++", res);
+        var causeString = ""
+        if (res.length > 0) {
+            for (var i = 0; i < res.length; i++) {
+                causeString = causeString.concat(res[i].monthRange[0] + " to " + res[i].monthRange[3] + " with consumption quantity " + res[i].consumptionValue + ",");
+            }
+        }
         var myStartDate = moment(row.dt).add(1, 'months').startOf('month').format("MMM-YY");
         var myEndDate = moment(row.dt).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
         // var desc = row.realmProblem.problem.actionLabel.label_en;
@@ -256,16 +278,16 @@ export default function getSuggestion(row, lang) {
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
@@ -335,6 +357,20 @@ export default function getSuggestion(row, lang) {
         // var label = row.realmProblem.problem.label;
         // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
         // return getLabelText(label, lang);
+
+        var obj = JSON.parse(row.data5);
+        var res = [];
+        for (var i in obj)
+            res.push(obj[i]);
+        // console.log("res+++", res);
+
+        var causeString = ""
+        if (res.length > 0) {
+            for (var i = 0; i < res.length; i++) {
+                causeString = causeString.concat(res[i].monthRange[0] + " to " + res[i].monthRange[3] + " with consumption quantity " + res[i].consumptionValue + ",");
+            }
+        }
+
         var myStartDate = moment(row.dt).add(1, 'months').startOf('month').format("MMM-YY");
         var myEndDate = moment(row.dt).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
         // var desc = row.realmProblem.problem.actionLabel.label_en;
@@ -349,16 +385,16 @@ export default function getSuggestion(row, lang) {
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
@@ -371,6 +407,20 @@ export default function getSuggestion(row, lang) {
         // var label = row.realmProblem.problem.label;
         // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
         // return getLabelText(label, lang);
+
+        var obj = JSON.parse(row.data5);
+        var res = [];
+        for (var i in obj)
+            res.push(obj[i]);
+        // console.log("res+++", res);
+
+        var causeString = ""
+        if (res.length > 0) {
+            for (var i = 0; i < res.length; i++) {
+                causeString = causeString.concat(res[i].monthRange[0] + " to " + res[i].monthRange[3] + " consumption quantity " + res[i].consumptionValue + ",");
+            }
+        }
+
         var myStartDate = moment(row.dt).add(1, 'months').startOf('month').format("MMM-YY");
         var myEndDate = moment(row.dt).add(row.realmProblem.data1, 'months').endOf('month').format("MMM-YY");
         // var desc = row.realmProblem.problem.actionLabel.label_en;
@@ -385,16 +435,16 @@ export default function getSuggestion(row, lang) {
         // console.log("desc_sp====",desc_sp);
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate);
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%DT%>').join(myStartDate + " to " + myEndDate).split('<%SAMECONSUMPTIONMONTHS%>').join(causeString.replace(/,\s*$/, ""));
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
@@ -588,5 +638,16 @@ export default function getSuggestion(row, lang) {
 
         return getLabelText(label, lang);
     }
+    if (row.realmProblem.problem.problemId == 23) {
+        var label = row.realmProblem.problem.actionLabel;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 24) {
+        var label = row.realmProblem.problem.actionLabel;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        return getLabelText(label, lang);
+    }
+
 
 }

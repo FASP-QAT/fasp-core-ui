@@ -70,7 +70,7 @@ class ResetPasswordComponent extends Component {
         this.showPopUp = this.showPopUp.bind(this);
     }
     showPopUp() {
-        alert("1) Password has to be at least 6 characters\n2) Password should not contain password string\n3) Password must contain atleast 1 special character\n4) Password must contain atleast 1 number\n5) Password must contain atleast 1 uppercase alphabet\n6) Password must start with alphabet\n7) New password should not be same as username\n8) New password should not be same as old password")
+        alert("1) "+i18n.t("static.message.newPasswordMinLength")+"\n2) "+i18n.t("static.message.newPasswordPassString")+"\n3) "+i18n.t("static.message.newPasswordSpecialChar")+"\n4) "+i18n.t("static.message.newPasswordNumber")+"\n5) "+i18n.t("static.message.newPasswordUppercase")+"\n6) "+i18n.t("static.message.newPasswordStartAlphabet")+"\n7) "+i18n.t("static.message.newPasswordNotSameAsUsername")+"\n8) "+i18n.t("static.message.newPasswordNotSameAsOldPassword"));
         // confirmAlert({
         //     message: "Anchal&lt;br /&gt;Bhashkar",
         //     buttons: [

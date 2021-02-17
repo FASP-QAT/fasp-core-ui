@@ -33,6 +33,7 @@ import actualIcon from '../../assets/img/actual.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import MultiSelect from 'react-multi-select-component';
 const entityname = i18n.t('static.report.problem');
 
@@ -1175,7 +1176,8 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated">
-                <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions>
+                {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions> */}
+                <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
