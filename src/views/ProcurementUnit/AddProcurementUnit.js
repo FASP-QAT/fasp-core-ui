@@ -730,23 +730,23 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validSupplierIdText')),
         heightQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         lengthQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         widthQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         weightQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         volumeQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         unitsPerCase: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))

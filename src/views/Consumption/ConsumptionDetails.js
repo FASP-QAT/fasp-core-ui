@@ -498,8 +498,13 @@ export default class ConsumptionDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            this.setState({
+                consumptionChangedFlag: 0,
+                consumptionBatchInfoChangedFlag:0
+            }, () => {
+                let id = AuthenticationService.displayDashboardBasedOnRole();
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })
         }
     }
 
