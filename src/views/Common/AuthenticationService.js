@@ -492,7 +492,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/language/addLanguage":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE1")) {
+                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
                         return true;
                     }
                     break;
