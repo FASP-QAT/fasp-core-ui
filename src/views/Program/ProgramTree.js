@@ -989,7 +989,8 @@ class Program extends Component {
                                                                     userId: userId,
                                                                     programCode: json[r].programCode,
                                                                     openCount: 0,
-                                                                    addressedCount: 0
+                                                                    addressedCount: 0,
+                                                                    programModified:0
                                                                 };
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                             }
@@ -1093,7 +1094,8 @@ class Program extends Component {
                                                     userId: userId,
                                                     programCode: json[r].programCode,
                                                     openCount: 0,
-                                                    addressedCount: 0
+                                                    addressedCount: 0,
+                                                    programModified:0
                                                 };
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                             }

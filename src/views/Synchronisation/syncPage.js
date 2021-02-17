@@ -2829,7 +2829,8 @@ export default class syncPage extends Component {
                     userId: userId,
                     programCode: json.programCode,
                     openCount: openCount,
-                    addressedCount: addressedCount
+                    addressedCount: addressedCount,
+                    programModified:0
                   }
                   var putRequest = programSaveData.put(item);
                   var putRequest1 = downloadedProgramSaveData.put(item);
