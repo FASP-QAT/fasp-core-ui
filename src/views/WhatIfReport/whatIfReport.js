@@ -3411,6 +3411,10 @@ export default class WhatIfReportComponent extends React.Component {
                     currency: {
                         currencyId: USD_CURRENCY_ID,
                         conversionRateToUsd: 1
+                    },
+                    expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
+                    planningUnit: {
+                        id: document.getElementById("planningUnitId").value
                     }
                 }
                 shipmentList.push(json);
@@ -3756,7 +3760,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
                                                     <div className="controls WhatifInputFeild">
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                                                             <div className="controls edit">
                                                                 <Picker
                                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}

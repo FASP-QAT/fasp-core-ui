@@ -107,7 +107,13 @@ const options = {
         }],
         yAxes: [{
             stacked: true,
-            labelString: i18n.t('static.common.product')
+            labelString: i18n.t('static.common.product'),
+            ticks: {
+                callback: function (value) {
+                    // return value.substr(0, 40) + "...";//truncate
+                    return (value.length > 40) ? value.substr(0, 40) + "..." : value;
+                },
+            }
         }],
     },
     tooltips: {
@@ -143,6 +149,62 @@ const options = {
         }
     }
 }
+
+const options1 = {
+    title: {
+        display: true,
+        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+        fontColor: 'black'
+    },
+    scales: {
+        xAxes: [{
+
+            stacked: true,
+            scaleLabel: {
+                display: true,
+                labelString: i18n.t('static.shipment.qty'),
+                fontColor: 'black',
+                fontStyle: "normal",
+                fontSize: "12"
+            },
+            ticks: {
+                beginAtZero: true,
+                fontColor: 'black',
+                callback: function (value) {
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+
+                }
+            },
+            gridLines: {
+                display: false
+            }
+
+        }],
+        yAxes: [{
+            stacked: true,
+            labelString: i18n.t('static.common.product')
+        }],
+    },
+    maintainAspectRatio: false,
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+            fontColor: 'black'
+        }
+    }
+}
+
 const optionsPie = {
     title: {
         display: true,
@@ -240,7 +302,7 @@ class ShipmentGlobalDemandView extends Component {
             show: false,
             message: '',
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
             programLst: []
@@ -503,7 +565,7 @@ class ShipmentGlobalDemandView extends Component {
 
         doc.setTextColor("#fff");
         const title = i18n.t('static.dashboard.shipmentGlobalDemandViewheader');
-        var canvas = document.getElementById("cool-canvas1");
+        var canvas = document.getElementById("cool-canvas11");
 
         var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
@@ -2508,6 +2570,14 @@ class ShipmentGlobalDemandView extends Component {
                                 </div>
 
 
+                            </Col>
+                            <Col md="12 pl-0" style={{ position: "absolute", opacity: "0.0", }}>
+                                {
+                                    this.state.planningUnitSplit.length > 0 &&
+                                    <div className="chart-wrapper shipmentOverviewgraphheight">
+                                        <HorizontalBar id="cool-canvas11" data={chartData} options={options1} />
+                                    </div>
+                                }
                             </Col>
                             {/* {
                                 this.state.procurementAgentSplit.length > 0 &&

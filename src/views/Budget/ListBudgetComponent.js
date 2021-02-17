@@ -696,22 +696,27 @@ class ListBudgetComponent extends Component {
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
       // data[5] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       // data[6] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[5] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[6] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[7] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[8] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[9] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[10] = budgetList[j].lastModifiedBy.username;
-      data[11] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+
+      // data[5] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      // data[6] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      // data[7] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      data[5] = budgetList[j].currency.currencyCode;
+      data[6] = budgetList[j].budgetAmt;
+      data[7] = (budgetList[j].usedUsdAmt).toFixed(2);
+      data[8] = (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2);
+      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[11] = budgetList[j].lastModifiedBy.username;
+      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
       // data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       // data[10] = budgetList[j].budgetAmt;
       // data[11] = budgetList[j].usedUsdAmt;
       // data[12] = budgetList[j].stopDate;
 
-      data[12] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
-      data[13] = budgetList[j].budgetAmt;
-      data[14] = budgetList[j].usedUsdAmt;
-      data[15] = budgetList[j].stopDate;
+      data[13] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
+      data[14] = budgetList[j].budgetAmt;
+      data[15] = budgetList[j].usedUsdAmt;
+      data[16] = budgetList[j].stopDate;
 
 
 
@@ -760,21 +765,26 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
+          title: i18n.t('static.country.currency'),
+          type: 'text',
+          // readOnly: true
+        },
+        {
           title: i18n.t('static.budget.budgetamount'),
-          // mask: '[-]#,##.00', decimal: '.', type: 'numeric'
-          type: 'text'
+          mask: '[-]#,##.00', decimal: '.', type: 'numeric'
+          // type: 'text'
           // readOnly: true
         },
         {
           title: i18n.t('static.budget.usedUSDAmount'),
-          // mask: '[-]#,##.00', decimal: '.', type: 'numeric'
-          type: 'text'
+          mask: '[-]#,##.00', decimal: '.', type: 'numeric'
+          // type: 'text'
           // readOnly: true
         },
         {
           title: i18n.t('static.budget.availableAmt'),
-          // mask: '[-]#,##.00', decimal: '.', type: 'numeric'
-          type: 'text'
+          mask: '[-]#,##.00', decimal: '.', type: 'numeric'
+          // type: 'text'
           // readOnly: true
         },
         {
@@ -904,7 +914,7 @@ class ListBudgetComponent extends Component {
     var elInstance = instance.jexcel;
     var json = elInstance.getJson();
 
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
     for (var j = 0; j < json.length; j++) {
 
 
@@ -914,9 +924,9 @@ class ListBudgetComponent extends Component {
       // var budgetAmt = rowData[10];
       // var usedUsdAmt = rowData[11];
 
-      var stopDate = rowData[15];
-      var budgetAmt = rowData[13];
-      var usedUsdAmt = rowData[14];
+      var stopDate = rowData[16];
+      var budgetAmt = rowData[14];
+      var usedUsdAmt = rowData[15];
 
       if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
         for (var i = 0; i < colArr.length; i++) {
