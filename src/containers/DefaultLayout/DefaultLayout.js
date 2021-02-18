@@ -22,7 +22,6 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
-const checkOnline=isSiteOnline();
 const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -653,7 +652,7 @@ class DefaultLayout extends Component {
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
       console.log("user timed out")
-      localStorage.setItem("sessionTimedOut",1);
+      localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
       this.setState({ showModal: true })
@@ -774,7 +773,7 @@ class DefaultLayout extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson1 = JSON.parse(programData);
-           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
+            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
             let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
             let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
             let pmax = moment.max(cmax, imax, smax)
@@ -852,7 +851,7 @@ class DefaultLayout extends Component {
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
-        console.log("P***proList downloaded program data---",proList)
+        console.log("P***proList downloaded program data---", proList)
         this.setState({
           downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
         }, () => {
@@ -928,7 +927,7 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-              {checkOnline && 
+              {localStorage.getItem('typeOfSession') === 'Online' &&
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -2055,8 +2054,8 @@ class DefaultLayout extends Component {
                     ]
 
                 }} {...this.props} />
-  }
-              {!checkOnline && 
+              }
+              {localStorage.getItem('typeOfSession') === 'Offline' &&
                 <AppSidebarNav navConfig={{
                   items:
                     [
@@ -2555,11 +2554,11 @@ class DefaultLayout extends Component {
                         key={idx}
                         path={route.path}
                         exact={route.exact}
-                        name={route.name!=undefined?(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name):''}
+                        name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name!=undefined?((route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)):'')} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '')} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )
