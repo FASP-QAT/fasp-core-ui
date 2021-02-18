@@ -58,7 +58,7 @@ function rgbToYIQ({r, g, b}) {
     request.open('GET', url, false);
     try {
       request.send('');
-      console.log("@@@request.status",request.status)
+      console.log("@@@ in is site online")
       if (request.status === 200) {
         return true;
       } else {

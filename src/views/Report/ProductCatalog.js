@@ -49,6 +49,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+const checkOnline=isSiteOnline();
 
 const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3,000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456,870", "isActive": 'Active' }];
 
@@ -1371,7 +1372,7 @@ class ProductCatalog extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                {isSiteOnline() && 
+                                {checkOnline && 
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1400,7 +1401,7 @@ class ProductCatalog extends Component {
                                         </div>
                                     </FormGroup>
     }
-                                {!isSiteOnline() && 
+                                {!checkOnline && 
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
