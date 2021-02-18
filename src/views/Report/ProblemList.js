@@ -81,8 +81,13 @@ export default class ConsumptionDetails extends React.Component {
         this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
     }
 
-    updateState(ekValue) {
-        this.setState({ loading: ekValue });
+    // updateState(ekValue) {
+    //     this.setState({ loading: ekValue });
+    // }
+    updateState(key, value) {
+        this.setState({
+            [key]: value
+        })
     }
 
     hideFirstComponent() {
@@ -151,7 +156,8 @@ export default class ConsumptionDetails extends React.Component {
                             if (needToCalculate == "false") {
                                 this.fetchData();
                             } else {
-                                this.getProblemListAfterCalculation();
+                                // this.getProblemListAfterCalculation();
+                                this.fetchData();
                             }
                         }
                     })
@@ -168,7 +174,8 @@ export default class ConsumptionDetails extends React.Component {
                             if (needToCalculate == "false") {
                                 this.fetchData();
                             } else {
-                                this.getProblemListAfterCalculation();
+                                // this.getProblemListAfterCalculation();
+                                this.fetchData();
 
                             }
                         }
@@ -790,7 +797,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
-            this.refs.problemListChild.qatProblemActions(programId);
+            this.refs.problemListChild.qatProblemActions(programId,"loading");
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
         }

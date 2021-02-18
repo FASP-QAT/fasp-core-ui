@@ -1804,7 +1804,7 @@ export default class syncPage extends Component {
                                         downloadedProgramData: downloadedProgramData,
                                       }, () => {
                                         // Problem list
-                                        this.refs.problemListChild.qatProblemActions((this.state.programId).value);
+                                        this.refs.problemListChild.qatProblemActions((this.state.programId).value,"loading");
                                       })
                                     }.bind(this)
                                   }.bind(this)

@@ -9,7 +9,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
     if (page == 'masterDataSync' && !rebuild) {
         if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
             if (problemListChild != undefined && problemListChild != "undefined") {
-                problemListChild.qatProblemActions(programId);
+                problemListChild.qatProblemActions(programId,"loading");
             }
         }
     } else {
@@ -1046,7 +1046,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == 'masterDataSync') {
                                     if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
                                         if (problemListChild != undefined && problemListChild != "undefined") {
-                                            problemListChild.qatProblemActions(programId);
+                                            problemListChild.qatProblemActions(programId,"loading");
                                         }
                                     }
                                 }

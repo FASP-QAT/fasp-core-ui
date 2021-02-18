@@ -45,7 +45,7 @@ export default class QatProblemActionNew extends Component {
         );
     }
 
-    qatProblemActions(programId) {
+    qatProblemActions(programId,key) {
         console.log("new logic start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         // console.log("programId.toString()+++", programId.toString());
         var problemActionList = [];
@@ -73,7 +73,7 @@ export default class QatProblemActionNew extends Component {
                     supplyPlanError: i18n.t('static.program.errortext')
                 });
                 if (this.props.updateState != undefined) {
-                    this.props.updateState(false);
+                    this.props.updateState(key,false);
                 }
 
             };
@@ -104,7 +104,7 @@ export default class QatProblemActionNew extends Component {
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
                     if (this.props.updateState != undefined) {
-                        this.props.updateState(false);
+                        this.props.updateState(key,false);
                     }
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
@@ -120,7 +120,7 @@ export default class QatProblemActionNew extends Component {
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
                         if (this.props.updateState != undefined) {
-                            this.props.updateState(false);
+                            this.props.updateState(key,false);
                         }
                     }.bind(this);
                     problemRequest.onsuccess = function (e) {
@@ -136,7 +136,7 @@ export default class QatProblemActionNew extends Component {
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
                             if (this.props.updateState != undefined) {
-                                this.props.updateState(false);
+                                this.props.updateState(key,false);
                             }
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
@@ -144,7 +144,7 @@ export default class QatProblemActionNew extends Component {
                             var planningUnitListAll = puRequest.result;
                             if (programList.length == 0) {
                                 if (this.props.updateState != undefined) {
-                                    this.props.updateState(false);
+                                    this.props.updateState(key,false);
                                 }
                             }
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
@@ -1050,7 +1050,7 @@ export default class QatProblemActionNew extends Component {
                                             version: programRequestList[pp].version,
                                             userId: programRequestList[pp].userId,
                                             programId: programList[pp].programId,
-                                            programModified:programList[pp].programModified
+                                            programModified: programList[pp].programModified
                                         }
                                         console.log("open+++", openCount, "addressed+++", addressedCount);
                                         // programRequestList[pp].openCount=openCount;
@@ -1066,7 +1066,7 @@ export default class QatProblemActionNew extends Component {
                                                 color: 'red'
                                             })
                                             if (this.props.updateState != undefined) {
-                                                this.props.updateState(false);
+                                                this.props.updateState(key,false);
                                             }
                                         }.bind(this);
                                         putRequest.onsuccess = function (event) {
@@ -1075,7 +1075,9 @@ export default class QatProblemActionNew extends Component {
                                             var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                             programQPLDetailsRequest.onsuccess = function (event) {
                                                 if (this.props.updateState != undefined) {
-                                                    this.props.updateState(false);
+                                                    this.props.updateState(key,false);
+                                                    // this.props.fetchData();
+                                                } if (this.props.fetchData != undefined) {
                                                     this.props.fetchData();
                                                 }
 

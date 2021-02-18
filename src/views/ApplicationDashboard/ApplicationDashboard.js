@@ -55,6 +55,7 @@ import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 import imageHelp from '../../assets/img/help-icon.png';
+import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -243,6 +244,7 @@ class ApplicationDashboard extends Component {
     this.previousProgramSlide = this.previousProgramSlide.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
+    this.updateState = this.updateState.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -355,12 +357,14 @@ class ApplicationDashboard extends Component {
             programCode: myResult[i].programCode,
             programVersion: myResult[i].version,
             programId: filteredGetRequestList[i].programId,
-            versionId: filteredGetRequestList[i].version
+            versionId: filteredGetRequestList[i].version,
+            id: myResult[i].id,
+            loading: false
           });
           // }
         }
         this.setState({
-          programList:programList
+          programList: programList
         })
         // this.setState({
         //     programs: proList
@@ -607,6 +611,33 @@ class ApplicationDashboard extends Component {
   goToIndex(newIndex) {
     if (this.animating) return;
     this.setState({ activeIndex: newIndex });
+  }
+
+  updateState(key, value) {
+    console.log("key+++", key, "value+++", value);
+    var programList = this.state.programList;
+    var index = programList.findIndex(c => c.id == key);
+    programList[index].loading = value;
+    this.setState({
+      'programList': programList
+    })
+  }
+
+  getProblemListAfterCalculation(id) {
+    
+   this.updateState(id,true);
+    // alert("hello");
+    // let programId = id;
+    if (id != 0) {
+      this.refs.problemListChild.qatProblemActions(id, id);
+    } else {
+      this.updateState(id,false);
+      // this.setState({
+      //   message: i18n.t('static.common.selectProgram'), data: [],
+      //   // loadingQPLArray: false
+      // });
+    }
+
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
@@ -874,6 +905,7 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={undefined} objectStore="programData"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -1253,16 +1285,38 @@ class ApplicationDashboard extends Component {
                 <Col xs="12" sm="6" lg="3">
                   <Card className=" CardHeight">
                     <CardBody className="box-p">
-                      <a href="javascript:void();" onClick={() => this.redirectToCrud("/report/problemList")} title={i18n.t('static.dashboard.qatProblemList')}>
-                        <div class="h1 text-muted text-left mb-2  ">
+                      {/* <a href="javascript:void();" onClick={() => this.redirectToCrud("/report/problemList")} title={i18n.t('static.dashboard.qatProblemList')}>
+                      </a> */}
+                      <div style={{ display: item.loading ? "none" : "block" }}>
+                        <div class="h1 text-muted text-left mb-2">
                           <i class="fa fa-list-alt icon-color"></i>
+                          <ButtonGroup className="float-right BtnZindex">
+                            <Dropdown id={item.id} isOpen={this.state[item.id]} toggle={() => { this.setState({ [item.id]: !this.state[item.id] }); }}>
+                              <DropdownToggle caret className="p-0" color="transparent">
+                              </DropdownToggle>
+                              <DropdownMenu right>
+                                <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>Recalculate</DropdownItem>
+                                <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QPL</DropdownItem>
+
+                              </DropdownMenu>
+                            </Dropdown>
+                          </ButtonGroup>
+                          {/* <i class="fa fa-list-alt icon-color"></i> &nbsp;
+                        <a href="javascript:void();" title="Recalculate" onClick={() => this.getProblemListAfterCalculation(item.id)}><i className="fa fa-refresh"></i></a> */}
                         </div>
                         <div className="TextTittle ">{item.programCode + "~v" + item.programVersion}</div>
                         <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}:{item.openCount}</div>
                         <div className="TextTittle">{i18n.t("static.ticket.addressedIssues")}: {item.addressedCount}</div>
-                        <div className="chart-wrapper mt-4 pb-2" >
+                      </div>
+                      <div style={{ display: item.loading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >
+                          <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status">
+                            </div>
+                          </div>
                         </div>
-                      </a>
+                      </div>
                     </CardBody>
                   </Card>
                 </Col>
