@@ -6,10 +6,11 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { generateRandomAplhaNumericCode } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, lastSyncDate, rebuild) {
+    console.log("program id in supply plan calculation***", programId);
     if (page == 'masterDataSync' && !rebuild) {
         if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
             if (problemListChild != undefined && problemListChild != "undefined") {
-                problemListChild.qatProblemActions(programId,"loading");
+                problemListChild.qatProblemActions(programId, "loading");
             }
         }
     } else {
@@ -48,6 +49,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     programQPLDetailsJsonRequest.onsuccess = function (e) {
                         var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
                         programQPLDetailsJson.programModified = 1;
+                        console.log("programQPLDetailsJson in calclualtion else***",programQPLDetailsJson);
                         var programPlanningUnitList = myResult;
                         var programJsonForStoringTheResult = programJson;
                         var coreBatchDetails = programJsonForStoringTheResult.batchInfoList;
@@ -964,6 +966,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         putRequest.onsuccess = function (event) {
                             var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
                             var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+                            console.log("programQPLDetailsJson bfor put***",programQPLDetailsJson);
                             var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
                             programQPLDetailsRequest1.onsuccess = function (event) {
                                 if (page == "consumption") {
@@ -1046,7 +1049,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == 'masterDataSync') {
                                     if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
                                         if (problemListChild != undefined && problemListChild != "undefined") {
-                                            problemListChild.qatProblemActions(programId,"loading");
+                                            problemListChild.qatProblemActions(programId, "loading");
                                         }
                                     }
                                 }

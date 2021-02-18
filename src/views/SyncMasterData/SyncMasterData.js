@@ -318,7 +318,8 @@ export default class SyncMasterData extends Component {
                                     if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
                                         dt = "2020-01-01 00:00:00";
                                     }
-                                    console.log("M------------------------>", dt);
+                                    // console.log("M------------------------>", dt);
+                                    console.log("program id in master data sync***",prog.id);
                                     calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt, rebuild);
                                 }.bind(this)
                             }.bind(this)

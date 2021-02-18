@@ -143,7 +143,22 @@ export default class ConsumptionDetails extends React.Component {
                 }
 
                 var needToCalculate = this.props.match.params.calculate;
-                if (proList.length == 1) {
+                var programIdd = this.props.match.params.programId;
+                if (programIdd != '' && programIdd != undefined) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: programIdd
+                    }, () => {
+                        if (this.state.programId != '' && this.state.programId != undefined) {
+                            this.fetchData();
+                        }
+                    })
+                }
+                else if (proList.length == 1) {
                     this.setState({
                         programList: proList.sort(function (a, b) {
                             a = a.name.toLowerCase();
@@ -153,12 +168,7 @@ export default class ConsumptionDetails extends React.Component {
                         programId: proList[0].id
                     }, () => {
                         if (this.state.programId != '' && this.state.programId != undefined) {
-                            if (needToCalculate == "false") {
                                 this.fetchData();
-                            } else {
-                                // this.getProblemListAfterCalculation();
-                                this.fetchData();
-                            }
                         }
                     })
                 } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
@@ -171,13 +181,13 @@ export default class ConsumptionDetails extends React.Component {
                         programId: localStorage.getItem("sesProgramId")
                     }, () => {
                         if (this.state.programId != '' && this.state.programId != undefined) {
-                            if (needToCalculate == "false") {
-                                this.fetchData();
-                            } else {
+                            // if (needToCalculate == "false") {
+                            //     this.fetchData();
+                            // } else {
                                 // this.getProblemListAfterCalculation();
                                 this.fetchData();
 
-                            }
+                            // }
                         }
                     })
 
@@ -797,7 +807,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
-            this.refs.problemListChild.qatProblemActions(programId,"loading");
+            this.refs.problemListChild.qatProblemActions(programId, "loading");
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
         }
@@ -1226,7 +1236,8 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
-                                                onChange={(e) => { this.getProblemListAfterCalculation() }}
+                                                // onChange={(e) => { this.getProblemListAfterCalculation() }}
+                                                onChange={(e) => { this.fetchData() }}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="0">{i18n.t('static.common.select')}</option>

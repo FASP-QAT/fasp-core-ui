@@ -45,7 +45,8 @@ export default class QatProblemActionNew extends Component {
         );
     }
 
-    qatProblemActions(programId,key) {
+    qatProblemActions(programId, key) {
+        console.log("program id in QPL***", programId);
         console.log("new logic start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         // console.log("programId.toString()+++", programId.toString());
         var problemActionList = [];
@@ -73,7 +74,7 @@ export default class QatProblemActionNew extends Component {
                     supplyPlanError: i18n.t('static.program.errortext')
                 });
                 if (this.props.updateState != undefined) {
-                    this.props.updateState(key,false);
+                    this.props.updateState(key, false);
                 }
 
             };
@@ -104,7 +105,7 @@ export default class QatProblemActionNew extends Component {
                         supplyPlanError: i18n.t('static.program.errortext')
                     })
                     if (this.props.updateState != undefined) {
-                        this.props.updateState(key,false);
+                        this.props.updateState(key, false);
                     }
                 }.bind(this);
                 planningunitRequest.onsuccess = function (e) {
@@ -120,7 +121,7 @@ export default class QatProblemActionNew extends Component {
                             supplyPlanError: i18n.t('static.program.errortext')
                         })
                         if (this.props.updateState != undefined) {
-                            this.props.updateState(key,false);
+                            this.props.updateState(key, false);
                         }
                     }.bind(this);
                     problemRequest.onsuccess = function (e) {
@@ -136,7 +137,7 @@ export default class QatProblemActionNew extends Component {
                                 supplyPlanError: i18n.t('static.program.errortext')
                             })
                             if (this.props.updateState != undefined) {
-                                this.props.updateState(key,false);
+                                this.props.updateState(key, false);
                             }
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
@@ -144,7 +145,7 @@ export default class QatProblemActionNew extends Component {
                             var planningUnitListAll = puRequest.result;
                             if (programList.length == 0) {
                                 if (this.props.updateState != undefined) {
-                                    this.props.updateState(key,false);
+                                    this.props.updateState(key, false);
                                 }
                             }
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
@@ -1037,11 +1038,13 @@ export default class QatProblemActionNew extends Component {
                                         var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                         //previously we use to use this bcz we use to calculate for all program now we do it for one program at a time so we can remove filter from below line.
                                         console.log("time taken to get object store+++", problemOs);
+                                        console.log("problemActionList***", problemActionList);
                                         var paList = problemActionList.filter(c => c.program.id == programList[pp].programId)
                                         programList[pp].problemReportList = paList;
-                                        // console.log("paList+++",paList);
+                                        console.log("paList***", paList);
                                         var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
                                         var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                        console.log("openCount***", openCount, "addressedCount***", addressedCount);
                                         var programQPLDetailsJson = {
                                             id: programRequestList[pp].id,
                                             openCount: openCount,
@@ -1059,6 +1062,7 @@ export default class QatProblemActionNew extends Component {
                                         console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                         programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
                                         console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+
                                         var putRequest = problemOs.put(programRequestList[pp]);
 
                                         putRequest.onerror = function (event) {
@@ -1067,16 +1071,17 @@ export default class QatProblemActionNew extends Component {
                                                 color: 'red'
                                             })
                                             if (this.props.updateState != undefined) {
-                                                this.props.updateState(key,false);
+                                                this.props.updateState(key, false);
                                             }
                                         }.bind(this);
                                         putRequest.onsuccess = function (event) {
                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                            console.log("programQPLDetailsJson***", programQPLDetailsJson);
                                             var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                             programQPLDetailsRequest.onsuccess = function (event) {
                                                 if (this.props.updateState != undefined) {
-                                                    this.props.updateState(key,false);
+                                                    this.props.updateState(key, false);
                                                     // this.props.fetchData();
                                                 } if (this.props.fetchData != undefined) {
                                                     this.props.fetchData();
@@ -1084,7 +1089,7 @@ export default class QatProblemActionNew extends Component {
 
                                             }.bind(this);
                                         }.bind(this);
-                                        //console.log("problemList for each program=====>", problemActionList);
+                                        console.log("problemList for each program***", problemActionList);
                                         console.log("new logic ends+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                     }
                                 }.bind(this);
