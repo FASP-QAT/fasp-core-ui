@@ -624,14 +624,14 @@ class ApplicationDashboard extends Component {
   }
 
   getProblemListAfterCalculation(id) {
-    
-   this.updateState(id,true);
+
+    this.updateState(id, true);
     // alert("hello");
     // let programId = id;
     if (id != 0) {
       this.refs.problemListChild.qatProblemActions(id, id);
     } else {
-      this.updateState(id,false);
+      this.updateState(id, false);
       // this.setState({
       //   message: i18n.t('static.common.selectProgram'), data: [],
       //   // loadingQPLArray: false
@@ -905,7 +905,7 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={undefined} objectStore="programData"></QatProblemActionNew>
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -1296,8 +1296,7 @@ class ApplicationDashboard extends Component {
                               </DropdownToggle>
                               <DropdownMenu right>
                                 <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>Recalculate</DropdownItem>
-                                <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>QPL</DropdownItem>
-
+                                <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
                           </ButtonGroup>

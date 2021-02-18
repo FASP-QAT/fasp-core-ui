@@ -983,9 +983,9 @@ class Program extends Component {
                                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                                             for (var r = 0; r < json.length; r++) {
                                                                 var programQPLDetailsJson = {
-                                                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
                                                                     programId: json[r].programId,
-                                                                    version: version,
+                                                                    version: json[r].currentVersion.versionId,
                                                                     userId: userId,
                                                                     programCode: json[r].programCode,
                                                                     openCount: 0,
@@ -1088,9 +1088,9 @@ class Program extends Component {
                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                             for (var r = 0; r < json.length; r++) {
                                                 var programQPLDetailsJson = {
-                                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
                                                     programId: json[r].programId,
-                                                    version: version,
+                                                    version: json[r].currentVersion.versionId,
                                                     userId: userId,
                                                     programCode: json[r].programCode,
                                                     openCount: 0,
