@@ -1050,9 +1050,10 @@ export default class QatProblemActionNew extends Component {
                                             version: programRequestList[pp].version,
                                             userId: programRequestList[pp].userId,
                                             programId: programList[pp].programId,
-                                            programModified: programList[pp].programModified
+                                            programModified: programRequestList[pp].programModified
                                         }
                                         console.log("open+++", openCount, "addressed+++", addressedCount);
+                                        console.log("@@@ProgramQPLDetailsJson",programQPLDetailsJson);
                                         // programRequestList[pp].openCount=openCount;
                                         // programRequestList[pp].addressedCount=addressedCount;
                                         console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));

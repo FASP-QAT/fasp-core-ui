@@ -114,8 +114,8 @@ export default class ConsumptionDetails extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = [];
             var shipStatusList = []
@@ -129,13 +129,13 @@ export default class ConsumptionDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programJson);
+                        // var programJson = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programJson);
                         var programJson = {
                             // getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version
-                            name: programJson1.programCode + "~v" + myResult[i].version,
+                            name: myResult[i].programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
