@@ -23,6 +23,7 @@ const propTypes = {
 };
 
 const defaultProps = {};
+const checkOnline=isSiteOnline();
 
 class DefaultHeader extends Component {
   constructor(props) {
@@ -98,7 +99,7 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          {isSiteOnline() &&
+          {checkOnline &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&

@@ -53,6 +53,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
+const checkOnline=isSiteOnline();
 class warehouseCapacity extends Component {
     constructor(props) {
         super(props);
@@ -951,7 +952,7 @@ class warehouseCapacity extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                        {isSiteOnline() && 
+                                        {checkOnline && 
                                                 <FormGroup className="col-md-3 ">
                                                     <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -996,7 +997,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup> */}
-                                                {isSiteOnline() && 
+                                                {checkOnline && 
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1018,7 +1019,7 @@ class warehouseCapacity extends Component {
                                                 </FormGroup>
     }
 
-                                            {!isSiteOnline() && 
+                                            {!checkOnline && 
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">

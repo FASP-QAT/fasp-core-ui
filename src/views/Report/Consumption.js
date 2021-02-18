@@ -61,7 +61,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
-
+const checkOnline=isSiteOnline();
 
 
 
@@ -1435,7 +1435,7 @@ class Consumption extends Component {
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
-          {isSiteOnline() && 
+          {checkOnline && 
                 this.state.consumptions.length > 0 &&
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1447,7 +1447,7 @@ class Consumption extends Component {
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
               }
-            {!isSiteOnline() && 
+            {!checkOnline && 
                 this.state.offlineConsumptionList.length > 0 &&
                 <div className="card-header-actions">
                   <a className="card-header-action">
@@ -1529,7 +1529,7 @@ class Consumption extends Component {
                       </FormGroup>
 
 
-                      {isSiteOnline() && 
+                      {checkOnline && 
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
@@ -1557,7 +1557,7 @@ class Consumption extends Component {
                           </div>
                         </FormGroup>
   }
-                      {!isSiteOnline() && 
+                      {!checkOnline && 
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
@@ -1611,7 +1611,7 @@ class Consumption extends Component {
 
                 <Col md="12 pl-0">
                   <div className="row">
-                  {isSiteOnline() && 
+                  {checkOnline && 
                         this.state.consumptions.length > 0
                         &&
                         <div className="col-md-12 p-0">
@@ -1633,7 +1633,7 @@ class Consumption extends Component {
 
 
 
-                        {!isSiteOnline() && 
+                        {!checkOnline && 
                         this.state.offlineConsumptionList.length > 0
                         &&
                         <div className="col-md-12 p-0">
@@ -1656,7 +1656,7 @@ class Consumption extends Component {
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                    {isSiteOnline() && this.state.show && this.state.consumptions.length > 0 &&
+                    {checkOnline && this.state.show && this.state.consumptions.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>
@@ -1703,7 +1703,7 @@ class Consumption extends Component {
                             </tbody>
 
                           </Table>}
-                          {!isSiteOnline() && this.state.show && this.state.offlineConsumptionList.length > 0 &&
+                          {!checkOnline && this.state.show && this.state.offlineConsumptionList.length > 0 &&
                           <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
                             <tbody>

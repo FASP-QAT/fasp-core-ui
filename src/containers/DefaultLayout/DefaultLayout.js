@@ -22,6 +22,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
+const checkOnline=isSiteOnline();
 const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -927,8 +928,7 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-
-              {isSiteOnline() && 
+              {checkOnline && 
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -2056,7 +2056,7 @@ class DefaultLayout extends Component {
 
                 }} {...this.props} />
   }
-              {!isSiteOnline() && 
+              {!checkOnline && 
                 <AppSidebarNav navConfig={{
                   items:
                     [

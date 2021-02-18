@@ -65,6 +65,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+const checkOnline=isSiteOnline();
 
 const options = {
   scales: {
@@ -860,7 +861,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-          {isSiteOnline() && this.state.id == 1 &&
+          {checkOnline && this.state.id == 1 &&
             <Row className="mt-2">
 
               <Col xs="12" sm="6" lg="3">
@@ -979,7 +980,7 @@ class ApplicationDashboard extends Component {
 
             </Row>
           }
-          {isSiteOnline() && this.state.id == 2 &&
+          {checkOnline && this.state.id == 2 &&
             <Row className="mt-2">
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1261,7 +1262,7 @@ class ApplicationDashboard extends Component {
                 </Card>
               </Col>
             }
-{isSiteOnline() && 
+{checkOnline && 
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">

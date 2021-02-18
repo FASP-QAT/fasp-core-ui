@@ -55,6 +55,8 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
+const checkOnline=isSiteOnline();
+
 // Return with commas in between
 var numberWithCommas = function (x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -2332,7 +2334,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </FormGroup>
                                         </Online> */}
-                                        {!isSiteOnline() && 
+                                        {!checkOnline && 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
@@ -2360,7 +2362,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </FormGroup>
                                         }
-                                        {!isSiteOnline() && 
+                                        {!checkOnline && 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
