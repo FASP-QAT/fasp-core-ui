@@ -41,6 +41,7 @@ export default class SyncMasterData extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.syncProgramData = this.syncProgramData.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.fetchData = this.fetchData.bind(this);
     }
 
     hideFirstComponent() {
@@ -112,7 +113,7 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActionNew>
+                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
                 {/* <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions> */}
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
@@ -314,13 +315,19 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
-                                    var dt = date;
-                                    if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
-                                        dt = "2020-01-01 00:00:00";
-                                    }
+                                    // var dt = date;
+                                    // if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
+                                    //     dt = "2020-01-01 00:00:00";
+                                    // }
                                     // console.log("M------------------------>", dt);
-                                    console.log("program id in master data sync***",prog.id);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt, rebuild);
+                                    console.log("program id in master data sync***", prog.id);
+                                    var rebuildQPL = false;
+                                    if (this.props.location.state != undefined) {
+                                        if (this.props.location.state.programIds.includes(prog.id)) {
+                                            rebuildQPL = true;
+                                        }
+                                    }
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, rebuild, rebuildQPL);
                                 }.bind(this)
                             }.bind(this)
                         } else {
@@ -383,26 +390,67 @@ export default class SyncMasterData extends Component {
         // this.refs.programListChild.checkNewerVersions();
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
 
-        if (valid) {
+        // if (valid) {
+        //     this.setState({
+        //         syncedMasters: this.state.syncedMasters + 1,
+        //         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+        //     })
+        // } else {
+        //     console.log("D--------------------------->in 7")
+        //     if (document.getElementById('div1') != null) {
+        //         document.getElementById('div1').style.display = 'none';
+        //     }
+        //     document.getElementById("retryButtonDiv").style.display = "block";
+        //     this.setState({
+        //         message: 'static.common.onlinealerttext'
+        //     },
+        //         () => {
+        //             this.hideSecondComponent();
+        //         })
+        // }
+        // console.log("Valid", valid);
+        return valid;
+    }
+
+    fetchData(hasPrograms) {
+        console.log("In fetch data @@@", this.state.syncedMasters)
+        console.log("HasPrograms@@@", hasPrograms);
+        var realmId = AuthenticationService.getRealmId();
+        if (hasPrograms != 0) {
             this.setState({
                 syncedMasters: this.state.syncedMasters + 1,
                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
             })
-        } else {
-            console.log("D--------------------------->in 7")
-            if (document.getElementById('div1') != null) {
-                document.getElementById('div1').style.display = 'none';
-            }
-            document.getElementById("retryButtonDiv").style.display = "block";
-            this.setState({
-                message: 'static.common.onlinealerttext'
-            },
-                () => {
-                    this.hideSecondComponent();
-                })
         }
-        console.log("Valid", valid);
-        return valid;
+        if (this.state.syncedMasters === this.state.totalMasters) {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+                var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+                var updatedLastSyncDateJson = {
+                    lastSyncDate: this.state.updatedSyncDate,
+                    id: 0
+                }
+                var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson)
+                var updatedLastSyncDateJson1 = {
+                    lastSyncDate: this.state.updatedSyncDate,
+                    id: realmId
+                }
+                var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
+                updateLastSyncDate.onsuccess = function (event) {
+                    console.log("M sync final success updated---", this.state.syncedMasters)
+                    document.getElementById("retryButtonDiv").style.display = "none";
+                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                    console.log("M sync role based dashboard done");
+                    console.log("End date", Date.now());
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                }.bind(this)
+            }.bind(this)
+        }
     }
 
 
@@ -419,6 +467,9 @@ export default class SyncMasterData extends Component {
                 var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
                 var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
                 var updatedSyncDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                this.setState({
+                    updatedSyncDate: updatedSyncDate
+                })
                 var lastSyncDateRequest = lastSyncDateTransaction.getAll();
                 lastSyncDateRequest.onsuccess = function (event) {
                     var lastSyncDate = lastSyncDateRequest.result[0];
@@ -464,7 +515,10 @@ export default class SyncMasterData extends Component {
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var pIds = [];
-
+                        var tm = this.state.totalMasters;
+                        this.setState({
+                            totalMasters: tm + myResult.length
+                        })
 
                         var programIds = myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
@@ -997,28 +1051,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                                                                                                 }, () => {
                                                                                                                                                                                                                                                                                                                                                     console.log("M sync after problem state updated---", this.state.syncedMasters)
-                                                                                                                                                                                                                                                                                                                                                    if (this.state.syncedMasters === this.state.totalMasters) {
-                                                                                                                                                                                                                                                                                                                                                        var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
-                                                                                                                                                                                                                                                                                                                                                        var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
-                                                                                                                                                                                                                                                                                                                                                        var updatedLastSyncDateJson = {
-                                                                                                                                                                                                                                                                                                                                                            lastSyncDate: updatedSyncDate,
-                                                                                                                                                                                                                                                                                                                                                            id: 0
-                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                        var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson)
-                                                                                                                                                                                                                                                                                                                                                        var updatedLastSyncDateJson1 = {
-                                                                                                                                                                                                                                                                                                                                                            lastSyncDate: updatedSyncDate,
-                                                                                                                                                                                                                                                                                                                                                            id: realmId
-                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                        var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
-                                                                                                                                                                                                                                                                                                                                                        updateLastSyncDate.onsuccess = function (event) {
-                                                                                                                                                                                                                                                                                                                                                            console.log("M sync final success updated---", this.state.syncedMasters)
-                                                                                                                                                                                                                                                                                                                                                            document.getElementById("retryButtonDiv").style.display = "none";
-                                                                                                                                                                                                                                                                                                                                                            let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                                                                                                                                                                                                                                                                                                                            console.log("M sync role based dashboard done");
-                                                                                                                                                                                                                                                                                                                                                            console.log("End date", Date.now());
-                                                                                                                                                                                                                                                                                                                                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
-                                                                                                                                                                                                                                                                                                                                                        }.bind(this)
-                                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                    this.fetchData(0);
                                                                                                                                                                                                                                                                                                                                                 })
                                                                                                                                                                                                                                                                                                                                             }.bind(this);
                                                                                                                                                                                                                                                                                                                                         })

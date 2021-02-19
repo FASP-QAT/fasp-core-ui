@@ -981,6 +981,7 @@ class Program extends Component {
                                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                            var programIds = []
                                                             for (var r = 0; r < json.length; r++) {
                                                                 var programQPLDetailsJson = {
                                                                     id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
@@ -990,8 +991,9 @@ class Program extends Component {
                                                                     programCode: json[r].programCode,
                                                                     openCount: 0,
                                                                     addressedCount: 0,
-                                                                    programModified:0
+                                                                    programModified: 0
                                                                 };
+                                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                             }
                                                             programQPLDetailsTransaction.oncomplete = function (event) {
@@ -1007,7 +1009,7 @@ class Program extends Component {
                                                                 // this.refs.programListChild.checkNewerVersions();
                                                                 this.getPrograms();
                                                                 this.getLocalPrograms();
-                                                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                                             }.bind(this)
                                                         }.bind(this)
                                                     }.bind(this)
@@ -1086,6 +1088,7 @@ class Program extends Component {
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                             var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                            var programIds = []
                                             for (var r = 0; r < json.length; r++) {
                                                 var programQPLDetailsJson = {
                                                     id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
@@ -1095,8 +1098,9 @@ class Program extends Component {
                                                     programCode: json[r].programCode,
                                                     openCount: 0,
                                                     addressedCount: 0,
-                                                    programModified:0
+                                                    programModified: 0
                                                 };
+                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                             }
                                             programQPLDetailsTransaction.oncomplete = function (event) {
@@ -1111,7 +1115,7 @@ class Program extends Component {
                                                 // this.refs.programListChild.checkNewerVersions();
                                                 this.getPrograms();
                                                 this.getLocalPrograms();
-                                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                             }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
