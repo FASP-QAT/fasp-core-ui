@@ -486,7 +486,8 @@ export default class ConsumptionDetails extends React.Component {
                 var items = [];
                 if (y != null) {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
-                    if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
+                    // if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
+                        if (obj.options.allowInsertRow == true) {
                         items.push({
                             title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
