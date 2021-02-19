@@ -8,7 +8,7 @@ import {
     PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS,
     APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS,
     ON_HOLD_SHIPMENT_STATUS,
-    INDEXED_DB_VERSION, INDEXED_DB_NAME, ACTUAL_CONSUMPTION_MONTHS_IN_PAST_FOR_QPL
+    INDEXED_DB_VERSION, INDEXED_DB_NAME, ACTUAL_CONSUMPTION_MONTHS_IN_PAST_FOR_QPL, FORECASTED_CONSUMPTION_MODIFIED, ACTUAL_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED
 
 } from '../Constants.js'
 import CryptoJS from 'crypto-js';
@@ -189,18 +189,29 @@ export default class QatProblemActionNew extends Component {
                                             try {
                                                 // var shipmentList = programList[pp].shipmentList;
                                                 // console.log("program===>", programList[pp]);
+                                                var actionList = [];
+                                                var actionPlanningUnitIds = [];
                                                 var versionID = versionIDs[pp];
                                                 var problemActionIndex = 0;
                                                 problemActionList = programList[pp].problemReportList;
                                                 problemActionIndex = programList[pp].problemReportList.length;
+                                                actionList = programList[pp].actionList;
+                                                console.log("actionList+++", actionList);
+                                                actionList.map(actionObj => {
+                                                    actionPlanningUnitIds.push(parseInt(actionObj.planningUnitId));
+                                                });
+
+                                                console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
                                                 var regionList = programList[pp].regionList;
                                                 problemList = problemRequest.result.filter(c =>
                                                     c.realm.id == programList[pp].realmCountry.realm.realmId
                                                     && c.active.toString() == "true");
-                                                planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
+                                                planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId && actionPlanningUnitIds.includes(c.planningUnit.id));
+                                                console.log("new filtered panning unit list+++", planningUnitList);
                                                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                                                 var curMonth = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM'));
                                                 for (var p = 0; p < planningUnitList.length; p++) {
+                                                    console.log("in for+++");
                                                     var checkPlanningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
                                                     var checkProgramPlanningUnitObj = planningUnitList[p];
                                                     if (checkPlanningUnitObj.active == true && checkProgramPlanningUnitObj.active == true) {
@@ -233,9 +244,24 @@ export default class QatProblemActionNew extends Component {
                                                             maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                                                         }
 
-
-                                                        for (var prob = 0; prob < problemList.length; prob++) {
-
+                                                        var actionTypeIds = [];
+                                                        var filteredActionListForType = actionList.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id);
+                                                        filteredActionListForType.map(actionForTypeObj => {
+                                                            actionTypeIds.push(parseInt(actionForTypeObj.type));
+                                                        });
+                                                        console.log("actionTypeIds+++", actionTypeIds);
+                                                        var typeProblemList = problemList.filter(
+                                                            c =>
+                                                                (actionTypeIds.includes(FORECASTED_CONSUMPTION_MODIFIED) && c.problem.forecastedConsumptionTrigger) ||
+                                                                (actionTypeIds.includes(ACTUAL_CONSUMPTION_MODIFIED) && c.problem.actualConsumptionTrigger) ||
+                                                                (actionTypeIds.includes(INVENTORY_MODIFIED) && c.problem.inventoryTrigger) ||
+                                                                (actionTypeIds.includes(ADJUSTMENT_MODIFIED) && c.problem.adjustmentTrigger) ||
+                                                                (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger)
+                                                        );
+                                                        console.log("typeProblemList+++", typeProblemList);
+                                                        for (var prob = 0; prob < typeProblemList.length; prob++) {
+                                                            // for (var prob = 0; prob < problemList.length; prob++) {
+                                                            console.log("in problemlist for+++");
                                                             switch (problemList[prob].problem.problemId) {
                                                                 case 1:
                                                                     // CASE 1 START (missing recent actual consumption in last three month including current month.)
@@ -1048,6 +1074,11 @@ export default class QatProblemActionNew extends Component {
                                                 var paList = problemActionList.filter(c => c.program.id == programList[pp].programId)
                                                 programList[pp].problemReportList = paList;
                                                 console.log("paList***", paList);
+
+                                                // after the logic for QPL is run accordign to the type and planning unit list we are clearing the action list and update the date on which QPL is calcukated
+                                                programList[pp].actionList = [];
+                                                programList[pp].qplLastModifiedDate = curDate;
+
                                                 var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
                                                 var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
                                                 console.log("openCount***", openCount, "addressedCount***", addressedCount);
