@@ -45,7 +45,7 @@ export default class QatProblemActionNew extends Component {
         );
     }
 
-    qatProblemActions(programId, key) {
+    qatProblemActions(programId, key, buildFullQPL) {
         console.log("program id in QPL***", programId);
         console.log("new logic start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         // console.log("programId.toString()+++", programId.toString());
@@ -190,6 +190,7 @@ export default class QatProblemActionNew extends Component {
                                                 // var shipmentList = programList[pp].shipmentList;
                                                 // console.log("program===>", programList[pp]);
                                                 var actionList = [];
+                                                var qplLastModifiedDate = "";
                                                 var actionPlanningUnitIds = [];
                                                 var versionID = versionIDs[pp];
                                                 var problemActionIndex = 0;
@@ -206,7 +207,16 @@ export default class QatProblemActionNew extends Component {
                                                 problemList = problemRequest.result.filter(c =>
                                                     c.realm.id == programList[pp].realmCountry.realm.realmId
                                                     && c.active.toString() == "true");
-                                                planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId && actionPlanningUnitIds.includes(c.planningUnit.id));
+                                                planningUnitList = planningUnitResult.filter(c =>
+                                                    c.program.id == programList[pp].programId
+                                                );
+
+                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM")) {
+                                                    planningUnitList = planningUnitList.filter(c =>
+                                                        actionPlanningUnitIds.includes(c.planningUnit.id)
+                                                    );
+                                                }
+
                                                 console.log("new filtered panning unit list+++", planningUnitList);
                                                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                                                 var curMonth = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM'));
@@ -250,14 +260,18 @@ export default class QatProblemActionNew extends Component {
                                                             actionTypeIds.push(parseInt(actionForTypeObj.type));
                                                         });
                                                         console.log("actionTypeIds+++", actionTypeIds);
-                                                        var typeProblemList = problemList.filter(
-                                                            c =>
-                                                                (actionTypeIds.includes(FORECASTED_CONSUMPTION_MODIFIED) && c.problem.forecastedConsumptionTrigger) ||
-                                                                (actionTypeIds.includes(ACTUAL_CONSUMPTION_MODIFIED) && c.problem.actualConsumptionTrigger) ||
-                                                                (actionTypeIds.includes(INVENTORY_MODIFIED) && c.problem.inventoryTrigger) ||
-                                                                (actionTypeIds.includes(ADJUSTMENT_MODIFIED) && c.problem.adjustmentTrigger) ||
-                                                                (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger)
-                                                        );
+                                                        var typeProblemList = problemList;
+                                                        if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM")) {
+                                                            typeProblemList = problemList.filter(
+                                                                c =>
+                                                                    (actionTypeIds.includes(FORECASTED_CONSUMPTION_MODIFIED) && c.problem.forecastedConsumptionTrigger) ||
+                                                                    (actionTypeIds.includes(ACTUAL_CONSUMPTION_MODIFIED) && c.problem.actualConsumptionTrigger) ||
+                                                                    (actionTypeIds.includes(INVENTORY_MODIFIED) && c.problem.inventoryTrigger) ||
+                                                                    (actionTypeIds.includes(ADJUSTMENT_MODIFIED) && c.problem.adjustmentTrigger) ||
+                                                                    (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger) || 
+                                                                    (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
+                                                            );
+                                                        }
                                                         console.log("typeProblemList+++", typeProblemList);
                                                         for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                             // for (var prob = 0; prob < problemList.length; prob++) {

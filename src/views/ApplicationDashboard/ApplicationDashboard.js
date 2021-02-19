@@ -629,7 +629,7 @@ class ApplicationDashboard extends Component {
     // alert("hello");
     // let programId = id;
     if (id != 0) {
-      this.refs.problemListChild.qatProblemActions(id, id);
+      this.refs.problemListChild.qatProblemActions(id, id,false);
     } else {
       this.updateState(id, false);
       // this.setState({
