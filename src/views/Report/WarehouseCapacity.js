@@ -53,7 +53,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
-const checkOnline=isSiteOnline();
+const checkOnline = localStorage.getItem('typeOfSession');
 class warehouseCapacity extends Component {
     constructor(props) {
         super(props);
@@ -952,7 +952,7 @@ class warehouseCapacity extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                        {checkOnline && 
+                                            {checkOnline === 'Online' &&
                                                 <FormGroup className="col-md-3 ">
                                                     <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -974,10 +974,10 @@ class warehouseCapacity extends Component {
                                                     </div>
 
                                                 </FormGroup>
-    }
-                                            
+                                            }
 
-                                                {/* <FormGroup className="col-md-3">
+
+                                            {/* <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
                                                         <InputGroup>
@@ -997,7 +997,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup> */}
-                                                {checkOnline && 
+                                            {checkOnline === 'Online' &&
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1017,9 +1017,9 @@ class warehouseCapacity extends Component {
                                                         )}
 
                                                 </FormGroup>
-    }
+                                            }
 
-                                            {!checkOnline && 
+                                            {checkOnline === 'Offline' &&
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">

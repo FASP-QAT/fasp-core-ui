@@ -44,7 +44,7 @@ import { polling } from '../../Constants';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
-const checkOnline=isSiteOnline();
+const checkOnline = localStorage.getItem('typeOfSession');
 const brandPrimary = getStyle('--primary')
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
@@ -341,7 +341,7 @@ class RealmDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        {checkOnline && 
+        {checkOnline === 'Online' && 
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
@@ -584,7 +584,7 @@ class RealmDashboard extends Component {
 
 
           </Row>
-  }
+        }
 
         {/* <Row>
             <Col md="12">

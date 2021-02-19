@@ -35,8 +35,7 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const checkOnline=isSiteOnline();
-
+const checkOnline = localStorage.getItem('typeOfSession');
 
 class FunderExport extends Component {
     constructor(props) {
@@ -1158,7 +1157,7 @@ class FunderExport extends Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                         </div> */}
-                        {checkOnline && 
+                        {checkOnline === 'Online' && 
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
@@ -1167,7 +1166,7 @@ class FunderExport extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                                 </div>
                             }
-                        {!checkOnline && 
+                        {checkOnline === 'Offline' && 
                                 this.state.data.length > 0 &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">

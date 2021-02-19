@@ -21,7 +21,7 @@ import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComp
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { polling } from '../../Constants';
 
-const checkOnline=isSiteOnline();
+const checkOnline = localStorage.getItem('typeOfSession');
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -240,10 +240,10 @@ console.log("Going to change online")
 
           <div className="avatar">
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            {checkOnline &&
+            {checkOnline === 'Online' && 
               <span className="avatar-status badge-success" title="Online"></span>
             }
-            {!checkOnline && 
+            {checkOnline === 'Offline' &&  
               <span className="avatar-status badge-danger" title="Offline"></span>
             }
           </div>
@@ -271,7 +271,7 @@ console.log("Going to change online")
           <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem>
-          {checkOnline && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
+          {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
           {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>

@@ -65,7 +65,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
-const checkOnline=isSiteOnline();
+const checkOnline = localStorage.getItem('typeOfSession');
 
 const options = {
   scales: {
@@ -861,7 +861,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-          {checkOnline && this.state.id == 1 &&
+        {checkOnline === 'Online' && this.state.id == 1 &&
             <Row className="mt-2">
 
               <Col xs="12" sm="6" lg="3">
@@ -980,7 +980,7 @@ class ApplicationDashboard extends Component {
 
             </Row>
           }
-          {checkOnline && this.state.id == 2 &&
+          {checkOnline === 'Online' && this.state.id == 2 &&
             <Row className="mt-2">
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1262,7 +1262,7 @@ class ApplicationDashboard extends Component {
                 </Card>
               </Col>
             }
-{checkOnline && 
+{checkOnline === 'Online' && 
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">
