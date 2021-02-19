@@ -1205,7 +1205,7 @@
     "static.manualtagging.resultOrderNoBlank": "Insira o número do pedido.",
     "static.add.addCountryRealm": "Adicionar País",
     "static.pipeline.programData": "Dados do Programa",
-    "static.quantimed.quantimedPlanningUnitLabel": "Unidade Quantimada",
+    "static.quantimed.quantimedPlanningUnitLabel": "Produto Quantimed\n",
     "static.report.veruploaduser": "Versão enviada pelo usuário",
     "static.report.forecasted": "Previsto",
     "static.productCategoryTree.duplicateProductCategoryTree": "Nome de categoria de produto duplicado encontrado",

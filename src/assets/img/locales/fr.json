@@ -1205,7 +1205,7 @@
     "static.manualtagging.resultOrderNoBlank": "Saisir le nº de commande",
     "static.add.addCountryRealm": "Ajouter un pays",
     "static.pipeline.programData": "Données du programme",
-    "static.quantimed.quantimedPlanningUnitLabel": "Unité Quantimed",
+    "static.quantimed.quantimedPlanningUnitLabel": "Produit Quantimed\n",
     "static.report.veruploaduser": "Version téléchargée par l`utilisateur",
     "static.report.forecasted": "Prévu",
     "static.productCategoryTree.duplicateProductCategoryTree": "Nom de catégorie de produit en double trouvé",

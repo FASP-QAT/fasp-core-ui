@@ -1205,7 +1205,7 @@
     "static.manualtagging.resultOrderNoBlank": "Enter ERP shipment number.",
     "static.add.addCountryRealm": "Add Country",
     "static.pipeline.programData": "Program Data",
-    "static.quantimed.quantimedPlanningUnitLabel": "Quantimed Unit",
+    "static.quantimed.quantimedPlanningUnitLabel": "Quantimed Product",
     "static.report.veruploaduser": "Version Uploaded by User",
     "static.report.forecasted": "Forecasted",
     "static.productCategoryTree.duplicateProductCategoryTree": "Duplicate Planning Unit Category Name Found",
