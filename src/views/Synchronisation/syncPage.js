@@ -3234,7 +3234,7 @@ export default class syncPage extends Component {
           columns: [
             {
               title: i18n.t('static.commitVersion.problemReportId'),
-              type: 'text',
+              type: 'hidden',
             },
             {
               title: 'problemActionIndex',
