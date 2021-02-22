@@ -62,6 +62,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     addRowInJexcel = function () {
@@ -543,6 +544,18 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return this.state.procurmentUnitListJexcel.filter(c => c.active.toString() == "true");
     }.bind(this);
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
+        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        }
+
+    }
+
     componentDidMount() {
         var procurmentAgentListJexcel = [];
         var procurmentUnitListJexcel = [];
@@ -692,6 +705,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         copyCompatibility: true,
                                         parseFormulas: true,
                                         onpaste: this.onPaste,
+                                        oneditionend: this.oneditionend,
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
