@@ -872,7 +872,7 @@ export default class syncPage extends Component {
   componentDidMount() {
     var db1;
     getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         commitVersionError: i18n.t('static.program.errortext'),
