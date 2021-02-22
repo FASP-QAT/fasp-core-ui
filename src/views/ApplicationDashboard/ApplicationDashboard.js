@@ -629,7 +629,7 @@ class ApplicationDashboard extends Component {
     // alert("hello");
     // let programId = id;
     if (id != 0) {
-      this.refs.problemListChild.qatProblemActions(id, id,false);
+      this.refs.problemListChild.qatProblemActions(id, id, false);
     } else {
       this.updateState(id, false);
       // this.setState({
@@ -1295,7 +1295,7 @@ class ApplicationDashboard extends Component {
                               <DropdownToggle caret className="p-0" color="transparent">
                               </DropdownToggle>
                               <DropdownMenu right>
-                                <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>Recalculate</DropdownItem>
+                                <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
                                 <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
@@ -1304,8 +1304,8 @@ class ApplicationDashboard extends Component {
                         <a href="javascript:void();" title="Recalculate" onClick={() => this.getProblemListAfterCalculation(item.id)}><i className="fa fa-refresh"></i></a> */}
                         </div>
                         <div className="TextTittle ">{item.programCode + "~v" + item.programVersion}</div>
-                        <div className="TextTittle ">{i18n.t("static.ticket.openIssues")}:{item.openCount}</div>
-                        <div className="TextTittle">{i18n.t("static.ticket.addressedIssues")}: {item.addressedCount}</div>
+                        <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
+                        <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
                       </div>
                       <div style={{ display: item.loading ? "block" : "none" }}>
                         <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >

@@ -350,7 +350,7 @@ export default class QatProblemActionNew extends Component {
                                                                     // CASE 1 END =================
                                                                     break;
                                                                 case 2:
-                                                                    // CASE 2 START (missing recent  inventory inputs for last three month including current month.)
+                                                                    // CASE 2 START (missing recent  inventory inputs for last three month including current month.) actual qty inputs are checked
                                                                     for (var r = 0; r < regionList.length; r++) {
                                                                         var inventoryList = programList[pp].inventoryList;
                                                                         var numberOfMonthsInventory = parseInt(problemList[prob].data1);
@@ -365,14 +365,22 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.region != null
                                                                             && c.region.id != 0
                                                                             && c.region.id == regionList[r].regionId
-                                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                            && c.actualQty != undefined 
+                                                                            && c.actualQty != null 
+                                                                            && c.actualQty !== ""
+                                                                            );
                                                                         var filterInventoryListForSixMonthRange = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= startDateForSixMonthRange
                                                                             && moment(c.inventoryDate).format('YYYY-MM-DD') <= endDateForSixMonthRange
                                                                             && c.active.toString() == "true"
                                                                             && c.region != null
                                                                             && c.region.id != 0
                                                                             && c.region.id == regionList[r].regionId
-                                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                            && c.actualQty != undefined 
+                                                                            && c.actualQty != null 
+                                                                            && c.actualQty !== ""
+                                                                            );
                                                                         var index = problemActionList.findIndex(
                                                                             c =>
                                                                                 // moment(c.dt).format("YYYY-MM") == curMonth &&
@@ -667,7 +675,7 @@ export default class QatProblemActionNew extends Component {
                                                                 case 10:
                                                                 case 14:
                                                                 case 15:
-                                                                    // Dynamic forecasting is ot used for commidity group ARV,VMMC,MALARIA
+                                                                    // Dynamic forecasting is not used for commidity group ARV,VMMC,MALARIA
                                                                     // console.log("planningUnit+++", planningUnitList[p].planningUnit.id);
                                                                     for (var r = 0; r < regionList.length; r++) {
                                                                         var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
