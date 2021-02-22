@@ -15,12 +15,12 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../assets/img/QAT-logo.png';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
-import QatProblemActions from '../../CommonComponent/QatProblemActions' ;
+import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -41,14 +41,15 @@ export default class SyncMasterData extends Component {
         this.retryClicked = this.retryClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.syncProgramData = this.syncProgramData.bind(this);
-        this.hideFirstComponent=this.hideFirstComponent.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.fetchData = this.fetchData.bind(this);
     }
 
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
-          document.getElementById('div1').style.display = 'none';
+            document.getElementById('div1').style.display = 'none';
         }, 8000);
-      }
+    }
 
     hideSecondComponent() {
         setTimeout(function () {
@@ -113,7 +114,7 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActionNew>
+                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
                 {/* <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions> */}
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
@@ -192,6 +193,7 @@ export default class SyncMasterData extends Component {
                             var programJson = JSON.parse(programData);
                             var shipmentDataList = (programJson.shipmentList);
                             var batchInfoList = (programJson.batchInfoList);
+                            var actionList = programJson.actionList;
                             var problemReportList = programJson.problemReportList;
                             console.log("Shipment data list", shipmentDataList);
                             console.log("Batch Info list", batchInfoList);
@@ -272,8 +274,16 @@ export default class SyncMasterData extends Component {
                                     problemReportList[index].problemReportTransList = problemReportTransList;
                                 }
                             }
+                            for (var p = 0; p < planningUnitList.length; p++) {
+                                actionList.push({
+                                    planningUnitId: planningUnitList[p],
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
 
+                                })
+                            }
                             programJson.shipmentList = shipmentDataList;
+                            programJson.actionList = actionList;
                             programJson.batchInfoList = batchInfoList;
                             programJson.problemReportList = problemReportList;
                             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -283,9 +293,9 @@ export default class SyncMasterData extends Component {
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
                                 console.log("D--------------------------->in 1")
-                                if(document.getElementById('div1')!=null){
+                                if (document.getElementById('div1') != null) {
                                     document.getElementById('div1').style.display = 'none';
-                                  }
+                                }
                                 this.setState({
                                     message: i18n.t('static.program.errortext')
                                 },
@@ -306,12 +316,19 @@ export default class SyncMasterData extends Component {
                                 }.bind(this);
                                 putRequest.onsuccess = function (event) {
                                     console.log("Planning unit list", planningUnitList);
-                                    var dt = date;
-                                    if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
-                                        dt = "2020-01-01 00:00:00";
+                                    // var dt = date;
+                                    // if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
+                                    //     dt = "2020-01-01 00:00:00";
+                                    // }
+                                    // console.log("M------------------------>", dt);
+                                    console.log("program id in master data sync***", prog.id);
+                                    var rebuildQPL = false;
+                                    if (this.props.location.state != undefined) {
+                                        if (this.props.location.state.programIds.includes(prog.id)) {
+                                            rebuildQPL = true;
+                                        }
                                     }
-                                    console.log("M------------------------>", dt);
-                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, dt, rebuild);
+                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, rebuild, rebuildQPL);
                                 }.bind(this)
                             }.bind(this)
                         } else {
@@ -374,26 +391,67 @@ export default class SyncMasterData extends Component {
         // this.refs.programListChild.checkNewerVersions();
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
 
-        if (valid) {
+        // if (valid) {
+        //     this.setState({
+        //         syncedMasters: this.state.syncedMasters + 1,
+        //         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+        //     })
+        // } else {
+        //     console.log("D--------------------------->in 7")
+        //     if (document.getElementById('div1') != null) {
+        //         document.getElementById('div1').style.display = 'none';
+        //     }
+        //     document.getElementById("retryButtonDiv").style.display = "block";
+        //     this.setState({
+        //         message: 'static.common.onlinealerttext'
+        //     },
+        //         () => {
+        //             this.hideSecondComponent();
+        //         })
+        // }
+        // console.log("Valid", valid);
+        return valid;
+    }
+
+    fetchData(hasPrograms) {
+        console.log("In fetch data @@@", this.state.syncedMasters)
+        console.log("HasPrograms@@@", hasPrograms);
+        var realmId = AuthenticationService.getRealmId();
+        if (hasPrograms != 0) {
             this.setState({
                 syncedMasters: this.state.syncedMasters + 1,
                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
             })
-        } else {
-            console.log("D--------------------------->in 7")
-            if(document.getElementById('div1')!=null){
-                document.getElementById('div1').style.display = 'none';
-              }
-            document.getElementById("retryButtonDiv").style.display = "block";
-            this.setState({
-                message: 'static.common.onlinealerttext'
-            },
-                () => {
-                    this.hideSecondComponent();
-                })
         }
-        console.log("Valid", valid);
-        return valid;
+        if (this.state.syncedMasters === this.state.totalMasters) {
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+                var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+                var updatedLastSyncDateJson = {
+                    lastSyncDate: this.state.updatedSyncDate,
+                    id: 0
+                }
+                var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson)
+                var updatedLastSyncDateJson1 = {
+                    lastSyncDate: this.state.updatedSyncDate,
+                    id: realmId
+                }
+                var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
+                updateLastSyncDate.onsuccess = function (event) {
+                    console.log("M sync final success updated---", this.state.syncedMasters)
+                    document.getElementById("retryButtonDiv").style.display = "none";
+                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                    console.log("M sync role based dashboard done");
+                    console.log("End date", Date.now());
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                }.bind(this)
+            }.bind(this)
+        }
     }
 
 
@@ -410,6 +468,9 @@ export default class SyncMasterData extends Component {
                 var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
                 var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
                 var updatedSyncDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                this.setState({
+                    updatedSyncDate: updatedSyncDate
+                })
                 var lastSyncDateRequest = lastSyncDateTransaction.getAll();
                 lastSyncDateRequest.onsuccess = function (event) {
                     var lastSyncDate = lastSyncDateRequest.result[0];
@@ -451,11 +512,14 @@ export default class SyncMasterData extends Component {
                     pGetRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = pGetRequest.result;
-                        var validation = this.syncProgramData(lastSyncDate, myResult);
+                        var validation = true;
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var pIds = [];
-
+                        var tm = this.state.totalMasters;
+                        this.setState({
+                            totalMasters: tm + myResult.length
+                        })
 
                         var programIds = myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
@@ -477,537 +541,531 @@ export default class SyncMasterData extends Component {
                                             console.log("M sync Response", response.data)
                                             var response = response.data;
 
-                                            // var cC = db1.transaction(['country'], 'readwrite');
-                                            // var cCObjectStore = cC.objectStore('country');
-                                            // var cRequest = cCObjectStore.clear();
-                                            // cRequest.onsuccess = function (event) {
+                                            var cC = db1.transaction(['country'], 'readwrite');
+                                            var cCObjectStore = cC.objectStore('country');
+                                            var cRequest = cCObjectStore.clear();
+                                            cRequest.onsuccess = function (event) {
 
-                                            //     var fuC = db1.transaction(['forecastingUnit'], 'readwrite');
-                                            //     var fuCObjectStore = fuC.objectStore('forecastingUnit');
-                                            //     var fuRequest = fuCObjectStore.clear();
-                                            //     fuRequest.onsuccess = function (event) {
+                                                var fuC = db1.transaction(['forecastingUnit'], 'readwrite');
+                                                var fuCObjectStore = fuC.objectStore('forecastingUnit');
+                                                var fuRequest = fuCObjectStore.clear();
+                                                fuRequest.onsuccess = function (event) {
 
-                                            //         var puC = db1.transaction(['planningUnit'], 'readwrite');
-                                            //         var puCObjectStore = puC.objectStore('planningUnit');
-                                            //         var puRequest = puCObjectStore.clear();
-                                            //         puRequest.onsuccess = function (event) {
+                                                    var puC = db1.transaction(['planningUnit'], 'readwrite');
+                                                    var puCObjectStore = puC.objectStore('planningUnit');
+                                                    var puRequest = puCObjectStore.clear();
+                                                    puRequest.onsuccess = function (event) {
 
-                                            //             var pruC = db1.transaction(['procurementUnit'], 'readwrite');
-                                            //             var pruCObjectStore = pruC.objectStore('procurementUnit');
-                                            //             var pruRequest = pruCObjectStore.clear();
-                                            //             pruRequest.onsuccess = function (event) {
+                                                        var pruC = db1.transaction(['procurementUnit'], 'readwrite');
+                                                        var pruCObjectStore = pruC.objectStore('procurementUnit');
+                                                        var pruRequest = pruCObjectStore.clear();
+                                                        pruRequest.onsuccess = function (event) {
 
-                                            //                 var rcC = db1.transaction(['realmCountry'], 'readwrite');
-                                            //                 var rcCObjectStore = rcC.objectStore('realmCountry');
-                                            //                 var rcRequest = rcCObjectStore.clear();
-                                            //                 rcRequest.onsuccess = function (event) {
+                                                            var rcC = db1.transaction(['realmCountry'], 'readwrite');
+                                                            var rcCObjectStore = rcC.objectStore('realmCountry');
+                                                            var rcRequest = rcCObjectStore.clear();
+                                                            rcRequest.onsuccess = function (event) {
 
-                                            //                     var rcpuC = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                                            //                     var rcpuCObjectStore = rcpuC.objectStore('realmCountryPlanningUnit');
-                                            //                     var rcpuRequest = rcpuCObjectStore.clear();
-                                            //                     rcpuRequest.onsuccess = function (event) {
+                                                                var rcpuC = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                                                                var rcpuCObjectStore = rcpuC.objectStore('realmCountryPlanningUnit');
+                                                                var rcpuRequest = rcpuCObjectStore.clear();
+                                                                rcpuRequest.onsuccess = function (event) {
 
-                                            //                         var papuC = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                                            //                         var papuCObjectStore = papuC.objectStore('procurementAgentPlanningUnit');
-                                            //                         var papuRequest = papuCObjectStore.clear();
-                                            //                         papuRequest.onsuccess = function (event) {
+                                                                    var papuC = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                                                                    var papuCObjectStore = papuC.objectStore('procurementAgentPlanningUnit');
+                                                                    var papuRequest = papuCObjectStore.clear();
+                                                                    papuRequest.onsuccess = function (event) {
 
-                                            //                             var paprouC = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
-                                            //                             var paprouCObjectStore = paprouC.objectStore('procurementAgentProcurementUnit');
-                                            //                             var paprouRequest = paprouCObjectStore.clear();
-                                            //                             paprouRequest.onsuccess = function (event) {
+                                                                        var paprouC = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
+                                                                        var paprouCObjectStore = paprouC.objectStore('procurementAgentProcurementUnit');
+                                                                        var paprouRequest = paprouCObjectStore.clear();
+                                                                        paprouRequest.onsuccess = function (event) {
 
-                                            //                                 var pC = db1.transaction(['program'], 'readwrite');
-                                            //                                 var pCObjectStore = pC.objectStore('program');
-                                            //                                 var pRequest = pCObjectStore.clear();
-                                            //                                 pRequest.onsuccess = function (event) {
+                                                                            var pC = db1.transaction(['program'], 'readwrite');
+                                                                            var pCObjectStore = pC.objectStore('program');
+                                                                            var pRequest = pCObjectStore.clear();
+                                                                            pRequest.onsuccess = function (event) {
 
-                                            //                                     var ppuC = db1.transaction(['programPlanningUnit'], 'readwrite');
-                                            //                                     var ppuCObjectStore = ppuC.objectStore('programPlanningUnit');
-                                            //                                     var ppuRequest = ppuCObjectStore.clear();
-                                            //                                     ppuRequest.onsuccess = function (event) {
+                                                                                var ppuC = db1.transaction(['programPlanningUnit'], 'readwrite');
+                                                                                var ppuCObjectStore = ppuC.objectStore('programPlanningUnit');
+                                                                                var ppuRequest = ppuCObjectStore.clear();
+                                                                                ppuRequest.onsuccess = function (event) {
 
-                                            //                                         var rC = db1.transaction(['region'], 'readwrite');
-                                            //                                         var rCObjectStore = rC.objectStore('region');
-                                            //                                         var rRequest = rCObjectStore.clear();
-                                            //                                         rRequest.onsuccess = function (event) {
+                                                                                    var rC = db1.transaction(['region'], 'readwrite');
+                                                                                    var rCObjectStore = rC.objectStore('region');
+                                                                                    var rRequest = rCObjectStore.clear();
+                                                                                    rRequest.onsuccess = function (event) {
 
-                                            //                                             var budC = db1.transaction(['budget'], 'readwrite');
-                                            //                                             var budCObjectStore = budC.objectStore('budget');
-                                            //                                             var budRequest = budCObjectStore.clear();
-                                            //                                             budRequest.onsuccess = function (event) {
+                                                                                        var budC = db1.transaction(['budget'], 'readwrite');
+                                                                                        var budCObjectStore = budC.objectStore('budget');
+                                                                                        var budRequest = budCObjectStore.clear();
+                                                                                        budRequest.onsuccess = function (event) {
 
-                                            // country
-                                            var countryTransaction = db1.transaction(['country'], 'readwrite');
-                                            console.log("M sync country transaction start")
-                                            var countryObjectStore = countryTransaction.objectStore('country');
-                                            var json = (response.countryList);
-                                            // countryObjectStore.clear();
-                                            for (var i = 0; i < json.length; i++) {
-                                                console.log("M sync in for", i)
-                                                countryObjectStore.put(json[i]);
-                                            }
-                                            console.log("M sync after country set statue 1", this.state.syncedMasters);
-                                            countryTransaction.oncomplete = function (event) {
-                                                console.log("M sync In abort------>")
-                                                this.setState({
-                                                    syncedMasters: this.state.syncedMasters + 1,
-                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                }, () => {
-                                                    // currency
-                                                    var currencyTransaction = db1.transaction(['currency'], 'readwrite');
-                                                    console.log("M sync currency transaction start")
-                                                    var currencyObjectStore = currencyTransaction.objectStore('currency');
-                                                    var json = (response.currencyList);
-                                                    for (var i = 0; i < json.length; i++) {
-                                                        currencyObjectStore.put(json[i]);
-                                                    }
-                                                    console.log("after currency set statue 1", this.state.syncedMasters);
-                                                    currencyTransaction.oncomplete = function (event) {
-                                                        this.setState({
-                                                            syncedMasters: this.state.syncedMasters + 1,
-                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                        }, () => {
-                                                            // dimension
-                                                            var dimensionTransaction = db1.transaction(['dimension'], 'readwrite');
-                                                            console.log("M sync dimension transaction start")
-                                                            var dimensionObjectStore = dimensionTransaction.objectStore('dimension');
-                                                            var json = (response.dimensionList);
-                                                            for (var i = 0; i < json.length; i++) {
-                                                                dimensionObjectStore.put(json[i]);
-                                                            }
-                                                            console.log("after dimension set statue 1", this.state.syncedMasters);
-                                                            dimensionTransaction.oncomplete = function (event) {
-                                                                this.setState({
-                                                                    syncedMasters: this.state.syncedMasters + 1,
-                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                                }, () => {
-                                                                    // language
-                                                                    var languageTransaction = db1.transaction(['language'], 'readwrite');
-                                                                    console.log("M sync language transaction start")
-                                                                    var languageObjectStore = languageTransaction.objectStore('language');
-                                                                    var json = (response.languageList);
-                                                                    for (var i = 0; i < json.length; i++) {
-                                                                        languageObjectStore.put(json[i]);
-                                                                    }
-                                                                    console.log("after language set statue 1", this.state.syncedMasters);
-                                                                    languageTransaction.oncomplete = function (event) {
-                                                                        this.setState({
-                                                                            syncedMasters: this.state.syncedMasters + 1,
-                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                                        }, () => {
-                                                                            // shipmentStatus
-                                                                            var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-                                                                            console.log("M sync shipmentStatus transaction start")
-                                                                            var shipmentStatusObjectStore = shipmentStatusTransaction.objectStore('shipmentStatus');
-                                                                            var json = (response.shipmentStatusList);
-                                                                            for (var i = 0; i < json.length; i++) {
-                                                                                shipmentStatusObjectStore.put(json[i]);
-                                                                            }
-                                                                            console.log("after shipmentStatus set statue 1", this.state.syncedMasters);
-                                                                            shipmentStatusTransaction.oncomplete = function (event) {
-                                                                                this.setState({
-                                                                                    syncedMasters: this.state.syncedMasters + 1,
-                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                                                }, () => {
-                                                                                    // unit
-                                                                                    var unitTransaction = db1.transaction(['unit'], 'readwrite');
-                                                                                    console.log("M sync unit transaction start")
-                                                                                    var unitObjectStore = unitTransaction.objectStore('unit');
-                                                                                    var json = (response.unitList);
-                                                                                    for (var i = 0; i < json.length; i++) {
-                                                                                        unitObjectStore.put(json[i]);
-                                                                                    }
-                                                                                    console.log("after unit set statue 1", this.state.syncedMasters);
-                                                                                    unitTransaction.oncomplete = function (event) {
-                                                                                        this.setState({
-                                                                                            syncedMasters: this.state.syncedMasters + 1,
-                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                                                        }, () => {
-                                                                                            // dataSourceType
-                                                                                            var dataSourceTypeTransaction = db1.transaction(['dataSourceType'], 'readwrite');
-                                                                                            console.log("M sync dataSourceType transaction start")
-                                                                                            var dataSourceTypeObjectStore = dataSourceTypeTransaction.objectStore('dataSourceType');
-                                                                                            var json = (response.dataSourceTypeList);
+                                                                                            // country
+                                                                                            var countryTransaction = db1.transaction(['country'], 'readwrite');
+                                                                                            console.log("M sync country transaction start")
+                                                                                            var countryObjectStore = countryTransaction.objectStore('country');
+                                                                                            var json = (response.countryList);
+                                                                                            // countryObjectStore.clear();
                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                dataSourceTypeObjectStore.put(json[i]);
+                                                                                                console.log("M sync in for", i)
+                                                                                                countryObjectStore.put(json[i]);
                                                                                             }
-                                                                                            console.log("after dataSourceType set statue 1", this.state.syncedMasters);
-                                                                                            dataSourceTypeTransaction.oncomplete = function (event) {
+                                                                                            console.log("M sync after country set statue 1", this.state.syncedMasters);
+                                                                                            countryTransaction.oncomplete = function (event) {
+                                                                                                console.log("M sync In abort------>")
                                                                                                 this.setState({
                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                 }, () => {
-                                                                                                    // dataSource
-                                                                                                    var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                                                                                                    console.log("M sync dataSource transaction start")
-                                                                                                    var dataSourceObjectStore = dataSourceTransaction.objectStore('dataSource');
-                                                                                                    var json = (response.dataSourceList);
+                                                                                                    // forecastingUnit
+                                                                                                    var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+                                                                                                    console.log("M sync forecastingUnit transaction start")
+                                                                                                    var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
+                                                                                                    var json = (response.forecastingUnitList);
+                                                                                                    // forecastingUnitObjectStore.clear();
                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                        dataSourceObjectStore.put(json[i]);
+                                                                                                        forecastingUnitObjectStore.put(json[i]);
                                                                                                     }
-                                                                                                    console.log("after dataSource set statue 1", this.state.syncedMasters);
-                                                                                                    dataSourceTransaction.oncomplete = function (event) {
+                                                                                                    console.log("after forecastingUnit set statue 1", this.state.syncedMasters);
+                                                                                                    forecastingUnitTransaction.oncomplete = function (event) {
                                                                                                         this.setState({
                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                         }, () => {
-                                                                                                            // tracerCategory
-                                                                                                            var tracerCategoryTransaction = db1.transaction(['tracerCategory'], 'readwrite');
-                                                                                                            console.log("M sync tracerCategory transaction start")
-                                                                                                            var tracerCategoryObjectStore = tracerCategoryTransaction.objectStore('tracerCategory');
-                                                                                                            var json = (response.tracerCategoryList);
+
+                                                                                                            // planningUnit
+                                                                                                            var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                                                                                                            console.log("M sync planningUnit transaction start")
+                                                                                                            var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
+                                                                                                            var json = (response.planningUnitList);
+                                                                                                            // planningUnitObjectStore.clear();
                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                tracerCategoryObjectStore.put(json[i]);
+                                                                                                                planningUnitObjectStore.put(json[i]);
                                                                                                             }
-                                                                                                            console.log("after tracerCategory set statue 1", this.state.syncedMasters);
-                                                                                                            tracerCategoryTransaction.oncomplete = function (event) {
+                                                                                                            console.log("after planningUnit set statue 1", this.state.syncedMasters);
+                                                                                                            planningUnitTransaction.oncomplete = function (event) {
                                                                                                                 this.setState({
                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                 }, () => {
-                                                                                                                    // productCategory
-                                                                                                                    var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
-                                                                                                                    console.log("M sync productCategory transaction start")
-                                                                                                                    var productCategoryObjectStore = productCategoryTransaction.objectStore('productCategory');
-                                                                                                                    var json = (response.productCategoryList);
+                                                                                                                    // procurementUnit
+                                                                                                                    var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                                                                                                                    console.log("M sync procurementUnit transaction start")
+                                                                                                                    var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
+                                                                                                                    var json = (response.procurementUnitList);
+                                                                                                                    // procurementUnitObjectStore.clear();
                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                        productCategoryObjectStore.put(json[i]);
+                                                                                                                        procurementUnitObjectStore.put(json[i]);
                                                                                                                     }
-                                                                                                                    console.log("after productCategory set statue 1", this.state.syncedMasters);
-                                                                                                                    productCategoryTransaction.oncomplete = function (event) {
+                                                                                                                    console.log("after procurementUnit set statue 1", this.state.syncedMasters);
+                                                                                                                    procurementUnitTransaction.oncomplete = function (event) {
                                                                                                                         this.setState({
                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                         }, () => {
-                                                                                                                            // realm
-                                                                                                                            var realmTransaction = db1.transaction(['realm'], 'readwrite');
-                                                                                                                            console.log("M sync realm transaction start")
-                                                                                                                            var realmObjectStore = realmTransaction.objectStore('realm');
-                                                                                                                            var json = (response.realmList);
+                                                                                                                            // realmCountry
+                                                                                                                            var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
+                                                                                                                            console.log("M sync realmCountry transaction start")
+                                                                                                                            var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
+                                                                                                                            var json = (response.realmCountryList);
+                                                                                                                            // realmCountryObjectStore.clear();
                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                realmObjectStore.put(json[i]);
+                                                                                                                                realmCountryObjectStore.put(json[i]);
                                                                                                                             }
-                                                                                                                            console.log("after realm set statue 1", this.state.syncedMasters);
-                                                                                                                            realmTransaction.oncomplete = function (event) {
+                                                                                                                            console.log("after realmCountry set statue 1", this.state.syncedMasters);
+                                                                                                                            realmCountryTransaction.oncomplete = function (event) {
                                                                                                                                 this.setState({
                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                 }, () => {
-                                                                                                                                    // healthArea
-                                                                                                                                    var healthAreaTransaction = db1.transaction(['healthArea'], 'readwrite');
-                                                                                                                                    console.log("M sync healthArea transaction start")
-                                                                                                                                    var healthAreaObjectStore = healthAreaTransaction.objectStore('healthArea');
-                                                                                                                                    var json = (response.healthAreaList);
+                                                                                                                                    // realmCountryPlanningUnit
+                                                                                                                                    var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                                                                                                                                    console.log("M sync realmCountryPlanningUnit transaction start")
+                                                                                                                                    var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
+                                                                                                                                    var json = (response.realmCountryPlanningUnitList);
+                                                                                                                                    // realmCountryPlanningUnitObjectStore.clear();
                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                        healthAreaObjectStore.put(json[i]);
+                                                                                                                                        realmCountryPlanningUnitObjectStore.put(json[i]);
                                                                                                                                     }
-                                                                                                                                    console.log("after healthArea set statue 1", this.state.syncedMasters);
-                                                                                                                                    healthAreaTransaction.oncomplete = function (event) {
+                                                                                                                                    console.log("after realmCountryPlanningUnit set statue 1", this.state.syncedMasters);
+                                                                                                                                    realmCountryPlanningUnitTransaction.oncomplete = function (event) {
                                                                                                                                         this.setState({
                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                         }, () => {
-                                                                                                                                            // organisation
-                                                                                                                                            var organisationTransaction = db1.transaction(['organisation'], 'readwrite');
-                                                                                                                                            console.log("M sync organisation transaction start")
-                                                                                                                                            var organisationObjectStore = organisationTransaction.objectStore('organisation');
-                                                                                                                                            var json = (response.organisationList);
+                                                                                                                                            // procurementAgentPlanningUnit
+                                                                                                                                            var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                                                                                                                                            console.log("M sync procurementAgentPlanningUnit transaction start")
+                                                                                                                                            var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                                                                                                                                            var json = (response.procurementAgentPlanningUnitList);
+                                                                                                                                            // procurementAgentPlanningUnitObjectStore.clear();
                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                organisationObjectStore.put(json[i]);
+                                                                                                                                                procurementAgentPlanningUnitObjectStore.put(json[i]);
                                                                                                                                             }
-                                                                                                                                            console.log("after organisation set statue 1", this.state.syncedMasters);
-                                                                                                                                            organisationTransaction.oncomplete = function (event) {
+                                                                                                                                            console.log("after procurementAgentPlanningUnit set statue 1", this.state.syncedMasters);
+                                                                                                                                            procurementAgentPlanningUnitTransaction.oncomplete = function (event) {
                                                                                                                                                 this.setState({
                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                 }, () => {
-                                                                                                                                                    // fundingSource
-                                                                                                                                                    var fundingSourceTransaction = db1.transaction(['fundingSource'], 'readwrite');
-                                                                                                                                                    console.log("M sync fundingSource transaction start")
-                                                                                                                                                    var fundingSourceObjectStore = fundingSourceTransaction.objectStore('fundingSource');
-                                                                                                                                                    var json = (response.fundingSourceList);
+                                                                                                                                                    // procurementAgentProcurementUnit
+                                                                                                                                                    var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
+                                                                                                                                                    console.log("M sync procurementAgentProcurementUnit transaction start")
+                                                                                                                                                    var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
+                                                                                                                                                    var json = (response.procurementAgentProcurementUnitList);
+                                                                                                                                                    // procurementAgentProcurementUnitObjectStore.clear();
                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                        fundingSourceObjectStore.put(json[i]);
+                                                                                                                                                        procurementAgentProcurementUnitObjectStore.put(json[i]);
                                                                                                                                                     }
-                                                                                                                                                    console.log("after fundingSource set statue 1", this.state.syncedMasters);
-                                                                                                                                                    fundingSourceTransaction.oncomplete = function (event) {
+                                                                                                                                                    console.log("after procurementAgentProcurementUnit set statue 1", this.state.syncedMasters);
+                                                                                                                                                    procurementAgentProcurementUnitTransaction.oncomplete = function (event) {
                                                                                                                                                         this.setState({
                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                         }, () => {
-                                                                                                                                                            // procurementAgent
-                                                                                                                                                            var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                                                                                                                                                            console.log("M sync procurementAgent transaction start")
-                                                                                                                                                            var procurementAgentObjectStore = procurementAgentTransaction.objectStore('procurementAgent');
-                                                                                                                                                            var json = (response.procurementAgentList);
+                                                                                                                                                            // program
+                                                                                                                                                            var programTransaction = db1.transaction(['program'], 'readwrite');
+                                                                                                                                                            console.log("M sync program transaction start")
+                                                                                                                                                            var programObjectStore = programTransaction.objectStore('program');
+                                                                                                                                                            var json = (response.programList);
+                                                                                                                                                            // programObjectStore.clear();
                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                procurementAgentObjectStore.put(json[i]);
+                                                                                                                                                                programObjectStore.put(json[i]);
                                                                                                                                                             }
-                                                                                                                                                            console.log("after procurementAgent set statue 1", this.state.syncedMasters);
-                                                                                                                                                            procurementAgentTransaction.oncomplete = function (event) {
+                                                                                                                                                            console.log("after program set statue 1", this.state.syncedMasters);
+                                                                                                                                                            programTransaction.oncomplete = function (event) {
                                                                                                                                                                 this.setState({
                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                 }, () => {
-                                                                                                                                                                    // supplier
-                                                                                                                                                                    var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
-                                                                                                                                                                    console.log("M sync supplier transaction start")
-                                                                                                                                                                    var supplierObjectStore = supplierTransaction.objectStore('supplier');
-                                                                                                                                                                    var json = [];
+                                                                                                                                                                    // programPlanningUnit
+                                                                                                                                                                    var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                                                                                                                                                                    console.log("M sync programPlanningUnit transaction start")
+                                                                                                                                                                    var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                                                                                                                                                                    var json = (response.programPlanningUnitList);
+                                                                                                                                                                    // programPlanningUnitObjectStore.clear();
                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                        supplierObjectStore.put(json[i]);
+                                                                                                                                                                        programPlanningUnitObjectStore.put(json[i]);
                                                                                                                                                                     }
-                                                                                                                                                                    console.log("after supplier set statue 1", this.state.syncedMasters);
-                                                                                                                                                                    supplierTransaction.oncomplete = function (event) {
+                                                                                                                                                                    console.log("after programPlanningUnit set statue 1", this.state.syncedMasters);
+                                                                                                                                                                    programPlanningUnitTransaction.oncomplete = function (event) {
                                                                                                                                                                         this.setState({
                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                         }, () => {
-                                                                                                                                                                            // forecastingUnit
-                                                                                                                                                                            var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
-                                                                                                                                                                            console.log("M sync forecastingUnit transaction start")
-                                                                                                                                                                            var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
-                                                                                                                                                                            var json = (response.forecastingUnitList);
-                                                                                                                                                                            // forecastingUnitObjectStore.clear();
+                                                                                                                                                                            // region
+                                                                                                                                                                            var regionTransaction = db1.transaction(['region'], 'readwrite');
+                                                                                                                                                                            console.log("M sync region transaction start")
+                                                                                                                                                                            var regionObjectStore = regionTransaction.objectStore('region');
+                                                                                                                                                                            var json = (response.regionList);
+                                                                                                                                                                            // regionObjectStore.clear();
                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                forecastingUnitObjectStore.put(json[i]);
+                                                                                                                                                                                regionObjectStore.put(json[i]);
                                                                                                                                                                             }
-                                                                                                                                                                            console.log("after forecastingUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                            forecastingUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                            console.log("after region set statue 1", this.state.syncedMasters);
+                                                                                                                                                                            regionTransaction.oncomplete = function (event) {
                                                                                                                                                                                 this.setState({
                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                    // planningUnit
-                                                                                                                                                                                    var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                                                                                                                                                                                    console.log("M sync planningUnit transaction start")
-                                                                                                                                                                                    var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
-                                                                                                                                                                                    var json = (response.planningUnitList);
-                                                                                                                                                                                    // planningUnitObjectStore.clear();
+                                                                                                                                                                                    // budget
+                                                                                                                                                                                    var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                                                                                                                                                                                    console.log("M sync budget transaction start")
+                                                                                                                                                                                    var budgetObjectStore = budgetTransaction.objectStore('budget');
+                                                                                                                                                                                    var json = (response.budgetList);
+                                                                                                                                                                                    // budgetObjectStore.clear();
                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                        planningUnitObjectStore.put(json[i]);
+                                                                                                                                                                                        budgetObjectStore.put(json[i]);
                                                                                                                                                                                     }
-                                                                                                                                                                                    console.log("after planningUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                    planningUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                                    console.log("after budget set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                    budgetTransaction.oncomplete = function (event) {
                                                                                                                                                                                         this.setState({
                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                            // procurementUnit
-                                                                                                                                                                                            var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
-                                                                                                                                                                                            console.log("M sync procurementUnit transaction start")
-                                                                                                                                                                                            var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
-                                                                                                                                                                                            var json = (response.procurementUnitList);
-                                                                                                                                                                                            // procurementUnitObjectStore.clear();
+                                                                                                                                                                                            this.syncProgramData(lastSyncDate, myResult);
+                                                                                                                                                                                            // currency
+                                                                                                                                                                                            var currencyTransaction = db1.transaction(['currency'], 'readwrite');
+                                                                                                                                                                                            console.log("M sync currency transaction start")
+                                                                                                                                                                                            var currencyObjectStore = currencyTransaction.objectStore('currency');
+                                                                                                                                                                                            var json = (response.currencyList);
                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                procurementUnitObjectStore.put(json[i]);
+                                                                                                                                                                                                currencyObjectStore.put(json[i]);
                                                                                                                                                                                             }
-                                                                                                                                                                                            console.log("after procurementUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                            procurementUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                                            console.log("after currency set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                            currencyTransaction.oncomplete = function (event) {
                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                    // realmCountry
-                                                                                                                                                                                                    var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
-                                                                                                                                                                                                    console.log("M sync realmCountry transaction start")
-                                                                                                                                                                                                    var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
-                                                                                                                                                                                                    var json = (response.realmCountryList);
-                                                                                                                                                                                                    // realmCountryObjectStore.clear();
+                                                                                                                                                                                                    // dimension
+                                                                                                                                                                                                    var dimensionTransaction = db1.transaction(['dimension'], 'readwrite');
+                                                                                                                                                                                                    console.log("M sync dimension transaction start")
+                                                                                                                                                                                                    var dimensionObjectStore = dimensionTransaction.objectStore('dimension');
+                                                                                                                                                                                                    var json = (response.dimensionList);
                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                        realmCountryObjectStore.put(json[i]);
+                                                                                                                                                                                                        dimensionObjectStore.put(json[i]);
                                                                                                                                                                                                     }
-                                                                                                                                                                                                    console.log("after realmCountry set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                    realmCountryTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                    console.log("after dimension set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                    dimensionTransaction.oncomplete = function (event) {
                                                                                                                                                                                                         this.setState({
                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                            // realmCountryPlanningUnit
-                                                                                                                                                                                                            var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                                                                                                                                                                                                            console.log("M sync realmCountryPlanningUnit transaction start")
-                                                                                                                                                                                                            var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
-                                                                                                                                                                                                            var json = (response.realmCountryPlanningUnitList);
-                                                                                                                                                                                                            // realmCountryPlanningUnitObjectStore.clear();
+                                                                                                                                                                                                            // language
+                                                                                                                                                                                                            var languageTransaction = db1.transaction(['language'], 'readwrite');
+                                                                                                                                                                                                            console.log("M sync language transaction start")
+                                                                                                                                                                                                            var languageObjectStore = languageTransaction.objectStore('language');
+                                                                                                                                                                                                            var json = (response.languageList);
                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                realmCountryPlanningUnitObjectStore.put(json[i]);
+                                                                                                                                                                                                                languageObjectStore.put(json[i]);
                                                                                                                                                                                                             }
-                                                                                                                                                                                                            console.log("after realmCountryPlanningUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                            realmCountryPlanningUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                            console.log("after language set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                            languageTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                                    // procurementAgentPlanningUnit
-                                                                                                                                                                                                                    var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                                                                                                                                                                                                                    console.log("M sync procurementAgentPlanningUnit transaction start")
-                                                                                                                                                                                                                    var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
-                                                                                                                                                                                                                    var json = (response.procurementAgentPlanningUnitList);
-                                                                                                                                                                                                                    // procurementAgentPlanningUnitObjectStore.clear();
+                                                                                                                                                                                                                    // shipmentStatus
+                                                                                                                                                                                                                    var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                                                                                                                                                                                                                    console.log("M sync shipmentStatus transaction start")
+                                                                                                                                                                                                                    var shipmentStatusObjectStore = shipmentStatusTransaction.objectStore('shipmentStatus');
+                                                                                                                                                                                                                    var json = (response.shipmentStatusList);
                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                        procurementAgentPlanningUnitObjectStore.put(json[i]);
+                                                                                                                                                                                                                        shipmentStatusObjectStore.put(json[i]);
                                                                                                                                                                                                                     }
-                                                                                                                                                                                                                    console.log("after procurementAgentPlanningUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                    procurementAgentPlanningUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                    console.log("after shipmentStatus set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                    shipmentStatusTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                         this.setState({
                                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                                            // procurementAgentProcurementUnit
-                                                                                                                                                                                                                            var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
-                                                                                                                                                                                                                            console.log("M sync procurementAgentProcurementUnit transaction start")
-                                                                                                                                                                                                                            var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
-                                                                                                                                                                                                                            var json = (response.procurementAgentProcurementUnitList);
-                                                                                                                                                                                                                            // procurementAgentProcurementUnitObjectStore.clear();
+                                                                                                                                                                                                                            // unit
+                                                                                                                                                                                                                            var unitTransaction = db1.transaction(['unit'], 'readwrite');
+                                                                                                                                                                                                                            console.log("M sync unit transaction start")
+                                                                                                                                                                                                                            var unitObjectStore = unitTransaction.objectStore('unit');
+                                                                                                                                                                                                                            var json = (response.unitList);
                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                procurementAgentProcurementUnitObjectStore.put(json[i]);
+                                                                                                                                                                                                                                unitObjectStore.put(json[i]);
                                                                                                                                                                                                                             }
-                                                                                                                                                                                                                            console.log("after procurementAgentProcurementUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                            procurementAgentProcurementUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                            console.log("after unit set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                            unitTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                                                    // program
-                                                                                                                                                                                                                                    var programTransaction = db1.transaction(['program'], 'readwrite');
-                                                                                                                                                                                                                                    console.log("M sync program transaction start")
-                                                                                                                                                                                                                                    var programObjectStore = programTransaction.objectStore('program');
-                                                                                                                                                                                                                                    var json = (response.programList);
-                                                                                                                                                                                                                                    // programObjectStore.clear();
+                                                                                                                                                                                                                                    // dataSourceType
+                                                                                                                                                                                                                                    var dataSourceTypeTransaction = db1.transaction(['dataSourceType'], 'readwrite');
+                                                                                                                                                                                                                                    console.log("M sync dataSourceType transaction start")
+                                                                                                                                                                                                                                    var dataSourceTypeObjectStore = dataSourceTypeTransaction.objectStore('dataSourceType');
+                                                                                                                                                                                                                                    var json = (response.dataSourceTypeList);
                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                        programObjectStore.put(json[i]);
+                                                                                                                                                                                                                                        dataSourceTypeObjectStore.put(json[i]);
                                                                                                                                                                                                                                     }
-                                                                                                                                                                                                                                    console.log("after program set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                    programTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                    console.log("after dataSourceType set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                    dataSourceTypeTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                         this.setState({
                                                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                                                            // programPlanningUnit
-                                                                                                                                                                                                                                            var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                                                                                                                                                                                                                                            console.log("M sync programPlanningUnit transaction start")
-                                                                                                                                                                                                                                            var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
-                                                                                                                                                                                                                                            var json = (response.programPlanningUnitList);
-                                                                                                                                                                                                                                            // programPlanningUnitObjectStore.clear();
+                                                                                                                                                                                                                                            // dataSource
+                                                                                                                                                                                                                                            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                                                                                                                                                                                                                            console.log("M sync dataSource transaction start")
+                                                                                                                                                                                                                                            var dataSourceObjectStore = dataSourceTransaction.objectStore('dataSource');
+                                                                                                                                                                                                                                            var json = (response.dataSourceList);
                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                programPlanningUnitObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                dataSourceObjectStore.put(json[i]);
                                                                                                                                                                                                                                             }
-                                                                                                                                                                                                                                            console.log("after programPlanningUnit set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                            programPlanningUnitTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                            console.log("after dataSource set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                            dataSourceTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                                                                    // region
-                                                                                                                                                                                                                                                    var regionTransaction = db1.transaction(['region'], 'readwrite');
-                                                                                                                                                                                                                                                    console.log("M sync region transaction start")
-                                                                                                                                                                                                                                                    var regionObjectStore = regionTransaction.objectStore('region');
-                                                                                                                                                                                                                                                    var json = (response.regionList);
-                                                                                                                                                                                                                                                    // regionObjectStore.clear();
+                                                                                                                                                                                                                                                    // tracerCategory
+                                                                                                                                                                                                                                                    var tracerCategoryTransaction = db1.transaction(['tracerCategory'], 'readwrite');
+                                                                                                                                                                                                                                                    console.log("M sync tracerCategory transaction start")
+                                                                                                                                                                                                                                                    var tracerCategoryObjectStore = tracerCategoryTransaction.objectStore('tracerCategory');
+                                                                                                                                                                                                                                                    var json = (response.tracerCategoryList);
                                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                        regionObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                        tracerCategoryObjectStore.put(json[i]);
                                                                                                                                                                                                                                                     }
-                                                                                                                                                                                                                                                    console.log("after region set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                                    regionTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                    console.log("after tracerCategory set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                    tracerCategoryTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                         this.setState({
                                                                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                                                                            // budget
-                                                                                                                                                                                                                                                            var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-                                                                                                                                                                                                                                                            console.log("M sync budget transaction start")
-                                                                                                                                                                                                                                                            var budgetObjectStore = budgetTransaction.objectStore('budget');
-                                                                                                                                                                                                                                                            var json = (response.budgetList);
-                                                                                                                                                                                                                                                            // budgetObjectStore.clear();
+                                                                                                                                                                                                                                                            // productCategory
+                                                                                                                                                                                                                                                            var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
+                                                                                                                                                                                                                                                            console.log("M sync productCategory transaction start")
+                                                                                                                                                                                                                                                            var productCategoryObjectStore = productCategoryTransaction.objectStore('productCategory');
+                                                                                                                                                                                                                                                            var json = (response.productCategoryList);
                                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                                budgetObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                productCategoryObjectStore.put(json[i]);
                                                                                                                                                                                                                                                             }
-                                                                                                                                                                                                                                                            console.log("after budget set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                                            budgetTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                            console.log("after productCategory set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                            productCategoryTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                                                                                    // problemStatus
-                                                                                                                                                                                                                                                                    var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
-                                                                                                                                                                                                                                                                    console.log("M sync problemStatus transaction start")
-                                                                                                                                                                                                                                                                    var problemStatusObjectStore = problemStatusTransaction.objectStore('problemStatus');
-                                                                                                                                                                                                                                                                    var json = (response.problemStatusList);
+                                                                                                                                                                                                                                                                    // realm
+                                                                                                                                                                                                                                                                    var realmTransaction = db1.transaction(['realm'], 'readwrite');
+                                                                                                                                                                                                                                                                    console.log("M sync realm transaction start")
+                                                                                                                                                                                                                                                                    var realmObjectStore = realmTransaction.objectStore('realm');
+                                                                                                                                                                                                                                                                    var json = (response.realmList);
                                                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                                        problemStatusObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                        realmObjectStore.put(json[i]);
                                                                                                                                                                                                                                                                     }
-                                                                                                                                                                                                                                                                    console.log("after problemStatus set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                                                    problemStatusTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                    console.log("after realm set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                    realmTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                                         this.setState({
                                                                                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                                                                                            // problemCriticality
-                                                                                                                                                                                                                                                                            var problemCriticalityTransaction = db1.transaction(['problemCriticality'], 'readwrite');
-                                                                                                                                                                                                                                                                            console.log("M sync problemCriticality transaction start")
-                                                                                                                                                                                                                                                                            var problemCriticalityObjectStore = problemCriticalityTransaction.objectStore('problemCriticality');
-                                                                                                                                                                                                                                                                            var json = (response.problemCriticalityList);
+                                                                                                                                                                                                                                                                            // healthArea
+                                                                                                                                                                                                                                                                            var healthAreaTransaction = db1.transaction(['healthArea'], 'readwrite');
+                                                                                                                                                                                                                                                                            console.log("M sync healthArea transaction start")
+                                                                                                                                                                                                                                                                            var healthAreaObjectStore = healthAreaTransaction.objectStore('healthArea');
+                                                                                                                                                                                                                                                                            var json = (response.healthAreaList);
                                                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                                                problemCriticalityObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                healthAreaObjectStore.put(json[i]);
                                                                                                                                                                                                                                                                             }
-                                                                                                                                                                                                                                                                            console.log("after problemCriticality set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                                                            problemCriticalityTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                            console.log("after healthArea set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                            healthAreaTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                                                                                                    // problemCategory
-                                                                                                                                                                                                                                                                                    var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
-                                                                                                                                                                                                                                                                                    console.log("M sync problemCategory transaction start")
-                                                                                                                                                                                                                                                                                    var problemCategoryObjectStore = problemCategoryTransaction.objectStore('problemCategory');
-                                                                                                                                                                                                                                                                                    var json = (response.problemCategoryList);
+                                                                                                                                                                                                                                                                                    // organisation
+                                                                                                                                                                                                                                                                                    var organisationTransaction = db1.transaction(['organisation'], 'readwrite');
+                                                                                                                                                                                                                                                                                    console.log("M sync organisation transaction start")
+                                                                                                                                                                                                                                                                                    var organisationObjectStore = organisationTransaction.objectStore('organisation');
+                                                                                                                                                                                                                                                                                    var json = (response.organisationList);
                                                                                                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                                                        problemCategoryObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                        organisationObjectStore.put(json[i]);
                                                                                                                                                                                                                                                                                     }
-                                                                                                                                                                                                                                                                                    console.log("after problemCategory set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                                                                    problemCategoryTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                    console.log("after organisation set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                    organisationTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                                                         this.setState({
                                                                                                                                                                                                                                                                                             syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                                             syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                                         }, () => {
-                                                                                                                                                                                                                                                                                            // realmProblem
-                                                                                                                                                                                                                                                                                            var realmProblemTransaction = db1.transaction(['problem'], 'readwrite');
-                                                                                                                                                                                                                                                                                            console.log("M sync realmProblem transaction start")
-                                                                                                                                                                                                                                                                                            var realmProblemObjectStore = realmProblemTransaction.objectStore('problem');
-                                                                                                                                                                                                                                                                                            var json = (response.realmProblemList);
+                                                                                                                                                                                                                                                                                            // fundingSource
+                                                                                                                                                                                                                                                                                            var fundingSourceTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                                                                                                                                                                                                                                                                                            console.log("M sync fundingSource transaction start")
+                                                                                                                                                                                                                                                                                            var fundingSourceObjectStore = fundingSourceTransaction.objectStore('fundingSource');
+                                                                                                                                                                                                                                                                                            var json = (response.fundingSourceList);
                                                                                                                                                                                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                                                                                                realmProblemObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                                fundingSourceObjectStore.put(json[i]);
                                                                                                                                                                                                                                                                                             }
-                                                                                                                                                                                                                                                                                            console.log("after realmProblem set statue 1", this.state.syncedMasters);
-                                                                                                                                                                                                                                                                                            realmProblemTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                            console.log("after fundingSource set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                            fundingSourceTransaction.oncomplete = function (event) {
                                                                                                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                                                 }, () => {
-                                                                                                                                                                                                                                                                                                    console.log("M sync after problem state updated---", this.state.syncedMasters)
-                                                                                                                                                                                                                                                                                                    if (this.state.syncedMasters === this.state.totalMasters) {
-                                                                                                                                                                                                                                                                                                        var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
-                                                                                                                                                                                                                                                                                                        var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
-                                                                                                                                                                                                                                                                                                        var updatedLastSyncDateJson = {
-                                                                                                                                                                                                                                                                                                            lastSyncDate: updatedSyncDate,
-                                                                                                                                                                                                                                                                                                            id: 0
-                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                        var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson)
-                                                                                                                                                                                                                                                                                                        var updatedLastSyncDateJson1 = {
-                                                                                                                                                                                                                                                                                                            lastSyncDate: updatedSyncDate,
-                                                                                                                                                                                                                                                                                                            id: realmId
-                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                        var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
-                                                                                                                                                                                                                                                                                                        updateLastSyncDate.onsuccess = function (event) {
-                                                                                                                                                                                                                                                                                                            console.log("M sync final success updated---", this.state.syncedMasters)
-                                                                                                                                                                                                                                                                                                            document.getElementById("retryButtonDiv").style.display = "none";
-                                                                                                                                                                                                                                                                                                            let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                                                                                                                                                                                                                                                                            console.log("M sync role based dashboard done");
-                                                                                                                                                                                                                                                                                                            console.log("End date", Date.now());
-                                                                                                                                                                                                                                                                                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
-                                                                                                                                                                                                                                                                                                        }.bind(this)
+                                                                                                                                                                                                                                                                                                    // procurementAgent
+                                                                                                                                                                                                                                                                                                    var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                                                                                                                                                                                                                                                                                                    console.log("M sync procurementAgent transaction start")
+                                                                                                                                                                                                                                                                                                    var procurementAgentObjectStore = procurementAgentTransaction.objectStore('procurementAgent');
+                                                                                                                                                                                                                                                                                                    var json = (response.procurementAgentList);
+                                                                                                                                                                                                                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                                                                                                                                                        procurementAgentObjectStore.put(json[i]);
                                                                                                                                                                                                                                                                                                     }
+                                                                                                                                                                                                                                                                                                    console.log("after procurementAgent set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                                    procurementAgentTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                                        this.setState({
+                                                                                                                                                                                                                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                                                                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                                                                                                                                                                        }, () => {
+                                                                                                                                                                                                                                                                                                            // supplier
+                                                                                                                                                                                                                                                                                                            var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                                                                                                                                                                                                                                                                                                            console.log("M sync supplier transaction start")
+                                                                                                                                                                                                                                                                                                            var supplierObjectStore = supplierTransaction.objectStore('supplier');
+                                                                                                                                                                                                                                                                                                            var json = [];
+                                                                                                                                                                                                                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                                                                                                                                                                supplierObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                            console.log("after supplier set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                                            supplierTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                                                this.setState({
+                                                                                                                                                                                                                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                                                                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                                                                                                                                                                                }, () => {
+                                                                                                                                                                                                                                                                                                                    // problemStatus
+                                                                                                                                                                                                                                                                                                                    var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
+                                                                                                                                                                                                                                                                                                                    console.log("M sync problemStatus transaction start")
+                                                                                                                                                                                                                                                                                                                    var problemStatusObjectStore = problemStatusTransaction.objectStore('problemStatus');
+                                                                                                                                                                                                                                                                                                                    var json = (response.problemStatusList);
+                                                                                                                                                                                                                                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                                                                                                                                                                        problemStatusObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                    console.log("after problemStatus set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                                                    problemStatusTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                                                        this.setState({
+                                                                                                                                                                                                                                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                                                                                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                                                                                                                                                                                        }, () => {
+                                                                                                                                                                                                                                                                                                                            // problemCriticality
+                                                                                                                                                                                                                                                                                                                            var problemCriticalityTransaction = db1.transaction(['problemCriticality'], 'readwrite');
+                                                                                                                                                                                                                                                                                                                            console.log("M sync problemCriticality transaction start")
+                                                                                                                                                                                                                                                                                                                            var problemCriticalityObjectStore = problemCriticalityTransaction.objectStore('problemCriticality');
+                                                                                                                                                                                                                                                                                                                            var json = (response.problemCriticalityList);
+                                                                                                                                                                                                                                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                                                                                                                                                                                problemCriticalityObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                            console.log("after problemCriticality set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                                                            problemCriticalityTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                                                                this.setState({
+                                                                                                                                                                                                                                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                                                                                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                                                                                                                                                                                                }, () => {
+                                                                                                                                                                                                                                                                                                                                    // problemCategory
+                                                                                                                                                                                                                                                                                                                                    var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
+                                                                                                                                                                                                                                                                                                                                    console.log("M sync problemCategory transaction start")
+                                                                                                                                                                                                                                                                                                                                    var problemCategoryObjectStore = problemCategoryTransaction.objectStore('problemCategory');
+                                                                                                                                                                                                                                                                                                                                    var json = (response.problemCategoryList);
+                                                                                                                                                                                                                                                                                                                                    for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                                                                                                                                                                                        problemCategoryObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                    console.log("after problemCategory set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                                                                    problemCategoryTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                                                                        this.setState({
+                                                                                                                                                                                                                                                                                                                                            syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                                                                                                                                                                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                                                                                                                                                                                                        }, () => {
+                                                                                                                                                                                                                                                                                                                                            // realmProblem
+                                                                                                                                                                                                                                                                                                                                            var realmProblemTransaction = db1.transaction(['problem'], 'readwrite');
+                                                                                                                                                                                                                                                                                                                                            console.log("M sync realmProblem transaction start")
+                                                                                                                                                                                                                                                                                                                                            var realmProblemObjectStore = realmProblemTransaction.objectStore('problem');
+                                                                                                                                                                                                                                                                                                                                            var json = (response.realmProblemList);
+                                                                                                                                                                                                                                                                                                                                            for (var i = 0; i < json.length; i++) {
+                                                                                                                                                                                                                                                                                                                                                realmProblemObjectStore.put(json[i]);
+                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                            console.log("after realmProblem set statue 1", this.state.syncedMasters);
+                                                                                                                                                                                                                                                                                                                                            realmProblemTransaction.oncomplete = function (event) {
+                                                                                                                                                                                                                                                                                                                                                this.setState({
+                                                                                                                                                                                                                                                                                                                                                    syncedMasters: this.state.syncedMasters + 1,
+                                                                                                                                                                                                                                                                                                                                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                                                                                                                                                                                                                                                                                                                }, () => {
+                                                                                                                                                                                                                                                                                                                                                    console.log("M sync after problem state updated---", this.state.syncedMasters)
+                                                                                                                                                                                                                                                                                                                                                    this.fetchData(0);
+                                                                                                                                                                                                                                                                                                                                                })
+                                                                                                                                                                                                                                                                                                                                            }.bind(this);
+                                                                                                                                                                                                                                                                                                                                        })
+                                                                                                                                                                                                                                                                                                                                    }.bind(this);
+                                                                                                                                                                                                                                                                                                                                })
+                                                                                                                                                                                                                                                                                                                            }.bind(this);
+                                                                                                                                                                                                                                                                                                                        })
+                                                                                                                                                                                                                                                                                                                    }.bind(this);
+
+                                                                                                                                                                                                                                                                                                                })
+                                                                                                                                                                                                                                                                                                            }.bind(this);
+                                                                                                                                                                                                                                                                                                        })
+                                                                                                                                                                                                                                                                                                    }.bind(this);
                                                                                                                                                                                                                                                                                                 })
                                                                                                                                                                                                                                                                                             }.bind(this);
                                                                                                                                                                                                                                                                                         })
@@ -1016,7 +1074,6 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                             }.bind(this);
                                                                                                                                                                                                                                                                         })
                                                                                                                                                                                                                                                                     }.bind(this);
-
                                                                                                                                                                                                                                                                 })
                                                                                                                                                                                                                                                             }.bind(this);
                                                                                                                                                                                                                                                         })
@@ -1059,36 +1116,24 @@ export default class SyncMasterData extends Component {
                                                                                                     }.bind(this);
                                                                                                 })
                                                                                             }.bind(this);
-                                                                                        })
+                                                                                        }.bind(this);
                                                                                     }.bind(this);
-                                                                                })
+                                                                                }.bind(this);
                                                                             }.bind(this);
-                                                                        })
+                                                                        }.bind(this);
                                                                     }.bind(this);
-                                                                })
+                                                                }.bind(this);
                                                             }.bind(this);
-                                                        })
+                                                        }.bind(this);
                                                     }.bind(this);
-                                                })
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
-                                                // }.bind(this);
+                                                }.bind(this);
                                             }.bind(this);
                                         }
                                     })
                             } else {
-                                if(document.getElementById('div1')!=null){
+                                if (document.getElementById('div1') != null) {
                                     document.getElementById('div1').style.display = 'none';
-                                  }
+                                }
                                 document.getElementById("retryButtonDiv").style.display = "block";
                                 this.setState({
                                     message: 'static.common.onlinealerttext'
@@ -1103,9 +1148,9 @@ export default class SyncMasterData extends Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            if(document.getElementById('div1')!=null){
+            if (document.getElementById('div1') != null) {
                 document.getElementById('div1').style.display = 'none';
-              }
+            }
             this.setState({
                 message: 'static.common.onlinealerttext'
             },

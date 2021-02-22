@@ -56,6 +56,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 import imageHelp from '../../assets/img/help-icon.png';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -245,6 +246,7 @@ class ApplicationDashboard extends Component {
     this.previousProgramSlide = this.previousProgramSlide.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
+    this.updateState = this.updateState.bind(this);
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -323,10 +325,10 @@ class ApplicationDashboard extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      var proList = []
+      var programList = [];
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -342,26 +344,34 @@ class ApplicationDashboard extends Component {
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
-            // console.log("programData---", programData);
-            var programJson = {
-              programId: programJson1.programId,
-              versionId: myResult[i].version
-            }
-            proList.push(programJson)
-          }
+        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
+
+          // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+          // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+          // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+          // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          // var programJson1 = JSON.parse(programData);
+          // console.log("programData---", programData);
+          programList.push({
+            openCount: myResult[i].openCount,
+            addressedCount: myResult[i].addressedCount,
+            programCode: myResult[i].programCode,
+            programVersion: myResult[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version,
+            id: myResult[i].id,
+            loading: false
+          });
+          // }
         }
-        console.log("T***proList dashboard---", proList)
+        this.setState({
+          programList: programList
+        })
         // this.setState({
         //     programs: proList
         // })
-        this.checkNewerVersions(proList);
+        this.checkNewerVersions(programList);
         // if (this.props.updateState != undefined) {
         //     this.props.updateState(false);
         //     this.props.fetchData();
@@ -418,48 +428,59 @@ class ApplicationDashboard extends Component {
     this.hideFirstComponent();
     console.log("====== in application dasboard =======");
 
-    var db1;
-    var storeOS;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      var programList = [];
-      db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-        this.setState({
-          // supplyPlanError: i18n.t('static.program.errortext')
-        });
+    // var db1;
+    // var storeOS;
+    // console.log("time bfor getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    // getDatabase();
+    // console.log("time after getDataBase+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    // openRequest.onsuccess = function (e) {
+    //   console.log("time for openRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //   var programList = [];
+    //   db1 = e.target.result;
+    //   var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+    //   var program = transaction.objectStore('programQPLDetails');
+    //   var getRequest = program.getAll();
+    //   console.log("time for getAllprogram+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //   getRequest.onerror = function (event) {
+    //     this.setState({
+    //       // supplyPlanError: i18n.t('static.program.errortext')
+    //     });
 
-      };
-      getRequest.onsuccess = function (event) {
+    //   };
+    //   getRequest.onsuccess = function (event) {
+    //     console.log("time taken for getRequestSuccess+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //     console.log("time takem for userDecrypt+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //     // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+    //     // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    //     // let username = decryptedUser.username;
 
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //     var filteredGetRequestList = getRequest.result.filter(c => c.userId == userId)
+    //     for (var i = 0; i < filteredGetRequestList.length; i++) {
+    //       // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
+    //       // if (getRequest.result[i].userId == userId) {
+    //       // var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
+    //       // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+    //       // var programJson = JSON.parse(programData);
+    //       // console.log("QPA 2====>", programJson);
+    //       programList.push({
+    //         openCount: filteredGetRequestList[i].openCount,
+    //         addressedCount: filteredGetRequestList[i].addressedCount,
+    //         programCode: filteredGetRequestList[i].programCode,
+    //         programVersion: filteredGetRequestList[i].version
+    //       });
+    //       // programRequestList.push(getRequest.result[i]);
+    //       // versionIDs.push(getRequest.result[i].version);
+    //       // }
 
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        let username = decryptedUser.username;
-
-        for (var i = 0; i < getRequest.result.length; i++) {
-          // console.log("QPA 2=====>  in for =======>",getRequest.result[i].userId,"=====>",userId);
-          if (getRequest.result[i].userId == userId) {
-            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            // console.log("QPA 2====>", programJson);
-            programList.push(programJson);
-            // programRequestList.push(getRequest.result[i]);
-            // versionIDs.push(getRequest.result[i].version);
-          }
-
-        }
-        console.log("program list in application dashboard===>", programList);
-        this.setState({ programList: programList });
-      }.bind(this)
-    }.bind(this)
+    //     }
+    //     console.log("time taken to create program list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+    //     console.log("program list in application dashboard+++", programList);
+    //     this.setState({ programList: programList });
+    //   }.bind(this)
+    // }.bind(this)
 
     // var problemActionList = [];
     // var db1;
@@ -592,6 +613,33 @@ class ApplicationDashboard extends Component {
   goToIndex(newIndex) {
     if (this.animating) return;
     this.setState({ activeIndex: newIndex });
+  }
+
+  updateState(key, value) {
+    console.log("key+++", key, "value+++", value);
+    var programList = this.state.programList;
+    var index = programList.findIndex(c => c.id == key);
+    programList[index].loading = value;
+    this.setState({
+      'programList': programList
+    })
+  }
+
+  getProblemListAfterCalculation(id) {
+
+    this.updateState(id, true);
+    // alert("hello");
+    // let programId = id;
+    if (id != 0) {
+      this.refs.problemListChild.qatProblemActions(id, id, false);
+    } else {
+      this.updateState(id, false);
+      // this.setState({
+      //   message: i18n.t('static.common.selectProgram'), data: [],
+      //   // loadingQPLArray: false
+      // });
+    }
+
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
@@ -828,35 +876,38 @@ class ApplicationDashboard extends Component {
       );
     });
 
-    const programSlides = this.state.programList.map((item) => {
-      var numberOfProblemsOpen = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 1);
-      var numberOfProblemsAddressed = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 3);
-      return (
-        <CarouselItem
-          onExiting={this.onExiting}
-          onExited={this.onExited}
-          key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
-        >
+    // const programSlides = this.state.programList.map((item) => {
+    //   // var numberOfProblemsOpen = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 1);
+    //   // var numberOfProblemsAddressed = item.problemReportList.filter(c => c.planningUnitActive != false && c.problemStatus.id == 3);
+    //   var numberOfProblemsOpen = item.openCount;
+    //   var numberOfProblemsAddressed = item.addressedCount;
+    //   return (
+    //     <CarouselItem
+    //       onExiting={this.onExiting}
+    //       onExited={this.onExited}
+    //       key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
+    //     >
 
-          <div className='carouselCont'>
-            <div className='ImgCont'>
-              <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
-            </div>
-            {/* <div className='TextCont'>
-              <CarouselCaption captionHeader={item.programCode + "~v" + item.currentVersion.versionId} captionText={numberOfProblems.length} />
-            </div> */}
-            <div className='TextCont'>
-              <CarouselCaption captionHeader={item.programCode + "~v" + item.currentVersion.versionId} className='mb-5 pb-2 mt-2' />
-              <CarouselCaption captionText={<p><div className="TextTittle ">{i18n.t("static.problemReport.open")}: {numberOfProblemsOpen.length}</div><div className="TextTittle pb-0">{i18n.t("static.problemReport.addressed")}: {numberOfProblemsAddressed.length}</div></p>} />
-            </div>
-          </div>
-        </CarouselItem>
-      );
-    });
+    //       <div className='carouselCont'>
+    //         <div className='ImgCont'>
+    //           <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
+    //         </div>
+    //         {/* <div className='TextCont'>
+    //           <CarouselCaption captionHeader={item.programCode + "~v" + item.currentVersion.versionId} captionText={numberOfProblems.length} />
+    //         </div> */}
+    //         <div className='TextCont'>
+    //           <CarouselCaption captionHeader={item.programCode + "~v" + item.programVersion} className='mb-5 pb-2 mt-2' />
+    //           <CarouselCaption captionText={<p><div className="TextTittle ">{i18n.t("static.problemReport.open")}: {numberOfProblemsOpen}</div><div className="TextTittle pb-0">{i18n.t("static.problemReport.addressed")}: {numberOfProblemsAddressed}</div></p>} />
+    //         </div>
+    //       </div>
+    //     </CarouselItem>
+    //   );
+    // });
 
 
     return (
       <div className="animated fadeIn">
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -1229,38 +1280,47 @@ class ApplicationDashboard extends Component {
             </Row>
           }
           <Row className="mt-2">
-            {this.state.programList.length > 0 &&
-              <Col xs="12" sm="6" lg="3">
-                <Card className=" CardHeight">
-
-                  <CardBody className="p-0">
-                    <a href="javascript:void();" onClick={() => this.redirectToCrud("/report/problemList")} title={i18n.t('static.dashboard.qatProblemList')}>
-                      <div class="h1 text-muted text-left mb-0 m-3">
-                        <i class="fa fa-list-alt icon-color"></i>
-                        {/* <ButtonGroup className="float-right BtnZindex">
-                        <Dropdown id='card9' isOpen={this.state.card9} toggle={() => { this.setState({ card9: !this.state.card9 }); }}>
-                          <DropdownToggle caret className="p-0" color="transparent"> */}
-                        {/* <i className="icon-settings"></i> */}
-                        {/* </DropdownToggle>
-                          <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/report/problemList")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem> */}
-                        {/* <DropdownItem onClick={() => this.redirectToCrud("/user/addUser")}>Add User</DropdownItem> */}
-
-                        {/* </DropdownMenu>
-                        </Dropdown>
-                      </ButtonGroup> */}
-                        <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexProgram} next={this.nextProgramSlide} previous={this.previousProgramSlide} ride="carousel">
-                          <CarouselIndicators items={this.state.programList} activeIndex={activeIndexProgram} onClickHandler={this.goToIndexProgram} />
-                          {programSlides}
-                        </Carousel>
-                        <div className="chart-wrapper " >
+            {
+              this.state.programList.length > 0 &&
+              this.state.programList.map((item) => (
+                <Col xs="12" sm="6" lg="3">
+                  <Card className=" CardHeight">
+                    <CardBody className="box-p">
+                      {/* <a href="javascript:void();" onClick={() => this.redirectToCrud("/report/problemList")} title={i18n.t('static.dashboard.qatProblemList')}>
+                      </a> */}
+                      <div style={{ display: item.loading ? "none" : "block" }}>
+                        <div class="h1 text-muted text-left mb-2">
+                          <i class="fa fa-list-alt icon-color"></i>
+                          <ButtonGroup className="float-right BtnZindex">
+                            <Dropdown id={item.id} isOpen={this.state[item.id]} toggle={() => { this.setState({ [item.id]: !this.state[item.id] }); }}>
+                              <DropdownToggle caret className="p-0" color="transparent">
+                              </DropdownToggle>
+                              <DropdownMenu right>
+                                <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
+                                <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                          </ButtonGroup>
+                          {/* <i class="fa fa-list-alt icon-color"></i> &nbsp;
+                        <a href="javascript:void();" title="Recalculate" onClick={() => this.getProblemListAfterCalculation(item.id)}><i className="fa fa-refresh"></i></a> */}
+                        </div>
+                        <div className="TextTittle ">{item.programCode + "~v" + item.programVersion}</div>
+                        <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
+                        <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
+                      </div>
+                      <div style={{ display: item.loading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >
+                          <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div class="spinner-border blue ml-4" role="status">
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </a>
-                  </CardBody>
-
-                </Card>
-              </Col>
+                    </CardBody>
+                  </Card>
+                </Col>
+              ))
             }
 {checkOnline === 'Online' && 
             <Col xs="12" sm="6" lg="3">

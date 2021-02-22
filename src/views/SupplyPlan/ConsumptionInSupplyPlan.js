@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -43,7 +43,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true)
-                (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
@@ -1275,14 +1275,36 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var consumptionDataList = (programJson.consumptionList);
-                    var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                    var actionList = programJson.actionList;
+                    var minDate = "";
+                    var minDateActualConsumption = "";
+                    var minDateForcastedConsumption = "";
+                    var actualConsumptionModified = 0;
+                    var forecastedConsumptionModified = 0;
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
                         if (map.get("13") == 1) {
-                            if (moment(map.get("0")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                            if (minDate == "") {
                                 minDate = moment(map.get("0")).format("YYYY-MM-DD");
+                            } else if (minDate != "" && moment(map.get("0")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = moment(map.get("0")).format("YYYY-MM-DD");
+                            }
+                            if (map.get("2") == 2) {
+                                forecastedConsumptionModified = 1;
+                                if (minDateForcastedConsumption == "") {
+                                    minDateForcastedConsumption = moment(map.get("0")).format("YYYY-MM-DD");
+                                } else if (minDateForcastedConsumption != "" && moment(map.get("0")).format("YYYY-MM") < moment(minDateForcastedConsumption).format("YYYY-MM")) {
+                                    minDateForcastedConsumption = moment(map.get("0")).format("YYYY-MM-DD");
+                                }
+                            } else {
+                                actualConsumptionModified = 1;
+                                if (minDateActualConsumption == "") {
+                                    minDateActualConsumption = moment(map.get("0")).format("YYYY-MM-DD");
+                                } else if (minDateActualConsumption != "" && moment(map.get("0")).format("YYYY-MM") < moment(minDateActualConsumption).format("YYYY-MM")) {
+                                    minDateActualConsumption = moment(map.get("0")).format("YYYY-MM-DD");
+                                }
                             }
                         }
                         var actualFlag = true;
@@ -1357,7 +1379,22 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             consumptionDataList.push(consumptionJson);
                         }
                     }
+                    if (actualConsumptionModified == 1) {
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: ACTUAL_CONSUMPTION_MODIFIED,
+                            date: moment(minDateActualConsumption).startOf('month').format("YYYY-MM-DD")
+                        })
+                    }
+                    if (forecastedConsumptionModified) {
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: FORECASTED_CONSUMPTION_MODIFIED,
+                            date: moment(minDateForcastedConsumption).startOf('month').format("YYYY-MM-DD")
+                        })
+                    }
                     programJson.consumptionList = consumptionDataList;
+                    programJson.actionList = actionList;
                     this.setState({
                         programJson: programJson
                     })

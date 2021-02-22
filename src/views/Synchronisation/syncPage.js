@@ -999,7 +999,8 @@ export default class syncPage extends Component {
           this.props.hideFirstComponent();
         }.bind(this);
         putRequest.onsuccess = function (event) {
-          this.refs.problemListChild.qatProblemActions((this.state.programId).value);
+          // this.refs.problemListChild.qatProblemActions((this.state.programId).value);
+          this.refs.problemListChild.qatProblemActions((this.state.programId).value,"loading",true);
         }.bind(this);
       }.bind(this);
     }.bind(this);
@@ -1018,8 +1019,8 @@ export default class syncPage extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
       var proList = [];
 
@@ -1037,11 +1038,11 @@ export default class syncPage extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
+            // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson1 = JSON.parse(programData);
             var programJson = {
-              label: programJson1.programCode + "~v" + myResult[i].version,
+              label: myResult[i].programCode + "~v" + myResult[i].version,
               value: myResult[i].id,
               version: myResult[i].version
             }
@@ -2993,10 +2994,16 @@ export default class syncPage extends Component {
 
                   var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                   var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+
+                  var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+                  var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
                   // for (var i = 0; i < json.length; i++) {
                   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
                   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                   var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1)).length;
+                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3)).length;
+
                   var item = {
                     id: json.programId + "_v" + version + "_uId_" + userId,
                     programId: json.programId,
@@ -3005,8 +3012,19 @@ export default class syncPage extends Component {
                     programData: encryptedText.toString(),
                     userId: userId
                   };
+                  var programQPLDetails = {
+                    id: json.programId + "_v" + version + "_uId_" + userId,
+                    programId: json.programId,
+                    version: version,
+                    userId: userId,
+                    programCode: json.programCode,
+                    openCount: openCount,
+                    addressedCount: addressedCount,
+                    programModified:0
+                  }
                   var putRequest = programSaveData.put(item);
                   var putRequest1 = downloadedProgramSaveData.put(item);
+                  var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
                   this.redirectToDashbaord();
                 }.bind(this)

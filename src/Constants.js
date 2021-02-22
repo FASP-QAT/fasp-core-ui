@@ -47,7 +47,7 @@ export const FIRST_DATA_ENTRY_DATE = '2017-01-01'
 export const NOTES_FOR_QAT_ADJUSTMENTS = 'Adjustment calculated by the system due to an actual stock count'
 export const TBD_PROCUREMENT_AGENT_ID = 11
 export const TBD_FUNDING_SOURCE = 8
-export const TOTAL_NO_OF_MASTERS_IN_SYNC = 32
+export const TOTAL_NO_OF_MASTERS_IN_SYNC = 31
 export const QAT_REALM_COUNTRY_PLANNING_UNIT = 1
 export const DECIMAL_NO_REGEX = /^\d+(\.\d{1,4})?$/
 export const INTEGER_NO_REGEX = /^[0-9\b]+$/
@@ -122,6 +122,14 @@ export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = "5e95b3262b755a0c091b38a1"
 export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = "5f1af96c4be9da001d844be3"
 export const JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST = "Change Request"
 export const JEXCEL_PIPELINE_CONVERSION_FACTOR = /^\d{0,10}(\.\d{1,6})?$/
+<<<<<<< HEAD
 export const PROBLEM_STATUS_IN_COMPLIANCE=4
 export const polling = {url: API_URL}
 export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"
+=======
+export const FORECASTED_CONSUMPTION_MODIFIED=1;
+export const ACTUAL_CONSUMPTION_MODIFIED=2;
+export const INVENTORY_MODIFIED=3;
+export const ADJUSTMENT_MODIFIED=4;
+export const SHIPMENT_MODIFIED=5;
+>>>>>>> QAT-394
