@@ -48,6 +48,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.calculateEmergencyOrder = this.calculateEmergencyOrder.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     onPaste(instance, data) {
@@ -55,7 +56,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`Y${parseInt(data[i].y) + 1}`, true)
-                (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
+                    (instance.jexcel).setValueFromCoords(2, data[i].y, document.getElementById("planningUnitId").value, true);
                 (instance.jexcel).setValueFromCoords(21, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 (instance.jexcel).setValueFromCoords(18, data[i].y, `=ROUND(ROUND(K${parseInt(data[i].y) + 1}*P${parseInt(data[i].y) + 1},2)+R${parseInt(data[i].y) + 1},2)`, true);
@@ -96,6 +97,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
     componentDidMount() {
+
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        } else if (x == 15 && !isNaN(rowData[15]) && rowData[15].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(15, y, parseFloat(rowData[15]), true);
+        } else if (x == 16 && !isNaN(rowData[16]) && rowData[16].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(16, y, parseFloat(rowData[16]), true);
+        } else if (x == 17 && !isNaN(rowData[17]) && rowData[17].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(17, y, parseFloat(rowData[17]), true);
+        } else if (x == 18 && !isNaN(rowData[18]) && rowData[18].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(18, y, parseFloat(rowData[18]), true);
+        }
 
     }
 
@@ -511,6 +530,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
                                             onchangepage: this.onchangepage,
+                                            oneditionend: this.oneditionend,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)

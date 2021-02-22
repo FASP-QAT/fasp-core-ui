@@ -753,6 +753,7 @@ class PlanningUnitCapacity extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     hideSecondComponent() {
@@ -1011,6 +1012,7 @@ class PlanningUnitCapacity extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             onpaste: this.onPaste,
+            oneditionend: this.oneditionend,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
@@ -1178,6 +1180,17 @@ class PlanningUnitCapacity extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[4]));
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        }
+
     }
 
     onPaste(instance, data) {
