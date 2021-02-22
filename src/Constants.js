@@ -64,7 +64,7 @@ export const SPACE_REGEX = /^[^\s]+(\s+[^\s]+)*$/
 export const PERCENTAGE_REGEX = /^0?[0-9]?[0-9]$|^(100)$/
 export const NO_DECIMAL_PERCENTAGE_REGEX = /^[0-9\b]+$/
 export const INDEXED_DB_NAME = "fasp"
-export const INDEXED_DB_VERSION = 1
+export const INDEXED_DB_VERSION = 2
 export const ACTUAL_CONSUMPTION_TYPE = 1;
 export const FORCASTED_CONSUMPTION_TYPE = 2;
 export const LATEST_VERSION_COLOUR = "#e5edf5"
@@ -122,14 +122,11 @@ export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = "5e95b3262b755a0c091b38a1"
 export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = "5f1af96c4be9da001d844be3"
 export const JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST = "Change Request"
 export const JEXCEL_PIPELINE_CONVERSION_FACTOR = /^\d{0,10}(\.\d{1,6})?$/
-<<<<<<< HEAD
 export const PROBLEM_STATUS_IN_COMPLIANCE=4
 export const polling = {url: API_URL}
 export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"
-=======
 export const FORECASTED_CONSUMPTION_MODIFIED=1;
 export const ACTUAL_CONSUMPTION_MODIFIED=2;
 export const INVENTORY_MODIFIED=3;
 export const ADJUSTMENT_MODIFIED=4;
 export const SHIPMENT_MODIFIED=5;
->>>>>>> QAT-394
