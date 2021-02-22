@@ -32,6 +32,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this)
         this.onPaste = this.onPaste.bind(this);
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -100,6 +101,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
+
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        }
 
     }
 
@@ -312,6 +325,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         filters: filterOption,
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
+                        oneditionend: this.oneditionend,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

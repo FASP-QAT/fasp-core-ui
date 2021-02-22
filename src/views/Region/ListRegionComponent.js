@@ -669,7 +669,7 @@ class RegionListComponent extends Component {
         let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
         console.log("CountryIds123---", this.state.countryValues.map(ele => (ele.value).toString()));
         if (this.state.countryValues.length > 0) {
-            this.setState({ loading: true })
+            this.setState({ loading: true, message: '' })
             // AuthenticationService.setupAxiosInterceptors();
             let inputjson = {
                 realmCountryIds: CountryIds

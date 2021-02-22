@@ -877,6 +877,17 @@ export default class RealmCountryPlanningUnitList extends Component {
         );
     };
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[5]));
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        }
+
+    }
+
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
