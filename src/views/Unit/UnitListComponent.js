@@ -358,6 +358,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -436,7 +437,7 @@ export default class UnitListComponent extends Component {
     }.bind(this);
 
     addUnit() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/unit/addUnit`)
         } else {
             alert(i18n.t('static.common.online'))

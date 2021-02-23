@@ -346,6 +346,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
 export default class DataSourceTypeListComponent extends Component {
@@ -669,7 +670,7 @@ export default class DataSourceTypeListComponent extends Component {
 
     addNewDataSourceType() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/dataSourceType/addDataSourceType`)
         } else {
             alert(i18n.t('static.common.online'))

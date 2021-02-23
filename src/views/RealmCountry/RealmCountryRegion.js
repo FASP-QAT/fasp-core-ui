@@ -81,6 +81,7 @@ class RealmCountryRegion extends Component {
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -207,6 +208,7 @@ class RealmCountryRegion extends Component {
                             allowManualInsertRow: false,
                             parseFormulas: true,
                             onpaste: this.onPaste,
+                            oneditionend: this.oneditionend,
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -476,6 +478,16 @@ class RealmCountryRegion extends Component {
                     }
                 }
             );
+
+    }
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[2]));
+            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
+        }
 
     }
     addRow = function () {

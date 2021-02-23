@@ -313,6 +313,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const entityname = i18n.t('static.currency.currencyMaster');
 export default class CurrencyListComponent extends Component {
 
@@ -555,7 +556,7 @@ export default class CurrencyListComponent extends Component {
 
     addNewCurrency() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/currency/addCurrency`)
         } else {
             alert("You must be Online.")

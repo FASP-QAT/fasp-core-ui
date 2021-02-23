@@ -31,7 +31,7 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/stockStatusOverTime`, json, {}
         );
     }
-    getProgramVersionList(programId, realmCountryId, versionStatusId,versionTypeId, startDate, stopDate) {
+    getProgramVersionList(programId, realmCountryId, versionStatusId, versionTypeId, startDate, stopDate) {
         return axios.get(`${API_URL}/api/programVersion/programId/${programId}/versionId/-1/realmCountryId/${realmCountryId}/healthAreaId/-1/organisationId/-1/versionTypeId/${versionTypeId}/versionStatusId/${versionStatusId}/dates/${startDate}/${stopDate}`, {}
         );
     }
@@ -104,6 +104,10 @@ class ReportService {
     }
     getExpiredStock(json) {
         return axios.post(`${API_URL}/api/report/expiredStock`, json, {}
+        );
+    }
+    wareHouseCapacityByCountry(json) {
+        return axios.post(`${API_URL}/api/report/warehouseByCountry`, json, {}
         );
     }
 }
