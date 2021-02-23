@@ -265,6 +265,7 @@ const routes = [
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
   { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   { path: '/report/problemList/:programId/:calculate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/1/:programId/:calculate', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
@@ -626,8 +627,8 @@ class DefaultLayout extends Component {
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
     this.getProgramData = this.getProgramData.bind(this);
-    this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
-    this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
+    // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
+    // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
@@ -651,7 +652,7 @@ class DefaultLayout extends Component {
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
       console.log("user timed out")
-      localStorage.setItem("sessionTimedOut",1);
+      localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
       this.setState({ showModal: true })
@@ -750,10 +751,9 @@ class DefaultLayout extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      var proList = []
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -766,120 +766,127 @@ class DefaultLayout extends Component {
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var programModified = 0;
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
-           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-            let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-            let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-            let pmax = moment.max(cmax, imax, smax)
-            var programJson = {
-              lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+            if (myResult[i].programModified == 1) {
+              programModified = 1;
+              break;
             }
-            proList.push(programJson)
           }
         }
-        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         this.setState({
-          programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        }, () => {
-          // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+          programModified: programModified
         })
-        this.getDownloadedPrograms();
+        console.log("Program modified@@@", programModified);
+        if (programModified == 1) {
+          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          localStorage.setItem("sesLocalVersionChange", true);
+          this.setState({ changeIcon: true });
+          console.log("P***d--------in if---------------")
+        } else {
+          localStorage.setItem("sesLocalVersionChange", false);
+          this.setState({ changeIcon: false });
+          console.log("P***d--------in else---------------")
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // this.setState({
+        //   programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // }, () => {
+        //   // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        // })
+        // this.getDownloadedPrograms();
       }.bind(this);
     }.bind(this)
 
   }
-  getDownloadedPrograms() {
-    console.log("P***get programs called 1");
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
-      this.setState({
-        message: i18n.t('static.program.errortext'),
-        color: 'red'
-      })
-    }.bind(this);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-      var program = transaction.objectStore('downloadedProgramData');
-      var getRequest = program.getAll();
-      var proList = []
-      getRequest.onerror = function (event) {
-        this.setState({
-          message: i18n.t('static.program.errortext'),
-          color: 'red',
-          loading: false
-        })
-      }.bind(this);
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
-            console.log("1---programJson program id 1---", programJson1.programId);
-            console.log("1---programData 1---", programData);
-            console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
-            console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
-            console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
-            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
-            let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
-            let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
-            let pmax = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
-            console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
-            var programJson = {
-              lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
-            }
-            proList.push(programJson)
-          }
-        }
-        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
-        console.log("P***proList downloaded program data---",proList)
-        this.setState({
-          downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        }, () => {
-          // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
-        })
-        this.checkIfLocalProgramVersionChanged();
-      }.bind(this);
-    }.bind(this)
+  // getDownloadedPrograms() {
+  //   console.log("P***get programs called 1");
+  //   var db1;
+  //   getDatabase();
+  //   var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+  //   openRequest.onerror = function (event) {
+  //     this.setState({
+  //       message: i18n.t('static.program.errortext'),
+  //       color: 'red'
+  //     })
+  //   }.bind(this);
+  //   openRequest.onsuccess = function (e) {
+  //     db1 = e.target.result;
+  //     var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+  //     var program = transaction.objectStore('downloadedProgramData');
+  //     var getRequest = program.getAll();
+  //     var proList = []
+  //     getRequest.onerror = function (event) {
+  //       this.setState({
+  //         message: i18n.t('static.program.errortext'),
+  //         color: 'red',
+  //         loading: false
+  //       })
+  //     }.bind(this);
+  //     getRequest.onsuccess = function (event) {
+  //       var myResult = [];
+  //       myResult = getRequest.result;
+  //       var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+  //       var userId = userBytes.toString(CryptoJS.enc.Utf8);
+  //       for (var i = 0; i < myResult.length; i++) {
+  //         if (myResult[i].userId == userId) {
+  //           var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+  //           var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+  //           var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+  //           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+  //           var programJson1 = JSON.parse(programData);
+  //           console.log("1---programJson program id 1---", programJson1.programId);
+  //           console.log("1---programData 1---", programData);
+  //           console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
+  //           console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
+  //           console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
+  //           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
+  //           console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+  //           let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
+  //           console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
+  //           let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
+  //           console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+  //           let pmax = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+  //           console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
+  //           var programJson = {
+  //             lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+  //           }
+  //           proList.push(programJson)
+  //         }
+  //       }
+  //       // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+  //       // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
+  //       console.log("P***proList downloaded program data---",proList)
+  //       this.setState({
+  //         downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+  //       }, () => {
+  //         // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+  //       })
+  //       this.checkIfLocalProgramVersionChanged();
+  //     }.bind(this);
+  //   }.bind(this)
 
-  }
-  checkIfLocalProgramVersionChanged() {
-    // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
-    // e.preventDefault();
-    console.log("P***d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
-    console.log("P***d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
-    console.log("P***d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
-    localStorage.removeItem("sesLocalVersionChange");
-    if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
-      console.log("P***d---hurrey local version changed-------------------------------------------------------------");
-      localStorage.setItem("sesLocalVersionChange", true);
-      this.setState({ changeIcon: true });
-      console.log("P***d--------in if---------------")
-    } else {
-      localStorage.setItem("sesLocalVersionChange", false);
-      this.setState({ changeIcon: false });
-      console.log("P***d--------in else---------------")
-    }
-    //   }
-  }
+  // }
+  // checkIfLocalProgramVersionChanged() {
+  //   // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
+  //   // e.preventDefault();
+  //   console.log("P***d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
+  //   console.log("P***d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
+  //   console.log("P***d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+  //   localStorage.removeItem("sesLocalVersionChange");
+  //   if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+  //     console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+  //     localStorage.setItem("sesLocalVersionChange", true);
+  //     this.setState({ changeIcon: true });
+  //     console.log("P***d--------in if---------------")
+  //   } else {
+  //     localStorage.setItem("sesLocalVersionChange", false);
+  //     this.setState({ changeIcon: false });
+  //     console.log("P***d--------in else---------------")
+  //   }
+  //   //   }
+  // }
   // componentDidUpdate() {
   //   console.log("Parent component did update called---",this.refs)
   // }
@@ -2554,11 +2561,11 @@ class DefaultLayout extends Component {
                         key={idx}
                         path={route.path}
                         exact={route.exact}
-                        name={route.name!=undefined?(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name):''}
+                        name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name!=undefined?((route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)):'')} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '')} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )
