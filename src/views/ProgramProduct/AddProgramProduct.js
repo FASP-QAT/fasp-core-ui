@@ -71,6 +71,7 @@ class AddprogramPlanningUnit extends Component {
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -444,6 +445,7 @@ class AddprogramPlanningUnit extends Component {
                                                             allowManualInsertRow: false,
                                                             parseFormulas: true,
                                                             onpaste: this.onPaste,
+                                                            oneditionend: this.oneditionend,
                                                             text: {
                                                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -836,6 +838,29 @@ class AddprogramPlanningUnit extends Component {
         this.el.insertRow(
             data, 0, 1
         );
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[2]));
+            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
+        } else if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
+        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        }
+
     }
 
     onPaste(instance, data) {

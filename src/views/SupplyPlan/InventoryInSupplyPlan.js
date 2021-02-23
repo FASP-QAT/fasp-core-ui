@@ -32,6 +32,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.addBatchRowInJexcel = this.addBatchRowInJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
@@ -57,6 +58,24 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
             }
         }
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
+        }
+
     }
 
     onPasteForBatchInfo(instance, data) {
@@ -328,6 +347,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         filters: filterOption,
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
+                        oneditionend: this.oneditionend,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
