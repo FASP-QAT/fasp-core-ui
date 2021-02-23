@@ -25,6 +25,7 @@ import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import ProgramService from "../../api/ProgramService"
+import moment from 'moment';
 
 const initialValues = {
     programId: ''
@@ -349,7 +350,15 @@ export default class ImportProgram extends Component {
                                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                 json.userId = userId;
-                                                json.id = json.programId + "_v" + json.version + "_uId_" + userId
+                                                json.id = json.programId + "_v" + json.version + "_uId_" + userId;
+                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                var programJson = JSON.parse(programData);
+                                                console.log("@@@programJson.actionList", programJson.actionList);
+                                                if (programJson.actionList == undefined) {
+                                                    programJson.actionList = [];
+                                                }
+                                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var addProgramDataRequest = program2.put(json);
                                                 addProgramDataRequest.onerror = function (event) {
                                                 };
@@ -357,15 +366,48 @@ export default class ImportProgram extends Component {
                                                 addProgramDataRequest.onsuccess = function (event) {
                                                 };
 
-                                                // Adding data in downloaded program data
-
-                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                                var program3 = transaction3.objectStore('downloadedProgramData');
                                                 var json1 = JSON.parse(fileData.split("@~-~@")[1]);
                                                 var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                 var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
                                                 json1.userId = userId1;
                                                 json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
+                                                var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                var programJson1 = JSON.parse(programData1);
+
+                                                // Adding data to program QPL details
+                                                var paList = programJson.problemReportList;
+                                                var lastModifiedDate = moment.max(moment.max(programJson.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.shipmentList.map(d => moment(d.lastModifiedDate))));
+                                                var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+                                                console.log("LastModifiedDate@@@", lastModifiedDate);
+                                                console.log("LastModifiedDate1@@@", lastModifiedDate1);
+                                                var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
+                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                                var programModified = 0;
+                                                if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
+                                                    programModified = 1;
+                                                }
+                                                var item = {
+                                                    id: json.programId + "_v" + json.version + "_uId_" + userId,
+                                                    programId: json.programId,
+                                                    version: json.version,
+                                                    userId: userId,
+                                                    programCode: programJson.programCode,
+                                                    openCount: openCount,
+                                                    addressedCount: addressedCount,
+                                                    programModified: programModified,
+                                                }
+                                                var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                console.log("programQPLDetailsJson***", item);
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+
+                                                // Adding data in downloaded program data
+
+                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                var program3 = transaction3.objectStore('downloadedProgramData');
+
+
                                                 var addProgramDataRequest1 = program3.put(json1);
                                                 addProgramDataRequest1.onerror = function (event) {
                                                 };
@@ -526,19 +568,58 @@ export default class ImportProgram extends Component {
                                                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                                 json.userId = userId;
-                                                                json.id = json.programId + "_v" + json.version + "_uId_" + userId
+                                                                json.id = json.programId + "_v" + json.version + "_uId_" + userId;
+                                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
+                                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                var programJson = JSON.parse(programData);
+                                                                console.log("@@@programJson.actionList", programJson.actionList);
+                                                                if (programJson.actionList == undefined) {
+                                                                    programJson.actionList = [];
+                                                                }
+                                                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                                 var addProgramDataRequest = program2.put(json);
                                                                 addProgramDataRequest.onerror = function (event) {
                                                                 };
 
-                                                                // Entry in downloaded program data
-                                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                                                var program3 = transaction3.objectStore('downloadedProgramData');
                                                                 var json1 = JSON.parse(fileData.split("@~-~@")[1]);
                                                                 var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                                 var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
                                                                 json1.userId = userId1;
-                                                                json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
+                                                                json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1;
+                                                                var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                                var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                var programJson1 = JSON.parse(programData1);
+
+                                                                // Adding data to program QPL details
+                                                                var paList = programJson.problemReportList;
+                                                                var lastModifiedDate = moment.max(moment.max(programJson.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.shipmentList.map(d => moment(d.lastModifiedDate))));
+                                                                var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+                                                                console.log("LastModifiedDate@@@", lastModifiedDate);
+                                                                console.log("LastModifiedDate1@@@", lastModifiedDate1);
+                                                                var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
+                                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                                                var programModified = 0;
+                                                                if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
+                                                                    programModified = 1;
+                                                                }
+                                                                var item = {
+                                                                    id: json.programId + "_v" + json.version + "_uId_" + userId,
+                                                                    programId: json.programId,
+                                                                    version: json.version,
+                                                                    userId: userId,
+                                                                    programCode: programJson.programCode,
+                                                                    openCount: openCount,
+                                                                    addressedCount: addressedCount,
+                                                                    programModified: programModified,
+                                                                }
+                                                                var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                                console.log("programQPLDetailsJson***", item);
+                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+                                                                // Adding data in downloaded program data
+
+                                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                                var program3 = transaction3.objectStore('downloadedProgramData');
                                                                 var addProgramDataRequest1 = program3.put(json1);
                                                                 addProgramDataRequest1.onerror = function (event) {
                                                                 };
@@ -623,7 +704,7 @@ export default class ImportProgram extends Component {
                                 console.log("filename", filename);
                                 programDataJson.filename = filename;
                                 fileName[i] = {
-                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJsonDecrypted.requestedProgramVersion
+                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJson.version
                                 }
                                 programListArray[i] = programDataJson;
                                 i++;
