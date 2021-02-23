@@ -7,6 +7,7 @@ import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import i18n from '../../i18n';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 let myDt;
 class AuthenticationService {
 
@@ -127,8 +128,7 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
-            console.log("offline to online return true");
+        if ((typeOfSession === 'Online' && isSiteOnline()) || (typeOfSession === 'Offline' && !isSiteOnline())) {
             return true;
         } else {
             console.log("offline to online false");
@@ -446,7 +446,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             console.log("cur user available");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+            if (isSiteOnline() && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
                 return true;
             }
@@ -1148,6 +1148,7 @@ class AuthenticationService {
                     break;
                 case "/report/problemList/:programId/:calculate/:color/:message":
                 case "/report/problemList/:color/:message":
+                case "/report/problemList/1/:programId/:calculate":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
@@ -1200,7 +1201,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (this.checkTypeOfSession()) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                         // if (this.checkLastActionTaken()) {
                         //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -1250,9 +1251,9 @@ class AuthenticationService {
         console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed","sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed","sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1265,7 +1266,7 @@ class AuthenticationService {
         }
     }
 
-    setLanguageChangeFlag(){
+    setLanguageChangeFlag() {
         localStorage.setItem('lastLoggedInUsersLanguageChanged', false);
     }
 
@@ -1286,7 +1287,7 @@ class AuthenticationService {
         localStorage.setItem('sesVersionIdReport', "");
         var currentDate = moment(Date.now()).utcOffset('-0500')
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
-        localStorage.setItem('sesStartDate',JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+        localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
     }
 
     getIconAndStaticLabel(val) {

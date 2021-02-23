@@ -27,6 +27,7 @@ export default class PipelineProgramInventory extends Component {
         }
         this.startLoading = this.startLoading.bind(this);
         this.stopLoading = this.stopLoading.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     startLoading() {
@@ -542,6 +543,7 @@ export default class PipelineProgramInventory extends Component {
                                         entries: '',
                                     },
                                     onload: this.loadedJexcelCommonFunction,
+                                    oneditionend: this.oneditionend,
                                     license: JEXCEL_PRO_KEY,
                                 };
 
@@ -752,6 +754,21 @@ export default class PipelineProgramInventory extends Component {
                 }
             }
         );
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[4]));
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        }
+
     }
 
     loadedJexcelCommonFunction = function (instance, cell, x, y, value) {

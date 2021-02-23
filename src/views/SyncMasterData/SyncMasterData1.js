@@ -20,6 +20,7 @@ import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 let mastersSynced = 0
 export default class SyncMasterData extends Component {
 
@@ -193,7 +194,7 @@ export default class SyncMasterData extends Component {
         var valid = true;
         for (var i = 0; i < programList.length; i++) {
             // AuthenticationService.setupAxiosInterceptors();
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 //Code to Sync Country list
                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, date)
                     .then(response => {
@@ -346,7 +347,7 @@ export default class SyncMasterData extends Component {
     syncMasters() {
         console.log("M sync inside sync masters function")
         this.setState({ loading: false })
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             console.log("M sync user is online")
             var db1;
             var storeOS;
@@ -415,7 +416,7 @@ export default class SyncMasterData extends Component {
                         // console.log("Validation", validation);
                         // if (validation) {
                         // AuthenticationService.setupAxiosInterceptors();
-                        if (navigator.onLine && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                        if (isSiteOnline() && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
                             //Code to Sync Language list
                             console.log("M sync going to get all the masters")
                             MasterSyncService.getSyncAllMasters(lastSyncDateRealm)

@@ -26,6 +26,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.startLoading = this.startLoading.bind(this);
         this.stopLoading = this.stopLoading.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     startLoading() {
@@ -812,6 +813,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     entries: '',
                                                 },
                                                 onload: this.loadedJexcelCommonFunction,
+                                                oneditionend: this.oneditionend,
                                                 license: JEXCEL_PRO_KEY,
                                                 // onload: this.loaded
 
@@ -1041,6 +1043,31 @@ export default class PipelineProgramPlanningUnits extends Component {
                 }
             );
 
+
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[4]));
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        } else if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        } else if (x == 11 && !isNaN(rowData[11]) && rowData[11].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
+        } else if (x == 12 && !isNaN(rowData[12]) && rowData[12].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(12, y, parseFloat(rowData[12]), true);
+        }
 
     }
 

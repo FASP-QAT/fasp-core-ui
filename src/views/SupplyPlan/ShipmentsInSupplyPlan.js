@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -48,6 +48,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.calculateEmergencyOrder = this.calculateEmergencyOrder.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     onPaste(instance, data) {
@@ -121,6 +122,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
     componentDidMount() {
+
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        } else if (x == 15 && !isNaN(rowData[15]) && rowData[15].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(15, y, parseFloat(rowData[15]), true);
+        } else if (x == 16 && !isNaN(rowData[16]) && rowData[16].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(16, y, parseFloat(rowData[16]), true);
+        } else if (x == 17 && !isNaN(rowData[17]) && rowData[17].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(17, y, parseFloat(rowData[17]), true);
+        } else if (x == 18 && !isNaN(rowData[18]) && rowData[18].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(18, y, parseFloat(rowData[18]), true);
+        }
 
     }
 
@@ -536,6 +555,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
                                             onchangepage: this.onchangepage,
+                                            oneditionend: this.oneditionend,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)
@@ -3049,15 +3069,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
+                    var actionList = programJson.actionList;
+                    var planningUnitId = document.getElementById("planningUnitId").value
                     var batchInfoList = (programJson.batchInfoList);
-                    var minDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                    var minDate = "";
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
                     var username = AuthenticationService.getLoggedInUsername();
                     for (var j = 0; j < json.length; j++) {
                         var map = new Map(Object.entries(json[j]));
                         if (map.get("29") == 1) {
-                            if (moment(map.get("4")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                            if (minDate == "") {
+                                minDate = moment(map.get("4")).format("YYYY-MM-DD");
+                            } else if (minDate != "" && moment(map.get("4")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                 minDate = moment(map.get("4")).format("YYYY-MM-DD");
                             }
                         }
@@ -3418,8 +3442,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentDataList.push(shipmentJson);
                         }
                     }
-
+                    actionList.push({
+                        planningUnitId: planningUnitId,
+                        type: SHIPMENT_MODIFIED,
+                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                    })
                     programJson.shipmentList = shipmentDataList;
+                    programJson.actionList = actionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
 
