@@ -8,7 +8,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL, polling } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -20,8 +20,10 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from 'react-detect-offline';
 import { Prompt } from 'react-router'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
+const checkOnline = localStorage.getItem('typeOfSession');
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -154,8 +156,8 @@ export default class AddInventory extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -172,13 +174,13 @@ export default class AddInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -519,7 +521,7 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Online>
+                    {checkOnline === 'Online' && 
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -530,7 +532,7 @@ export default class AddInventory extends Component {
                                 </div>
                             </div>
                         </div>
-                    </Online>
+                    }
                     <CardBody className="pb-lg-2 pt-lg-2" >
                         <Formik
                             render={
@@ -590,7 +592,7 @@ export default class AddInventory extends Component {
                                                                 name="inventoryDataType"
                                                                 id="inventoryDataType"
                                                                 bsSize="sm"
-                                                                options={[ { value: 2, label: i18n.t('static.inventoryType.adjustment') },{ value: 1, label: i18n.t('static.inventory.inventory') }]}
+                                                                options={[{ value: 2, label: i18n.t('static.inventoryType.adjustment') }, { value: 1, label: i18n.t('static.inventory.inventory') }]}
                                                                 value={this.state.inventoryDataType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
                                                             />

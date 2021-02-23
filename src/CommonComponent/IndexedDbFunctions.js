@@ -6,7 +6,7 @@ export function getDatabase() {
     console.log("inside get databases----------------------")
     var db1;
     var storeOS;
-    var openRequest = indexedDB.open(INDEXED_DB_NAME,INDEXED_DB_VERSION );
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onupgradeneeded = function (e) {
         console.log("indexed db 1----------------------")
         db1 = e.target.result;
@@ -139,10 +139,14 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('problemCriticality')) {
             storeOS = db1.createObjectStore('problemCriticality', { keyPath: 'id', autoIncrement: true });
         }
-        if(!db1.objectStoreNames.contains('problemCategory')){
+        if (!db1.objectStoreNames.contains('problemCategory')) {
             storeOS = db1.createObjectStore('problemCategory', { keyPath: 'id', autoIncrement: true });
         }
+        if(!db1.objectStoreNames.contains('programQPLDetails')){
+            storeOS = db1.createObjectStore('programQPLDetails', { keyPath: 'id', autoIncrement: true });
+        }
         console.log("indexed db completed----------------------")
+        
     };
 }
 
