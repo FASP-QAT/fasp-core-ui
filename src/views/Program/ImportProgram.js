@@ -26,6 +26,7 @@ import AuthenticationService from '../Common/AuthenticationService';
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import ProgramService from "../../api/ProgramService"
 import moment from 'moment';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const initialValues = {
     programId: ''
@@ -150,7 +151,7 @@ export default class ImportProgram extends Component {
     }
     checkNewerVersions(programs) {
         console.log("T***going to call check newer versions import program---", programs)
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
                 .then(response => {

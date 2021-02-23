@@ -21,6 +21,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 
 
@@ -514,7 +515,7 @@ export default class ManualTagging extends Component {
         }
     }
     addNewCountry() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/country/addCountry`)
         } else {
             alert("You must be Online.")

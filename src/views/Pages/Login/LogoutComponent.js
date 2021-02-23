@@ -4,6 +4,7 @@ import LogoutService from "../../../api/LogoutService";
 import axios from 'axios';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../../Constants.js'
+import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions.js';
 
 
 
@@ -21,7 +22,7 @@ class LogoutComponent extends Component {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+            if (isSiteOnline() && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                 // AuthenticationService.setupAxiosInterceptors();
                 console.log("########### Going to call Logout api####################")
                 LogoutService.logout()

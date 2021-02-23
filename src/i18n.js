@@ -10,6 +10,7 @@ import pr from '../src/assets/img/locales/pr.json';
 import sp from '../src/assets/img/locales/sp.json';
 
 import { initReactI18next } from 'react-i18next';
+import { isSiteOnline } from './CommonComponent/JavascriptCommonFunctions.js';
 //import moment from 'moment';
 var lang = localStorage.getItem('lang');
 if (lang == null) {
@@ -26,7 +27,7 @@ i18n
     backend: {
       /* translation file path */
       // loadPath: '/locales/{{lng}}.json',
-      loadPath: navigator.onLine ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
+      loadPath: isSiteOnline() ? '../src/assets/img/locales/{{lng}}.json' : '/{{lng}}.json',
       crossDomain: true
     },
     fallbackLng: 'en',

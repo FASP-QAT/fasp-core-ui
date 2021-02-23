@@ -127,3 +127,5 @@ export const ACTUAL_CONSUMPTION_MODIFIED=2;
 export const INVENTORY_MODIFIED=3;
 export const ADJUSTMENT_MODIFIED=4;
 export const SHIPMENT_MODIFIED=5;
+export const polling = {url: API_URL}
+export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"
