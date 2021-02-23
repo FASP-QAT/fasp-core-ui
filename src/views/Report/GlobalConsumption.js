@@ -56,6 +56,7 @@ import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import MultiSelect from "react-multi-select-component";
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -678,7 +679,7 @@ class GlobalConsumption extends Component {
   }
 
   getCountrys() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
 
       let realmId = AuthenticationService.getRealmId();
       // let realmId = document.getElementById('realmId').value

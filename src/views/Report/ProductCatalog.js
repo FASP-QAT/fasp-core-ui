@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online, Offline } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -37,6 +37,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { act } from 'react-test-renderer';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 // const { getToggledOptions } = utils;
@@ -48,6 +49,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+const checkOnline = localStorage.getItem('typeOfSession');
 
 const data = [{ "program": "HIV/AIDS-Malawi-National", "pc": "HIV Rapid Test Kits (RTKs)", "tc": "HIV RTK", "fc": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White)", "UOMCode": "Each", "genericName": "", "MultiplierForecastingUnitToPlanningUnit": "1", "PlanningUnit": "(Campaign Bulk) LLIN 180x160x170 cm (LxWxH) PBO Rectangular (White) 1 Each", "NoOfItems": "3,000", "UOMCodeP": "Each", "MultipliertoForecastingUnit": "1", "Min": "5", "ReorderFrequecy": "4", "ShelfLife": "18", "CatalogPrice": "456,870", "isActive": 'Active' }];
 
@@ -245,7 +247,7 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
                     if (response.status == 200) {
@@ -415,7 +417,7 @@ class ProductCatalog extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
@@ -601,7 +603,7 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 ProductService.getProductCategoryListByProgram(realmId, programId)
                     .then(response => {
                         console.log(response.data);
@@ -871,7 +873,7 @@ class ProductCatalog extends Component {
             this.setState({
                 programId: programId
             })
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
 
                 this.setState({ loading: true })
                 console.log("json---", json);
@@ -1370,7 +1372,7 @@ class ProductCatalog extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <Online>
+                                {checkOnline === 'Online' &&
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1398,8 +1400,8 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Online>
-                                <Offline>
+                                }
+                                {checkOnline === 'Offline' &&
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1428,7 +1430,7 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Offline>
+                                }
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">

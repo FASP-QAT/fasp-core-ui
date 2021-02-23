@@ -27,6 +27,7 @@ export default class PipelineProgramConsumption extends Component {
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     startLoading() {
@@ -538,6 +539,7 @@ export default class PipelineProgramConsumption extends Component {
                                             entries: '',
                                         },
                                         onload: this.loadedJexcelCommonFunctionTwo,
+                                        oneditionend: this.oneditionend,
                                     };
 
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
@@ -860,6 +862,21 @@ export default class PipelineProgramConsumption extends Component {
     }
     loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionPipeline(instance, 0);
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[4]));
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        }
+
     }
 
     render() {

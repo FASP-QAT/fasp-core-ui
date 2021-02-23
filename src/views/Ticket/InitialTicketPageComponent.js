@@ -43,6 +43,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import AuthenticationService from '../Common/AuthenticationService';
 import EditTechnicalAreaTicketComponent from './EditTechnicalAreaTicketComponent';
 import ChangeRequestTicketComponent from './ChangeRequestTicketComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 export default class InitialTicketPageComponent extends Component {
 
@@ -132,7 +133,7 @@ export default class InitialTicketPageComponent extends Component {
   }
 
   togglehelp() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       this.setState({        
         help: !this.state.help,
         initialPage: 1,

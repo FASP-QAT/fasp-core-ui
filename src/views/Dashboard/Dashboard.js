@@ -1,6 +1,7 @@
 import React, { Component, lazy, Suspense } from 'react';
 import i18n from '../../i18n'
 import AuthenticationService from '../Common/AuthenticationService.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -26,7 +27,7 @@ hideSecondComponent() {
     console.log("COLOR===",this.props.match.params.color);
     console.log("MESSAGE===",this.props.match.params.message);
     this.hideFirstComponent();
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
     }
   }
