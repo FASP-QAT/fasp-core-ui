@@ -1230,8 +1230,10 @@ class ProcurementAgentExport extends Component {
                                     }
                                 })
                                 console.log("data----->", data);
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
+                                var procurementAgentIds=data.map(q => parseInt(q.procurementAgent.id));
+                                var uniqueProcurementAgentIds=procurementAgentIds.filter((q, idx) => procurementAgentIds.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
@@ -1239,6 +1241,8 @@ class ProcurementAgentExport extends Component {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
                                     // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
+                                    for(var u=0;u<uniqueProcurementAgentIds.length;u++){
+                                        planningUnitFilterdata=data.filter(c => c.procurementAgent.id == uniqueProcurementAgentIds[u]);
                                     var qty = 0;
                                     var productCost = 0;
                                     var freightPerc = 0;
@@ -1268,7 +1272,7 @@ class ProcurementAgentExport extends Component {
                                     // }
                                     filteredData.push(myJson);
                                 }
-
+                            }
                                 console.log("filteredData=====>", filteredData);
                                 this.setState({
                                     data: filteredData
@@ -1534,14 +1538,18 @@ class ProcurementAgentExport extends Component {
                                         data.push(json);
                                     }
                                 })
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
+                                var fundingSourceIds=data.map(q => parseInt(q.fundingSource.id));
+                                var uniqueFundingSourceIds=fundingSourceIds.filter((q, idx) => fundingSourceIds.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
+                                    for(var u=0;u<uniqueFundingSourceIds.length;u++){
+                                        planningUnitFilterdata=data.filter(c => c.fundingSource.id == uniqueFundingSourceIds[u]);
                                     console.log("planningUnitFilterdata===>", planningUnitFilterdata);
                                     var qty = 0;
                                     var productCost = 0;
@@ -1571,6 +1579,7 @@ class ProcurementAgentExport extends Component {
 
                                     // }
                                     filteredData.push(myJson);
+                                }
                                 }
                                 console.log("end offline data----", filteredData);
                                 this.setState({
@@ -1829,7 +1838,7 @@ class ProcurementAgentExport extends Component {
                                     data.push(json);
                                 }
 
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
