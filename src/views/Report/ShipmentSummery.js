@@ -1057,7 +1057,7 @@ class ShipmentSummery extends Component {
                                 return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                             })
                             var shipmentDetailsFundingSourceList = []
-                            const fundingSourceIds = [...new Set(data.map(q => q.fundingSource.id))];
+                            const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
                             console.log('fundingSourceIds', fundingSourceIds)
                             fundingSourceIds.map(ele => {
                                 var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
