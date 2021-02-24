@@ -1056,7 +1056,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         allowManualInsertColumn: false,
                                                         allowDeleteRow: true,
                                                         onchange: this.changed,
-                                                        oneditionend: this.onedit,
+                                                        // oneditionend: this.onedit,
                                                         copyCompatibility: true,
                                                         parseFormulas: true,
                                                         onpaste: this.onPaste,
@@ -1411,6 +1411,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
+        elInstance.setValueFromCoords(12, y, 1, true);
 
     }
 
@@ -1463,6 +1464,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("value ---",this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         planningUnit: {
@@ -1808,9 +1810,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }.bind(this);
     // -----end of changed function
 
-    onedit = function (instance, cell, x, y, value) {
-        this.el.setValueFromCoords(12, y, 1, true);
-    }.bind(this);
+    // onedit = function (instance, cell, x, y, value) {
+    //     console.log("hi anchal-------------------");
+    //     this.el.setValueFromCoords(12, y, 1, true);
+    // }.bind(this);
 
 
     checkValidation() {
