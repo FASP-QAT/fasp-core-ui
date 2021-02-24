@@ -128,8 +128,7 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
-            console.log("offline to online return true");
+        if ((typeOfSession === 'Online' && isSiteOnline()) || (typeOfSession === 'Offline' && !isSiteOnline())) {
             return true;
         } else {
             console.log("offline to online false");

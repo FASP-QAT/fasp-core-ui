@@ -55,8 +55,8 @@ import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 import imageHelp from '../../assets/img/help-icon.png';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));

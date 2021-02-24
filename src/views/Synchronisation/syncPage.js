@@ -999,7 +999,6 @@ export default class syncPage extends Component {
           this.props.hideFirstComponent();
         }.bind(this);
         putRequest.onsuccess = function (event) {
-          // this.refs.problemListChild.qatProblemActions((this.state.programId).value);
           this.refs.problemListChild.qatProblemActions((this.state.programId).value,"loading",true);
         }.bind(this);
       }.bind(this);
@@ -3252,7 +3251,7 @@ export default class syncPage extends Component {
           columns: [
             {
               title: i18n.t('static.commitVersion.problemReportId'),
-              type: 'text',
+              type: 'hidden',
             },
             {
               title: 'problemActionIndex',

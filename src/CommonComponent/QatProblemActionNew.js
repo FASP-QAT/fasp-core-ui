@@ -190,7 +190,7 @@ export default class QatProblemActionNew extends Component {
                                                 // var shipmentList = programList[pp].shipmentList;
                                                 // console.log("program===>", programList[pp]);
                                                 var actionList = [];
-                                                var qplLastModifiedDate = "";
+                                                var qplLastModifiedDate = programList[pp].qplLastModifiedDate;
                                                 var actionPlanningUnitIds = [];
                                                 var versionID = versionIDs[pp];
                                                 var problemActionIndex = 0;
@@ -211,7 +211,8 @@ export default class QatProblemActionNew extends Component {
                                                     c.program.id == programList[pp].programId
                                                 );
 
-                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM")) {
+                                                console.log("qplLastModifiedDate+++",moment(qplLastModifiedDate).format("YYYY-MM"));
+                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD") ) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
                                                     );
