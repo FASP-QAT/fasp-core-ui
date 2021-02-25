@@ -462,10 +462,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         // Calculating actual consumption qty
                                         if (consumptionList[c].actualFlag.toString() == "true") {
                                             actualConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier));
-                                            var daysPerMonth = moment(startDate).daysInMonth();
-                                            var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
-                                            var trueDemandPerDay = (Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData);
-                                            trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
+                                            if (consumptionList[c].dayOfStockOut > 0) {
+                                                var daysPerMonth = moment(startDate).daysInMonth();
+                                                var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
+                                                var trueDemandPerDay = (Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData);
+                                                trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
+                                            }
                                             // Adding regions reporting actual consumption
                                             var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                                             if (index == -1) {
@@ -895,7 +897,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
 
                                     var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
-                                    console.log("diffBetweenTrueDemandAndConsumption###",diffBetweenTrueDemandAndConsumption,"STart Month",startDate)
+                                    console.log("diffBetweenTrueDemandAndConsumption###", diffBetweenTrueDemandAndConsumption, "STart Month", startDate)
                                     // Calculations of unmet demand
                                     if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
