@@ -803,7 +803,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 allowManualInsertColumn: false,
                                                 allowDeleteRow: false,
                                                 onchange: this.changed,
-                                                oneditionend: this.onedit,
+                                                // oneditionend: this.onedit,
                                                 copyCompatibility: true,
                                                 allowInsertRow: false,
                                                 text: {

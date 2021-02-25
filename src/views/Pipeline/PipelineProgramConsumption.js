@@ -529,7 +529,7 @@ export default class PipelineProgramConsumption extends Component {
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: false,
                                         onchange: this.changed,
-                                        oneditionend: this.onedit,
+                                        // oneditionend: this.onedit,
                                         allowInsertRow: false,
                                         copyCompatibility: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,

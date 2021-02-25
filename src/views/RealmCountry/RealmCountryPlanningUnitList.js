@@ -885,7 +885,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             console.log("RESP---------", parseFloat(rowData[5]));
             elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
         }
-
+        this.el.setValueFromCoords(9, y, 1, true);
     }
 
     onPaste(instance, data) {
