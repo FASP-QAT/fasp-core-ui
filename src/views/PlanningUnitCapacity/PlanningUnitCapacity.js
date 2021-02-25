@@ -1009,7 +1009,7 @@ class PlanningUnitCapacity extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed,
-            oneditionend: this.onedit,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             onpaste: this.onPaste,
             oneditionend: this.oneditionend,
@@ -1190,7 +1190,7 @@ class PlanningUnitCapacity extends Component {
             console.log("RESP---------", parseFloat(rowData[4]));
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         }
-
+        this.el.setValueFromCoords(7, y, 1, true);
     }
 
     onPaste(instance, data) {
