@@ -203,7 +203,7 @@ class RealmCountryRegion extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: true,
                             onchange: this.changed,
-                            oneditionend: this.onedit,
+                            // oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowManualInsertRow: false,
                             parseFormulas: true,
@@ -488,6 +488,7 @@ class RealmCountryRegion extends Component {
             // console.log("RESP---------", parseFloat(rowData[2]));
             elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
         }
+        this.el.setValueFromCoords(7, y, 1, true);
 
     }
     addRow = function () {

@@ -533,7 +533,7 @@ export default class PipelineProgramInventory extends Component {
                                     allowManualInsertColumn: false,
                                     allowDeleteRow: false,
                                     onchange: this.changed,
-                                    oneditionend: this.onedit,
+                                    // oneditionend: this.onedit,
                                     copyCompatibility: true,
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     position: 'top',
