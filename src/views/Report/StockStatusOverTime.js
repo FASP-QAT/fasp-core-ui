@@ -823,7 +823,7 @@ class StockStatusOverTime extends Component {
         console.log(monthsInFutureForAmc, monthsInPastForAmc)
         if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != 0) {
             if (versionId.includes('Local')) {
-
+                this.setState({ loading: true })
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                 let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
 
@@ -831,6 +831,11 @@ class StockStatusOverTime extends Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -843,6 +848,11 @@ class StockStatusOverTime extends Component {
                     var data = [];
                     var programRequest = programTransaction.get(program);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -986,7 +996,8 @@ class StockStatusOverTime extends Component {
                                     if (month == this.state.rangeValue.to.month && from == to) {
                                         this.setState({
                                             matricsList: data,
-                                            message: ''
+                                            message: '',
+                                            loading: false
                                         })
 
                                         return;
@@ -996,6 +1007,7 @@ class StockStatusOverTime extends Component {
                                 monthstartfrom = 1
 
                             }
+                            this.setState({ loading: false })
 
 
 

@@ -458,6 +458,7 @@ class Budgets extends Component {
         if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length > 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
+                this.setState({ loading: true })
 
                 var db1;
                 getDatabase();
@@ -466,6 +467,12 @@ class Budgets extends Component {
                 var procurementAgentList = [];
                 var fundingSourceList = [];
                 var budgetList = [];
+
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -473,6 +480,11 @@ class Budgets extends Component {
                     var budgetOs = budgetTransaction.objectStore('budget');
                     var budgetRequest = budgetOs.getAll();
 
+                    budgetRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     budgetRequest.onsuccess = function (event) {
                         var budgetResult = [];
                         budgetResult = budgetRequest.result;
@@ -495,6 +507,11 @@ class Budgets extends Component {
                         var data = [];
                         var programRequest = programTransaction.get(program);
 
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false
+                            })
+                        }.bind(this);
                         programRequest.onsuccess = function (event) {
                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -537,7 +554,8 @@ class Budgets extends Component {
                             console.log("B** data ---", data);
                             this.setState({
                                 selBudget: data,
-                                message: ''
+                                message: '',
+                                loading: false
                             })
 
 
