@@ -553,7 +553,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         }
-
+        this.el.setValueFromCoords(7, y, 1, true);
     }
 
     componentDidMount() {
@@ -701,7 +701,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: true,
                                         onchange: this.changed,
-                                        oneditionend: this.onedit,
+                                        // oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         parseFormulas: true,
                                         onpaste: this.onPaste,

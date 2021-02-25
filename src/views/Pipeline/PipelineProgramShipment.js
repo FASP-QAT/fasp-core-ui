@@ -1176,7 +1176,7 @@ export default class PipelineProgramShipment extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed,
-            oneditionend: this.onedit,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             contextMenu: function (obj, x, y, e) {
                 return [];
