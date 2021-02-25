@@ -9,7 +9,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
     if (page == 'masterDataSync' && !rebuild) {
         // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-            problemListChild.qatProblemActions(programId, "loading",true);
+            problemListChild.qatProblemActions(programId, "loading", true);
         } else {
             props.fetchData(1);
         }
@@ -451,6 +451,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     // Filtering consumption list for that month, that planning unit
                                     var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
                                     var actualConsumptionQty = 0;
+                                    var trueDemandPerMonth = 0;
                                     var forecastedConsumptionQty = 0;
                                     var regionsReportingActualConsumption = [];
                                     var noOfRegionsReportingActualConsumption = 0;
@@ -461,6 +462,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         // Calculating actual consumption qty
                                         if (consumptionList[c].actualFlag.toString() == "true") {
                                             actualConsumptionQty += Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier));
+                                            var daysPerMonth = moment(startDate).daysInMonth();
+                                            var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
+                                            var trueDemandPerDay = (Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData);
+                                            trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
                                             // Adding regions reporting actual consumption
                                             var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                                             if (index == -1) {
@@ -524,6 +529,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         // Consider forecasted consumption since that is greater
                                         consumptionQty = forecastedConsumptionQty;
                                         consumptionType = 0;
+                                        trueDemandPerMonth = forecastedConsumptionQty;
                                     }
 
                                     // Calculating expected stock
@@ -888,15 +894,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
                                     }
 
-
+                                    var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
+                                    console.log("diffBetweenTrueDemandAndConsumption###",diffBetweenTrueDemandAndConsumption,"STart Month",startDate)
                                     // Calculations of unmet demand
-                                    if (closingBalance < 0) {
-                                        unmetDemandQty = 0 - expectedStock;
+                                    if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
+                                        unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
                                         closingBalance = 0;
                                     }
 
-                                    if (closingBalanceWps < 0) {
-                                        unmetDemandQtyWps = 0 - expectedStockWps;
+                                    if (closingBalanceWps - diffBetweenTrueDemandAndConsumption < 0) {
+                                        unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
                                         closingBalanceWps = 0;
                                     }
 
@@ -1053,7 +1060,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == 'masterDataSync') {
                                     // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
                                     if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-                                        problemListChild.qatProblemActions(programId, "loading",true);
+                                        problemListChild.qatProblemActions(programId, "loading", true);
                                     } else {
                                         props.fetchData(1)
                                     }
