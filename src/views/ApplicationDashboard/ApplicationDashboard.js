@@ -65,7 +65,6 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
-const checkOnline = localStorage.getItem('typeOfSession');
 
 const options = {
   scales: {
@@ -597,6 +596,7 @@ class ApplicationDashboard extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
+    const checkOnline = localStorage.getItem('typeOfSession');
     const { activeIndex } = this.state;
     const { activeIndexProgram } = this.state;
     // const { problemActionlist } = this.state;
