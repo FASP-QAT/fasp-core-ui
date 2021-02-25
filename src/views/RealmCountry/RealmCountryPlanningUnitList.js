@@ -860,7 +860,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             console.log("RESP---------", parseFloat(rowData[5]));
             elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
         }
-
+        this.el.setValueFromCoords(9, y, 1, true);
     }
 
     onPaste(instance, data) {
@@ -1460,7 +1460,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                     onchange: this.changed,
                                                     onblur: this.blur,
                                                     onfocus: this.focus,
-                                                    oneditionend: this.onedit,
+                                                    // oneditionend: this.onedit,
                                                     copyCompatibility: true,
                                                     allowManualInsertRow: false,
                                                     parseFormulas: true,
