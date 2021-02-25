@@ -778,11 +778,16 @@ class ForcastMatrixOverTime extends Component {
     var input = { "programId": programId, "versionId": versionId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate, "previousMonths": monthInCalc }
     if (programId > 0 && planningUnitId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
-
+        this.setState({ loading: true })
 
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            loading: false
+          })
+        }.bind(this);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
 
@@ -795,6 +800,11 @@ class ForcastMatrixOverTime extends Component {
           var data = [];
           var programRequest = programTransaction.get(program);
 
+          programRequest.onerror = function (event) {
+            this.setState({
+              loading: false
+            })
+          }.bind(this);
           programRequest.onsuccess = function (event) {
             // this.setState({ loading: true })
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -881,6 +891,7 @@ class ForcastMatrixOverTime extends Component {
               })
 
             }
+            this.setState({ loading: false })
 
           }.bind(this)
         }.bind(this)
