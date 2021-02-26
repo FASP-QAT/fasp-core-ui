@@ -1555,11 +1555,11 @@ class ProcurementAgentExport extends Component {
                                         var freightCost = 0;
                                         var totalCost = 0;
                                         for (var pf = 0; pf < pupaFilterdata.length; pf++) {
-                                            qty = qty + pupaFilterdata[pf].qty;
-                                            productCost = productCost + pupaFilterdata[pf].productCost;
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
                                             freightPerc = Number(freightPerc) + isNaN(Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                            freightCost = freightCost + pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd;
-                                            totalCost = totalCost + (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd) + (pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
                                         }
                                         myJson = {
                                             "active": true,
