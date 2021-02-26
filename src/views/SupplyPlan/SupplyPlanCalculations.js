@@ -465,7 +465,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (consumptionList[c].dayOfStockOut > 0) {
                                                 var daysPerMonth = moment(startDate).daysInMonth();
                                                 var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
-                                                var trueDemandPerDay = (Math.round(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData);
+                                                var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;
                                                 trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
                                             }
                                             // Adding regions reporting actual consumption
