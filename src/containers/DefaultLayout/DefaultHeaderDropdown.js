@@ -21,7 +21,6 @@ import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComp
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { polling } from '../../Constants';
 
-const checkOnline = localStorage.getItem('typeOfSession');
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -234,6 +233,7 @@ console.log("Going to change online")
   // }
 
   dropAccnt() {
+    const checkOnline = localStorage.getItem('typeOfSession');
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>

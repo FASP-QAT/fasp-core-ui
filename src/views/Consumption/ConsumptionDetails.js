@@ -24,7 +24,6 @@ import { Online } from "react-detect-offline";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
-const checkOnline = localStorage.getItem('typeOfSession');
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -535,6 +534,7 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
