@@ -211,8 +211,8 @@ export default class QatProblemActionNew extends Component {
                                                     c.program.id == programList[pp].programId
                                                 );
 
-                                                console.log("qplLastModifiedDate+++",moment(qplLastModifiedDate).format("YYYY-MM"));
-                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD") ) {
+                                                console.log("qplLastModifiedDate+++", moment(qplLastModifiedDate).format("YYYY-MM"));
+                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD")) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
                                                     );
@@ -269,7 +269,7 @@ export default class QatProblemActionNew extends Component {
                                                                     (actionTypeIds.includes(ACTUAL_CONSUMPTION_MODIFIED) && c.problem.actualConsumptionTrigger) ||
                                                                     (actionTypeIds.includes(INVENTORY_MODIFIED) && c.problem.inventoryTrigger) ||
                                                                     (actionTypeIds.includes(ADJUSTMENT_MODIFIED) && c.problem.adjustmentTrigger) ||
-                                                                    (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger) || 
+                                                                    (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger) ||
                                                                     (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                             );
                                                         }
@@ -367,10 +367,10 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.region.id != 0
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                            && c.actualQty != undefined 
-                                                                            && c.actualQty != null 
+                                                                            && c.actualQty != undefined
+                                                                            && c.actualQty != null
                                                                             && c.actualQty !== ""
-                                                                            );
+                                                                        );
                                                                         var filterInventoryListForSixMonthRange = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= startDateForSixMonthRange
                                                                             && moment(c.inventoryDate).format('YYYY-MM-DD') <= endDateForSixMonthRange
                                                                             && c.active.toString() == "true"
@@ -378,10 +378,10 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.region.id != 0
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                            && c.actualQty != undefined 
-                                                                            && c.actualQty != null 
+                                                                            && c.actualQty != undefined
+                                                                            && c.actualQty != null
                                                                             && c.actualQty !== ""
-                                                                            );
+                                                                        );
                                                                         var index = problemActionList.findIndex(
                                                                             c =>
                                                                                 // moment(c.dt).format("YYYY-MM") == curMonth &&
@@ -1070,6 +1070,85 @@ export default class QatProblemActionNew extends Component {
                                                                     } else {
                                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                             incomplianceProblem(index, username, userId, problemActionList);
+                                                                        }
+                                                                    }
+                                                                    break;
+                                                                case 25:
+                                                                    for (var r = 0; r < regionList.length; r++) {
+                                                                        var numberOfMonths = parseInt(typeProblemList[prob].data1);
+                                                                        var myStartDate = moment(curDate).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                        var myEndDate = moment(curDate).endOf('month').format("YYYY-MM-DD");
+                                                                        var filteredConsumptionList = consumptionList.filter(c =>
+                                                                            moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate
+                                                                            && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate
+                                                                            && c.actualFlag.toString() == "true"
+                                                                            && c.active.toString() == "true"
+                                                                            && c.region.id == regionList[r].regionId
+                                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+
+                                                                        var monthsWithActualConsumption = [];
+                                                                        for (var fcm = 0; fcm < filteredConsumptionList.length; fcm++) {
+                                                                            monthsWithActualConsumption.push(moment(filteredConsumptionList[fcm].consumptionDate).format("YYYY-MM"));
+                                                                        }
+                                                                        // console.log("monthsWithActualConsumption>>>", monthsWithActualConsumption);
+                                                                        var pastSixMonthsArray = [];
+                                                                        for (var ema = 1; ema <= numberOfMonths; ema++) {
+                                                                            pastSixMonthsArray.push(moment(curDate).subtract(ema, 'months').format("YYYY-MM"));
+                                                                        }
+                                                                        // console.log("pastSixMonthsArray>>>", pastSixMonthsArray);
+                                                                        var monthWithNoActualConsumption = pastSixMonthsArray.filter(function (obj) { return monthsWithActualConsumption.indexOf(obj) == -1; });
+                                                                        console.log("monthWithNoActualConsumption>>>", monthWithNoActualConsumption);
+                                                                        var actualCauseMonths = [];
+                                                                        // jan21 and dec20
+                                                                        //start aug2020 stop is feb21
+                                                                        // console.log("filteredConsumptionList>>>", filteredConsumptionList);
+                                                                        for (var nac = 0; nac < monthWithNoActualConsumption.length; nac++) {
+                                                                            // console.log("monthWithNoActualConsumption[]>>>", moment(monthWithNoActualConsumption[nac]).format('YYYY-MM'));
+                                                                            // console.log("moment(myStartDate).format('MMM-YY')>>>", moment(myStartDate).format('YYYY-MM'));
+
+                                                                            var checkListBack = filteredConsumptionList.filter(c =>
+                                                                                moment(c.consumptionDate).format('YYYY-MM') < moment(monthWithNoActualConsumption[nac]).format('YYYY-MM')
+                                                                                && moment(c.consumptionDate).format('YYYY-MM') >= moment(myStartDate).format('YYYY-MM')
+                                                                            );
+                                                                            var checkListForward = filteredConsumptionList.filter(c =>
+                                                                                moment(c.consumptionDate).format('YYYY-MM') > moment(monthWithNoActualConsumption[nac]).format('YYYY-MM')
+                                                                                && moment(c.consumptionDate).format('YYYY-MM') <= moment(myEndDate).format('YYYY-MM')
+                                                                            );
+                                                                            // console.log("checkListBack>>>", checkListBack, "checkListForward>>>", checkListForward);
+                                                                            if (checkListBack.length > 0 && checkListForward.length > 0) {
+                                                                                actualCauseMonths.push(moment(monthWithNoActualConsumption[nac]).format('MMM-YY'));
+                                                                            }
+
+                                                                        }
+                                                                        console.log("actual cause months***", actualCauseMonths);
+                                                                        var index = problemActionList.findIndex(
+                                                                            c =>
+                                                                                c.region.id == regionList[r].regionId
+                                                                                && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                && c.program.id == programList[pp].programId
+                                                                                && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                        );
+                                                                        if (actualCauseMonths.length > 0) {
+                                                                            if (index == -1) {
+                                                                                // console.log("in create logic+++");
+                                                                                createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList);
+                                                                                problemActionIndex++;
+                                                                            } else {
+                                                                                // problemActionList[index].isFound = 1===== auto open logic;
+                                                                                // update cause ***********
+                                                                                problemActionList[index].dt = curDate;
+                                                                                problemActionList[index].data5 = JSON.stringify(actualCauseMonths);
+                                                                                if (problemActionList[index].problemStatus.id == 4) {
+                                                                                    openProblem(index, username, userId, problemActionList);
+                                                                                }
+                                                                            }
+
+                                                                        } else {
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
+                                                                                // problemActionList[index].isFound = 0;
+                                                                                // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
+                                                                                incomplianceProblem(index, username, userId, problemActionList);
+                                                                            }
                                                                         }
                                                                     }
                                                                     break;
