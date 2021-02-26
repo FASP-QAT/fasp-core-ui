@@ -1119,7 +1119,7 @@ class ProductCatalog extends Component {
             }
 
         } else {
-            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] },
+            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [], programId: '' },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
