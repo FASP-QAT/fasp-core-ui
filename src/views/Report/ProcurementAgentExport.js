@@ -910,7 +910,7 @@ class ProcurementAgentExport extends Component {
 
     buildJExcel() {
         let shipmentCosttList = this.state.data;
-        // console.log("shipmentCosttList---->", shipmentCosttList);
+        console.log("shipmentCosttList @@@---->", shipmentCosttList);
         let shipmentCostArray = [];
         let count = 0;
 
@@ -1555,11 +1555,11 @@ class ProcurementAgentExport extends Component {
                                         var freightCost = 0;
                                         var totalCost = 0;
                                         for (var pf = 0; pf < pupaFilterdata.length; pf++) {
-                                            qty = qty + pupaFilterdata[pf].qty;
-                                            productCost = productCost + pupaFilterdata[pf].productCost;
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
                                             freightPerc = Number(freightPerc) + isNaN(Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                            freightCost = freightCost + pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd;
-                                            totalCost = totalCost + (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd) + (pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
                                         }
                                         myJson = {
                                             "active": true,
@@ -1841,6 +1841,7 @@ class ProcurementAgentExport extends Component {
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
+                                console.log("User Filter@@@", useFilter);
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
@@ -1850,12 +1851,13 @@ class ProcurementAgentExport extends Component {
                                     var freightPerc = 0;
                                     var freightCost = 0;
                                     var totalCost = 0;
+                                    console.log("@@@PlanningUnitFiltered data",planningUnitFilterdata);
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
+                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
+                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
                                         freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,
@@ -1864,10 +1866,10 @@ class ProcurementAgentExport extends Component {
                                         "fundingSource": planningUnitFilterdata[0].fundingSource,
                                         "planningUnit": planningUnitFilterdata[0].planningUnit,
                                         "qty": qty,
-                                        "productCost": productCost.toFixed(2),
+                                        "productCost": productCost,
                                         "freightPerc": freightPerc,
                                         "freightCost": freightCost,
-                                        "totalCost": totalCost.toFixed(2),
+                                        "totalCost": totalCost,
                                     }
 
 
