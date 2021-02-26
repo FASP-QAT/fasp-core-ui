@@ -2971,6 +2971,10 @@ export default class syncPage extends Component {
                 var programDataOs1 = programDataTransaction1.objectStore('programData');
                 var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
+                var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                var programRequest3 = programDataOs3.delete((this.state.programId).value);
+
                 var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                 var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
                 var programRequest2 = programDataOs2.delete((this.state.programId).value);
@@ -3155,7 +3159,7 @@ export default class syncPage extends Component {
           } else {
             // If 0 check whether that exists in latest version or not
             var index = 0;
-            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15) {
+            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 25) {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
