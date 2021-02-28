@@ -3012,6 +3012,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                                            actionList = []
+                                        }
                     var planningUnitId = document.getElementById("planningUnitId").value
                     var batchInfoList = (programJson.batchInfoList);
                     var minDate = "";

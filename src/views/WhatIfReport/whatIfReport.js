@@ -594,6 +594,9 @@ export default class WhatIfReportComponent extends React.Component {
                             let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
                             var shipmentList = programJson.shipmentList;
                             var actionList = programJson.actionList;
+                            if (actionList == undefined) {
+                                actionList = []
+                            }
                             var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                             var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -621,6 +624,9 @@ export default class WhatIfReportComponent extends React.Component {
 
                             var consumptionList = programJson.consumptionList;
                             var actionList = programJson.actionList;
+                            if (actionList == undefined) {
+                                actionList = []
+                            }
                             var consumptionFiltered = consumptionList.filter(c => c.active == true
                                 && c.planningUnit.id == planningUnitId
                                 && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
@@ -659,6 +665,9 @@ export default class WhatIfReportComponent extends React.Component {
                             let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
                             var consumptionList = programJson.consumptionList;
                             var actionList = programJson.actionList;
+                            if (actionList == undefined) {
+                                actionList = []
+                            }
                             var consumptionFiltered = consumptionList.filter(c => c.active == true
                                 && c.planningUnit.id == planningUnitId
                                 && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
@@ -694,6 +703,9 @@ export default class WhatIfReportComponent extends React.Component {
                         } else if (rows[r].scenarioId == 4) {
                             var shipmentList = programJson.shipmentList;
                             var actionList = programJson.actionList;
+                            if (actionList == undefined) {
+                                actionList = []
+                            }
                             var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                             var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -761,6 +773,9 @@ export default class WhatIfReportComponent extends React.Component {
                         } else if (rows[r].scenarioId == 5) {
                             var shipmentList = programJson.shipmentList;
                             var actionList = programJson.actionList;
+                            if (actionList == undefined) {
+                                actionList = []
+                            }
                             var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                             var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                             if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -828,6 +843,9 @@ export default class WhatIfReportComponent extends React.Component {
                         } else if (rows[r].scenarioId == 6) {
                             var shipmentList = programJson.shipmentList;
                             var actionList = programJson.actionList;
+                            if (actionList == undefined) {
+                                actionList = []
+                            }
                             // var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                             var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                             var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
@@ -967,6 +985,9 @@ export default class WhatIfReportComponent extends React.Component {
                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                     var shipmentList = programJson.shipmentList;
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1018,6 +1039,9 @@ export default class WhatIfReportComponent extends React.Component {
                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                     var consumptionList = programJson.consumptionList;
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var consumptionFiltered = consumptionList.filter(c => c.active == true
                         && c.planningUnit.id == planningUnitId
                         && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
@@ -1082,6 +1106,9 @@ export default class WhatIfReportComponent extends React.Component {
                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                     var consumptionList = programJson.consumptionList;
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var consumptionFiltered = consumptionList.filter(c => c.active == true
                         && c.planningUnit.id == planningUnitId
                         && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
@@ -1141,6 +1168,9 @@ export default class WhatIfReportComponent extends React.Component {
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
                     var actionList=programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1231,6 +1261,9 @@ export default class WhatIfReportComponent extends React.Component {
                 } else if (this.state.scenarioId == 5) {
                     var shipmentList = programJson.shipmentList;
                     var actionList=programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                     for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1321,6 +1354,9 @@ export default class WhatIfReportComponent extends React.Component {
                 } else if (this.state.scenarioId == 6) {
                     var shipmentList = programJson.shipmentList;
                     var actionList=programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     // var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)) || (moment(c.arrivedDate).format("YYYY-MM-DD") <= moment(Date.now()).format("YYYY-MM-DD") && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                     var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS || c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS));
                     var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))

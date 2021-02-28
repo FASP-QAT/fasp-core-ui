@@ -1558,6 +1558,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var inventoryDataList = (programJson.inventoryList);
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var minDate = "";
                     var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
                     var curUser = AuthenticationService.getLoggedInUserId();
