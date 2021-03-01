@@ -186,7 +186,7 @@ export default class SyncMasterData extends Component {
                             console.log("Response=========================>", response.data);
                             console.log("i", i);
                             var curUser = AuthenticationService.getLoggedInUserId();
-                            var prog = programList.filter(c => c.programId == response.data.programId && c.version == response.data.versionId && c.userId == response.data.userId)[0];
+                            var prog = programList.filter(c => parseInt(c.programId) == parseInt(response.data.programId) && parseInt(c.version) == parseInt(response.data.versionId) && parseInt(c.userId) == parseInt(response.data.userId))[0];
                             console.log("Prog=====================>", prog)
                             var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
