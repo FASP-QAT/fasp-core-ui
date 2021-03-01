@@ -848,7 +848,7 @@ class ShipmentGlobalDemandView extends Component {
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList Original------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
                         let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))

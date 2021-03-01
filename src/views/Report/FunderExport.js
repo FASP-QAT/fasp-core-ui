@@ -804,7 +804,7 @@ class FunderExport extends Component {
 
                             var shipmentList = (programJson.shipmentList);
 
-                            const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                            const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                             // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                             let isPlannedShipment = [];
