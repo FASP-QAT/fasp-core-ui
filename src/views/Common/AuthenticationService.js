@@ -573,6 +573,22 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/integration/AddIntegration":
+                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
+                        return true;
+                    }
+                    break;
+                case "/integration/editIntegration/:integrationId":
+                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
+                        return true;
+                    }
+                    break;
+                case "/integration/listIntegration":
+                case "/integration/listIntegration/:color/:message":
+                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
+                        return true;
+                    }
+                    break;
                 case "/realm/addrealm":
                     if (bfunction.includes("ROLE_BF_CREATE_REALM")) {
                         return true;
@@ -1235,15 +1251,15 @@ class AuthenticationService {
                 //     }
                 // }
             } else {
-                localStorage.setItem("sessionChanged",1)
+                localStorage.setItem("sessionChanged", 1)
                 return "/login/static.message.sessionChange";
             }
         } else {
             console.log("offline to online ");
-            if(localStorage.getItem("sessionChanged")==1){
+            if (localStorage.getItem("sessionChanged") == 1) {
                 return "/login/static.message.sessionChange";
-            }else{
-            return "/accessDenied";
+            } else {
+                return "/accessDenied";
             }
         }
     }

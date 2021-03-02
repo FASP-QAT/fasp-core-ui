@@ -259,6 +259,10 @@ const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
 const QuantimedImport = React.lazy(() => import('../../views/Quantimed/QuantimedImportOnboarding'));
 // const EditProblem = React.lazy(() => import('../../views/Problem/EditProblem'));
 
+const AddIntegration = React.lazy(() => import('../../views/Integration/AddIntegrationComponent'));
+const IntegrationList = React.lazy(() => import('../../views/Integration/IntegrationListComponent'));
+const EditIntegration = React.lazy(() => import('../../views/Integration/EditIntegrationComponent'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
@@ -600,7 +604,14 @@ const routes = [
   { path: '/report/stockAdjustment', name: 'static.report.stockAdjustment', component: StockAdjustment },
   // { path: '/report/expiredInventory', name:static.report.expiredInventory' ,component: ExpiredInventory },
   { path: '/report/expiredInventory', name: 'static.report.expiredInventory', component: ExpiredInventory },
-  { path: '/quantimed/quantimedImport', name: 'static.quantimed.quantimedImport', component: QuantimedImport }
+  { path: '/quantimed/quantimedImport', name: 'static.quantimed.quantimedImport', component: QuantimedImport },
+
+  { path: '/integration/AddIntegration', name: 'static.breadcrum.add', entityname: 'static.dashboard.integrationheader', component: AddIntegration },
+  { path: '/integration/listIntegration', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.integration', component: IntegrationList },
+  // { path: '/integration/listIntegration/:message', component: IntegrationList },
+  { path: '/integration/listIntegration/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.integration', component: IntegrationList },
+  { path: '/integration/listIntegration/:message', component: IntegrationList },
+  { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.integrationheader', component: EditIntegration }
 ];
 
 class DefaultLayout extends Component {
@@ -935,7 +946,7 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-              {checkOnline === 'Online' && 
+              {checkOnline === 'Online' &&
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -1041,6 +1052,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_UNIT') ? false : true) }
                           }
                           ,
+                          {
+                            name: i18n.t('static.dashboard.integration'),
+                            url: '/integration/listIntegration',
+                            icon: 'fa fa-map',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_DIMENSION') ? false : true) }
+                          },
                           // {
                           //   name: i18n.t('static.dashboard.realmheader'),
                           //   icon: 'fa fa-list',
@@ -2063,7 +2080,7 @@ class DefaultLayout extends Component {
 
                 }} {...this.props} />
               }
-              {checkOnline === 'Offline' &&  
+              {checkOnline === 'Offline' &&
                 <AppSidebarNav navConfig={{
                   items:
                     [
