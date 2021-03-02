@@ -1387,14 +1387,28 @@ class ProductCatalog extends Component {
                                                 >
 
                                                     {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
-                                                    {productCategories.length > 0
+                                                    {/* {productCategories.length > 0
                                                         && productCategories.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
                                                                     {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
                                                                 </option>
                                                             )
-                                                        }, this)}
+                                                        }, this)} */}
+
+                                                    {
+                                                        (productCategories.length > 0 ? productCategories.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                                </option>
+                                                            )
+                                                        }, this) :
+                                                            <option value={-1}>
+                                                                {i18n.t('static.common.allCategories')}
+                                                            </option>
+                                                        )
+                                                    }
 
                                                 </Input>
                                             </InputGroup>
