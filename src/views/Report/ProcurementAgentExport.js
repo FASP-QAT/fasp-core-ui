@@ -42,7 +42,6 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const checkOnline = localStorage.getItem('typeOfSession');
 
 class ProcurementAgentExport extends Component {
     constructor(props) {
@@ -910,7 +909,7 @@ class ProcurementAgentExport extends Component {
 
     buildJExcel() {
         let shipmentCosttList = this.state.data;
-        // console.log("shipmentCosttList---->", shipmentCosttList);
+        console.log("shipmentCosttList @@@---->", shipmentCosttList);
         let shipmentCostArray = [];
         let count = 0;
 
@@ -1177,7 +1176,7 @@ class ProcurementAgentExport extends Component {
                                 var shipmentList = (programJson.shipmentList);
                                 console.log("shipmentList----*********----", shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const activeFilter = shipmentList;
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
@@ -1230,46 +1229,49 @@ class ProcurementAgentExport extends Component {
                                     }
                                 })
                                 console.log("data----->", data);
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
-                                // console.log("userFilter===>", useFilter);
+                                // console.log("userFilter===>###", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
+                                    var procurementAgentIds = planningUnitFilterdata.map(q => parseInt(q.procurementAgent.id));
+                                    var uniqueProcurementAgentIds = procurementAgentIds.filter((q, idx) => procurementAgentIds.indexOf(q) === idx);
                                     // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
-                                    var qty = 0;
-                                    var productCost = 0;
-                                    var freightPerc = 0;
-                                    var freightCost = 0;
-                                    var totalCost = 0;
-                                    for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
-                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
-                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
-                                    }
-                                    myJson = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilterdata[0].shipmentId,
-                                        "procurementAgent": planningUnitFilterdata[0].procurementAgent,
-                                        "fundingSource": planningUnitFilterdata[0].fundingSource,
-                                        "planningUnit": planningUnitFilterdata[0].planningUnit,
-                                        "qty": qty,
-                                        "productCost": productCost,
-                                        "freightPerc": freightPerc,
-                                        "freightCost": freightCost,
-                                        "totalCost": totalCost,
-                                    }
+                                    for (var u = 0; u < uniqueProcurementAgentIds.length; u++) {
+                                        var pupaFilterdata = planningUnitFilterdata.filter(c => c.procurementAgent.id == uniqueProcurementAgentIds[u]);
+                                        var qty = 0;
+                                        var productCost = 0;
+                                        var freightPerc = 0;
+                                        var freightCost = 0;
+                                        var totalCost = 0;
+                                        for (var pf = 0; pf < pupaFilterdata.length; pf++) {
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
+                                            freightPerc = Number(freightPerc) + isNaN(Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
+                                        }
+                                        myJson = {
+                                            "active": true,
+                                            "shipmentId": pupaFilterdata[0].shipmentId,
+                                            "procurementAgent": pupaFilterdata[0].procurementAgent,
+                                            "fundingSource": pupaFilterdata[0].fundingSource,
+                                            "planningUnit": pupaFilterdata[0].planningUnit,
+                                            "qty": qty,
+                                            "productCost": productCost,
+                                            "freightPerc": freightPerc,
+                                            "freightCost": freightCost,
+                                            "totalCost": totalCost,
+                                        }
 
 
-                                    // }
-                                    filteredData.push(myJson);
+                                        // }
+                                        filteredData.push(myJson);
+                                    }
                                 }
-
-                                console.log("filteredData=====>", filteredData);
                                 this.setState({
                                     data: filteredData
                                     , message: ''
@@ -1481,7 +1483,7 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                                 let isPlannedShipment = [];
@@ -1534,7 +1536,7 @@ class ProcurementAgentExport extends Component {
                                         data.push(json);
                                     }
                                 })
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
@@ -1542,35 +1544,39 @@ class ProcurementAgentExport extends Component {
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
-                                    console.log("planningUnitFilterdata===>", planningUnitFilterdata);
-                                    var qty = 0;
-                                    var productCost = 0;
-                                    var freightPerc = 0;
-                                    var freightCost = 0;
-                                    var totalCost = 0;
-                                    for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
-                                    }
-                                    myJson = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilterdata[0].shipmentId,
-                                        "procurementAgent": planningUnitFilterdata[0].procurementAgent,
-                                        "fundingSource": planningUnitFilterdata[0].fundingSource,
-                                        "planningUnit": planningUnitFilterdata[0].planningUnit,
-                                        "qty": qty,
-                                        "productCost": productCost,
-                                        "freightPerc": freightPerc,
-                                        "freightCost": freightCost,
-                                        "totalCost": totalCost,
-                                    }
+                                    var fundingSourceIds = planningUnitFilterdata.map(q => parseInt(q.fundingSource.id));
+                                    var uniqueFundingSourceIds = fundingSourceIds.filter((q, idx) => fundingSourceIds.indexOf(q) === idx);
+                                    for (var u = 0; u < uniqueFundingSourceIds.length; u++) {
+                                        var pupaFilterdata = planningUnitFilterdata.filter(c => c.fundingSource.id == uniqueFundingSourceIds[u]);
+                                        var qty = 0;
+                                        var productCost = 0;
+                                        var freightPerc = 0;
+                                        var freightCost = 0;
+                                        var totalCost = 0;
+                                        for (var pf = 0; pf < pupaFilterdata.length; pf++) {
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
+                                            freightPerc = Number(freightPerc) + isNaN(Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
+                                        }
+                                        myJson = {
+                                            "active": true,
+                                            "shipmentId": pupaFilterdata[0].shipmentId,
+                                            "procurementAgent": pupaFilterdata[0].procurementAgent,
+                                            "fundingSource": pupaFilterdata[0].fundingSource,
+                                            "planningUnit": pupaFilterdata[0].planningUnit,
+                                            "qty": qty,
+                                            "productCost": productCost,
+                                            "freightPerc": freightPerc,
+                                            "freightCost": freightCost,
+                                            "totalCost": totalCost,
+                                        }
 
 
-                                    // }
-                                    filteredData.push(myJson);
+                                        // }
+                                        filteredData.push(myJson);
+                                    }
                                 }
                                 console.log("end offline data----", filteredData);
                                 this.setState({
@@ -1786,7 +1792,7 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
@@ -1829,11 +1835,12 @@ class ProcurementAgentExport extends Component {
                                     data.push(json);
                                 }
 
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
+                                console.log("User Filter@@@", useFilter);
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
@@ -1843,12 +1850,13 @@ class ProcurementAgentExport extends Component {
                                     var freightPerc = 0;
                                     var freightCost = 0;
                                     var totalCost = 0;
+                                    console.log("@@@PlanningUnitFiltered data",planningUnitFilterdata);
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
+                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
+                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
                                         freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,
@@ -1857,10 +1865,10 @@ class ProcurementAgentExport extends Component {
                                         "fundingSource": planningUnitFilterdata[0].fundingSource,
                                         "planningUnit": planningUnitFilterdata[0].planningUnit,
                                         "qty": qty,
-                                        "productCost": productCost.toFixed(2),
+                                        "productCost": productCost,
                                         "freightPerc": freightPerc,
                                         "freightCost": freightCost,
-                                        "totalCost": totalCost.toFixed(2),
+                                        "totalCost": totalCost,
                                     }
 
 
@@ -2434,6 +2442,7 @@ class ProcurementAgentExport extends Component {
                 text: 'All', value: this.state.selRegion.length
             }]
         }
+        const checkOnline = localStorage.getItem('typeOfSession');
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
