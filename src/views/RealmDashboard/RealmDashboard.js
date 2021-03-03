@@ -44,7 +44,6 @@ import { polling } from '../../Constants';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
-const checkOnline = localStorage.getItem('typeOfSession');
 const brandPrimary = getStyle('--primary')
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
@@ -316,6 +315,7 @@ class RealmDashboard extends Component {
 
   render() {
     const { activeIndex } = this.state;
+    const checkOnline = localStorage.getItem('typeOfSession');
     const slides = this.state.users.map((item) => {
 
       return (

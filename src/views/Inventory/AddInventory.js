@@ -23,7 +23,6 @@ import { Prompt } from 'react-router'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
-const checkOnline = localStorage.getItem('typeOfSession');
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -501,6 +500,7 @@ export default class AddInventory extends Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
