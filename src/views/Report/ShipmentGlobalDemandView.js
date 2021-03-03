@@ -1203,7 +1203,10 @@ class ShipmentGlobalDemandView extends Component {
         this.setState({
             programLst: [],
             programValues: [],
-            programLabels: []
+            programLabels: [],
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
             if (countryIds.length != 0) {
                 let programLst = [];
@@ -2396,7 +2399,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </FormGroup>
                                         </Online> */}
-                                        {checkOnline === 'Offline' && 
+                                        {checkOnline === 'Offline' &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
@@ -2424,7 +2427,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </FormGroup>
                                         }
-                                        {checkOnline === 'Offline' && 
+                                        {checkOnline === 'Offline' &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
