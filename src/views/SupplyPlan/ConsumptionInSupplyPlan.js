@@ -1290,6 +1290,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var consumptionDataList = (programJson.consumptionList);
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var minDate = "";
                     var minDateActualConsumption = "";
                     var minDateForcastedConsumption = "";

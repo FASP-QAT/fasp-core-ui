@@ -999,7 +999,7 @@ export default class syncPage extends Component {
           this.props.hideFirstComponent();
         }.bind(this);
         putRequest.onsuccess = function (event) {
-          this.refs.problemListChild.qatProblemActions((this.state.programId).value,"loading",true);
+          this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", true);
         }.bind(this);
       }.bind(this);
     }.bind(this);
@@ -2983,6 +2983,7 @@ export default class syncPage extends Component {
                 programRequest2.onsuccess = function (e) {
 
                   var json = response.data;
+                  json.actionList = [];
                   var version = json.requestedProgramVersion;
                   if (version == -1) {
                     version = json.currentVersion.versionId
@@ -3019,7 +3020,7 @@ export default class syncPage extends Component {
                     programCode: json.programCode,
                     openCount: openCount,
                     addressedCount: addressedCount,
-                    programModified:0
+                    programModified: 0
                   }
                   var putRequest = programSaveData.put(item);
                   var putRequest1 = downloadedProgramSaveData.put(item);
