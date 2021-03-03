@@ -81,6 +81,27 @@ class AuthenticationService {
         }
     }
 
+    getLoggedInUserRoleIdArr() {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let roleList = [];
+            for (let i = 0; i < decryptedUser.roleList.length; i++) {
+                console.log("decryptedUser.roleList[i]", (decryptedUser.roleList[i]).roleId);
+                roleList.push((decryptedUser.roleList[i]).roleId);
+                // if (role != null && role != "") {
+                //     if (i > 0) {
+                //         roles += "," + role.label.label_en;
+                //     } else {
+                //         roles += role.label.label_en;
+                //     }
+                // }
+            }
+            // console.log("decryptedUser.roles---" + decryptedUser.roleList);
+            return roleList;
+        }
+    }
+
     displayDashboardBasedOnRole() {
         console.log("M sync role based dashboard 1");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
@@ -1235,15 +1256,15 @@ class AuthenticationService {
                 //     }
                 // }
             } else {
-                localStorage.setItem("sessionChanged",1)
+                localStorage.setItem("sessionChanged", 1)
                 return "/login/static.message.sessionChange";
             }
         } else {
             console.log("offline to online ");
-            if(localStorage.getItem("sessionChanged")==1){
+            if (localStorage.getItem("sessionChanged") == 1) {
                 return "/login/static.message.sessionChange";
-            }else{
-            return "/accessDenied";
+            } else {
+                return "/accessDenied";
             }
         }
     }
