@@ -186,6 +186,7 @@
     "static.message.skucodevalid": "Somente letras e números permitidos",
     "static.fundingSource.allowInBudget": "Permitir no orçamento",
     "static.problemReport.addressedExample": "Uma unidade de planejamento de eliminação progressiva tem apenas 8 meses de consumo previsto no futuro, em vez de 18. Isso é aceitável, pois é uma unidade de planejamento de eliminação progressiva, mas o usuário ainda precisará desativar a unidade de planejamento quando ela for totalmente eliminada , é por isso que o problema está marcado como `endereçado` em vez de `resolvido`.",
+    "static.common.allCategories": "todas as categorias",
     "static.supplyPlan.saveBudget": "Economize orçamento",
     "static.dashboard.qatProblemList": "Lista de Problemas QAT",
     "static.dashboard.listprogramproduct": "Exibir unidade de planejamento do programa",

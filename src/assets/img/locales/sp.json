@@ -186,6 +186,7 @@
     "static.message.skucodevalid": "Solo se permiten letras y números",
     "static.fundingSource.allowInBudget": "Permitir en el presupuesto",
     "static.problemReport.addressedExample": "Este producto sólo tiene 8 meses de consumo estimado en lugar de 18. Esto es aceptable ya que es un producto en proceso de eliminación gradual. Cuando se elimine por completo, el usuario tendrá que desactivarlo; mientras, el problema se marca como `discutido` en lugar de `resuelto`.",
+    "static.common.allCategories": "todas las categorias",
     "static.supplyPlan.saveBudget": "Guardar presupuesto",
     "static.dashboard.qatProblemList": "Lista de problemas QAT",
     "static.dashboard.listprogramproduct": "Lista de productos del programa",
