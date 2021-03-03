@@ -193,6 +193,7 @@ class AnnualShipmentCost extends Component {
                                     var outPutList = [];
                                     var shipmentList = [];
                                     shipmentList = programJson.shipmentList;
+                                    shipmentList=shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
                                         var planningUnitId = p.value
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)

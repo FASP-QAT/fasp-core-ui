@@ -1176,7 +1176,7 @@ class ProcurementAgentExport extends Component {
                                 var shipmentList = (programJson.shipmentList);
                                 console.log("shipmentList----*********----", shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const activeFilter = shipmentList;
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
@@ -1483,7 +1483,7 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                                 let isPlannedShipment = [];
@@ -1792,7 +1792,7 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled

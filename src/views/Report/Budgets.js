@@ -501,7 +501,8 @@ class Budgets extends Component {
                             var programJson = JSON.parse(programData);
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
-                                var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                                var shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                var shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {

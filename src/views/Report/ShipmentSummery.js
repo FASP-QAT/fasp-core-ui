@@ -974,7 +974,7 @@ class ShipmentSummery extends Component {
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => c.active == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
+                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true") && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                         // const activeFilter = shipmentList;
                         console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
