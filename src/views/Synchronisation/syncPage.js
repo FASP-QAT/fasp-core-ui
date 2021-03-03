@@ -1448,7 +1448,8 @@ export default class syncPage extends Component {
                                             moment(f.consumptionDate).format("YYYY-MM") == moment(oldProgramDataConsumption[c].consumptionDate).format("YYYY-MM") &&
                                             f.region.id == oldProgramDataConsumption[c].region.id &&
                                             f.actualFlag.toString() == oldProgramDataConsumption[c].actualFlag.toString() &&
-                                            f.realmCountryPlanningUnit.id == oldProgramDataConsumption[c].realmCountryPlanningUnit.id
+                                            f.realmCountryPlanningUnit.id == oldProgramDataConsumption[c].realmCountryPlanningUnit.id &&
+                                            !existingConsumptionId.includes(f.consumptionId)
                                           );
                                           if (index == -1) { // Does not exists
                                             mergedConsumptionData.push(oldProgramDataConsumption[c]);
@@ -1614,7 +1615,8 @@ export default class syncPage extends Component {
                                               moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
                                               f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
                                               (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
-                                              f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id
+                                              f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id &&
+                                              !existingInventoryId.includes(f.inventoryId)
                                             );
                                           } else {
                                             index = -1;
@@ -3161,7 +3163,8 @@ export default class syncPage extends Component {
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId && 
+                  !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
               index = -1;
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 3 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 4 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 5 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 6 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 7) {
@@ -3170,12 +3173,14 @@ export default class syncPage extends Component {
                   // f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id &&
                   f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
                   // && oldProgramDataProblemList[c].newAdded != true
-                  && f.shipmentId == oldProgramDataProblemList[c].shipmentId);
+                  && f.shipmentId == oldProgramDataProblemList[c].shipmentId &&
+                  !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 23 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 24) {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
+                  !existingProblemReportId.includes(f.problemReportId));
 
             }
             // else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
