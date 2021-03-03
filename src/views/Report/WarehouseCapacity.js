@@ -53,7 +53,6 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
-const checkOnline = localStorage.getItem('typeOfSession');
 class warehouseCapacity extends Component {
     constructor(props) {
         super(props);
@@ -898,6 +897,7 @@ class warehouseCapacity extends Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         // const { programLst } = this.state;
         // let programList = programLst.length > 0
         //     && programLst.map((item, i) => {

@@ -458,6 +458,7 @@ class Budgets extends Component {
         if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length > 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
+                this.setState({ loading: true })
 
                 var db1;
                 getDatabase();
@@ -466,6 +467,12 @@ class Budgets extends Component {
                 var procurementAgentList = [];
                 var fundingSourceList = [];
                 var budgetList = [];
+
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -473,6 +480,11 @@ class Budgets extends Component {
                     var budgetOs = budgetTransaction.objectStore('budget');
                     var budgetRequest = budgetOs.getAll();
 
+                    budgetRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     budgetRequest.onsuccess = function (event) {
                         var budgetResult = [];
                         budgetResult = budgetRequest.result;
@@ -495,13 +507,19 @@ class Budgets extends Component {
                         var data = [];
                         var programRequest = programTransaction.get(program);
 
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false
+                            })
+                        }.bind(this);
                         programRequest.onsuccess = function (event) {
                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
-                                var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                                var shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                var shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
@@ -537,7 +555,8 @@ class Budgets extends Component {
                             console.log("B** data ---", data);
                             this.setState({
                                 selBudget: data,
-                                message: ''
+                                message: '',
+                                loading: false
                             })
 
 

@@ -391,5 +391,10 @@ export default function getProblemDesc(row, lang) {
         // label.label_en = "Inventory doen't fall within min/max range";
         // return getLabelText(label, lang);
     }
+    if (row.realmProblem.problem.problemId == 25) {
+        var label = row.realmProblem.problem.label;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        return getLabelText(label, lang);
+    }
 
 }

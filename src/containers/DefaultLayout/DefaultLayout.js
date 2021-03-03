@@ -22,7 +22,6 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
-const checkOnline = localStorage.getItem('typeOfSession');
 const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -910,6 +909,7 @@ class DefaultLayout extends Component {
   render() {
     // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
+    const checkOnline = localStorage.getItem('typeOfSession');
     return (
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
