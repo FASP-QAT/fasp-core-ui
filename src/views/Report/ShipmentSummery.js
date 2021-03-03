@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -937,6 +937,7 @@ class ShipmentSummery extends Component {
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
+                this.setState({ loading: true })
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value));
                 console.log("planninuit ids====>", planningUnitIds);
                 var db1;
@@ -967,14 +968,13 @@ class ShipmentSummery extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => c.active == true);
+                        const activeFilter = shipmentList.filter(c => c.active == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                         // const activeFilter = shipmentList;
                         console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
