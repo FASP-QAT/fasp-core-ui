@@ -54,7 +54,6 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const checkOnline = localStorage.getItem('typeOfSession');
 
 // Return with commas in between
 var numberWithCommas = function (x) {
@@ -849,7 +848,7 @@ class ShipmentGlobalDemandView extends Component {
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList Original------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
                         let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
@@ -1204,7 +1203,10 @@ class ShipmentGlobalDemandView extends Component {
         this.setState({
             programLst: [],
             programValues: [],
-            programLabels: []
+            programLabels: [],
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
             if (countryIds.length != 0) {
                 let programLst = [];
@@ -2274,6 +2276,8 @@ class ShipmentGlobalDemandView extends Component {
             return '?'
         }
 
+        const checkOnline = localStorage.getItem('typeOfSession');
+
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -2395,7 +2399,7 @@ class ShipmentGlobalDemandView extends Component {
 
                                             </FormGroup>
                                         </Online> */}
-                                        {checkOnline === 'Offline' && 
+                                        {checkOnline === 'Offline' &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
@@ -2423,7 +2427,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 </div>
                                             </FormGroup>
                                         }
-                                        {checkOnline === 'Offline' && 
+                                        {checkOnline === 'Offline' &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">

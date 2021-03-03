@@ -999,7 +999,7 @@ export default class syncPage extends Component {
           this.props.hideFirstComponent();
         }.bind(this);
         putRequest.onsuccess = function (event) {
-          this.refs.problemListChild.qatProblemActions((this.state.programId).value,"loading",true);
+          this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", true);
         }.bind(this);
       }.bind(this);
     }.bind(this);
@@ -1448,7 +1448,8 @@ export default class syncPage extends Component {
                                             moment(f.consumptionDate).format("YYYY-MM") == moment(oldProgramDataConsumption[c].consumptionDate).format("YYYY-MM") &&
                                             f.region.id == oldProgramDataConsumption[c].region.id &&
                                             f.actualFlag.toString() == oldProgramDataConsumption[c].actualFlag.toString() &&
-                                            f.realmCountryPlanningUnit.id == oldProgramDataConsumption[c].realmCountryPlanningUnit.id
+                                            f.realmCountryPlanningUnit.id == oldProgramDataConsumption[c].realmCountryPlanningUnit.id &&
+                                            !existingConsumptionId.includes(f.consumptionId)
                                           );
                                           if (index == -1) { // Does not exists
                                             mergedConsumptionData.push(oldProgramDataConsumption[c]);
@@ -1614,7 +1615,8 @@ export default class syncPage extends Component {
                                               moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
                                               f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
                                               (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
-                                              f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id
+                                              f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id &&
+                                              !existingInventoryId.includes(f.inventoryId)
                                             );
                                           } else {
                                             index = -1;
@@ -2971,6 +2973,10 @@ export default class syncPage extends Component {
                 var programDataOs1 = programDataTransaction1.objectStore('programData');
                 var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
+                var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                var programRequest3 = programDataOs3.delete((this.state.programId).value);
+
                 var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                 var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
                 var programRequest2 = programDataOs2.delete((this.state.programId).value);
@@ -2983,6 +2989,7 @@ export default class syncPage extends Component {
                 programRequest2.onsuccess = function (e) {
 
                   var json = response.data;
+                  json.actionList = [];
                   var version = json.requestedProgramVersion;
                   if (version == -1) {
                     version = json.currentVersion.versionId
@@ -3019,7 +3026,7 @@ export default class syncPage extends Component {
                     programCode: json.programCode,
                     openCount: openCount,
                     addressedCount: addressedCount,
-                    programModified:0
+                    programModified: 0
                   }
                   var putRequest = programSaveData.put(item);
                   var putRequest1 = downloadedProgramSaveData.put(item);
@@ -3155,13 +3162,14 @@ export default class syncPage extends Component {
           } else {
             // If 0 check whether that exists in latest version or not
             var index = 0;
-            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15) {
+            if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 25) {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId && 
+                  !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
               index = -1;
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 3 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 4 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 5 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 6 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 7) {
@@ -3170,12 +3178,14 @@ export default class syncPage extends Component {
                   // f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id &&
                   f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId
                   // && oldProgramDataProblemList[c].newAdded != true
-                  && f.shipmentId == oldProgramDataProblemList[c].shipmentId);
+                  && f.shipmentId == oldProgramDataProblemList[c].shipmentId &&
+                  !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 23 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 24) {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
+                  !existingProblemReportId.includes(f.problemReportId));
 
             }
             // else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {

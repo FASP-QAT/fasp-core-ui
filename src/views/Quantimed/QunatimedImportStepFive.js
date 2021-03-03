@@ -218,6 +218,9 @@ export default class QunatimedImportStepFive extends Component {
 
                                         var consumptionDataList = (programJson.consumptionList);
                                         var actionList = (programJson.actionList);
+                                        if (actionList == undefined) {
+                                            actionList = []
+                                        }
                                         var qunatimedData = this.state.finalImportData;
                                         var finalPuList = []
                                         for (var i = 0; i < finalImportQATData.length; i++) {

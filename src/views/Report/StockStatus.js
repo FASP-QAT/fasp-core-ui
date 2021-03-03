@@ -442,8 +442,8 @@ class StockStatus extends Component {
 
 
 
-              var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-              var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+              var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
               var monthstartfrom = this.state.rangeValue.from.month
               for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                 var monthlydata = [];
@@ -1307,7 +1307,7 @@ class StockStatus extends Component {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
 
-              ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+              ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1325,7 +1325,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1344,7 +1344,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1362,7 +1362,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
