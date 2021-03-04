@@ -260,7 +260,7 @@ export default class DimensionListComponent extends Component {
 
     addNewDimension() {
         if (isSiteOnline()) {
-            this.props.history.push(`/diamension/addDiamension`)
+            this.props.history.push(`/integration/addIntegration`)
         } else {
             alert("You must be Online.")
         }
