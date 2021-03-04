@@ -1184,6 +1184,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/userManual/uploadUserManual":
+                    if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
+                        return true;
+                    }
+                    break;
                 default:
                     console.log("default case");
                     return false;
