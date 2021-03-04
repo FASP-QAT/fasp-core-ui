@@ -14,7 +14,8 @@ import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } fro
 
 let initialValues = {
     languageName: '',
-    languageCode: ''
+    languageCode: '',
+    countryCode: ''
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
@@ -27,8 +28,11 @@ const validationSchema = function (values) {
         languageCode: Yup.string()
             // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
             .matches(SPECIAL_CHARECTER_WITHOUT_NUM, i18n.t('static.common.alphabetsOnly'))
-            .required(i18n.t('static.language.languagecodetext'))
+            .required(i18n.t('static.language.languagecodetext')),
         // .max(2, i18n.t('static.language.languageCodemax3digittext'))
+        countryCode: Yup.string()
+            .max(2, i18n.t('static.language.languageCodemax3digittext'))
+            .required(i18n.t('static.language.languagecodetext'))
 
     })
 }
@@ -61,7 +65,8 @@ export default class EditLanguageComponent extends Component {
         this.state = {
             // language: this.props.location.state.language,
             language: {
-                languageName: ''
+                languageName: '',
+                countryCode: ''
             },
             message: '',
             loading: true
@@ -95,7 +100,10 @@ export default class EditLanguageComponent extends Component {
             language.languageName = event.target.value
         } else if (event.target.name === "languageCode") {
             language.languageCode = event.target.value
-        } else if (event.target.name === "active") {
+        } else if (event.target.name == "countryCode") {
+            language.countryCode = event.target.value;
+        }
+        else if (event.target.name === "active") {
             language.active = event.target.id === "active2" ? false : true
         }
 
@@ -110,7 +118,8 @@ export default class EditLanguageComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             languageName: true,
-            languageCode: true
+            languageCode: true,
+            countryCode: true
         }
         )
         this.validateForm(errors)
@@ -211,7 +220,8 @@ export default class EditLanguageComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     languageName: this.state.language.languageName,
-                                    languageCode: this.state.language.languageCode
+                                    languageCode: this.state.language.languageCode,
+                                    countryCode: this.state.language.countryCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -321,6 +331,22 @@ export default class EditLanguageComponent extends Component {
                                                             maxLength={2}
                                                         />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="languageCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="countryCode"
+                                                            id="countryCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.countryCode && this.state.language.countryCode != ''}
+                                                            invalid={touched.countryCode && !!errors.countryCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.countryCode}
+                                                            required
+                                                            maxLength={2}
+                                                        />
+                                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>

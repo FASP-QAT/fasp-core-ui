@@ -186,6 +186,7 @@
     "static.message.skucodevalid": "Seuls les lettres et les chiffres sont autorisés",
     "static.fundingSource.allowInBudget": "Autoriser dans le budget",
     "static.problemReport.addressedExample": "Une unité de planification en phase de retrait progressif ne dispose que de 8 mois de consommation prévue dans le futur au lieu de 18. Cela est acceptable car il s`agit d`une unité de planification en phasde de retrait progressif, mais l`utilisateur devra toujours désactiver l`unité de planification une fois qu`elle sera complètement supprimée. , c`est pourquoi le problème est marqué comme `adressé` au lieu de `résolu.",
+    "static.common.allCategories": "toutes catégories",
     "static.supplyPlan.saveBudget": "Engegistrer le budget",
     "static.dashboard.qatProblemList": "Liste des problèmes QAT",
     "static.dashboard.listprogramproduct": "Afficher l`unité de planification du programme",

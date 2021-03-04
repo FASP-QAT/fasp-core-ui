@@ -17,7 +17,8 @@ import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } fro
 
 const initialValues = {
     languageName: "",
-    languageCode: ""
+    languageCode: "",
+    countryCode: ""
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
@@ -31,8 +32,10 @@ const validationSchema = function (values) {
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITHOUT_NUM, i18n.t('static.common.alphabetsOnly'))
+            .required(i18n.t('static.language.languagecodetext')),
+        countryCode: Yup.string()
+            .max(2, i18n.t('static.language.languageCodemax3digittext'))
             .required(i18n.t('static.language.languagecodetext'))
-        // .max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -66,6 +69,7 @@ class AddLanguageComponent extends Component {
             language: {
                 languageName: '',
                 languageCode: '',
+                countryCode: ''
             },
             message: '',
             loading: true
@@ -87,6 +91,10 @@ class AddLanguageComponent extends Component {
         if (event.target.name == "languageCode") {
             language.languageCode = event.target.value;
         }
+        if (event.target.name == "countryCode") {
+            language.countryCode = event.target.value;
+        }
+
         this.setState({
             language
         },
@@ -106,7 +114,8 @@ class AddLanguageComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             languageName: true,
-            languageCode: true
+            languageCode: true,
+            countryCode: true
         }
         )
         this.validateForm(errors)
@@ -262,6 +271,23 @@ class AddLanguageComponent extends Component {
                                                             />
                                                             <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                         </FormGroup>
+
+                                                        <FormGroup>
+                                                            <Label for="languageCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                            <Input type="text"
+                                                                name="countryCode"
+                                                                id="countryCode"
+                                                                bsSize="sm"
+                                                                valid={!errors.countryCode && this.state.language.countryCode != ''}
+                                                                invalid={touched.countryCode && !!errors.countryCode}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.language.countryCode}
+                                                                required
+                                                                maxLength={2}
+                                                            />
+                                                            <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                        </FormGroup>
                                                     </CardBody>
                                                     <CardFooter>
                                                         <FormGroup>
@@ -301,6 +327,7 @@ class AddLanguageComponent extends Component {
         let { language } = this.state;
         language.languageName = '';
         language.languageCode = '';
+        language.countryCode = '';
         this.setState({
             language
         },

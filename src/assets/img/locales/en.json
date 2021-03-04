@@ -186,6 +186,7 @@
     "static.message.skucodevalid": "Only letters and numbers allowed",
     "static.fundingSource.allowInBudget": "Allow In Budget?",
     "static.problemReport.addressedExample": "A phasing out planning unit only has 8 months of forecasted consumption in the future instead of 18. This is acceptable as it is a phasing out planning unit, but the user will still need to de-activate the planning unit once it is fully phased out, which is why the issue is marked as `Addressed` instead of `Resolved`.",
+    "static.common.allCategories": "All Categories",
     "static.supplyPlan.saveBudget": "Save Budget",
     "static.dashboard.qatProblemList": "QAT Problem List",
     "static.dashboard.listprogramproduct": "Display program planning unit",
