@@ -362,7 +362,7 @@ export default class LanguageListComponent extends Component {
                             for (var j = 0; j < langaugeList.length; j++) {
                                 data = [];
                                 data[0] = langaugeList[j].languageId
-                                data[1] = langaugeList[j].languageName;
+                                data[1] = langaugeList[j].label.label_en;
                                 data[2] = langaugeList[j].languageCode;
                                 data[3] = langaugeList[j].lastModifiedBy.username;
                                 data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)

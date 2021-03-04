@@ -16,12 +16,15 @@ import image3 from '../../../assets/img/PEPFAR-logo.png';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import image2 from '../../../assets/img/wordmark.png';
-import { SECRET_KEY, APP_VERSION_REACT, JEXCEL_DEFAULT_PAGINATION, polling } from '../../../Constants.js';
+import { SECRET_KEY, APP_VERSION_REACT, JEXCEL_DEFAULT_PAGINATION, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling } from '../../../Constants.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import '../../Forms/ValidationForms/ValidationForms.css';
 import axios from 'axios';
 import { Online, Offline } from 'react-detect-offline';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
+import { getDatabase } from "../../../CommonComponent/IndexedDbFunctions";
+import MasterSyncService from '../../../api/MasterSyncService.js';
+import getLabelText from '../../../CommonComponent/getLabelText';
 
 
 
@@ -74,16 +77,129 @@ class Login extends Component {
       dropdownOpen: new Array(19).fill(false),
       icon: AuthenticationService.getIconAndStaticLabel("icon"),
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
-
+      languageList: [],
+      updatedSyncDate: '',
+      lang : localStorage.getItem('lastLoggedInUsersLanguage')
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
     this.logoutMessagehide = this.logoutMessagehide.bind(this);
     this.toggle = this.toggle.bind(this);
     this.changeLanguage = this.changeLanguage.bind(this);
+    this.getLanguageList = this.getLanguageList.bind(this);
   }
 
+  getLanguageList() {
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+    }.bind(this);
 
+    console.log("Hey anchal going to get languages for profile section")
+    var lastSyncDateRealm = "2020-01-01 00:00:00";
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['language'], 'readwrite');
+      var program = transaction.objectStore('language');
+      delete axios.defaults.headers.common["Authorization"];
+      if (isSiteOnline()) {
+        
+        // var transaction1 = db1.transaction(['lastSyncDate'], 'readwrite');
+        // var lastSyncDateTransaction = transaction1.objectStore('lastSyncDate');
+        // var updatedSyncDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+        // this.setState({
+        //   updatedSyncDate: updatedSyncDate
+        // })
+        // var lastSyncDateRequest = lastSyncDateTransaction.getAll();
+        // lastSyncDateRequest.onsuccess = function (event) {
+        //   var lastSyncDate = lastSyncDateRequest.result[0];
+        //   console.log("lastsyncDate", lastSyncDate);
+        //   var result = lastSyncDateRequest.result;
+        //   console.log("Result", result)
+        //   var realmId = 1;
+        //   console.log("RealmId", realmId)
+        //   for (var i = 0; i < result.length; i++) {
+        //     if (result[i].id == realmId) {
+        //       console.log("in if")
+        //       lastSyncDateRealm = lastSyncDateRequest.result[i];
+        //       console.log("last sync date in realm", lastSyncDateRealm)
+        //     }
+        //     if (result[i].id == 0) {
+        //       var lastSyncDate = lastSyncDateRequest.result[i];
+        //       console.log("last sync date", lastSyncDate)
+        //     }
+        //   }
+        //   if (lastSyncDate == undefined) {
+        //     lastSyncDate = "2020-01-01 00:00:00";
+        //   } else {
+        //     lastSyncDate = lastSyncDate.lastSyncDate;
+        //   }
+        //   if (lastSyncDateRealm == undefined) {
+        //     lastSyncDateRealm = "2020-01-01 00:00:00";
+        //   } else {
+        //     lastSyncDateRealm = lastSyncDateRealm.lastSyncDate;
+        //   }
+        //   console.log("Last sync date above", lastSyncDateRealm);
+        // }
+        // console.log("lastSyncDateRealm---", lastSyncDateRealm);
+        MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
+          console.log("response---", response);
+          var transaction = db1.transaction(['language'], 'readwrite');
+          var program = transaction.objectStore('language');
+          var json = (response.data);
+          for (var i = 0; i < json.length; i++) {
+            console.log("json[i]---", json[i]);
+            var psuccess = program.put(json[i]);
+
+          }
+          var getRequest1 = program.getAll();
+          getRequest1.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: 'red',
+              loading: false
+            })
+          }.bind(this);
+          getRequest1.onsuccess = function (event) {
+            var languageList = [];
+            languageList = getRequest1.result;
+            console.log("my language list---", languageList);
+            this.setState({
+              languageList
+            });
+            i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
+          }.bind(this);
+        });
+      } else {
+        var transaction = db1.transaction(['language'], 'readwrite');
+        var program1 = transaction.objectStore('language');
+        var getRequest1 = program1.getAll();
+        getRequest1.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red',
+            loading: false
+          })
+        }.bind(this);
+        getRequest1.onsuccess = function (event) {
+          var languageList = [];
+          languageList = getRequest1.result;
+          console.log("my language list---", languageList);
+          this.setState({
+            languageList
+          });
+          
+        }.bind(this);
+      }
+    }.bind(this)
+
+
+  }
 
   changeLanguage(lang, icon, staticLabel) {
     // localStorage.setItem('lang', lang);
@@ -142,6 +258,7 @@ class Login extends Component {
     }
     AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
     console.log("timeout going to change language")
+    this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
   }
 
@@ -227,10 +344,18 @@ class Login extends Component {
                     </DropdownToggle>
                     <DropdownMenu right>
                       {/* <DropdownItem ><i className="flag-icon flag-icon-us"></i>English</DropdownItem> */}
-                      <DropdownItem onClick={this.changeLanguage.bind(this, 'en', "flag-icon flag-icon-us", "static.language.english")}><i className="flag-icon flag-icon-us"></i>  {i18n.t('static.language.english')}</DropdownItem>
+                      {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
+                        language =>
+                          <>
+                            <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode, "flag-icon flag-icon-" + language.countryCode, getLabelText(language.label,this.state.lang))}>
+                              <i className={"flag-icon flag-icon-" + language.countryCode}></i>  {getLabelText(language.label,this.state.lang)}
+                            </DropdownItem>
+                          </>
+                      )}
+                      {/* <DropdownItem onClick={this.changeLanguage.bind(this, 'en', "flag-icon flag-icon-us", "static.language.english")}><i className="flag-icon flag-icon-us"></i>  {i18n.t('static.language.english')}</DropdownItem>
                       <DropdownItem onClick={this.changeLanguage.bind(this, 'fr', "flag-icon flag-icon-wf", "static.language.french")}><i className="flag-icon flag-icon-wf "></i>  {i18n.t('static.language.french')}</DropdownItem>
                       <DropdownItem onClick={this.changeLanguage.bind(this, 'sp', "flag-icon flag-icon-es", "static.language.spanish")}><i className="flag-icon flag-icon-es"></i>  {i18n.t('static.language.spanish')} </DropdownItem>
-                      <DropdownItem onClick={this.changeLanguage.bind(this, 'pr', "flag-icon flag-icon-pt", "static.language.portuguese")}><i className="flag-icon flag-icon-pt"></i>  {i18n.t('static.language.portuguese')}</DropdownItem>
+                      <DropdownItem onClick={this.changeLanguage.bind(this, 'pr', "flag-icon flag-icon-pt", "static.language.portuguese")}><i className="flag-icon flag-icon-pt"></i>  {i18n.t('static.language.portuguese')}</DropdownItem> */}
                     </DropdownMenu>
                   </ButtonDropdown>
                 </div>
@@ -252,15 +377,15 @@ class Login extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                           var emailId = values.emailId;
                           var password = values.password;
-                          
+
                           AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
-                          localStorage.setItem("sessionTimedOut",0);
-                          localStorage.setItem("sessionChanged",0)
+                          localStorage.setItem("sessionTimedOut", 0);
+                          localStorage.setItem("sessionChanged", 0)
                           if (isSiteOnline()) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
-                          var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
-                            console.log("Language change flag---",lastLoggedInUsersLanguageChanged);
-                            LoginService.authenticate(emailId, password,languageCode,lastLoggedInUsersLanguageChanged)
+                            var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
+                            console.log("Language change flag---", lastLoggedInUsersLanguageChanged);
+                            LoginService.authenticate(emailId, password, languageCode, lastLoggedInUsersLanguageChanged)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
                                 // console.log("decoded token---", decoded);
@@ -455,8 +580,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                  official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                  Agency for International Development or the U.S. government.
+                                                                                                                                                                                official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                                                Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
