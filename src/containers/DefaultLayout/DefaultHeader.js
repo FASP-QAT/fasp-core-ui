@@ -23,7 +23,6 @@ const propTypes = {
 };
 
 const defaultProps = {};
-const checkOnline = localStorage.getItem('typeOfSession');
 
 class DefaultHeader extends Component {
   constructor(props) {
@@ -41,6 +40,7 @@ class DefaultHeader extends Component {
 
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
+    const checkOnline = localStorage.getItem('typeOfSession');
 
     return (
       <React.Fragment>

@@ -263,6 +263,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[12] = index;
                         data[13] = 0;
                         data[14] = 0;
+                        data[15] = consumptionList[j].consumptionId;
                         consumptionDataArr[j] = data;
                     }
                     if (consumptionList.length == 0 && consumptionEditable) {
@@ -287,6 +288,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[12] = -1;
                         data[13] = 1;
                         data[14] = 0;
+                        data[15] = 0;
                         consumptionDataArr[0] = data;
                     }
                     var options = {
@@ -307,6 +309,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
+                            { type: 'hidden', width: 0 },
                             { type: 'hidden', width: 0 }
                         ],
                         pagination: paginationOption,
@@ -360,6 +363,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         // }
                                     }
                                     lastY = y;
+                                }
+                                if(rowData[15]>0){
+                                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                }else{
+                                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                    cell.classList.remove('readonly');
                                 }
                                 // Commented the CR
                                 // if (rowData[2] == 2) {
@@ -632,6 +642,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[12] = -1;
         data[13] = 1;
         data[14] = 0;
+        data[15] = 0;
         obj.insertRow(data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
             var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
@@ -1290,6 +1301,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var programJson = JSON.parse(programData);
                     var consumptionDataList = (programJson.consumptionList);
                     var actionList = programJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
                     var minDate = "";
                     var minDateActualConsumption = "";
                     var minDateForcastedConsumption = "";

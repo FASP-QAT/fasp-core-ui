@@ -440,7 +440,7 @@ class AddprogramPlanningUnit extends Component {
                                                             allowManualInsertColumn: false,
                                                             allowDeleteRow: true,
                                                             onchange: this.changed,
-                                                            oneditionend: this.onedit,
+                                                            // oneditionend: this.onedit,
                                                             copyCompatibility: true,
                                                             allowManualInsertRow: false,
                                                             parseFormulas: true,

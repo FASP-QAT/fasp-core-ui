@@ -211,8 +211,8 @@ export default class QatProblemActionNew extends Component {
                                                     c.program.id == programList[pp].programId
                                                 );
 
-                                                console.log("qplLastModifiedDate+++",moment(qplLastModifiedDate).format("YYYY-MM"));
-                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD") ) {
+                                                console.log("qplLastModifiedDate+++", moment(qplLastModifiedDate).format("YYYY-MM"));
+                                                if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD")) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
                                                     );
@@ -269,7 +269,7 @@ export default class QatProblemActionNew extends Component {
                                                                     (actionTypeIds.includes(ACTUAL_CONSUMPTION_MODIFIED) && c.problem.actualConsumptionTrigger) ||
                                                                     (actionTypeIds.includes(INVENTORY_MODIFIED) && c.problem.inventoryTrigger) ||
                                                                     (actionTypeIds.includes(ADJUSTMENT_MODIFIED) && c.problem.adjustmentTrigger) ||
-                                                                    (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger) || 
+                                                                    (actionTypeIds.includes(SHIPMENT_MODIFIED) && c.problem.shipmentTrigger) ||
                                                                     (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                             );
                                                         }
@@ -277,13 +277,13 @@ export default class QatProblemActionNew extends Component {
                                                         for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                             // for (var prob = 0; prob < problemList.length; prob++) {
                                                             console.log("in problemlist for+++");
-                                                            switch (problemList[prob].problem.problemId) {
+                                                            switch (typeProblemList[prob].problem.problemId) {
                                                                 case 1:
                                                                     // CASE 1 START (missing recent actual consumption in last three month including current month.)
                                                                     for (var r = 0; r < regionList.length; r++) {
                                                                         var consumptionList = programList[pp].consumptionList;
-                                                                        var numberOfMonths = parseInt(problemList[prob].data1);
-                                                                        var numberOfMonthsData2 = parseInt(problemList[prob].data2);
+                                                                        var numberOfMonths = parseInt(typeProblemList[prob].data1);
+                                                                        var numberOfMonthsData2 = parseInt(typeProblemList[prob].data2);
                                                                         var myStartDate = moment(curDate).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                                         var myEndDate = moment(curDate).endOf('month').format("YYYY-MM-DD");
                                                                         var startDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsData2, 'months').startOf('month').format("YYYY-MM-DD");
@@ -328,7 +328,7 @@ export default class QatProblemActionNew extends Component {
                                                                             // console.log("cause json+++",causeJson);
                                                                             if (index == -1) {
                                                                                 // crete problem
-                                                                                createDataQualityProblems(programList[pp], versionID, problemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList);
+                                                                                createDataQualityProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 // auto open logic for index problemstatus 4 means we are checking for status incompliance
@@ -354,8 +354,8 @@ export default class QatProblemActionNew extends Component {
                                                                     // CASE 2 START (missing recent  inventory inputs for last three month including current month.) actual qty inputs are checked
                                                                     for (var r = 0; r < regionList.length; r++) {
                                                                         var inventoryList = programList[pp].inventoryList;
-                                                                        var numberOfMonthsInventory = parseInt(problemList[prob].data1);
-                                                                        var numberOfMonthsInventoryData2 = parseInt(problemList[prob].data2);
+                                                                        var numberOfMonthsInventory = parseInt(typeProblemList[prob].data1);
+                                                                        var numberOfMonthsInventoryData2 = parseInt(typeProblemList[prob].data2);
                                                                         var myStartDateInventory = moment(curDate).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
                                                                         var myEndDateInventory = moment(curDate).endOf('month').format("YYYY-MM-DD");
                                                                         var startDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventoryData2, 'months').startOf('month').format("YYYY-MM-DD");
@@ -367,10 +367,10 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.region.id != 0
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                            && c.actualQty != undefined 
-                                                                            && c.actualQty != null 
+                                                                            && c.actualQty != undefined
+                                                                            && c.actualQty != null
                                                                             && c.actualQty !== ""
-                                                                            );
+                                                                        );
                                                                         var filterInventoryListForSixMonthRange = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= startDateForSixMonthRange
                                                                             && moment(c.inventoryDate).format('YYYY-MM-DD') <= endDateForSixMonthRange
                                                                             && c.active.toString() == "true"
@@ -378,10 +378,10 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.region.id != 0
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                            && c.actualQty != undefined 
-                                                                            && c.actualQty != null 
+                                                                            && c.actualQty != undefined
+                                                                            && c.actualQty != null
                                                                             && c.actualQty !== ""
-                                                                            );
+                                                                        );
                                                                         var index = problemActionList.findIndex(
                                                                             c =>
                                                                                 // moment(c.dt).format("YYYY-MM") == curMonth &&
@@ -404,7 +404,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 causeJson.push(item);
                                                                             }
                                                                             if (index == -1) {
-                                                                                createDataQualityProblems(programList[pp], versionID, problemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList);
+                                                                                createDataQualityProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 problemActionList[index].dt = curDate;
@@ -426,7 +426,7 @@ export default class QatProblemActionNew extends Component {
                                                                     // var shipmentList = programList[pp].shipmentList;
                                                                     var myDateShipment = curDate;
                                                                     var filteredShipmentList = shipmentListForMonths.filter(c =>
-                                                                        moment(c.expectedDeliveryDate).add(parseInt(problemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
+                                                                        moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
                                                                         && c.shipmentStatus.id != 7
                                                                         && c.shipmentId != 0
                                                                     );
@@ -443,7 +443,7 @@ export default class QatProblemActionNew extends Component {
                                                                             );
                                                                             if (indexShipment == -1) {
                                                                                 var index = 0;
-                                                                                createProcurementScheduleProblems(programList[pp], versionID, problemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList);
+                                                                                createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
@@ -538,7 +538,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                             }
                                                                             //  //console.log("submittedDate=====>", submittedDate);
-                                                                            if ((moment(submittedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
+                                                                            if ((moment(submittedDate).add(parseInt(typeProblemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                                 shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
                                                                                 var indexShipment = 0;
                                                                                 var newAddShipment = false;
@@ -550,7 +550,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 );
                                                                                 if (indexShipment == -1) {
                                                                                     var index = 0;
-                                                                                    createProcurementScheduleProblems(programList[pp], versionID, problemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList);
+                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // make shipmet problem status eual to open========
@@ -612,7 +612,7 @@ export default class QatProblemActionNew extends Component {
                                                                         // consumptionList = consumptionList.filter(c =>
                                                                         //     c.region.id == regionList[r].regionId
                                                                         //     && c.planningUnit.id == planningUnitList[p].planningUnit.id);
-                                                                        var numberOfMonthsInFunture = parseInt(problemList[prob].data1);
+                                                                        var numberOfMonthsInFunture = parseInt(typeProblemList[prob].data1);
                                                                         // for (var m = 1; m <= numberOfMonthsInFunture; m++) {
                                                                         var myStartDateFuture = moment(curDate).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                                         var myEndDateFuture = moment(curDate).add(numberOfMonthsInFunture, 'months').endOf('month').format("YYYY-MM-DD");
@@ -648,7 +648,7 @@ export default class QatProblemActionNew extends Component {
                                                                         if (filteredConsumptionListTwo.length < 18) {
                                                                             if (index == -1) {
                                                                                 // console.log("in create logic+++");
-                                                                                createSupplyPlanningProblems(programList[pp], versionID, problemList[prob], regionList[r], planningUnitList[p], monthWithNoForecastedConsumption, problemActionIndex, userId, username, problemActionList);
+                                                                                createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], monthWithNoForecastedConsumption, problemActionIndex, userId, username, problemActionList);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 // problemActionList[index].isFound = 1===== auto open logic;
@@ -680,8 +680,8 @@ export default class QatProblemActionNew extends Component {
                                                                     // console.log("planningUnit+++", planningUnitList[p].planningUnit.id);
                                                                     for (var r = 0; r < regionList.length; r++) {
                                                                         var planningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
-                                                                        var numberOfMonthsInFuture = parseInt(problemList[prob].data1);
-                                                                        var tracerCategories = problemList[prob].data3;
+                                                                        var numberOfMonthsInFuture = parseInt(typeProblemList[prob].data1);
+                                                                        var tracerCategories = typeProblemList[prob].data3;
                                                                         var tracerArray = [];
                                                                         if (tracerCategories != null && tracerCategories != "") {
                                                                             var tracerSplit = tracerCategories.split(',');
@@ -705,11 +705,11 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.program.id == programList[pp].programId
-                                                                                    && c.realmProblem.problem.problemId == problemList[prob].problem.problemId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                                 // && c.versionId == versionID
                                                                             );
                                                                             // console.log("consumptionList.length+++", consumptionList.length)
-                                                                            if (consumptionList.length > parseInt(problemList[prob].data2)) {
+                                                                            if (consumptionList.length > parseInt(typeProblemList[prob].data2)) {
                                                                                 var conQtyArray = [];
                                                                                 for (var i = 0; i < consumptionList.length; i++) {
                                                                                     var item = {}
@@ -723,14 +723,14 @@ export default class QatProblemActionNew extends Component {
                                                                                 var check = false;
                                                                                 var currArray = [];
                                                                                 var curMonthArray = [];
-                                                                                var spanLength = parseInt(problemList[prob].data2) - 1;
+                                                                                var spanLength = parseInt(typeProblemList[prob].data2) - 1;
                                                                                 var cause = [];
                                                                                 // var criticalityArray = [];
                                                                                 for (var i = 0; i < a.length - spanLength; i++) {
                                                                                     var causeItem = {};
                                                                                     var currArray = [];
                                                                                     var curMonthArray = [];
-                                                                                    for (var j = 0; j < parseInt(problemList[prob].data2); j++) {
+                                                                                    for (var j = 0; j < parseInt(typeProblemList[prob].data2); j++) {
                                                                                         currArray.push(a[i + j].consumptionQty);
                                                                                         curMonthArray.push(moment(a[i + j].month).format("MMM-YY"));
                                                                                     }
@@ -750,7 +750,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (check == true) {
                                                                                     // //console.log("flag problem=====>");
                                                                                     if (index == -1) {
-                                                                                        createSupplyPlanningProblems(programList[pp], versionID, problemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
+                                                                                        createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
                                                                                         problemActionIndex++;
                                                                                     } else {
                                                                                         // auto open problem logic for index
@@ -800,7 +800,7 @@ export default class QatProblemActionNew extends Component {
                                                                 // region["regionId"] = 0;
                                                                 // region["label"] = {};
                                                                 // var monthWithMosLessThenMin = '';
-                                                                // for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
+                                                                // for (var mosCounter = parseInt(typeProblemList[prob].data1); mosCounter <= parseInt(typeProblemList[prob].data2); mosCounter++) {
                                                                 //     var m = moment(curDate).add(mosCounter, 'months');
                                                                 //     var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
                                                                 //         c.planningUnitId == planningUnitList[p].planningUnit.id
@@ -834,13 +834,13 @@ export default class QatProblemActionNew extends Component {
                                                                 //         // && c.region.id == regionList[r].regionId
                                                                 //         c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                 //         && c.program.id == programList[pp].programId
-                                                                //         && c.realmProblem.problem.problemId == problemList[prob].problem.problemId
+                                                                //         && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                 //     // && c.versionId == versionID
                                                                 // );
 
                                                                 // if (monthWithMosLessThenMin != '') {
                                                                 //     if (index == -1) {
-                                                                //         createSupplyPlanningProblems(programList[pp], versionID, problemList[prob], region, planningUnitList[p], monthWithMosLessThenMin, problemActionIndex, userId, username, problemActionList);
+                                                                //         createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], monthWithMosLessThenMin, problemActionIndex, userId, username, problemActionList);
                                                                 //         problemActionIndex++;
                                                                 //     } else {
                                                                 //         //auto open for index=======>
@@ -870,25 +870,25 @@ export default class QatProblemActionNew extends Component {
                                                                 //     break;
                                                                 case 23:
                                                                     // console.log("planning unit***", planningUnitList[p].planningUnit.id);
-                                                                    // console.log("problem***",problemList[prob].problem.problemId);
-                                                                    // console.log("data1***",problemList[prob].data1,"data2***",problemList[prob].data2);
+                                                                    // console.log("problem***",typeProblemList[prob].problem.problemId);
+                                                                    // console.log("data1***",typeProblemList[prob].data1,"data2***",typeProblemList[prob].data2);
                                                                     // problem for mos is less then min having shipments within lead time 1-6/7-18 months months ============
                                                                     // var mosArray = [];
-                                                                    // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t+1 to t+6 months
-                                                                    // problemList[prob].data1=1
-                                                                    // problemList[prob].data2=6
+                                                                    // typeProblemList[prob].data1 AND typeProblemList[prob].data2 is the range  i:e t+1 to t+6 months
+                                                                    // typeProblemList[prob].data1=1
+                                                                    // typeProblemList[prob].data2=6
                                                                     var region = {};
                                                                     region["regionId"] = 0;
                                                                     region["label"] = {};
                                                                     var monthWithMosLessThenMinWithing6months = [];
                                                                     var monthWithMosAboveThenMinWithing6months = [];
-                                                                    var filteredShipmentListWithin6Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(problemList[prob].data1), "months").format('YYYY-MM'));
+                                                                    var filteredShipmentListWithin6Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('YYYY-MM'));
 
                                                                     var monthWithMosLessThenMinWithing7to18months = [];
                                                                     var monthWithMosAboveThenMaxWithing7to18months = [];
-                                                                    var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(problemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(problemList[prob].data2), "months").format('YYYY-MM'));
+                                                                    var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('YYYY-MM'));
 
-                                                                    for (var mosCounter = 1; mosCounter <= parseInt(problemList[prob].data1); mosCounter++) {
+                                                                    for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                         var m = moment(curDate).add(mosCounter, 'months');
                                                                         var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
@@ -911,7 +911,7 @@ export default class QatProblemActionNew extends Component {
                                                                             }
                                                                         }
                                                                     }
-                                                                    for (var mosCounter7to18 = parseInt(problemList[prob].data1) + 1; mosCounter7to18 <= parseInt(problemList[prob].data2); mosCounter7to18++) {
+                                                                    for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
                                                                         var m7to18 = moment(curDate).add(mosCounter7to18, 'months');
                                                                         var supplyPlanJson7to18 = programList[pp].supplyPlan.filter(c =>
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
@@ -951,15 +951,15 @@ export default class QatProblemActionNew extends Component {
                                                                     cause["monthWithMosAboveThenMaxWithing7to18months"] = monthWithMosAboveThenMaxWithing7to18months.length;
                                                                     cause["shipmentListWithin6Months"] = filteredShipmentListWithin6Months.length;
                                                                     cause["shipmentListWithin7to18Months"] = filteredShipmentListWithin7to18Months.length;
-                                                                    cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data1), "months").format('MMM-YY');
-                                                                    cause["range7to18months"] = moment(curDate).add(parseInt(problemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data2), "months").format('MMM-YY');
+                                                                    cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('MMM-YY');
+                                                                    cause["range7to18months"] = moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('MMM-YY');
                                                                     // console.log("cause+++", cause);
 
                                                                     var index = problemActionList.findIndex(
                                                                         c =>
                                                                             c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
-                                                                            && c.realmProblem.problem.problemId == problemList[prob].problem.problemId
+                                                                            && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                     );
 
                                                                     if (monthWithMosLessThenMinWithing6months.length > 0 || monthWithMosAboveThenMinWithing6months.length > 0 || monthWithMosLessThenMinWithing7to18months.length > 0 || monthWithMosAboveThenMaxWithing7to18months.length > 0) {
@@ -977,7 +977,7 @@ export default class QatProblemActionNew extends Component {
                                                                         // console.log("cId+++", getProblemCriticality(problemCriticality));
 
                                                                         if (index == -1) {
-                                                                            createMinMaxProblems(programList[pp], versionID, problemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
+                                                                            createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
                                                                             problemActionIndex++;
                                                                         } else {
                                                                             //auto open for index=======>
@@ -1002,11 +1002,11 @@ export default class QatProblemActionNew extends Component {
                                                                     region["regionId"] = 0;
                                                                     region["label"] = {};
                                                                     var stockoutsWithing6months = [];
-                                                                    var filteredShipmentListWithin6Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(problemList[prob].data1), "months").format('YYYY-MM'));
+                                                                    var filteredShipmentListWithin6Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('YYYY-MM'));
                                                                     var stockoutsWithing7to18months = [];
-                                                                    var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(problemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(problemList[prob].data2), "months").format('YYYY-MM'));
+                                                                    var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('YYYY-MM'));
 
-                                                                    for (var mosCounter = 1; mosCounter <= parseInt(problemList[prob].data1); mosCounter++) {
+                                                                    for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                         var m = moment(curDate).add(mosCounter, 'months');
                                                                         var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
@@ -1019,7 +1019,7 @@ export default class QatProblemActionNew extends Component {
                                                                             }
                                                                         }
                                                                     }
-                                                                    for (var mosCounter7to18 = parseInt(problemList[prob].data1) + 1; mosCounter7to18 <= parseInt(problemList[prob].data2); mosCounter7to18++) {
+                                                                    for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
                                                                         var m7to18 = moment(curDate).add(mosCounter7to18, 'months');
                                                                         var supplyPlanJson7to18 = programList[pp].supplyPlan.filter(c =>
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
@@ -1034,8 +1034,8 @@ export default class QatProblemActionNew extends Component {
                                                                     }
                                                                     // console.log("stockoutmonths 1-6+++", stockoutsWithing6months.length);
                                                                     // console.log("stockoutmonths 7-18+++", stockoutsWithing7to18months.length);
-                                                                    // console.log("date range 1-6 months+++", moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data1), "months").format('MMM-YY'));
-                                                                    // console.log("date range 7-18 months+++", moment(curDate).add(parseInt(problemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data2), "months").format('MMM-YY'));
+                                                                    // console.log("date range 1-6 months+++", moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('MMM-YY'));
+                                                                    // console.log("date range 7-18 months+++", moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('MMM-YY'));
                                                                     // console.log("shipments in 1-6 months+++", filteredShipmentListWithin6Months.length);
                                                                     // console.log("shipments in 7-18 months+++", filteredShipmentListWithin7to18Months.length);
                                                                     var cause = {};
@@ -1043,20 +1043,20 @@ export default class QatProblemActionNew extends Component {
                                                                     cause["stockoutsWithing7to18months"] = stockoutsWithing7to18months.length > 0 ? stockoutsWithing7to18months.toString() : "No months";
                                                                     cause["shipmentListWithin6Months"] = filteredShipmentListWithin6Months.length;
                                                                     cause["shipmentListWithin7to18Months"] = filteredShipmentListWithin7to18Months.length;
-                                                                    cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data1), "months").format('MMM-YY');
-                                                                    cause["range7to18months"] = moment(curDate).add(parseInt(problemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(problemList[prob].data2), "months").format('MMM-YY');
+                                                                    cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('MMM-YY');
+                                                                    cause["range7to18months"] = moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('MMM-YY');
                                                                     console.log("cause+++", cause);
 
                                                                     var index = problemActionList.findIndex(
                                                                         c =>
                                                                             c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
-                                                                            && c.realmProblem.problem.problemId == problemList[prob].problem.problemId
+                                                                            && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                     );
 
                                                                     if (stockoutsWithing6months.length > 0 || stockoutsWithing7to18months.length > 0) {
                                                                         if (index == -1) {
-                                                                            createMinMaxProblems(programList[pp], versionID, problemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
+                                                                            createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
                                                                             problemActionIndex++;
                                                                         } else {
                                                                             //auto open for index=======>
@@ -1070,6 +1070,85 @@ export default class QatProblemActionNew extends Component {
                                                                     } else {
                                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
                                                                             incomplianceProblem(index, username, userId, problemActionList);
+                                                                        }
+                                                                    }
+                                                                    break;
+                                                                case 25:
+                                                                    for (var r = 0; r < regionList.length; r++) {
+                                                                        var numberOfMonths = parseInt(typeProblemList[prob].data1);
+                                                                        var myStartDate = moment(curDate).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                        var myEndDate = moment(curDate).endOf('month').format("YYYY-MM-DD");
+                                                                        var filteredConsumptionList = consumptionList.filter(c =>
+                                                                            moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate
+                                                                            && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate
+                                                                            && c.actualFlag.toString() == "true"
+                                                                            && c.active.toString() == "true"
+                                                                            && c.region.id == regionList[r].regionId
+                                                                            && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+
+                                                                        var monthsWithActualConsumption = [];
+                                                                        for (var fcm = 0; fcm < filteredConsumptionList.length; fcm++) {
+                                                                            monthsWithActualConsumption.push(moment(filteredConsumptionList[fcm].consumptionDate).format("YYYY-MM"));
+                                                                        }
+                                                                        // console.log("monthsWithActualConsumption>>>", monthsWithActualConsumption);
+                                                                        var pastSixMonthsArray = [];
+                                                                        for (var ema = 1; ema <= numberOfMonths; ema++) {
+                                                                            pastSixMonthsArray.push(moment(curDate).subtract(ema, 'months').format("YYYY-MM"));
+                                                                        }
+                                                                        // console.log("pastSixMonthsArray>>>", pastSixMonthsArray);
+                                                                        var monthWithNoActualConsumption = pastSixMonthsArray.filter(function (obj) { return monthsWithActualConsumption.indexOf(obj) == -1; });
+                                                                        console.log("monthWithNoActualConsumption>>>", monthWithNoActualConsumption);
+                                                                        var actualCauseMonths = [];
+                                                                        // jan21 and dec20
+                                                                        //start aug2020 stop is feb21
+                                                                        // console.log("filteredConsumptionList>>>", filteredConsumptionList);
+                                                                        for (var nac = 0; nac < monthWithNoActualConsumption.length; nac++) {
+                                                                            // console.log("monthWithNoActualConsumption[]>>>", moment(monthWithNoActualConsumption[nac]).format('YYYY-MM'));
+                                                                            // console.log("moment(myStartDate).format('MMM-YY')>>>", moment(myStartDate).format('YYYY-MM'));
+
+                                                                            var checkListBack = filteredConsumptionList.filter(c =>
+                                                                                moment(c.consumptionDate).format('YYYY-MM') < moment(monthWithNoActualConsumption[nac]).format('YYYY-MM')
+                                                                                && moment(c.consumptionDate).format('YYYY-MM') >= moment(myStartDate).format('YYYY-MM')
+                                                                            );
+                                                                            var checkListForward = filteredConsumptionList.filter(c =>
+                                                                                moment(c.consumptionDate).format('YYYY-MM') > moment(monthWithNoActualConsumption[nac]).format('YYYY-MM')
+                                                                                && moment(c.consumptionDate).format('YYYY-MM') <= moment(myEndDate).format('YYYY-MM')
+                                                                            );
+                                                                            // console.log("checkListBack>>>", checkListBack, "checkListForward>>>", checkListForward);
+                                                                            if (checkListBack.length > 0 && checkListForward.length > 0) {
+                                                                                actualCauseMonths.push(moment(monthWithNoActualConsumption[nac]).format('MMM-YY'));
+                                                                            }
+
+                                                                        }
+                                                                        console.log("actual cause months***", actualCauseMonths);
+                                                                        var index = problemActionList.findIndex(
+                                                                            c =>
+                                                                                c.region.id == regionList[r].regionId
+                                                                                && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                && c.program.id == programList[pp].programId
+                                                                                && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                        );
+                                                                        if (actualCauseMonths.length > 0) {
+                                                                            if (index == -1) {
+                                                                                // console.log("in create logic+++");
+                                                                                createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList);
+                                                                                problemActionIndex++;
+                                                                            } else {
+                                                                                // problemActionList[index].isFound = 1===== auto open logic;
+                                                                                // update cause ***********
+                                                                                problemActionList[index].dt = curDate;
+                                                                                problemActionList[index].data5 = JSON.stringify(actualCauseMonths);
+                                                                                if (problemActionList[index].problemStatus.id == 4) {
+                                                                                    openProblem(index, username, userId, problemActionList);
+                                                                                }
+                                                                            }
+
+                                                                        } else {
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
+                                                                                // problemActionList[index].isFound = 0;
+                                                                                // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
+                                                                                incomplianceProblem(index, username, userId, problemActionList);
+                                                                            }
                                                                         }
                                                                     }
                                                                     break;

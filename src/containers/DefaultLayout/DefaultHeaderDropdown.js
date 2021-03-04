@@ -25,7 +25,6 @@ import {
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
-const checkOnline = localStorage.getItem('typeOfSession');
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -274,6 +273,7 @@ class DefaultHeaderDropdown extends Component {
   // }
 
   dropAccnt() {
+    const checkOnline = localStorage.getItem('typeOfSession');
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
