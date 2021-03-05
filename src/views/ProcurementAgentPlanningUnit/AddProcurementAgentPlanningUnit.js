@@ -1441,7 +1441,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);

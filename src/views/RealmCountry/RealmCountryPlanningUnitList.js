@@ -867,7 +867,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
                     (instance.jexcel).setValueFromCoords(6, data[i].y, true, true);
