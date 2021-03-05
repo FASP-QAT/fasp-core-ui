@@ -35,6 +35,7 @@ import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import MultiSelect from 'react-multi-select-component';
+import ProblemListDashboard from '../Report/ProblemListDashboard';
 const entityname = i18n.t('static.report.problem');
 
 export default class ConsumptionDetails extends React.Component {
@@ -59,7 +60,8 @@ export default class ConsumptionDetails extends React.Component {
             loading: false,
             problemCategoryList: [],
             problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
-            programId: ''
+            programId: '',
+            showProblemDashboard: 0
         }
 
 
@@ -168,7 +170,7 @@ export default class ConsumptionDetails extends React.Component {
                         programId: proList[0].id
                     }, () => {
                         if (this.state.programId != '' && this.state.programId != undefined) {
-                                this.fetchData();
+                            this.fetchData();
                         }
                     })
                 } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
@@ -184,8 +186,8 @@ export default class ConsumptionDetails extends React.Component {
                             // if (needToCalculate == "false") {
                             //     this.fetchData();
                             // } else {
-                                // this.getProblemListAfterCalculation();
-                                this.fetchData();
+                            // this.getProblemListAfterCalculation();
+                            this.fetchData();
 
                             // }
                         }
@@ -487,7 +489,7 @@ export default class ConsumptionDetails extends React.Component {
                 if (y != null) {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
                     // if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
-                        if (obj.options.allowInsertRow == true) {
+                    if (obj.options.allowInsertRow == true) {
                         items.push({
                             title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
@@ -808,7 +810,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
-            this.refs.problemListChild.qatProblemActions(programId, "loading",false);
+            this.refs.problemListChild.qatProblemActions(programId, "loading", false);
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
         }
@@ -819,7 +821,8 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({
             data: [],
             message: '',
-            loading: true
+            loading: true,
+            showProblemDashboard: 0
         },
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -867,6 +870,10 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
+                    this.setState({
+                        problemReportListUnFiltered: problemReportList,
+                        showProblemDashboard: 1
+                    })
                     var problemReportFilterList = problemReportList;
 
                     console.log("problemList===========>", problemReportList);
@@ -1342,9 +1349,11 @@ export default class ConsumptionDetails extends React.Component {
                                 <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
                         </FormGroup>
-                        <div className="qat-problemListSearch">
+                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
+                            {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
+
                             {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground ">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground ">
                             </div>
                             {/* </div> */}
                         </div>
