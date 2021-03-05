@@ -1221,7 +1221,6 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": isNaN(Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1251,7 +1250,6 @@ class ProcurementAgentExport extends Component {
                                         for (var pf = 0; pf < pupaFilterdata.length; pf++) {
                                             qty = Number(qty) + Number(pupaFilterdata[pf].qty);
                                             productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
-                                            freightPerc = Number(freightPerc) + isNaN(Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
                                             freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
                                             totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
                                         }
@@ -1263,7 +1261,7 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": pupaFilterdata[0].planningUnit,
                                             "qty": qty,
                                             "productCost": productCost,
-                                            "freightPerc": freightPerc,
+                                            "freightPerc": Number((Number(freightCost)/Number(productCost))*100),
                                             "freightCost": freightCost,
                                             "totalCost": totalCost,
                                         }
@@ -1529,7 +1527,6 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1557,7 +1554,6 @@ class ProcurementAgentExport extends Component {
                                         for (var pf = 0; pf < pupaFilterdata.length; pf++) {
                                             qty = Number(qty) + Number(pupaFilterdata[pf].qty);
                                             productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
-                                            freightPerc = Number(freightPerc) + isNaN(Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((pupaFilterdata[pf].freightCost * pupaFilterdata[pf].currency.conversionRateToUsd) / (pupaFilterdata[pf].productCost * pupaFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
                                             freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
                                             totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
                                         }
@@ -1569,7 +1565,7 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": pupaFilterdata[0].planningUnit,
                                             "qty": qty,
                                             "productCost": productCost,
-                                            "freightPerc": freightPerc,
+                                            "freightPerc": Number((Number(freightCost)/Number(productCost))*100),
                                             "freightCost": freightCost,
                                             "totalCost": totalCost,
                                         }
@@ -1828,7 +1824,6 @@ class ProcurementAgentExport extends Component {
                                         "planningUnit": planningUnitFilter[j].planningUnit,
                                         "qty": planningUnitFilter[j].shipmentQty,
                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                         "currency": planningUnitFilter[j].currency
@@ -1851,11 +1846,10 @@ class ProcurementAgentExport extends Component {
                                     var freightPerc = 0;
                                     var freightCost = 0;
                                     var totalCost = 0;
-                                    console.log("@@@PlanningUnitFiltered data",planningUnitFilterdata);
+                                    console.log("@@@PlanningUnitFiltered data", planningUnitFilterdata);
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
                                         qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
                                         productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
                                         freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
                                         totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
@@ -1867,7 +1861,7 @@ class ProcurementAgentExport extends Component {
                                         "planningUnit": planningUnitFilterdata[0].planningUnit,
                                         "qty": qty,
                                         "productCost": productCost,
-                                        "freightPerc": freightPerc,
+                                        "freightPerc": Number((Number(freightCost)/Number(productCost))*100),
                                         "freightCost": freightCost,
                                         "totalCost": totalCost,
                                     }
