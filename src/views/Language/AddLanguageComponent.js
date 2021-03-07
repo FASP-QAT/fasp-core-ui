@@ -17,7 +17,8 @@ import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } fro
 
 const initialValues = {
     label: "",
-    languageCode: ""
+    languageCode: "",
+    countryCode :""
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
@@ -31,8 +32,11 @@ const validationSchema = function (values) {
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITHOUT_NUM, i18n.t('static.common.alphabetsOnly'))
-            .required(i18n.t('static.language.languagecodetext'))
+            .required(i18n.t('static.language.languagecodetext')),
         // .max(2, i18n.t('static.language.languageCodemax3digittext'))
+        countryCode: Yup.string()
+        .required(i18n.t('static.language.countrycodetext'))
+        .max(2, i18n.t('static.language.countrycode2chartext'))
 
     })
 }
@@ -68,6 +72,7 @@ class AddLanguageComponent extends Component {
                     label_en:''
                 },
                 languageCode: '',
+                countryCode:''
             },
             message: '',
             loading: true
@@ -89,6 +94,10 @@ class AddLanguageComponent extends Component {
         if (event.target.name == "languageCode") {
             language.languageCode = event.target.value;
         }
+        if (event.target.name == "countryCode") {
+            language.countryCode = event.target.value;
+        }
+        
         this.setState({
             language
         },
@@ -108,7 +117,8 @@ class AddLanguageComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             label: true,
-            languageCode: true
+            languageCode: true,
+            countryCode:true
         }
         )
         this.validateForm(errors)
@@ -164,7 +174,8 @@ class AddLanguageComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    LanguageService.addLanguage(values).then(response => {
+                                    console.log("values---",this.state.language)
+                                    LanguageService.addLanguage(this.state.language).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
@@ -264,6 +275,22 @@ class AddLanguageComponent extends Component {
                                                             />
                                                             <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                         </FormGroup>
+                                                        <FormGroup>
+                                                            <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                            <Input type="text"
+                                                                name="countryCode"
+                                                                id="countryCode"
+                                                                bsSize="sm"
+                                                                valid={!errors.countryCode && this.state.language.countryCode != ''}
+                                                                invalid={touched.countryCode && !!errors.countryCode}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.language.countryCode}
+                                                                required
+                                                                maxLength={2}
+                                                            />
+                                                            <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                        </FormGroup>
                                                     </CardBody>
                                                     <CardFooter>
                                                         <FormGroup>
@@ -303,6 +330,7 @@ class AddLanguageComponent extends Component {
         let { language } = this.state;
         language.label.label_en = '';
         language.languageCode = '';
+        language.countryCode = '';
         this.setState({
             language
         },

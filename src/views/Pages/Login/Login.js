@@ -79,7 +79,7 @@ class Login extends Component {
       staticLabel: AuthenticationService.getIconAndStaticLabel("label"),
       languageList: [],
       updatedSyncDate: '',
-      lang : localStorage.getItem('lastLoggedInUsersLanguage')
+      lang: localStorage.getItem('lastLoggedInUsersLanguage')
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -87,8 +87,43 @@ class Login extends Component {
     this.toggle = this.toggle.bind(this);
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
+    this.getAllLanguages = this.getAllLanguages.bind(this);
   }
-
+  getAllLanguages() {
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['language'], 'readwrite');
+      var program = transaction.objectStore('language');
+      // var transaction = db1.transaction(['language'], 'readwrite');
+      // var program1 = transaction.objectStore('language');
+      var getRequest1 = program.getAll();
+      getRequest1.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red',
+          loading: false
+        })
+      }.bind(this);
+      getRequest1.onsuccess = function (event) {
+        var languageList = [];
+        languageList = getRequest1.result;
+        console.log("my language list---", languageList);
+        this.setState({
+          languageList
+        });
+        i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
+      }.bind(this);
+    }.bind(this);
+  }
   getLanguageList() {
     var db1;
     getDatabase();
@@ -108,7 +143,7 @@ class Login extends Component {
       var program = transaction.objectStore('language');
       delete axios.defaults.headers.common["Authorization"];
       if (isSiteOnline()) {
-        
+
         // var transaction1 = db1.transaction(['lastSyncDate'], 'readwrite');
         // var lastSyncDateTransaction = transaction1.objectStore('lastSyncDate');
         // var updatedSyncDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
@@ -157,44 +192,11 @@ class Login extends Component {
             var psuccess = program.put(json[i]);
 
           }
-          var getRequest1 = program.getAll();
-          getRequest1.onerror = function (event) {
-            this.setState({
-              message: i18n.t('static.program.errortext'),
-              color: 'red',
-              loading: false
-            })
-          }.bind(this);
-          getRequest1.onsuccess = function (event) {
-            var languageList = [];
-            languageList = getRequest1.result;
-            console.log("my language list---", languageList);
-            this.setState({
-              languageList
-            });
-            i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
-          }.bind(this);
+          this.getAllLanguages();
+
         });
       } else {
-        var transaction = db1.transaction(['language'], 'readwrite');
-        var program1 = transaction.objectStore('language');
-        var getRequest1 = program1.getAll();
-        getRequest1.onerror = function (event) {
-          this.setState({
-            message: i18n.t('static.program.errortext'),
-            color: 'red',
-            loading: false
-          })
-        }.bind(this);
-        getRequest1.onsuccess = function (event) {
-          var languageList = [];
-          languageList = getRequest1.result;
-          console.log("my language list---", languageList);
-          this.setState({
-            languageList
-          });
-          
-        }.bind(this);
+        this.getAllLanguages();
       }
     }.bind(this)
 
@@ -347,8 +349,8 @@ class Login extends Component {
                       {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
                         language =>
                           <>
-                            <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode, "flag-icon flag-icon-" + language.countryCode, getLabelText(language.label,this.state.lang))}>
-                              <i className={"flag-icon flag-icon-" + language.countryCode}></i>  {getLabelText(language.label,this.state.lang)}
+                            <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode, "flag-icon flag-icon-" + language.countryCode, getLabelText(language.label, this.state.lang))}>
+                              <i className={"flag-icon flag-icon-" + language.countryCode}></i>  {getLabelText(language.label, this.state.lang)}
                             </DropdownItem>
                           </>
                       )}
@@ -580,8 +582,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                                official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                                Agency for International Development or the U.S. government.
+                                                                                                                                                                                    official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                                                    Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

@@ -364,9 +364,10 @@ export default class LanguageListComponent extends Component {
                                 data[0] = langaugeList[j].languageId
                                 data[1] = langaugeList[j].label.label_en;
                                 data[2] = langaugeList[j].languageCode;
-                                data[3] = langaugeList[j].lastModifiedBy.username;
-                                data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                                data[5] = langaugeList[j].active;
+                                data[3] = langaugeList[j].countryCode;
+                                data[4] = langaugeList[j].lastModifiedBy.username;
+                                data[5] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                                data[6] = langaugeList[j].active;
 
                                 languageArray[count] = data;
                                 count++;
@@ -384,7 +385,7 @@ export default class LanguageListComponent extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [0,150, 150, 100,100,100],
+                                colWidths: [0,150, 150,150, 100,100,100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
                                     {
@@ -399,6 +400,11 @@ export default class LanguageListComponent extends Component {
                                     },
                                     {
                                         title: i18n.t('static.language.languageCode'),
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.language.countryCode'),
                                         type: 'text',
                                         readOnly: true
                                     },

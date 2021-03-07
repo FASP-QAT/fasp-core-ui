@@ -14,7 +14,8 @@ import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } fro
 
 let initialValues = {
     label: '',
-    languageCode: ''
+    languageCode: '',
+    countryCode: ''
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
@@ -27,8 +28,11 @@ const validationSchema = function (values) {
         languageCode: Yup.string()
             // .matches(ALPHABETS_REGEX, i18n.t('static.common.alphabetsOnly'))
             .matches(SPECIAL_CHARECTER_WITHOUT_NUM, i18n.t('static.common.alphabetsOnly'))
-            .required(i18n.t('static.language.languagecodetext'))
+            .required(i18n.t('static.language.languagecodetext')),
         // .max(2, i18n.t('static.language.languageCodemax3digittext'))
+        countryCode: Yup.string()
+            .required(i18n.t('static.language.countrycodetext'))
+            .max(2, i18n.t('static.language.countrycode2chartext'))
 
     })
 }
@@ -62,7 +66,7 @@ export default class EditLanguageComponent extends Component {
             // language: this.props.location.state.language,
             language: {
                 label: {
-                    label_en:''
+                    label_en: ''
                 }
             },
             message: '',
@@ -97,6 +101,8 @@ export default class EditLanguageComponent extends Component {
             language.label.label_en = event.target.value
         } else if (event.target.name === "languageCode") {
             language.languageCode = event.target.value
+        } else if (event.target.name === "countryCode") {
+            language.countryCode = event.target.value
         } else if (event.target.name === "active") {
             language.active = event.target.id === "active2" ? false : true
         }
@@ -112,7 +118,8 @@ export default class EditLanguageComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             label: true,
-            languageCode: true
+            languageCode: true,
+            countryCode: true
         }
         )
         this.validateForm(errors)
@@ -323,6 +330,22 @@ export default class EditLanguageComponent extends Component {
                                                             maxLength={2}
                                                         />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="countryCode"
+                                                            id="countryCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.countryCode && this.state.language.countryCode != ''}
+                                                            invalid={touched.countryCode && !!errors.countryCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.countryCode}
+                                                            required
+                                                            maxLength={2}
+                                                        />
+                                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
