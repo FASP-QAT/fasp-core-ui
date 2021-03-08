@@ -867,7 +867,7 @@ class AddprogramPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);

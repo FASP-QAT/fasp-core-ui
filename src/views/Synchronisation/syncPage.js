@@ -1419,6 +1419,10 @@ export default class syncPage extends Component {
                                       })
 
                                       var latestProgramData = response.data;
+                                      this.setState({
+                                        comparedLatestVersion:latestProgramData.currentVersion.versionId,
+                                        singleProgramId:latestProgramData.programId
+                                      })
                                       var oldProgramData = programJson;
                                       var downloadedProgramData = response1.data;
                                       var regionList = [];
@@ -2967,6 +2971,9 @@ export default class syncPage extends Component {
             programJson.versionType = { id: document.getElementById("versionType").value };
             programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
             programJson.notes = document.getElementById("notes").value;
+            ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
+              if (response.status == 200) {
+                if(response.data==this.state.comparedLatestVersion){
             ProgramService.saveProgramData(programJson).then(response => {
               if (response.status == 200) {
                 var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
@@ -3034,6 +3041,70 @@ export default class syncPage extends Component {
 
                   this.redirectToDashbaord();
                 }.bind(this)
+              } else {
+                this.setState({
+                  message: response.data.messageCode,
+                  color: "red",
+                  loading: false
+                })
+                this.hideFirstComponent();
+              }
+            })
+              .catch(
+                error => {
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      message: 'static.unkownError',
+                      color: "red",
+                      loading: false
+                    }, () => {
+                      this.hideFirstComponent();
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: error.response.data.messageCode,
+                          color: "red",
+                          loading: false
+                        }, () => {
+                          this.hideFirstComponent()
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: error.response.data.messageCode,
+                          loading: false,
+                          color: "red"
+                        }, () => {
+                          this.hideFirstComponent()
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false,
+                          color: "red"
+                        }, () => {
+                          this.hideFirstComponent()
+                        });
+                        break;
+                    }
+                  }
+                }
+              );
+              }else{
+                alert(i18n.t("static.commitVersion.versionIsOutDated"));
+              }
               } else {
                 this.setState({
                   message: response.data.messageCode,

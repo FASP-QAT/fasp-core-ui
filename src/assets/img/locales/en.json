@@ -479,6 +479,7 @@
     "static.supplyPlanFormula.minMonthOfStockEx3": "Min MoS Guardrail = 3(Based on realm)",
     "static.planningunit.countrysku": "Alternate Reporting Unit",
     "static.supplyPlanFormula.minMonthOfStockEx1": "MIN MONTH OF STOCK = 4",
+    "static.commitVersion.versionIsOutDated": "Loaded version is out dated. Please refresh the page.",
     "static.user.accessControl": "Add access control",
     "static.message.fundingSource.listFailed": "Could not retrieve funding source list",
     "static.message.accountFlagChanged": "Account flag changed",
