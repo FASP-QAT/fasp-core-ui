@@ -1620,5 +1620,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = MIN (7,18)",
+    "static.language.countryCode":"Código de Bandeira",
+    "static.language.countrycodetext":"Insira o código da bandeira",
+    "static.language.countrycode2chartext": "São permitidos no máximo dois caracteres"
 }

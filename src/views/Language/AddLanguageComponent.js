@@ -16,26 +16,27 @@ import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
 import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
-    languageName: "",
+    label: "",
     languageCode: "",
-    countryCode: ""
+    countryCode :""
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
-        // languageName: Yup.string()
+        // label: Yup.string()
         //     .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext'))
         //     .required(i18n.t('static.language.languagetext')),
-        languageName: Yup.string()
+        label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITHOUT_NUM, i18n.t('static.common.alphabetsOnly'))
             .required(i18n.t('static.language.languagecodetext')),
+        // .max(2, i18n.t('static.language.languageCodemax3digittext'))
         countryCode: Yup.string()
-            .max(2, i18n.t('static.language.languageCodemax3digittext'))
-            .required(i18n.t('static.language.languagecodetext'))
+        .required(i18n.t('static.language.countrycodetext'))
+        .max(2, i18n.t('static.language.countrycode2chartext'))
 
     })
 }
@@ -67,9 +68,11 @@ class AddLanguageComponent extends Component {
         super(props);
         this.state = {
             language: {
-                languageName: '',
+                label: {
+                    label_en:''
+                },
                 languageCode: '',
-                countryCode: ''
+                countryCode:''
             },
             message: '',
             loading: true
@@ -85,8 +88,8 @@ class AddLanguageComponent extends Component {
 
     dataChange(event) {
         let { language } = this.state;
-        if (event.target.name == "langauageName") {
-            language.languageName = event.target.value;
+        if (event.target.name == "label") {
+            language.label.label_en = event.target.value;
         }
         if (event.target.name == "languageCode") {
             language.languageCode = event.target.value;
@@ -94,7 +97,7 @@ class AddLanguageComponent extends Component {
         if (event.target.name == "countryCode") {
             language.countryCode = event.target.value;
         }
-
+        
         this.setState({
             language
         },
@@ -109,13 +112,13 @@ class AddLanguageComponent extends Component {
         // }
 
         let { language } = this.state
-        language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
+        language.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     touchAll(setTouched, errors) {
         setTouched({
-            languageName: true,
+            label: true,
             languageCode: true,
-            countryCode: true
+            countryCode:true
         }
         )
         this.validateForm(errors)
@@ -171,7 +174,8 @@ class AddLanguageComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    LanguageService.addLanguage(values).then(response => {
+                                    console.log("values---",this.state.language)
+                                    LanguageService.addLanguage(this.state.language).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
@@ -243,17 +247,17 @@ class AddLanguageComponent extends Component {
                                                             <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                                             <Input type="text"
                                                                 // autocomplete="off"
-                                                                name="languageName"
-                                                                id="languageName"
+                                                                name="label"
+                                                                id="label"
                                                                 bsSize="sm"
-                                                                valid={!errors.languageName && this.state.language.languageName != ''}
-                                                                invalid={touched.languageName && !!errors.languageName}
+                                                                valid={!errors.label && this.state.language.label.label_en != ''}
+                                                                invalid={touched.label && !!errors.label}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                                 onBlur={handleBlur}
                                                                 maxLength={100}
-                                                                value={this.state.language.languageName}
+                                                                value={this.state.language.label.label_en}
                                                                 required />
-                                                            <FormFeedback className="red">{errors.languageName}</FormFeedback>
+                                                            <FormFeedback className="red">{errors.label}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup>
                                                             <Label for="languageCode">{i18n.t('static.language.languageCode')}<span class="red Reqasterisk">*</span></Label>
@@ -271,9 +275,8 @@ class AddLanguageComponent extends Component {
                                                             />
                                                             <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                         </FormGroup>
-
                                                         <FormGroup>
-                                                            <Label for="languageCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                            <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
                                                             <Input type="text"
                                                                 name="countryCode"
                                                                 id="countryCode"
@@ -325,7 +328,7 @@ class AddLanguageComponent extends Component {
 
     resetClicked() {
         let { language } = this.state;
-        language.languageName = '';
+        language.label.label_en = '';
         language.languageCode = '';
         language.countryCode = '';
         this.setState({
