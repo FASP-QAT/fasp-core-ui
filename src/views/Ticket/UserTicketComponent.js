@@ -231,8 +231,8 @@ export default class UserTicketComponent extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.languageName.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.languageName.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -478,7 +478,7 @@ export default class UserTicketComponent extends Component {
             && languages.map((item, i) => {
                 return (
                     <option key={i} value={item.languageId}>
-                        {item.languageName}
+                        {item.label.label_en}
                     </option>
                 )
             }, this);
