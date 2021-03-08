@@ -220,7 +220,8 @@ export default class EditLanguageComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.language.label.label_en,
-                                    languageCode: this.state.language.languageCode
+                                    languageCode: this.state.language.languageCode,
+                                    countryCode: this.state.language.countryCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -337,8 +338,8 @@ export default class EditLanguageComponent extends Component {
                                                             name="countryCode"
                                                             id="countryCode"
                                                             bsSize="sm"
-                                                            valid={!errors.countryCode && this.state.language.countryCode != ''}
-                                                            invalid={touched.countryCode && !!errors.countryCode}
+                                                            valid={!errors.countryCode}
+                                                            invalid={touched.countryCode && !!errors.countryCode || !!errors.countryCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.countryCode}
