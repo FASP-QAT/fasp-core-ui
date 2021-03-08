@@ -3104,6 +3104,15 @@ export default class syncPage extends Component {
               );
               }else{
                 alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                this.setState({
+                  message: i18n.t("static.commitVersion.versionIsOutDated"),
+                  loading: false,
+                  color: "red"
+                }, () => {
+                  this.hideFirstComponent()
+                  this.getDataForCompare(this.state.programId);
+                });
+
               }
               } else {
                 this.setState({
