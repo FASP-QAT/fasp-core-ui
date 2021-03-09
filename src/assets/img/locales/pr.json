@@ -846,6 +846,7 @@
     "static.report.id": "Id de Remessa QAT",
     "static.problemReport.resolvedDesc": "O problema foi marcado manualmente pelo revisor como `resolvido`. O revisor usa esse status se esse problema provavelmente não for corrigido por meio da entrada de dados e também não exigir mais notas no futuro. Apenas um revisor pode marcar um problema como `resolvido`.",
     "static.program.airfreightperc": "Porcentagem de frete aéreo",
+    "static.language.countryCode": "Código de Bandeira",
     "static.report.consumptionDate": "Mês de Consumo",
     "static.procurementAgentPlanningUnit.unitPerPalletText": "Insira unidades por palete",
     "static.common.max15digittext": "Máximo de 15 caracteres",
@@ -1287,6 +1288,7 @@
     "static.procurementAgent.UnitPerPalletEuro2": "Unidade por palete (EURO2)",
     "static.program.as": "Como",
     "static.manualTagging.planningUnitSKUCode": "Código SKU da Unidade de Planejamento",
+    "static.language.countrycode2chartext": "São permitidos no máximo dois caracteres",
     "static.unitType.unitTypeName": "Nome do tipo de unidade",
     "static.mapProcurementUnit.validProcurementUnitText": "Selecione Unidade de Aquisição",
     "static.breadcrum.add": "Adicionar {{entityname}}",
@@ -1300,6 +1302,7 @@
     "static.currency.currency": "Moeda (inglês)",
     "static.message.invaliddate": "Data inválida",
     "static.report.planningUOM": "Unidade de Planejamento (UoM)",
+    "static.language.countrycodetext": "Insira o código da bandeira",
     "static.shipment.amount": "Quantidade (USD)",
     "static.report.historicalConsumptionActual": "Consumo Real Histórico",
     "static.ticket.addMasters": "Adicionar Masters",
@@ -1619,8 +1622,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = MIN (7,18)",
-    "static.language.countryCode":"Código de Bandeira",
-    "static.language.countrycodetext":"Insira o código da bandeira",
-    "static.language.countrycode2chartext": "São permitidos no máximo dois caracteres"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = MIN (7,18)"
 }
