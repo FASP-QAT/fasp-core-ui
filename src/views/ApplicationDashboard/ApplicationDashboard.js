@@ -353,13 +353,13 @@ class ApplicationDashboard extends Component {
           // var programJson1 = JSON.parse(programData);
           // console.log("programData---", programData);
           programList.push({
-            openCount: myResult[i].openCount,
-            addressedCount: myResult[i].addressedCount,
-            programCode: myResult[i].programCode,
-            programVersion: myResult[i].version,
+            openCount: filteredGetRequestList[i].openCount,
+            addressedCount: filteredGetRequestList[i].addressedCount,
+            programCode: filteredGetRequestList[i].programCode,
+            programVersion: filteredGetRequestList[i].version,
             programId: filteredGetRequestList[i].programId,
             versionId: filteredGetRequestList[i].version,
-            id: myResult[i].id,
+            id: filteredGetRequestList[i].id,
             loading: false
           });
           // }
