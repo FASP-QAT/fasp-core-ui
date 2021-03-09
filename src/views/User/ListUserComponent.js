@@ -820,7 +820,7 @@ class ListUserComponent extends Component {
         return cell.label.label_en;
     }
     showLanguageLabel(cell, row) {
-        return cell.languageName;
+        return cell.label.label_en;
     }
     showStatus(cell, row) {
         if (cell) {
