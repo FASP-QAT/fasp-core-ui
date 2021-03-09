@@ -2081,7 +2081,8 @@ class ProcurementAgentExport extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
             this.filterVersion();
         })
