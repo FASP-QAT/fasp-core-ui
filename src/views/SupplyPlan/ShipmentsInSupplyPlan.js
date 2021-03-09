@@ -107,7 +107,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     var rowData = (instance.jexcel).getRowData(0);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, rowData[2], true);
