@@ -1791,7 +1791,7 @@ export default class syncPage extends Component {
                                         data[4] = mergedShipmentData[cd].procurementAgent.id;
                                         data[5] = mergedShipmentData[cd].fundingSource.id;
                                         data[6] = mergedShipmentData[cd].budget.id;
-                                        data[7] = mergedShipmentData[cd].orderNo != "" && mergedShipmentData[cd].orderNo != null ? mergedShipmentData[cd].orderNo.concat(mergedShipmentData[cd].primeLineNo != null ? "~" : "").concat(mergedShipmentData[cd].primeLineNo != null ? mergedShipmentData[cd].primeLineNo : "") : "";
+                                        data[7] = mergedShipmentData[cd].orderNo != "" && mergedShipmentData[cd].orderNo != null ? mergedShipmentData[cd].orderNo.toString().concat(mergedShipmentData[cd].primeLineNo != null ? "~" : "").concat(mergedShipmentData[cd].primeLineNo != null ? mergedShipmentData[cd].primeLineNo : "") : "";
                                         data[8] = mergedShipmentData[cd].dataSource.id;
                                         data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
                                         data[10] = mergedShipmentData[cd].suggestedQty;
