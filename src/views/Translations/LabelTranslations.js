@@ -257,7 +257,6 @@ export default class DatabaseTranslations extends React.Component {
                 listToUpdate.push(labelList[staticLabelJsonIndex]);
             }
         }
-        console.log("LabelList after update+++", listToUpdate);
         if (JSON.stringify(this.el.getComments()).length == 2 || this.el.getComments() == null) {
             // AuthenticationService.setupAxiosInterceptors();
             LabelsService.saveStaticLabels(listToUpdate).then(response => {
