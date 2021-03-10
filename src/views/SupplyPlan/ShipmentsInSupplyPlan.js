@@ -1649,8 +1649,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (x == 27) {
         }
         if (x == 8) {
-            if (rowData[8].length > 25) {
-                inValid("I", y, i18n.t('static.common.max25digittext'), elInstance);
+            if (rowData[8].length > 50) {
+                inValid("I", y, i18n.t('static.common.max50digittext'), elInstance);
             } else {
                 positiveValidation("I", y, elInstance)
             }
@@ -2821,8 +2821,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                if (rowData[8].length > 25) {
-                    inValid("I", y, i18n.t('static.common.max25digittext'), elInstance);
+                if (rowData[8].length > 50) {
+                    inValid("I", y, i18n.t('static.common.max50digittext'), elInstance);
                     valid = false;
                 } else {
                     positiveValidation("I", y, elInstance)
