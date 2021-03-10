@@ -75,7 +75,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
                 z = data[i].y;
             }
-            console.log("Before if @@@", data[i].x)
             if (data[i].x == 15 && data[i].value == "") {
                 var rowData = (instance.jexcel).getRowData(data[i].y);
                 var pricePerUnit = "";
@@ -3010,7 +3009,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
             }
         }
-        console.log("Negative budget", negativeBudget, "Valid", valid);
         if (negativeBudget > 0 && valid == true) {
             var cf = window.confirm(i18n.t("static.shipmentDetails.warningBudget"));
             if (cf == true) {
