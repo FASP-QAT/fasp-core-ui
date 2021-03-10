@@ -1683,7 +1683,7 @@ export default class ConsumptionDetails extends React.Component {
                 <Modal isOpen={this.state.problemTransDetailsModal}
                     className={'modal-md modalWidthExpiredStock'}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                        {/* <strong>{i18n.t('static.report.problemTransDetails')}</strong> */}
+                        <strong>{i18n.t('static.report.problemTransDetails')}</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
@@ -1698,7 +1698,7 @@ export default class ConsumptionDetails extends React.Component {
                                 {
                                     props => (
                                         <div className="col-md-12 bg-white pb-1 mb-2">
-                                            <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul>
+                                            {/* <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul> */}
                                             <div className="TableCust">
                                                 <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
