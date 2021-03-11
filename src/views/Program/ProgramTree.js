@@ -28,6 +28,7 @@ import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import cleanUp from '../../assets/img/cleanUp.png';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
@@ -667,7 +668,7 @@ class Program extends Component {
                                                                                                     <div className="checkbox m-0">
                                                                                                         <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
                                                                                                         <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
-                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <i onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1 fa fa-trash"></i>}
+                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
