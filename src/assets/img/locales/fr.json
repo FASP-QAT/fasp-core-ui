@@ -204,6 +204,7 @@
     "static.manualTagging.ROPrimeline": "N° de ligne principale",
     "static.dashboard.expiryDetails": "Détails du lot projeté à expirer ",
     "static.program.mapPlanningUnit": "Mappage de l`unité de planification",
+    "static.common.max50digittext": "Maximum 50 caractères seulement",
     "static.message.spacetext": "Espaces non autorisés au début et à la fin",
     "static.fundingSource.fundingSourceName": "Nom de la source de financement",
     "static.validNoSpace.string": "Aucun espace n`est autorisé au début, à la fin ou au milieu de la chaîne",

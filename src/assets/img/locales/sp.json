@@ -204,6 +204,7 @@
     "static.manualTagging.ROPrimeline": "No. de línea principal ERP",
     "static.dashboard.expiryDetails": "Detalles de lotes con vencimiento proyectado",
     "static.program.mapPlanningUnit": "Agregar producto",
+    "static.common.max50digittext": "Solo 50 caracteres como máximo",
     "static.message.spacetext": "No se permite espacios al principio o al final",
     "static.fundingSource.fundingSourceName": "Nombre de la fuente de financiamiento",
     "static.validNoSpace.string": "No se permiten espacios al principio, al final, o en medio",

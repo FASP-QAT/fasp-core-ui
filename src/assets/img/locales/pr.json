@@ -204,6 +204,7 @@
     "static.manualTagging.ROPrimeline": "Linha RO Prime nº",
     "static.dashboard.expiryDetails": "Detalhes do lote expirado projetado",
     "static.program.mapPlanningUnit": "Unidade de planejamento de mapas",
+    "static.common.max50digittext": "Máximo de 50 caracteres apenas",
     "static.message.spacetext": "Espaços não permitidos no início e no final",
     "static.fundingSource.fundingSourceName": "Nome da fonte de financiamento",
     "static.validNoSpace.string": "Não são permitidos espaços no início, no final ou no meio da string.",

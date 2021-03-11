@@ -204,6 +204,7 @@
     "static.manualTagging.ROPrimeline": "ERP Order Prime Line No.",
     "static.dashboard.expiryDetails": "Projected Expired Batch Details",
     "static.program.mapPlanningUnit": "Map Planning Unit",
+    "static.common.max50digittext": "Maximum 50 characters only",
     "static.message.spacetext": "Spaces are not allowed at the beginning and end of this entry",
     "static.fundingSource.fundingSourceName": "Funding source name",
     "static.validNoSpace.string": "No spaces are allowed at start, end or in middle of string.",
