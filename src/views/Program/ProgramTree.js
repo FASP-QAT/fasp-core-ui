@@ -668,7 +668,7 @@ class Program extends Component {
                                                                                                     <div className="checkbox m-0">
                                                                                                         <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
                                                                                                         <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
-                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
+                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
@@ -726,7 +726,7 @@ class Program extends Component {
                             <CardFooter>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.deleteClicked()}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -750,6 +750,132 @@ class Program extends Component {
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    deleteClicked() {
+        this.setState({ loading: true })
+        var programCheckboxes = document.getElementsByName("programCheckBox");
+        var versionCheckBox = document.getElementsByClassName("versionCheckBox");
+        var checkboxesChecked = [];
+        var programCheckedCount = 0;
+        var programInvalidCheckedCount = 0;
+        var count = 0;
+
+        for (var i = 0; i < versionCheckBox.length; i++) {
+            if (versionCheckBox[i].checked) {
+                programCheckedCount = programCheckedCount + 1;
+                count = count + 1;
+                var json = {
+                    programId: versionCheckBox[i].dataset.programId,
+                    versionId: parseInt(versionCheckBox[i].value)
+                }
+                checkboxesChecked = checkboxesChecked.concat([json]);
+            }
+        }
+        // loop over them all
+        for (var i = 0; i < programCheckboxes.length; i++) {
+            // And stick the checked ones onto an array...
+            if (programCheckboxes[i].checked) {
+                programCheckedCount = programCheckedCount + 1;
+                var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
+                // loop over them all
+                if (versionCheckboxes.length > 0) {
+                    var count1 = 0;
+                    for (var j = 0; j < versionCheckboxes.length; j++) {
+                        // And stick the checked ones onto an array...
+                        if (versionCheckboxes[j].checked) {
+                            count = count + 1;
+                            count1 = count1 + 1;
+                            var json = {
+                                programId: programCheckboxes[i].value,
+                                versionId: parseInt(versionCheckboxes[j].value)
+                            }
+                            // checkboxesChecked = checkboxesChecked.concat([json]);
+                        }
+
+                    }
+                    if (count1 == 0) {
+                        var programList = this.state.programList.filter(c => c.programId == programCheckboxes[i].value);
+                        for (var p = 0; p < programList.length; p++) {
+                            var json = {
+                                programId: programCheckboxes[i].value,
+                                versionId: programList[p].versionId
+                            }
+                            checkboxesChecked = checkboxesChecked.concat([json]);
+                        }
+                    }
+
+                }
+            } else {
+                var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
+                // loop over them all
+                if (versionCheckboxes.length > 0) {
+                    // var count = 0;
+                    for (var j = 0; j < versionCheckboxes.length; j++) {
+                        // And stick the checked ones onto an array...
+                        if (versionCheckboxes[j].checked) {
+                            count = count + 1;
+                        }
+                    }
+                    if (count > 0) {
+                        programInvalidCheckedCount = programInvalidCheckedCount + 1;
+                    }
+                }
+            }
+        }
+        if (programCheckedCount == 0) {
+            this.setState({
+                message: i18n.t('static.program.errorSelectAtleastOneProgram'),
+                loading: false, color: "red"
+            },
+                () => {
+                    this.hideFirstComponent();
+                })
+        } else {
+            console.log("Checkbox checked+++", checkboxesChecked);
+            var listOfProgramVersion = checkboxesChecked;
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                for (var i = 0; i < listOfProgramVersion.length; i++) {
+                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                    programTransaction.delete(id);
+                }
+                transaction.oncomplete = function (event) {
+                    var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                    for (var i = 0; i < listOfProgramVersion.length; i++) {
+                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                        programTransaction1.delete(id);
+                    }
+                    transaction1.oncomplete = function (event) {
+                        var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                        var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                        for (var i = 0; i < listOfProgramVersion.length; i++) {
+                            var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                            programTransaction2.delete(id);
+                        }
+                        transaction2.oncomplete = function (event) {
+                            this.setState({
+                                loading: false,
+                                message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                color: 'green'
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }
     }
 
     deleteLocalVersionUsingProgramId(programId) {
