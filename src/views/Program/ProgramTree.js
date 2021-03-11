@@ -63,9 +63,6 @@ class Program extends Component {
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
     }
     getMoreVersions(programId, pageNo) {
-        // console.log("val---", val);
-        // console.log("programId---", programId);
-        // console.log("pageNo---", pageNo);
         ProgramService.loadMoreProgramList(programId, pageNo)
             .then(response => {
                 if (response.status == 200) {
@@ -73,7 +70,6 @@ class Program extends Component {
                     var index = prgList.findIndex(c => c.program.id == programId);
                     prgList[index].versionList = prgList[index].versionList.concat(response.data.versionList);
                     prgList[index].currentPage = response.data.currentPage;
-                    // console.log("Program List more", response.data);
                     this.setState({
                         prgList,
                         loading: false
@@ -141,7 +137,6 @@ class Program extends Component {
             );
     }
     checkNewerVersions(programs) {
-        // console.log("T***going to call check newer versions")
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
@@ -300,7 +295,6 @@ class Program extends Component {
                         proList.push(programJson);
                     }
                 }
-                console.log("D--------------->ProList", proList);
                 this.setState({
                     programList: proList,
                     // loading: false
@@ -311,10 +305,8 @@ class Program extends Component {
 
     getTree() {
         this.setState({ loading: true })
-        // console.log(this.state.realmId)
         document.getElementById("treeDiv").style.display = "block";
         // AuthenticationService.setupAxiosInterceptors();
-        // console.log("This.state.realmId", this.state.realmId)
         if (this.state.realmId != "" && this.state.realmId > 0) {
             this.setState({
                 message: ""
@@ -322,14 +314,12 @@ class Program extends Component {
             RealmCountryService.getRealmCountryForProgram(this.state.realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        // console.log("response.data------------>", response.data)
                         this.setState({
                             countryList: response.data
                         })
                         // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
                         //     .then(response => {
                         //         if (response.status == 200) {
-                        //             console.log("Response.data", response.data);
                         //             this.setState({
                         //                 healthAreaList: response.data
                         //             })
@@ -337,7 +327,6 @@ class Program extends Component {
                             // getProgramList()
                             .then(response => {
                                 if (response.status == 200) {
-                                    // console.log("Program List", response.data);
                                     this.setState({
                                         prgList: response.data,
                                         loading: false
@@ -428,7 +417,6 @@ class Program extends Component {
                         //                 default:
                         //                     this.setState({ message: 'static.unkownError', color: "red" });
                         //                     this.hideFirstComponent()
-                        //                     console.log("Error code unkown");
                         //                     break;
                         //             }
                         //             this.setState({ loading: false })
@@ -528,7 +516,6 @@ class Program extends Component {
     }
 
     getPrograms() {
-        // console.log("T***get programs called");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -573,7 +560,6 @@ class Program extends Component {
                         // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         // var programJson1 = JSON.parse(programData);
-                        // console.log("programData---", programData);
                         var programJson = {
                             programId: myResult[i].programId,
                             versionId: myResult[i].version
@@ -680,12 +666,11 @@ class Program extends Component {
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
                                                                                                         <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
-                                                                                                        {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
-                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
+                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <i onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1 fa fa-trash"></i>}
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
-                                                                                            {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))}
                                                                                             <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)} />
                                                                                             <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)}></label>
                                                                                             <ul>
@@ -697,7 +682,8 @@ class Program extends Component {
                                                                                                                     <span className="">
                                                                                                                         <div className="checkbox m-0">
                                                                                                                             <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                            <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
                                                                                                                         </div>
                                                                                                                     </span>
                                                                                                                 </span>
@@ -739,6 +725,7 @@ class Program extends Component {
                             <CardFooter>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -764,6 +751,99 @@ class Program extends Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    deleteLocalVersionUsingProgramId(programId) {
+        this.setState({
+            loading: true
+        })
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
+        var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            for (var i = 0; i < listOfProgramVersion.length; i++) {
+                var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                programTransaction.delete(id);
+            }
+            transaction.oncomplete = function (event) {
+                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                for (var i = 0; i < listOfProgramVersion.length; i++) {
+                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                    programTransaction1.delete(id);
+                }
+                transaction1.oncomplete = function (event) {
+                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                    for (var i = 0; i < listOfProgramVersion.length; i++) {
+                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                        programTransaction2.delete(id);
+                    }
+                    transaction2.oncomplete = function (event) {
+                        this.setState({
+                            loading: false,
+                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            color: 'green'
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
+                        this.getPrograms();
+                        this.getLocalPrograms();
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
+    deleteLocalVersion(programId, versionId) {
+        this.setState({
+            loading: true
+        })
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var id = programId + "_v" + versionId + "_uId_" + userId;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var deleteRequest = programTransaction.delete(id);
+            deleteRequest.onsuccess = function (event) {
+                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                var deleteRequest1 = programTransaction1.delete(id);
+                deleteRequest1.onsuccess = function (event) {
+                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                    var deleteRequest2 = programTransaction2.delete(id);
+                    deleteRequest2.onsuccess = function (event) {
+                        this.setState({
+                            loading: false,
+                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            color: 'green'
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
+                        this.getPrograms();
+                        this.getLocalPrograms();
+
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
     downloadClicked() {
         this.setState({ loading: true })
         var programCheckboxes = document.getElementsByName("programCheckBox");
@@ -773,11 +853,9 @@ class Program extends Component {
         var programInvalidCheckedCount = 0;
         var count = 0;
 
-        // console.log("versionCheckBox-------------", versionCheckBox);
         for (var i = 0; i < versionCheckBox.length; i++) {
             if (versionCheckBox[i].checked) {
                 programCheckedCount = programCheckedCount + 1;
-                // console.log("parent program--------", versionCheckBox[i].dataset.programId);
                 count = count + 1;
                 var json = {
                     programId: versionCheckBox[i].dataset.programId,
@@ -786,33 +864,25 @@ class Program extends Component {
                 checkboxesChecked = checkboxesChecked.concat([json]);
             }
         }
-        // console.log("checkboxesChecked--------", checkboxesChecked);
         // loop over them all
-        // console.log("programCheckboxes.length---", programCheckboxes.length)
         for (var i = 0; i < programCheckboxes.length; i++) {
             // And stick the checked ones onto an array...
             if (programCheckboxes[i].checked) {
-                // console.log("program checked")
                 programCheckedCount = programCheckedCount + 1;
                 var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
                 // loop over them all
                 if (versionCheckboxes.length > 0) {
                     var count1 = 0;
-                    // console.log("versionCheckboxes length > 0")
                     for (var j = 0; j < versionCheckboxes.length; j++) {
                         // And stick the checked ones onto an array...
-                        // console.log("inside for loop")
                         if (versionCheckboxes[j].checked) {
-                            // console.log("versionCheckboxes[j].checked---")
                             count = count + 1;
                             count1 = count1 + 1;
-                            // console.log("count ---", count)
                             var json = {
                                 programId: programCheckboxes[i].value,
                                 versionId: versionCheckboxes[j].value
                             }
                             // checkboxesChecked = checkboxesChecked.concat([json]);
-                            // console.log("checkboxesChecked inside loop---", checkboxesChecked);
                         }
 
                     }
@@ -857,7 +927,6 @@ class Program extends Component {
         //     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         // }
         else {
-            console.log("Checl boxes checked array", checkboxesChecked)
             var programThenCount = 0;
             // for (var i = 0; i < checkboxesChecked.length; i++) {
             // var version = (checkboxesChecked[i]).versionId;
@@ -865,8 +934,6 @@ class Program extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
-                        // console.log("ProgramThenCount", programThenCount)
-                        // console.log("Response data", response.data)
                         var json = response.data;
                         var programAndVersionList = [];
                         for (var r = 0; r < json.length; r++) {
@@ -876,10 +943,7 @@ class Program extends Component {
                             }
                             programAndVersionList.push({ programId: json[r].programId, version: version })
                         }
-                        // console.log("Json-------->", json);
-                        // console("version befor -1 check",version)
 
-                        // console.log("Version", version)
                         var db1;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -895,7 +959,6 @@ class Program extends Component {
                             getRequest.onsuccess = function (event) {
                                 var myResult = [];
                                 myResult = getRequest.result;
-                                console.log("myResult---", myResult)
                                 var programAndVersionListLocal = [];
                                 for (var i = 0; i < myResult.length; i++) {
                                     // for (var j = 0; j < json.length; j++) {
@@ -907,11 +970,8 @@ class Program extends Component {
                                 }
                                 var isExists = 0;
                                 var downloadProgram = false;
-                                console.log("D------------------>", programAndVersionListLocal);
-                                console.log("D------------------>", programAndVersionList);
                                 for (var r = 0; r < programAndVersionList.length; r++) {
                                     var filterList = programAndVersionListLocal.filter(c => c.programId == programAndVersionList[r].programId && c.version == programAndVersionList[r].version);
-                                    console.log("D---------------->filterList", filterList)
                                     if (filterList.length > 0) {
                                         isExists += 1;
                                     }
@@ -925,8 +985,6 @@ class Program extends Component {
                                             {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
-                                                    console.log("D-------------------->Yes clicked");
-                                                    console.log("D--------------> in download program")
                                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                                     for (var r = 0; r < json.length; r++) {
@@ -952,7 +1010,6 @@ class Program extends Component {
                                                             // openCount: 0,
                                                             // addressedCount: 0
                                                         };
-                                                        // console.log("Item------------>", item);
                                                         var putRequest = programSaveData.put(item);
 
                                                     }
@@ -975,7 +1032,6 @@ class Program extends Component {
                                                                 programData: encryptedText.toString(),
                                                                 userId: userId
                                                             };
-                                                            // console.log("Item------------>", item);
                                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                                         }
@@ -1033,7 +1089,6 @@ class Program extends Component {
                                     downloadProgram = true;
                                 }
                                 if (downloadProgram) {
-                                    console.log("D--------------> in download program")
                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {
@@ -1059,7 +1114,6 @@ class Program extends Component {
                                             // openCount: 0,
                                             // addressedCount: 0
                                         };
-                                        // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
 
                                     }
@@ -1082,7 +1136,6 @@ class Program extends Component {
                                                 programData: encryptedText.toString(),
                                                 userId: userId
                                             };
-                                            // console.log("Item------------>", item);
                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                         }
