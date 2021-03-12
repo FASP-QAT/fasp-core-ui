@@ -1043,18 +1043,19 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/program/downloadProgram/:message":
                 case "/program/downloadProgram":
                     if (bfunction.includes("ROLE_BF_DOWNLOAD_PROGARM")) {
                         return true;
                     }
                     break;
-                case "/program/deleteLocalProgram":
-                    // console.log("Going to check if condition")
-                    if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
-                        // console.log("Going to check if condition")
-                        return true;
-                    }
-                    break;
+                // case "/program/deleteLocalProgram":
+                //     // console.log("Going to check if condition")
+                //     if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
+                //         // console.log("Going to check if condition")
+                //         return true;
+                //     }
+                //     break;
                 case "/program/importProgram":
                     if (bfunction.includes("ROLE_BF_IMPORT_EXPORT_PROGARM")) {
                         return true;
@@ -1235,15 +1236,15 @@ class AuthenticationService {
                 //     }
                 // }
             } else {
-                localStorage.setItem("sessionChanged",1)
+                localStorage.setItem("sessionChanged", 1)
                 return "/login/static.message.sessionChange";
             }
         } else {
             console.log("offline to online ");
-            if(localStorage.getItem("sessionChanged")==1){
+            if (localStorage.getItem("sessionChanged") == 1) {
                 return "/login/static.message.sessionChange";
-            }else{
-            return "/accessDenied";
+            } else {
+                return "/accessDenied";
             }
         }
     }

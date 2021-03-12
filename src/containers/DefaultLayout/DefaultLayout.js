@@ -149,7 +149,7 @@ const AddProduct = React.lazy(() => import('../../views/Product/AddProduct'));
 const ListProdct = React.lazy(() => import('../../views/Product/ProductList'));
 const EditProdct = React.lazy(() => import('../../views/Product/EditProduct'));
 const ProgramTree = React.lazy(() => import('../../views/Program/ProgramTree'));
-const DeleteLocalPrograms = React.lazy(() => import('../../views/Program/DeleteLocalProgramComponent'));
+// const DeleteLocalPrograms = React.lazy(() => import('../../views/Program/DeleteLocalProgramComponent'));
 const ExportProgram = React.lazy(() => import('../../views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('../../views/Program/ImportProgram'));
 // const MasterDataSync = React.lazy(() => import('../../views/SyncMasterData/SyncMasterData'));
@@ -287,7 +287,7 @@ const routes = [
 
   { path: '/', exact: true, name: 'static.home' },
   { path: '/programTree', name: 'static.dashboard.program', component: ProgramTree },
-  { path: '/program/deleteLocalProgram', name: 'static.program.deleteLocalProgram', component: DeleteLocalPrograms },
+  // { path: '/program/deleteLocalProgram', name: 'static.program.deleteLocalProgram', component: DeleteLocalPrograms },
   { path: '/diamension/AddDiamension', name: 'static.breadcrum.add', entityname: 'static.dashboard.dimensionheader', component: AddDimension },
   { path: '/dimension/listDimension', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.dimension', component: DimensionList },
   // { path: '/dimension/listDimension/:message', component: DimensionList },
@@ -413,7 +413,7 @@ const routes = [
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
-  { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
+  { path: '/program/downloadProgram',exact:true, name: 'static.dashboard.downloadprogram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
@@ -1264,13 +1264,13 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.programimport'),
                             // url: '/pipeline/pipelineProgramImport',
@@ -2113,12 +2113,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-sign-in',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') ? false : true) }
+                          // },
                           // {
                           //   name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
                           //   url: '/consumptionDetails',

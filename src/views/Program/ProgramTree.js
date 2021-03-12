@@ -163,6 +163,7 @@ class Program extends Component {
     }
 
     componentDidMount() {
+        this.hideSecondComponent()
         this.getLocalPrograms();
         this.getPrograms();
         if (AuthenticationService.getRealmId() == -1) {
@@ -593,13 +594,13 @@ class Program extends Component {
                     </option>
                 )
             }, this);
-
+console.log("this.props.match.params.message",this.props.params)
         return (
             <div className="animated fadeIn">
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className="green" id="div2">{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -864,13 +865,15 @@ class Program extends Component {
                             programTransaction2.delete(id);
                         }
                         transaction2.oncomplete = function (event) {
-                            this.setState({
-                                loading: false,
-                                message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                                color: 'green'
-                            }, () => {
-                                this.hideFirstComponent()
-                            })
+                            // this.setState({
+                            //     loading: false,
+                            //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            //     color: 'green'
+                            // }, () => {
+                            //     this.hideFirstComponent()
+                            // })
+                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.deleteLocalProgramSuccess'))
+                            window.location.reload();
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
