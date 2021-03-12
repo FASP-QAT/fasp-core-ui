@@ -154,7 +154,7 @@ class SupplyPlanVersionAndReview extends Component {
             data[4] = matricsList[j].createdBy.username
             data[5] = matricsList[j].versionStatus.id == 1 ? "" : getLabelText(matricsList[j].versionStatus.label, this.state.lang);
             data[6] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedBy.username) : ''
-            data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
+            data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null) : null
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
@@ -213,8 +213,9 @@ class SupplyPlanVersionAndReview extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
-                    type: 'text',
-                    readOnly: true
+                    options:{isTime:1,format:"DD-Mon-YY HH24:MM PM"},
+                    readOnly: true,
+                    type:'calendar'
                 }, {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
