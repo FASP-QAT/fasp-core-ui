@@ -132,10 +132,8 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            // Commented the CR
-            // monthCount: monthDifference,
-            monthCount: 0,
-            // Commented the CR
+            monthCount: monthDifference,
+            // monthCount: 0,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -2229,9 +2227,7 @@ export default class WhatIfReportComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
-        // Commented the CR
-        // localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
-        // Commented the CR
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
