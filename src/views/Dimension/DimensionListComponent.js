@@ -456,33 +456,20 @@ export default class DimensionListComponent extends Component {
         jExcelLoadedFunction(instance);
     }
     editDimension(dimension) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
                 pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
                 // state: { dimension: dimension }
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
-                this.props.history.push({
-                    pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
-            }
-        }
-    }.bind(this);
 
     selected = function (instance, cell, x, y, value) {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
                     this.props.history.push({
                         pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -526,7 +513,7 @@ export default class DimensionListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DIMENSION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
