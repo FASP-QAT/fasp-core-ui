@@ -661,6 +661,11 @@ label.arrow_label:after {
   color: red !important;
 }
 
+.jexcel > tbody > tr > td.readonly.shipmentEntryActive {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
 .jexcel > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
@@ -672,6 +677,11 @@ label.arrow_label:after {
 
 .jexcel > tbody > tr > td.shipmentEntryEmergency {
   color: red !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryActive {
+  color: #808080 !important;
+  background-color: #808080 !important;
 }
 
 .jexcel > tbody > tr > td.shipmentEntryDoNotInclude {
