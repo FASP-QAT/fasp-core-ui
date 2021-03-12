@@ -464,18 +464,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var options = {
                                             data: shipmentsArr,
                                             columns: [
-                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80 },
+                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80,readOnly:!shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                 { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 150 },
                                                 { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
-                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80 },
+                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80,readOnly:!shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100, readOnly: true },
                                                 { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100 },
+                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100,readOnly:!shipmentEditable },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
@@ -2002,10 +2002,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
                 if (rowData[21].toString() == "true") {
-
                     var cell = elInstance.getCell(col)
                     cell.classList.add('readonly');
-
                 }
                 if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -2047,6 +2045,27 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setStyle(col, "color", "#000");
                     var cell = elInstance.getCell(col);
                     cell.classList.remove('shipmentEntryEmergency');
+                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
+                    // cell.classList.remove('shipmentEntryEmergency');
+                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
+                    // cell.classList.remove('shipmentEntryEmergency');
+                }
+
+                if (rowData[29].toString() == "false") {
+                    console.log("In if");
+                    elInstance.setStyle(col, "color", "#000");
+                    // elInstance.setStyle(col, "color", "red");
+                    var cell = elInstance.getCell(col);
+                    cell.classList.add('shipmentEntryActive');
+                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
+                    // cell.classList.add('shipmentEntryEmergency');
+                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
+                    // cell.classList.add('shipmentEntryEmergency');
+                } else {
+                    console.log("In else")
+                    elInstance.setStyle(col, "color", "#000");
+                    var cell = elInstance.getCell(col);
+                    cell.classList.remove('shipmentEntryActive');
                     // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
                     // cell.classList.remove('shipmentEntryEmergency');
                     // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
