@@ -3007,8 +3007,8 @@ export default class syncPage extends Component {
                   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
                   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                   var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1)).length;
-                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3)).length;
+                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive == true)).length;
+                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive == true)).length;
 
                   var item = {
                     id: json.programId + "_v" + version + "_uId_" + userId,
@@ -3168,7 +3168,7 @@ export default class syncPage extends Component {
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId && 
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
                   !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
               index = -1;

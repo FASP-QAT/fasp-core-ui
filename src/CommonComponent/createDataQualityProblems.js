@@ -1,6 +1,6 @@
 import moment, { months } from 'moment';
 
-export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj,causeJson, problemActionIndex, userId, username,problemActionList) {
+export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList) {
 
     var json = {
         problemReportId: 0,
@@ -23,8 +23,9 @@ export default function createDataQualityProblems(programObj, versionID, problem
 
         },
         shipmentId: '',
-        data5:JSON.stringify(causeJson),
+        data5: JSON.stringify(causeJson),
         planningUnitActive: true,
+        regionActive: true,
         newAdded: false,
 
         problemActionIndex: problemActionIndex,
