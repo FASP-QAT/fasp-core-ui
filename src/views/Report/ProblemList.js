@@ -416,19 +416,22 @@ export default class ConsumptionDetails extends React.Component {
                         var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
                         let problemList = this.state.data;
                         problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
+                        console.log("changedProblemsList+++", changedProblemsList);
                         for (var i = 0; i < changedProblemsList.length; i++) {
                             if ((changedProblemsList[i])[0] != 0) {
                                 var indexToUpdate = problemList.findIndex(c =>
                                     c.problemReportId == (changedProblemsList[i])[0]
                                 );
                             } else {
+                                console.log("in else===>", (changedProblemsList[i])[1]);
                                 var indexToUpdate = (changedProblemsList[i])[1];
                             }
 
                             var probObj = problemList[indexToUpdate];
+                            var probObj = (changedProblemsList[i])[0] != 0 ? problemList.filter(c => c.problemReportId == indexToUpdate)[0] : problemList.filter(c => c.problemActionIndex == indexToUpdate)[0];
                             var probTransList = probObj.problemTransList;
-                            var changedProblemStatusId = (changedProblemsList[i])[10];
-                            var statusObj = this.state.problemListForUpdate.filter(c => c.id == changedProblemStatusId)[0];
+                            var changedProblemStatusId = parseInt((changedProblemsList[i])[10]);
+                            var statusObj = this.state.problemListForUpdate.filter(c => parseInt(c.id) == changedProblemStatusId)[0];
                             let tempProblemTransObj = {
                                 problemReportTransId: '',
                                 problemStatus: statusObj,
