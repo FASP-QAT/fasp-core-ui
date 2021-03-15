@@ -4076,6 +4076,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                             <Input
                                                                 type="textarea"
+                                                                maxLength={65535}
                                                                 name="versionNotes"
                                                                 id="versionNotes"
                                                                 value={this.state.program.currentVersion.notes}
