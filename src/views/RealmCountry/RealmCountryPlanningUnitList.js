@@ -828,6 +828,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         this.changed = this.changed.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.handleChangeProgram = this.handleChangeProgram.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     cancelClicked() {
@@ -876,6 +877,17 @@ export default class RealmCountryPlanningUnitList extends Component {
             data, 0, 1
         );
     };
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[5]));
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        }
+        this.el.setValueFromCoords(9, y, 1, true);
+    }
 
     onPaste(instance, data) {
         var z = -1;
@@ -1537,11 +1549,12 @@ export default class RealmCountryPlanningUnitList extends Component {
             onchange: this.changed,
             onblur: this.blur,
             onfocus: this.focus,
-            oneditionend: this.onedit,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
             onpaste: this.onPaste,
+            oneditionend: this.oneditionend,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
