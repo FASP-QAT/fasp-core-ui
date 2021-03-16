@@ -79,10 +79,8 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            // Commented the CR
-            // monthCount: monthDifference,
-            monthCount: 0,
-            // Commented the CR
+            monthCount: monthDifference,
+            // monthCount: 0,
 
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
@@ -2284,9 +2282,7 @@ export default class SupplyPlanComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
-        // Commented the CR
-        // localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
-        // Commented the CR
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -3692,8 +3688,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Form name='simpleForm'>
                                             <div className=" pl-0">
                                                 <div className="row">
-                                                    {/* // Commented the CR */}
-                                                    {/* <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
 
@@ -3709,8 +3704,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
                                                             </Picker>
                                                         </div>
-                                                    </FormGroup> */}
-                                                    {/* // Commented the CR */}
+                                                    </FormGroup>
                                                     <FormGroup className="col-md-4">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                         <div className="controls ">
