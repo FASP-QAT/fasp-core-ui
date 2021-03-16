@@ -373,15 +373,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                                     cell.classList.remove('readonly');
                                 }
-                                // Commented the CR
-                                // if (rowData[2] == 2) {
-                                //     var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                //     cell.classList.add('readonly');
-                                // } else {
-                                //     var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                //     cell.classList.remove('readonly');
-                                // }
-                                // Commented the CR
+                                if (rowData[2] == 2) {
+                                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                    cell.classList.add('readonly');
+                                } else {
+                                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                    cell.classList.remove('readonly');
+                                }
                             }
                         }.bind(this),
                         onsearch: function (el) {
@@ -812,11 +810,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                 }
             }
-            // Commented the CR
-            // if (rowData[2] == 2) {
-            //     elInstance.setValueFromCoords(8, y, "", true);
-            // }
-            // Commented the CR
+            if (rowData[2] == 2) {
+                elInstance.setValueFromCoords(8, y, "", true);
+            }
         }
         // this.showOnlyErrors();
     }
