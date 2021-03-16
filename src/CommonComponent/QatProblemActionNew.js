@@ -219,19 +219,29 @@ export default class QatProblemActionNew extends Component {
                                                 });
 
                                                 // console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
+
+                                                //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
                                                 var regionIdArray = [];
                                                 var regionList = programList[pp].regionList;
                                                 regionList.map(rm => {
-                                                    regionIdArray.push(parseInt(rm.id));
+                                                    regionIdArray.push(parseInt(rm.regionId));
                                                 });
-
+                                                console.log("regionIdArray+++", regionIdArray);
                                                 var problemReportIdForRegion = [];
                                                 problemActionList.filter(c =>
-                                                    !regionIdArray.includes(parseInt(c.region.id))).
+                                                    !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0).
                                                     map(m => {
-                                                        problemReportIdForRegion.push(m.problemReportId);
+                                                        problemReportIdForRegion.push(parseInt(m.problemReportId));
                                                     });
                                                 console.log("problem reportId to mark region acive false+++", problemReportIdForRegion);
+                                                for (var pal = 0; pal < problemActionList.length; pal++) {
+                                                    if (problemReportIdForRegion.includes(parseInt(problemActionList[pal].problemReportId))) {
+                                                        problemActionList[pal].regionActive = false;
+                                                    } else {
+                                                        problemActionList[pal].regionActive = true;
+                                                    }
+                                                }
+                                                //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
 
                                                 problemList = problemRequest.result.filter(c =>
                                                     c.realm.id == programList[pp].realmCountry.realm.realmId
@@ -1217,8 +1227,8 @@ export default class QatProblemActionNew extends Component {
                                                 programList[pp].actionList = [];
                                                 programList[pp].qplLastModifiedDate = curDate;
 
-                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive == true)).length;
-                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive == true)).length;
+                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                 // console.log("openCount***", openCount, "addressedCount***", addressedCount);
                                                 var programQPLDetailsJson = {
                                                     id: programRequestList[pp].id,

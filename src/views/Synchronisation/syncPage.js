@@ -2874,7 +2874,7 @@ export default class syncPage extends Component {
         }
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-      problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
+      problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
       var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
@@ -2958,7 +2958,7 @@ export default class syncPage extends Component {
               }
             }
             problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-            problemReportList = problemReportList.filter(c => c.planningUnitActive != false);
+            problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
             // programJson.consumptionList = consumptionData;
             // programJson.inventoryList = inventoryData;
             // programJson.shipmentList = shipmentData;
@@ -3007,8 +3007,8 @@ export default class syncPage extends Component {
                   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
                   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                   var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive == true)).length;
-                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive == true)).length;
+                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
 
                   var item = {
                     id: json.programId + "_v" + version + "_uId_" + userId,
@@ -3209,7 +3209,7 @@ export default class syncPage extends Component {
         // Getting other entries of latest problemList data
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
-        mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false)
+        mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false && c.regionActive != false)
 
         var data = [];
         var mergedProblemListJexcel = [];
