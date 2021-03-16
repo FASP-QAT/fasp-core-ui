@@ -553,6 +553,29 @@ class Budgets extends Component {
                                 console.log("B** json ---", json);
                             }
                             console.log("B** data ---", data);
+
+                            data.sort(function (a, b) {
+                                var keyA = new Date(a.startDate),
+                                    keyB = new Date(b.startDate);
+                                // Compare the 2 dates
+                                if (keyA < keyB) return -1;
+                                if (keyA > keyB) return 1;
+                                return 0;
+                            });
+                            data.sort(function (a, b) {
+                                var keyA1 = new Date(a.startDate),
+                                    keyA11 = new Date(a.stopDate),
+                                    keyB1 = new Date(b.startDate),
+                                    keyB11 = new Date(b.stopDate);
+                                // Compare the 2 dates
+                                if (keyA1.getTime() === keyB1.getTime()) {
+                                    if (keyA11 < keyB11) return -1;
+                                    if (keyA11 > keyB11) return 1;
+                                }
+                                return 0;
+                            });
+
+                            console.log("data---->", data);
                             this.setState({
                                 selBudget: data,
                                 message: '',

@@ -132,10 +132,8 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryTotalMonthWise: [],
             projectedTotalMonthWise: [],
             inventoryChangedFlag: 0,
-            // Commented the CR
-            // monthCount: monthDifference,
-            monthCount: 0,
-            // Commented the CR
+            monthCount: monthDifference,
+            // monthCount: 0,
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
             minStockArray: [],
@@ -495,8 +493,7 @@ export default class WhatIfReportComponent extends React.Component {
                         rows: [],
                         scenarioId: '',
                         percentage: '',
-                        startDate: '',
-                        stopDate: ''
+                        
                     })
                 }.bind(this)
             }.bind(this)
@@ -1167,7 +1164,7 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
-                    var actionList=programJson.actionList;
+                    var actionList = programJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1231,7 +1228,7 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList=actionList;
+                    programJson.actionList = actionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
@@ -1260,7 +1257,7 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 5) {
                     var shipmentList = programJson.shipmentList;
-                    var actionList=programJson.actionList;
+                    var actionList = programJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1324,7 +1321,7 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList=actionList;
+                    programJson.actionList = actionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
@@ -1353,7 +1350,7 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 6) {
                     var shipmentList = programJson.shipmentList;
-                    var actionList=programJson.actionList;
+                    var actionList = programJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1427,7 +1424,7 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList=actionList;
+                    programJson.actionList = actionList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
@@ -2229,9 +2226,7 @@ export default class WhatIfReportComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
-        // Commented the CR
-        // localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
-        // Commented the CR
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -2244,6 +2239,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
+        console.log("MonthCount+++",monthCount)
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -2436,6 +2432,10 @@ export default class WhatIfReportComponent extends React.Component {
                                     var sd2 = [];
                                     var sd3 = [];
                                     var sd4 = [];
+                                    var paColor1Array = [];
+                                    var paColor2Array = [];
+                                    var paColor3Array = [];
+                                    var paColor4Array = [];
                                     var paColor1 = "";
                                     var paColor2 = "";
                                     var paColor3 = "";
@@ -2479,6 +2479,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent1 = true;
                                                 }
                                                 sd1.push(shipmentDetail);
+                                                if (paColor1Array.indexOf(paColor1) === -1) {
+                                                    paColor1Array.push(paColor1);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -2508,7 +2511,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent2 = true;
                                                 }
                                                 sd2.push(shipmentDetail);
+
+                                                if (paColor2Array.indexOf(paColor2) === -1) {
+                                                    paColor2Array.push(paColor2);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2537,7 +2545,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent3 = true;
                                                 }
                                                 sd3.push(shipmentDetail);
+
+                                                if (paColor3Array.indexOf(paColor3) === -1) {
+                                                    paColor3Array.push(paColor3);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2566,13 +2579,16 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent4 = true;
                                                 }
                                                 sd4.push(shipmentDetail);
+                                                if (paColor4Array.indexOf(paColor4) === -1) {
+                                                    paColor4Array.push(paColor4);
+                                                }
                                             }
                                         }
                                     }
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor1;
-                                        if (sd1.length > 1) {
+                                        if (paColor1Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -2582,7 +2598,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor2;
-                                        if (sd2.length > 1) {
+                                        if (paColor2Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -2592,7 +2608,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor3;
-                                        if (sd3.length > 1) {
+                                        if (paColor3Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
@@ -2602,7 +2618,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor4;
-                                        if (sd4.length > 1) {
+                                        if (paColor4Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
@@ -2626,6 +2642,10 @@ export default class WhatIfReportComponent extends React.Component {
                                     var isEmergencyOrder2 = 0;
                                     var isEmergencyOrder3 = 0;
                                     var isEmergencyOrder4 = 0;
+                                    var paColor1Array = [];
+                                    var paColor2Array = [];
+                                    var paColor3Array = [];
+                                    var paColor4Array = [];
                                     var isLocalProcurementAgent1 = 0;
                                     var isLocalProcurementAgent2 = 0;
                                     var isLocalProcurementAgent3 = 0;
@@ -2661,7 +2681,9 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent1 = true;
                                                 }
                                                 sd1.push(shipmentDetail);
-
+                                                if (paColor1Array.indexOf(paColor1) === -1) {
+                                                    paColor1Array.push(paColor1);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -2691,7 +2713,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent2 = true;
                                                 }
                                                 sd2.push(shipmentDetail);
+
+                                                if (paColor2Array.indexOf(paColor2) === -1) {
+                                                    paColor2Array.push(paColor2);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2720,7 +2747,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent3 = true;
                                                 }
                                                 sd3.push(shipmentDetail);
+
+                                                if (paColor3Array.indexOf(paColor3) === -1) {
+                                                    paColor3Array.push(paColor3);
+                                                }
                                             } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2749,13 +2781,16 @@ export default class WhatIfReportComponent extends React.Component {
                                                     isLocalProcurementAgent4 = true;
                                                 }
                                                 sd4.push(shipmentDetail);
+                                                if (paColor4Array.indexOf(paColor4) === -1) {
+                                                    paColor4Array.push(paColor4);
+                                                }
                                             }
                                         }
                                     }
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor1;
-                                        if (sd1.length > 1) {
+                                        if (paColor1Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -2765,7 +2800,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor2;
-                                        if (sd2.length > 1) {
+                                        if (paColor2Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -2775,7 +2810,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor3;
-                                        if (sd3.length > 1) {
+                                        if (paColor3Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
@@ -2785,7 +2820,7 @@ export default class WhatIfReportComponent extends React.Component {
 
                                     if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
                                         var colour = paColor4;
-                                        if (sd4.length > 1) {
+                                        if (paColor4Array.length > 1) {
                                             colour = "#d9ead3";
                                         }
                                         plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
@@ -4812,25 +4847,23 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardBody className="pt-lg-0 pb-lg-0">
                         <div className=" pl-0">
                             <div className="row">
-                                {/* Commented the CR */}
-                                {/* <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
 
                                         <Picker
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                            ref={this.pickRange}
+                                            ref={this.pickRange1}
                                             value={this.state.startDate}
                                             lang={pickerLang}
                                             //theme="light"
-                                            onChange={this.handleRangeChange}
-                                            onDismiss={this.handleRangeDissmis}
+                                            onChange={this.handleRangeChange1}
+                                            onDismiss={this.handleRangeDissmis1}
                                         >
-                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox1} />
                                         </Picker>
                                     </div>
-                                </FormGroup> */}
-                                {/* Commented the CR */}
+                                </FormGroup>
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls ">
