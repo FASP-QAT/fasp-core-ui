@@ -1164,24 +1164,42 @@ class Consumption extends Component {
         }
 
         console.log(verList)
+        var versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        })
+        versionList.reverse();
 
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+
+          let versionVar = versionList.filter(c => c.versionId === localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+              this.filterData()
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+              this.filterData()
+            })
+          }
+        } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
+            versions: versionList,
+            versionId: versionList[0].versionId
           }, () => {
             this.getPlanningUnit();
             this.filterData()
           })
-        } else {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
-          }, () => { this.filterData() })
         }
+
+
 
 
       }.bind(this);
@@ -1205,7 +1223,21 @@ class Consumption extends Component {
     this.setState({
       versionId: event.target.value
     }, () => {
-      this.getPlanningUnit();
+      if (isSiteOnline()) {
+        if (this.state.consumptions.length != 0) {
+          localStorage.setItem("sesVersionIdReport", this.state.versionId);
+          this.filterData();
+        } else {
+          this.getPlanningUnit();
+        }
+      } else {
+        if (this.state.offlineConsumptionList.length != 0) {
+          localStorage.setItem("sesVersionIdReport", this.state.versionId);
+          this.filterData();
+        } else {
+          this.getPlanningUnit();
+        }
+      }
     })
   }
 
@@ -1371,79 +1403,79 @@ class Consumption extends Component {
     let bar = "";
     if (isSiteOnline()) {
 
-        bar = {
+      bar = {
 
-          // labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
-          labels: this.state.consumptions.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
-          datasets: [
-            {
-              type: "line",
-              lineTension: 0,
-              label: i18n.t('static.report.forecastConsumption'),
-              backgroundColor: 'transparent',
-              borderColor: '#000',
-              borderDash: [10, 10],
-              ticks: {
-                fontSize: 2,
-                fontColor: 'transparent',
-              },
-              showInLegend: true,
-              pointStyle: 'line',
-              pointBorderWidth: 5,
-              yValueFormatString: "###,###,###,###",
-              data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
-            }, {
-              label: i18n.t('static.report.actualConsumption'),
-              backgroundColor: '#118b70',
-              borderColor: 'rgba(179,181,198,1)',
-              pointBackgroundColor: 'rgba(179,181,198,1)',
-              pointBorderColor: '#fff',
-              pointHoverBackgroundColor: '#fff',
-              pointHoverBorderColor: 'rgba(179,181,198,1)',
-              yValueFormatString: "###,###,###,###",
-              data: this.state.consumptions.map((item, index) => (item.actualConsumption)),
-            }
-          ],
+        // labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
+        labels: this.state.consumptions.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
+        datasets: [
+          {
+            type: "line",
+            lineTension: 0,
+            label: i18n.t('static.report.forecastConsumption'),
+            backgroundColor: 'transparent',
+            borderColor: '#000',
+            borderDash: [10, 10],
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            showInLegend: true,
+            pointStyle: 'line',
+            pointBorderWidth: 5,
+            yValueFormatString: "###,###,###,###",
+            data: this.state.consumptions.map((item, index) => (item.forecastedConsumption))
+          }, {
+            label: i18n.t('static.report.actualConsumption'),
+            backgroundColor: '#118b70',
+            borderColor: 'rgba(179,181,198,1)',
+            pointBackgroundColor: 'rgba(179,181,198,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(179,181,198,1)',
+            yValueFormatString: "###,###,###,###",
+            data: this.state.consumptions.map((item, index) => (item.actualConsumption)),
+          }
+        ],
 
 
 
-        }
+      }
     }
     if (!isSiteOnline()) {
 
-        bar = {
+      bar = {
 
-          // labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
-          labels: this.state.offlineConsumptionList.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
-          datasets: [
-            {
-              type: "line",
-              lineTension: 0,
-              label: i18n.t('static.report.forecastConsumption'),
-              backgroundColor: 'transparent',
-              borderColor: '#000',
-              borderDash: [10, 10],
-              ticks: {
-                fontSize: 2,
-                fontColor: 'transparent',
-              },
-              showInLegend: true,
-              pointStyle: 'line',
-              pointBorderWidth: 5,
-              yValueFormatString: "$#,##0",
-              data: this.state.offlineConsumptionList.map((item, index) => (item.forecastedConsumption))
-            }, {
-              label: i18n.t('static.report.actualConsumption'),
-              backgroundColor: '#118b70',
-              borderColor: 'rgba(179,181,198,1)',
-              pointBackgroundColor: 'rgba(179,181,198,1)',
-              pointBorderColor: '#fff',
-              pointHoverBackgroundColor: '#fff',
-              pointHoverBorderColor: 'rgba(179,181,198,1)',
-              data: this.state.offlineConsumptionList.map((item, index) => (item.actualConsumption)),
-            }
-          ],
-        }
+        // labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
+        labels: this.state.offlineConsumptionList.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
+        datasets: [
+          {
+            type: "line",
+            lineTension: 0,
+            label: i18n.t('static.report.forecastConsumption'),
+            backgroundColor: 'transparent',
+            borderColor: '#000',
+            borderDash: [10, 10],
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            showInLegend: true,
+            pointStyle: 'line',
+            pointBorderWidth: 5,
+            yValueFormatString: "$#,##0",
+            data: this.state.offlineConsumptionList.map((item, index) => (item.forecastedConsumption))
+          }, {
+            label: i18n.t('static.report.actualConsumption'),
+            backgroundColor: '#118b70',
+            borderColor: 'rgba(179,181,198,1)',
+            pointBackgroundColor: 'rgba(179,181,198,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(179,181,198,1)',
+            data: this.state.offlineConsumptionList.map((item, index) => (item.actualConsumption)),
+          }
+        ],
+      }
     }
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
