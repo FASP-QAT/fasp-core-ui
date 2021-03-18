@@ -2962,7 +2962,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         lastActualConsumptionDate.push({ lastActualConsumptionDate: conmax, region: regionListFiltered[r].id });
                                     }
                                     var json = {
-                                        month: m[n].month,
+                                        month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                         consumption: jsonList[0].consumptionQty,
                                         stock: jsonList[0].closingBalance,
                                         planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
@@ -3006,7 +3006,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     lastActualConsumptionDate.push("");
 
                                     var json = {
-                                        month: m[n].month,
+                                        month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                         consumption: null,
                                         stock: lastClosingBalance,
                                         planned: 0,
