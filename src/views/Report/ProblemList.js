@@ -485,16 +485,24 @@ export default class ConsumptionDetails extends React.Component {
 
     toggleLarge(problemReportId, problemActionIndex) {
         var problemTransList = [];
+        var problemType = "";
+        var problemCreatedDate = "";
         if (problemReportId != undefined) {
             if (problemReportId != 0) {
                 problemTransList = this.state.problemList.filter(c => c.problemReportId == problemReportId)[0].problemTransList;
+                problemType = getLabelText(this.state.problemList.filter(c => c.problemReportId == problemReportId)[0].problemType.label, this.state.lang)
+                problemCreatedDate = this.state.problemList.filter(c => c.problemReportId == problemReportId)[0].createdDate
             } else {
                 problemTransList = this.state.problemList.filter(c => c.problemActionIndex == problemActionIndex)[0].problemTransList;
+                problemType = getLabelText(this.state.problemList.filter(c => c.problemReportId == problemActionIndex)[0].problemType.label, this.state.lang)
+                problemCreatedDate = this.state.problemList.filter(c => c.problemReportId == problemActionIndex)[0].createdDate
             }
         }
         this.setState({
             problemTransDetailsModal: !this.state.problemTransDetailsModal,
-            problemTransList: problemTransList
+            problemTransList: problemTransList,
+            problemType: problemType,
+            problemCreatedDate: problemCreatedDate
         });
     }
     toggleProblemDetails(problemReportId, problemActionIndex) {
@@ -1702,6 +1710,29 @@ export default class ConsumptionDetails extends React.Component {
                                     props => (
                                         <div className="col-md-12 bg-white pb-1 mb-2">
                                             {/* <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" ><b>{i18n.t('static.report.problemTransDetails')}</b></a></li></ul> */}
+                                            <div className="row">
+                                                <FormGroup className="col-md-6 ">
+                                                    <Label for="problemType">{i18n.t('static.report.problemType')}</Label>
+                                                    <Input type="text"
+                                                        name="problemType"
+                                                        id="problemType"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={this.state.problemType}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6 ">
+                                                    <Label for="createdDate">{i18n.t('static.report.createdDate')}</Label>
+                                                    <Input type="text"
+                                                        name="createdDate"
+                                                        id="createdDate"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={moment(this.state.problemCreatedDate).format(DATE_FORMAT_CAP)}
+                                                        className="form-control-sm form-control date-color"
+                                                    />
+                                                </FormGroup>
+                                            </div>
                                             <div className="TableCust">
                                                 <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
 
