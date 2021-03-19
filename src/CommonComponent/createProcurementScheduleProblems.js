@@ -22,7 +22,7 @@ export default function createProcurementScheduleProblems(programObj,versionID,p
         shipmentId: shipmentId,
         data5: '',
         planningUnitActive: true,
-        regionActive: true,
+        // regionActive: true,
         newAdded: newAddShipment,
         problemActionIndex: problemActionIndex,
         index: 0,
