@@ -372,6 +372,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         }
                                     }
                                     lastY = y;
+                                } else {
+                                    if (rowData[2] == 2) {
+                                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                        cell.classList.add('readonly');
+                                    } else {
+                                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                        cell.classList.remove('readonly');
+                                    }
                                 }
                                 if (rowData[15] > 0) {
                                     var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
