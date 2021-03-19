@@ -229,7 +229,7 @@ export default class QatProblemActionNew extends Component {
                                                 console.log("regionIdArray+++", regionIdArray);
                                                 var problemReportIdForRegion = [];
                                                 problemActionList.filter(c =>
-                                                    !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0).
+                                                    !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
                                                     map(m => {
                                                         problemReportIdForRegion.push(parseInt(m.problemReportId));
                                                     });
