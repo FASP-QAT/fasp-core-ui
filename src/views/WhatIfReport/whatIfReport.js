@@ -493,8 +493,7 @@ export default class WhatIfReportComponent extends React.Component {
                         rows: [],
                         scenarioId: '',
                         percentage: '',
-                        startDate: '',
-                        stopDate: ''
+                        
                     })
                 }.bind(this)
             }.bind(this)
@@ -2240,6 +2239,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
+        console.log("MonthCount+++",monthCount)
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,

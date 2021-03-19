@@ -828,6 +828,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         this.changed = this.changed.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.handleChangeProgram = this.handleChangeProgram.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     cancelClicked() {
@@ -1548,11 +1549,12 @@ export default class RealmCountryPlanningUnitList extends Component {
             onchange: this.changed,
             onblur: this.blur,
             onfocus: this.focus,
-            oneditionend: this.onedit,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
             onpaste: this.onPaste,
+            oneditionend: this.oneditionend,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

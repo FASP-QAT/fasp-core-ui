@@ -723,22 +723,35 @@ class ShipmentSummery extends Component {
                 }
 
                 // console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                })
 
+                versionList.reverse();
 
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.getPlanningUnit();
-                    })
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
                 }
 
@@ -756,10 +769,16 @@ class ShipmentSummery extends Component {
         let versionId = document.getElementById("versionId").value;
         this.setState({
             planningUnits: [],
-            planningUnitValues: []
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
             if (versionId == 0) {
-                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+                this.setState({
+                    message: i18n.t('static.program.validversion'), data: [],
+                    shipmentDetailsList: [],
+                    shipmentDetailsFundingSourceList: [],
+                    shipmentDetailsMonthList: []
+                });
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
@@ -907,18 +926,39 @@ class ShipmentSummery extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
         })
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.getPlanningUnit();
-        })
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if ((this.state.shipmentDetailsList.length != 0 && this.state.shipmentDetailsFundingSourceList.length != 0 && this.state.shipmentDetailsMonthList.length != 0)) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
     }
 
     fetchData = () => {
@@ -1249,13 +1289,13 @@ class ShipmentSummery extends Component {
 
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
 
         } else if (this.state.planningUnitValues.length == 0) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
         }
     }
 
