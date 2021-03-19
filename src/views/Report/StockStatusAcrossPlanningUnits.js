@@ -614,7 +614,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 versionList.reverse();
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
 
-                    let versionVar = versionList.filter(c => c.versionId === localStorage.getItem("sesVersionIdReport"));
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
                     if (versionVar != '' && versionVar != undefined) {
                         this.setState({
                             versions: versionList,
@@ -721,8 +721,10 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion()
         })
     }

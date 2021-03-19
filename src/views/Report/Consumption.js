@@ -1171,7 +1171,7 @@ class Consumption extends Component {
 
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
 
-          let versionVar = versionList.filter(c => c.versionId === localStorage.getItem("sesVersionIdReport"));
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
           if (versionVar != '' && versionVar != undefined) {
             this.setState({
               versions: versionList,
@@ -1213,32 +1213,49 @@ class Consumption extends Component {
 
   setProgramId(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
 
   setVersionId(event) {
-    this.setState({
-      versionId: event.target.value
-    }, () => {
-      if (isSiteOnline()) {
-        if (this.state.consumptions.length != 0) {
-          localStorage.setItem("sesVersionIdReport", this.state.versionId);
-          this.filterData();
-        } else {
-          this.getPlanningUnit();
-        }
-      } else {
-        if (this.state.offlineConsumptionList.length != 0) {
-          localStorage.setItem("sesVersionIdReport", this.state.versionId);
-          this.filterData();
-        } else {
-          this.getPlanningUnit();
-        }
-      }
-    })
+    // this.setState({
+    //   versionId: event.target.value
+    // }, () => {
+    //   if (isSiteOnline()) {
+    //     if (this.state.consumptions.length != 0) {
+    //       localStorage.setItem("sesVersionIdReport", this.state.versionId);
+    //       this.filterData();
+    //     } else {
+    //       this.getPlanningUnit();
+    //     }
+    //   } else {
+    //     if (this.state.offlineConsumptionList.length != 0) {
+    //       localStorage.setItem("sesVersionIdReport", this.state.versionId);
+    //       this.filterData();
+    //     } else {
+    //       this.getPlanningUnit();
+    //     }
+    //   }
+    // })
+
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        this.getPlanningUnit();
+      })
+    }
   }
 
   toggle() {

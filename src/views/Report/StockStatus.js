@@ -131,17 +131,33 @@ class StockStatus extends Component {
 
   programChange(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
       console.log("ProgramId-------->1", this.state.programId);
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
 
   versionChange(event) {
-    this.setState({
-      versionId: event.target.value
-    })
+    // this.setState({
+    //   versionId: event.target.value
+    // })
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        this.getPlanningUnit();
+      })
+    }
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -920,30 +936,50 @@ class StockStatus extends Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+
         if (verList.length == 1) {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
+            versions: versionList,
             versionId: verList[0].versionId
           }, () => {
             this.getPlanningUnit();
           })
         } else if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
-          }, () => {
-            this.getPlanningUnit();
-          })
+          // this.setState({
+          //   versions: versionList,
+          //   versionId: localStorage.getItem("sesVersionIdReport")
+          // }, () => {
+          //   this.getPlanningUnit();
+          // })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar.length != 0) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
         }
 
@@ -1543,7 +1579,8 @@ class StockStatus extends Component {
                               id="versionId"
                               bsSize="sm"
                               // onChange={(e) => { this.getPlanningUnit(); }}
-                              onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              // onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              onChange={(e) => { this.versionChange(e); }}
                               value={this.state.versionId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>

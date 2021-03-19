@@ -649,7 +649,7 @@ class StockStatusOverTime extends Component {
                 versionList.reverse();
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
 
-                    let versionVar = versionList.filter(c => c.versionId === localStorage.getItem("sesVersionIdReport"));
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
                     if (versionVar != '' && versionVar != undefined) {
                         this.setState({
                             versions: versionList,
@@ -804,8 +804,10 @@ class StockStatusOverTime extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
             this.updateMonthsforAMCCalculations()
         })
@@ -813,17 +815,32 @@ class StockStatusOverTime extends Component {
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            if (this.state.matricsList.length != 0) {
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.matricsList.length != 0) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+
+        // })
+
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
                 localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 this.fetchData();
-            } else {
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
                 this.getPlanningUnit();
-            }
-
-        })
+            })
+        }
 
     }
 
