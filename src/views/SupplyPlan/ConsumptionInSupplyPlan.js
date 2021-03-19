@@ -370,6 +370,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                                             cell.classList.remove('readonly');
                                         }
+
+                                        if (rowData[15] > 0) {
+                                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                            cell.classList.add('readonly');
+                                        } else {
+                                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                            cell.classList.remove('readonly');
+                                        }
                                     }
                                     lastY = y;
                                 } else {
@@ -380,13 +388,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                                         cell.classList.remove('readonly');
                                     }
-                                }
-                                if (rowData[15] > 0) {
-                                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                    cell.classList.add('readonly');
-                                } else {
-                                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                    cell.classList.remove('readonly');
+
+                                    if (rowData[15] > 0) {
+                                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                        cell.classList.add('readonly');
+                                    } else {
+                                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                        cell.classList.remove('readonly');
+                                    }
                                 }
                             }
                         }.bind(this),
