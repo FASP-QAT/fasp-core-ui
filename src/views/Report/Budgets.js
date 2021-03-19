@@ -299,19 +299,7 @@ class Budgets extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-    formatter = value => {
 
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
@@ -541,11 +529,13 @@ class Budgets extends Component {
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
                                     fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
                                     currency: budgetList[l].currency,
-                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd), // 1000000,
-                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd), // 1000000,
+                                    // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    // orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
+                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
                                     startDate: budgetList[l].startDate,
                                     stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt // 1000000
+                                    budgetAmt: budgetList[l].budgetAmt
 
                                 }
 
@@ -1051,6 +1041,24 @@ class Budgets extends Component {
         // return currencyCode + "    " + x1 + x2;
         return x1 + x2
     }
+
+    formatter = value => {
+        if (value != null) {
+            var cell1 = parseFloat(value).toFixed(2)
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else {
+            return ''
+        }
+    }
+
     handleChangeProgram = (programIds) => {
 
         this.setState({
@@ -1219,43 +1227,53 @@ class Budgets extends Component {
             },
             {
                 dataField: 'budgetAmt',
-                text: i18n.t('static.budget.budgetamount'),// + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.budget.budgetamount'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundNStr
+                // formatter: this.roundN
+                formatter: this.formatter
             },
             {
                 dataField: 'plannedBudgetAmt',
-                text: i18n.t('static.report.plannedBudgetAmt'),// + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.plannedBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundNStr,
+                // formatter: this.roundN,
+                formatter: this.formatter,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.orderedBudgetAmt'),// + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.orderedBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundNStr,
+                // formatter: this.roundN,
+                formatter: this.formatter,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.remainingBudgetAmt'),// + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.remainingBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
+                // formatter: (cell, row) => {
+                //     return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                // }
                 formatter: (cell, row) => {
-                    return this.roundNStr(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                    return (row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt)).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                 }
             },
 
