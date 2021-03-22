@@ -415,20 +415,25 @@ export default class ConsumptionDetails extends React.Component {
                         var changedProblemsList = json.filter(c => c[21] == 1);
                         var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
                         let problemList = this.state.data;
+                        let problemReportListForUpdate=this.state.problemReportListForUpdate;
                         problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
                         console.log("changedProblemsList+++", changedProblemsList);
                         for (var i = 0; i < changedProblemsList.length; i++) {
                             if ((changedProblemsList[i])[0] != 0) {
-                                var indexToUpdate = problemList.findIndex(c =>
+                                console.log("in if+++");
+                                var indexToUpdate = problemReportListForUpdate.findIndex(c =>
                                     c.problemReportId == (changedProblemsList[i])[0]
                                 );
                             } else {
-                                console.log("in else===>", (changedProblemsList[i])[1]);
+                                console.log("in else+++", (changedProblemsList[i])[1]);
+                                // var indexToUpdate = problemReportListForUpdate.findIndex(c =>
+                                //     c.problemActionIndex == (changedProblemsList[i])[1]
+                                // );
                                 var indexToUpdate = (changedProblemsList[i])[1];
                             }
 
-                            var probObj = problemList[indexToUpdate];
-                            var probObj = (changedProblemsList[i])[0] != 0 ? problemList.filter(c => c.problemReportId == indexToUpdate)[0] : problemList.filter(c => c.problemActionIndex == indexToUpdate)[0];
+                            var probObj = problemReportListForUpdate[indexToUpdate];
+                            // var probObj = (changedProblemsList[i])[0] != 0 ? problemList.filter(c => c.problemReportId == indexToUpdate)[0] : problemList.filter(c => c.problemActionIndex == indexToUpdate)[0];
                             var probTransList = probObj.problemTransList;
                             var changedProblemStatusId = parseInt((changedProblemsList[i])[10]);
                             var statusObj = this.state.problemListForUpdate.filter(c => parseInt(c.id) == changedProblemStatusId)[0];
@@ -448,12 +453,12 @@ export default class ConsumptionDetails extends React.Component {
                             probObj.reviewed = false;
                             var problemStatusObject = statusObj
                             probObj.problemStatus = problemStatusObject;
-                            problemList[indexToUpdate] = probObj;
+                            problemReportListForUpdate[indexToUpdate] = probObj;
                         }
                         //=========================================================================
-                        programJson.problemReportList = problemList;
-                        var openCount = (problemList.filter(c => c.problemStatus.id == 1)).length;
-                        var addressedCount = (problemList.filter(c => c.problemStatus.id == 3)).length;
+                        programJson.problemReportList = problemReportListForUpdate;
+                        var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
+                        var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                         programQPLDetails.openCount = openCount;
                         programQPLDetails.addressedCount = addressedCount;
                         programObj.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -1133,7 +1138,8 @@ export default class ConsumptionDetails extends React.Component {
 
                     this.setState({
                         data: problemReportFilterList,
-                        message: ''
+                        message: '',
+                        problemReportListForUpdate:problemReportList
                     },
                         () => {
                             this.buildJExcel();
