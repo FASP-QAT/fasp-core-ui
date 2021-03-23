@@ -574,22 +574,38 @@ class ForcastMatrixOverTime extends Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
 
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
-          }, () => {
-            this.getPlanningUnit();
-          })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
+
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
         }
 
@@ -749,8 +765,10 @@ class ForcastMatrixOverTime extends Component {
 
   setProgramId(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
@@ -759,7 +777,12 @@ class ForcastMatrixOverTime extends Component {
     this.setState({
       versionId: event.target.value
     }, () => {
-      this.getPlanningUnit();
+      if (this.state.matricsList.length != 0) {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.fetchData();
+      } else {
+        this.getPlanningUnit();
+      }
     })
   }
 
