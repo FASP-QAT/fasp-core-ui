@@ -497,18 +497,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var options = {
                                             data: shipmentsArr,
                                             columns: [
-                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80,readOnly:!shipmentEditable },
+                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                 { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 150 },
                                                 { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
-                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80,readOnly:!shipmentEditable },
+                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100, readOnly: true },
                                                 { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100,readOnly:!shipmentEditable },
+                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
@@ -1869,13 +1869,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
 
-        if (x == 20) {
-            if (rowData[20].length > 600) {
-                inValid("U", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-            } else {
-                positiveValidation("U", y, elInstance);
-            }
-        }
+        // if (x == 20) {
+        //     if (rowData[20].length > 600) {
+        //         inValid("U", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+        //     } else {
+        //         positiveValidation("U", y, elInstance);
+        //     }
+        // }
 
         if (x == 5) {
             var valid = checkValidtion("text", "F", y, rowData[5], elInstance);
@@ -2893,12 +2893,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(31, y, 1, true);
                 }
 
-                if (rowData[20].length > 600) {
-                    inValid("U", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                    valid = false;
-                } else {
-                    positiveValidation("U", y, elInstance);
-                }
+                // if (rowData[20].length > 600) {
+                //     inValid("U", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                //     valid = false;
+                // } else {
+                //     positiveValidation("U", y, elInstance);
+                // }
 
                 var validation = checkValidtion("text", "F", y, rowData[5], elInstance);
                 if (validation == false) {
@@ -3024,8 +3024,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var shipmentDataList = (programJson.shipmentList);
                     var actionList = programJson.actionList;
                     if (actionList == undefined) {
-                                            actionList = []
-                                        }
+                        actionList = []
+                    }
                     var planningUnitId = document.getElementById("planningUnitId").value
                     var batchInfoList = (programJson.batchInfoList);
                     var minDate = "";

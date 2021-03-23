@@ -800,11 +800,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 9) {
-            if (rowData[9].length > 600) {
-                inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-            } else {
-                positiveValidation("J", y, elInstance);
-            }
+            // if (rowData[9].length > 600) {
+            //     inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            // } else {
+            //     positiveValidation("J", y, elInstance);
+            // }
         }
         if (x == 2) {
             var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
@@ -1235,12 +1235,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             }
                         }
 
-                        if (rowData[9].length > 600) {
-                            inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                            valid = false;
-                        } else {
-                            positiveValidation("J", y, elInstance);
-                        }
+                        // if (rowData[9].length > 600) {
+                        //     inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                        //     valid = false;
+                        // } else {
+                        //     positiveValidation("J", y, elInstance);
+                        // }
 
                         validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                         console.log("A--------------------> Validation 2", validation);
