@@ -9,7 +9,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
     if (page == 'masterDataSync' && !rebuild) {
         // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-            problemListChild.qatProblemActions(programId, "loading",true);
+            problemListChild.qatProblemActions(programId, "loading", true);
         } else {
             props.fetchData(1);
         }
@@ -903,6 +903,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var mos = "";
                                     if (closingBalance != 0 && amc != 0) {
                                         mos = Number(closingBalance / amc).toFixed(4);
+                                    } else if (amc == 0) {
+                                        mos = null;
                                     } else {
                                         mos = 0;
                                     }
@@ -951,7 +953,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         nationalAdjustmentWps: nationalAdjustmentWps,
                                         expectedStock: expectedStock,
                                         expectedStockWps: expectedStockWps,
-                                        regionCountForStock: regionsReportingActualInventory
+                                        regionCountForStock: regionsReportingActualInventory,
+                                        regionCount:totalNoOfRegions
                                     }
                                     supplyPlanData.push(json);
                                 }
@@ -1053,7 +1056,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == 'masterDataSync') {
                                     // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
                                     if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-                                        problemListChild.qatProblemActions(programId, "loading",true);
+                                        problemListChild.qatProblemActions(programId, "loading", true);
                                     } else {
                                         props.fetchData(1)
                                     }

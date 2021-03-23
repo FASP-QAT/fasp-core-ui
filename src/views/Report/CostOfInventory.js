@@ -331,26 +331,60 @@ export default class CostOfInventory extends Component {
 
                 }
 
-                console.log(verList)
-                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        console.log("VERSIONID-----", this.state.versionId);
-                        // this.dataChange(e); 
-                        let costOfInventoryInput = this.state.CostOfInventoryInput;
-                        costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
-                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                console.log(verList);
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
 
-                    })
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    // this.setState({
+                    //     versions: versionList,
+                    //     versionId: localStorage.getItem("sesVersionIdReport")
+                    // }, () => {
+                    //     console.log("VERSIONID-----", this.state.versionId);
+                    //     // this.dataChange(e); 
+                    //     let costOfInventoryInput = this.state.CostOfInventoryInput;
+                    //     costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                    //     this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+
+                    // })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar.length != 0) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            console.log("VERSIONID-----", this.state.versionId);
+                            // this.dataChange(e); 
+                            let costOfInventoryInput = this.state.CostOfInventoryInput;
+                            costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            console.log("VERSIONID-----", this.state.versionId);
+                            // this.dataChange(e); 
+                            let costOfInventoryInput = this.state.CostOfInventoryInput;
+                            costOfInventoryInput.versionId = versionList[0].versionId;
+                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        })
+                    }
+
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        // this.dataChange(e); 
+                        let costOfInventoryInput = this.state.CostOfInventoryInput;
+                        costOfInventoryInput.versionId = versionList[0].versionId;
+                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+
                     })
                 }
 
@@ -564,8 +598,10 @@ export default class CostOfInventory extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             // this.dataChange(event);
             let costOfInventoryInput = this.state.CostOfInventoryInput;
             costOfInventoryInput.programId = this.state.programId;
@@ -810,6 +846,13 @@ export default class CostOfInventory extends Component {
                     });
                 }).catch(
                     error => {
+                        this.setState({
+                            costOfInventory: [],
+                            loading: false
+                        }, () => {
+                            this.el = jexcel(document.getElementById("tableDiv"), '');
+                            this.el.destroy();
+                        });
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
