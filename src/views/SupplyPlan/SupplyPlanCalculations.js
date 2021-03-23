@@ -953,7 +953,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         nationalAdjustmentWps: nationalAdjustmentWps,
                                         expectedStock: expectedStock,
                                         expectedStockWps: expectedStockWps,
-                                        regionCountForStock: regionsReportingActualInventory
+                                        regionCountForStock: regionsReportingActualInventory,
+                                        regionCount:totalNoOfRegions
                                     }
                                     supplyPlanData.push(json);
                                 }
