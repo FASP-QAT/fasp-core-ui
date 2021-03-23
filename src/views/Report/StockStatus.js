@@ -131,23 +131,39 @@ class StockStatus extends Component {
 
   programChange(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
       console.log("ProgramId-------->1", this.state.programId);
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
 
   versionChange(event) {
-    this.setState({
-      versionId: event.target.value
-    })
+    // this.setState({
+    //   versionId: event.target.value
+    // })
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        this.getPlanningUnit();
+      })
+    }
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   roundN = num => {
-    if (num != '') {
+    if (num !== '') {
       return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
@@ -228,7 +244,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
+      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -337,7 +353,7 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
+        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -920,30 +936,50 @@ class StockStatus extends Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+
         if (verList.length == 1) {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
+            versions: versionList,
             versionId: verList[0].versionId
           }, () => {
             this.getPlanningUnit();
           })
         } else if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
-          }, () => {
-            this.getPlanningUnit();
-          })
+          // this.setState({
+          //   versions: versionList,
+          //   versionId: localStorage.getItem("sesVersionIdReport")
+          // }, () => {
+          //   this.getPlanningUnit();
+          // })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar.length != 0) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
         }
 
@@ -1421,7 +1457,7 @@ class StockStatus extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (this.roundN(item.mos)))
+          data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
         }
         , {
           type: "line",
@@ -1543,7 +1579,8 @@ class StockStatus extends Component {
                               id="versionId"
                               bsSize="sm"
                               // onChange={(e) => { this.getPlanningUnit(); }}
-                              onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              // onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              onChange={(e) => { this.versionChange(e); }}
                               value={this.state.versionId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
@@ -1659,7 +1696,7 @@ class StockStatus extends Component {
                               {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
                             </td>
                             <td>
-                              {this.roundN(this.state.stockStatusList[idx].mos)}
+                              {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
                             </td>
                             <td>
                               {this.roundN(this.state.stockStatusList[idx].minMos)}
