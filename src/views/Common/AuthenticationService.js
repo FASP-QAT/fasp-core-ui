@@ -442,7 +442,12 @@ class AuthenticationService {
     authenticatedRoute(route) {
         console.log("route---" + route);
 
-
+        localStorage.setItem("isOfflinePage", 0);
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId"];
+        if (urlarr.includes(route)) {
+            localStorage.setItem("isOfflinePage", 1);
+        }
+        console.log("offline 1---------------")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             console.log("cur user available");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -856,12 +861,16 @@ class AuthenticationService {
                     break;
                 case "/consumptionDetails":
                     if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 2---------------")
                         return true;
                     }
                     break;
                 case "/inventory/addInventory":
                 case "/inventory/addInventory/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_INVENTORY_DATA")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 3---------------")
                         return true;
                     }
                     break;
@@ -879,6 +888,8 @@ class AuthenticationService {
                 case "/shipment/shipmentDetails/:message":
                 case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_SHIPMENT_DATA")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 4---------------")
                         return true;
                     }
                     break;
@@ -912,6 +923,8 @@ class AuthenticationService {
                 case "/supplyPlanFormulas":
                 case "/supplyPlan/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 5---------------")
                         return true;
                     }
                     break;

@@ -36,7 +36,12 @@ export default class AuthenticationServiceComponent extends Component {
         var result = AuthenticationService.validateRequest();
         console.log("result----" + result);
         if (result != "") {
-            this.props.history.push(result)
+            if (result == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
+                console.log("offline 6---------------")
+            } else {
+                this.props.history.push(result)
+            }
+
         } else if (isSiteOnline()) {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
@@ -51,9 +56,19 @@ export default class AuthenticationServiceComponent extends Component {
                 console.log("result1----" + result1);
                 let url = config.url;
                 console.log("url---", url);
-                if (result1 != null && result1 != "" && !url.includes("api/sync/language") && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
-                    this.props.history.push(result1)
+                console.log("offline 12---------------", localStorage.getItem("isOfflinePage"))
+                
+                if (result1 != null && result1 != "") {
+                    console.log("isOfflinePage---",localStorage.getItem("isOfflinePage"));
+                    if (result1 == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
+                        console.log("offline 7---------------")
+                    }
+                    else if (!url.includes("api/sync/language") && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
+                        this.props.history.push(result1)
+                    }
+                    
                 }
+                console.log("offline 11---------------")
                 return config;
             }, (error) => {
                 console.log("common request axios interceptors error--->", error);
