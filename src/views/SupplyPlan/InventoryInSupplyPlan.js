@@ -1562,7 +1562,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         actionList = []
                     }
                     var minDate = "";
-                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var curUser = AuthenticationService.getLoggedInUserId();
                     var username = AuthenticationService.getLoggedInUsername();
                     for (var i = 0; i < json.length; i++) {
