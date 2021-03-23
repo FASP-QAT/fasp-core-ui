@@ -1325,7 +1325,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var minDateForcastedConsumption = "";
                     var actualConsumptionModified = 0;
                     var forecastedConsumptionModified = 0;
-                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var curUser = AuthenticationService.getLoggedInUserId();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
