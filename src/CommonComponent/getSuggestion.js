@@ -80,8 +80,10 @@ export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 3) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Received by now
         // Please check to make sure shipment id <%SHIPMENT_ID%>  for product <%PLANNING_UNIT%> was received, and update either the receive date or the shipment status.
-
-
+        console.log("===", row.data5);
+        if (row.data5 != "") {
+            var obj = JSON.parse(row.data5);
+        }
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -90,16 +92,16 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_pr = result_pr;
         }
 
@@ -108,6 +110,10 @@ export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 4) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Submitted by now
         // Please check to make sure shipment id <%SHIPMENT_ID%>   for product <%PLANNING_UNIT%> was submitted, and update either the receive date or the shipment status.
+        console.log("===", row.data5);
+        if (row.data5 != "") {
+            var obj = JSON.parse(row.data5);
+        }
 
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
@@ -117,16 +123,16 @@ export default function getSuggestion(row, lang) {
         var label = row.realmProblem.problem.actionLabel;
 
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_en = desc_en.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_fr = desc_fr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");;
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_sp = desc_sp.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
+            const result_pr = desc_pr.split('<%SHIPMENT_ID%>').join(row.shipmentId).split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%PROCUREMNET_AGENT%>').join(row.data5 != "" ? obj.procurementAgentCode : "").split('<%RO_NO%>').join(row.data5 != "" ? (obj.orderNo == null ? "" : obj.orderNo) : "").split('<%SHIPMENT_QTY%>').join(row.data5 != "" ? obj.shipmentQuantity : "").split('<%SHIPMENT_DATE%>').join(row.data5 != "" ? moment(obj.shipmentDate).format("MMM-DD, YYYY") : "");
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
