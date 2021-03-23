@@ -507,7 +507,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -704,10 +704,10 @@ class ListBudgetComponent extends Component {
       data[6] = parseFloat(budgetList[j].budgetAmt).toFixed(2);
       data[7] = (budgetList[j].usedUsdAmt).toFixed(2);
       data[8] = (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2);
-      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
+      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
       data[11] = budgetList[j].lastModifiedBy.username;
-      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null)
       // data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       // data[10] = budgetList[j].budgetAmt;
       // data[11] = budgetList[j].usedUsdAmt;
@@ -789,12 +789,14 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.startdate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
           title: i18n.t('static.common.stopdate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
@@ -804,7 +806,8 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
