@@ -25,6 +25,8 @@ import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions
 import { getDatabase } from "../../../CommonComponent/IndexedDbFunctions";
 import MasterSyncService from '../../../api/MasterSyncService.js';
 import getLabelText from '../../../CommonComponent/getLabelText';
+// import momentTimeZone from 'moment-timezone';
+// require('moment-timezone');
 
 
 
@@ -88,6 +90,10 @@ class Login extends Component {
     this.changeLanguage = this.changeLanguage.bind(this);
     this.getLanguageList = this.getLanguageList.bind(this);
     this.getAllLanguages = this.getAllLanguages.bind(this);
+    this.convertTZ = this.convertTZ.bind(this);
+  }
+  convertTZ(date, tzString) {
+    return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", { timeZone: tzString }));
   }
   getAllLanguages() {
     var db1;
@@ -236,6 +242,9 @@ class Login extends Component {
   }
 
   componentDidMount() {
+
+    console.log("timezone---",this.convertTZ(new Date(), "America/New_York"));
+    // here you can paste "your time zone string"
     // console.log("############## Login component did mount #####################");
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
@@ -582,8 +591,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                                                                                                                                                    official U.S. government information and does not represent the views or positions of the
-                                                                                                                                                                                    Agency for International Development or the U.S. government.
+                                                                                                                                                                                            official U.S. government information and does not represent the views or positions of the
+                                                                                                                                                                                            Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
