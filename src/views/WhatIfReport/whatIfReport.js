@@ -1578,7 +1578,7 @@ export default class WhatIfReportComponent extends React.Component {
         senheaders.push((i18n.t('static.whatIf.percentage')).replaceAll(' ', '%20'))
         var B = [senheaders]
 
-        this.state.rows.map(
+        this.state.rows.filter(c => c.scenarioChecked == true).map(
             ele => B.push(this.addDoubleQuoteToRowContent([
                 (ele.scenarioName).replaceAll(' ', '%20'),
                 (ele.startDate).replaceAll(' ', '%20'),
@@ -1762,7 +1762,7 @@ export default class WhatIfReportComponent extends React.Component {
         senHeaders.push(i18n.t('static.common.stopdate'));
         senHeaders.push(i18n.t('static.whatIf.percentage'));
 
-        let senData = this.state.rows.map(ele => [
+        let senData = this.state.rows.filter(c => c.scenarioChecked == true).map(ele => [
             ele.scenarioName,
             ele.startDate,
             ele.stopDate,
@@ -3968,9 +3968,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Table responsive>
                                     <thead>
                                         <tr>
-                                            {/* // Commented the CR */}
-                                            {/* <th></th> */}
-                                            {/* // Commented the CR */}
+                                            <th></th>
                                             <th className="text-left">{i18n.t('static.whatIf.scenario')}</th>
                                             <th className="text-left">{i18n.t('static.common.startdate')}</th>
                                             <th className="text-left">{i18n.t('static.common.stopdate')}</th>
@@ -3981,9 +3979,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
-                                                    {/* // Commented the CR */}
-                                                    {/* <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td> */}
-                                                    {/* // Commented the CR */}
+                                                    <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td>
                                                     <td>{this.state.rows[idx].scenarioName}</td>
                                                     <td>{moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                     <td>{moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
