@@ -2883,7 +2883,7 @@ export default class syncPage extends Component {
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
         moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE) {
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
