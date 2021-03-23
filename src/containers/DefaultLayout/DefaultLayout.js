@@ -909,7 +909,7 @@ class DefaultLayout extends Component {
   render() {
     // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
     return (
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
