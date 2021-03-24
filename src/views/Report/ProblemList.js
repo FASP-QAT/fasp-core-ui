@@ -168,7 +168,7 @@ export default class ConsumptionDetails extends React.Component {
                         programId: proList[0].id
                     }, () => {
                         if (this.state.programId != '' && this.state.programId != undefined) {
-                                this.fetchData();
+                            this.fetchData();
                         }
                     })
                 } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
@@ -184,8 +184,8 @@ export default class ConsumptionDetails extends React.Component {
                             // if (needToCalculate == "false") {
                             //     this.fetchData();
                             // } else {
-                                // this.getProblemListAfterCalculation();
-                                this.fetchData();
+                            // this.getProblemListAfterCalculation();
+                            this.fetchData();
 
                             // }
                         }
@@ -487,7 +487,7 @@ export default class ConsumptionDetails extends React.Component {
                 if (y != null) {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
                     // if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
-                        if (obj.options.allowInsertRow == true) {
+                    if (obj.options.allowInsertRow == true) {
                         items.push({
                             title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
@@ -573,7 +573,8 @@ export default class ConsumptionDetails extends React.Component {
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
-                this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                // this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang) == null ? "" : this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
                 ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
                 (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
@@ -808,7 +809,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
-            this.refs.problemListChild.qatProblemActions(programId, "loading",false);
+            this.refs.problemListChild.qatProblemActions(programId, "loading", false);
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
         }
