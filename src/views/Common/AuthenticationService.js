@@ -128,13 +128,13 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let sessionType = localStorage.getItem('sessionType');
-        let checkSite=isSiteOnline();
-        if (checkSite && sessionType === 'Offline') {
+        let typeOfSession = localStorage.getItem('typeOfSession');
+        let checkSite = isSiteOnline();
+        if (checkSite && sessionType === 'Offline' && typeOfSession === 'Online') {
             localStorage.setItem("sessionType", 'Online')
-        } else if(!checkSite && sessionType === 'Online'){
+        } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        let typeOfSession = localStorage.getItem('typeOfSession');
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite)) {
             return true;
         } else {
