@@ -741,7 +741,7 @@ class EditBudgetComponent extends Component {
                                                             id="notes"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
-                                                            maxLength={600}
+                                                            // maxLength={600}
                                                             type="textarea"
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>

@@ -910,7 +910,7 @@ export default class EditLanguageComponent extends Component {
                                                                 <Label for="problemDescription">Suggestion</Label>
                                                                 <Input
                                                                     type="textarea"
-                                                                    maxLength={600}
+                                                                    // maxLength={600}
                                                                     name="problemSuggestion"
                                                                     id="problemSuggestion"
                                                                     bsSize="sm"
@@ -1062,7 +1062,7 @@ export default class EditLanguageComponent extends Component {
                                                                     name="notes"
                                                                     id="notes"
                                                                     bsSize="sm"
-                                                                    maxLength={600}
+                                                                    // maxLength={600}
                                                                     autocomplete="off"
                                                                     valid={!errors.notes}
                                                                     invalid={touched.notes && !!errors.notes || this.state.problemReport.problemStatus.id == 3 ? this.state.notes == '' : false}
