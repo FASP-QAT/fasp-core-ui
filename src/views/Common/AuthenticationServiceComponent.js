@@ -55,11 +55,9 @@ export default class AuthenticationServiceComponent extends Component {
                 var result1 = AuthenticationService.validateRequest();
                 console.log("result1----" + result1);
                 let url = config.url;
-                console.log("url---", url);
-                console.log("offline 12---------------", localStorage.getItem("isOfflinePage"))
+                // console.log("url---", url);
                 
                 if (result1 != null && result1 != "") {
-                    console.log("isOfflinePage---",localStorage.getItem("isOfflinePage"));
                     if (result1 == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
                         console.log("offline 7---------------")
                     }
@@ -68,7 +66,6 @@ export default class AuthenticationServiceComponent extends Component {
                     }
                     
                 }
-                console.log("offline 11---------------")
                 return config;
             }, (error) => {
                 console.log("common request axios interceptors error--->", error);
