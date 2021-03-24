@@ -273,7 +273,7 @@ class DefaultHeaderDropdown extends Component {
   // }
 
   dropAccnt() {
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>

@@ -2473,7 +2473,7 @@ class ProcurementAgentExport extends Component {
                 text: 'All', value: this.state.selRegion.length
             }]
         }
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

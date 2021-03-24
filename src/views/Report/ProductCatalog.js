@@ -1322,7 +1322,7 @@ class ProductCatalog extends Component {
                 text: 'All', value: this.state.outPutList.length
             }]
         }
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
 
         return (
             <div className="animated fadeIn" >
