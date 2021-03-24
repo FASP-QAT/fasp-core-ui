@@ -831,7 +831,7 @@ export default class ConsumptionDetails extends React.Component {
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
-                this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang) == null ? '' :  this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
                 ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
                 (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
