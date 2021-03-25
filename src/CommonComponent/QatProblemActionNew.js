@@ -254,6 +254,7 @@ export default class QatProblemActionNew extends Component {
                                                 if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD")) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
+                                                         || moment(c.createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD")
                                                     );
                                                 }
 
@@ -307,7 +308,7 @@ export default class QatProblemActionNew extends Component {
                                                         });
                                                         // console.log("actionTypeIds+++", actionTypeIds);
                                                         var typeProblemList = problemList;
-                                                        if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM")) {
+                                                        if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && !(moment(planningUnitList[p].createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD"))) {
                                                             typeProblemList = problemList.filter(
                                                                 c =>
                                                                     (actionTypeIds.includes(FORECASTED_CONSUMPTION_MODIFIED) && c.problem.forecastedConsumptionTrigger) ||
