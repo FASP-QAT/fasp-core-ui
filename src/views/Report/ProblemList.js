@@ -711,6 +711,7 @@ export default class ConsumptionDetails extends React.Component {
                     // console.log("in context menue===>", this.el.getValueFromCoords(12, y));
                     // if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
                     if (obj.options.allowInsertRow == true) {
+<<<<<<< HEAD
                         // items.push({
                         //     title: i18n.t('static.report.problemDescription'),
                         //     onclick: function () {
@@ -718,6 +719,8 @@ export default class ConsumptionDetails extends React.Component {
                         //         this.toggleProblemDetails(rowData[0], rowData[1]);
                         //     }.bind(this)
                         // });
+=======
+>>>>>>> QAT-673
                         items.push({
                             title: i18n.t('static.report.problemTransDetails'),
                             onclick: function () {
@@ -831,7 +834,8 @@ export default class ConsumptionDetails extends React.Component {
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
-                this.getNote(ele, this.state.lang) == null ? '' :  this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                // this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang) == null ? "" : this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
                 ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
                 (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
