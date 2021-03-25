@@ -711,7 +711,6 @@ export default class ConsumptionDetails extends React.Component {
                     // console.log("in context menue===>", this.el.getValueFromCoords(12, y));
                     // if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
                     if (obj.options.allowInsertRow == true) {
-<<<<<<< HEAD
                         // items.push({
                         //     title: i18n.t('static.report.problemDescription'),
                         //     onclick: function () {
@@ -719,8 +718,6 @@ export default class ConsumptionDetails extends React.Component {
                         //         this.toggleProblemDetails(rowData[0], rowData[1]);
                         //     }.bind(this)
                         // });
-=======
->>>>>>> QAT-673
                         items.push({
                             title: i18n.t('static.report.problemTransDetails'),
                             onclick: function () {
