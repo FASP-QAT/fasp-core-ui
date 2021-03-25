@@ -19,9 +19,12 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-import { polling } from '../../Constants';
+import {
+  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling
 
-const checkOnline = localStorage.getItem('typeOfSession');
+} from '../../Constants.js'
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -57,10 +60,12 @@ class DefaultHeaderDropdown extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.changeLanguage = this.changeLanguage.bind(this);
+    this.getLanguageList = this.getLanguageList.bind(this);
     this.state = {
       dropdownOpen: false,
       roleList: AuthenticationService.getLoggedInUserRole(),
       lang: localStorage.getItem('lang'),
+      languageList: [],
       message: ""
     };
 
@@ -75,7 +80,41 @@ class DefaultHeaderDropdown extends Component {
   dashboard() {
     this.props.history.push(`/ApplicationDashboard/`)
   }
+  getLanguageList() {
+    console.log("Hey anchal going to get languages for profile section")
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['language'], 'readwrite');
+      var program = transaction.objectStore('language');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var languageList = [];
+        languageList = getRequest.result;
+        console.log("my language list---", languageList);
+        this.setState({
+          languageList
+        });
+      }.bind(this);
+    }.bind(this)
 
+
+  }
   changeLanguage(lang) {
     console.log("Going to change language---", lang)
     localStorage.setItem('lang', lang);
@@ -83,14 +122,14 @@ class DefaultHeaderDropdown extends Component {
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (isSiteOnline()) {
-console.log("Going to change online")
+      console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {
           console.log("Going to change language api success---", lang)
           i18n.changeLanguage(lang)
           console.log("Going to change language reload location reload---")
-         
+
           var url = window.location.href;
           if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
             // "The specific word exists";
@@ -234,16 +273,17 @@ console.log("Going to change online")
   // }
 
   dropAccnt() {
+    const checkOnline = localStorage.getItem('typeOfSession');
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
 
-          <div className="avatar">
+          <div className="avatar" onClick={this.getLanguageList}>
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            {checkOnline === 'Online' && 
+            {checkOnline === 'Online' &&
               <span className="avatar-status badge-success" title="Online"></span>
             }
-            {checkOnline === 'Offline' &&  
+            {checkOnline === 'Offline' &&
               <span className="avatar-status badge-danger" title="Offline"></span>
             }
           </div>
@@ -265,12 +305,26 @@ console.log("Going to change online")
             )}
           </DropdownItem>
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
-          <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}><i className="flag-icon flag-icon-us"></i>
-            {localStorage.getItem('lang')==null||localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
+          {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
+            language =>
+            <>
+              
+              <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode)}>
+                <i className={"flag-icon flag-icon-"+language.countryCode}></i>
+                {localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == language.languageCode ? 
+                <b>{getLabelText(language.label,this.state.lang)}</b> 
+                : getLabelText(language.label,this.state.lang)}
+                  {/* {language.languageName} */}
+              </DropdownItem>
+            </>
+          )}
+          {/* <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}><i className="flag-icon flag-icon-us"></i>
+            {localStorage.getItem('lang') == null || localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
           </DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
           <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
-          <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem>
+          <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i>{localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem> */}
+
           {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
           {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>

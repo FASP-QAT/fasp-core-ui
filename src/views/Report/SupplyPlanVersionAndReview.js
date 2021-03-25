@@ -89,6 +89,7 @@ class SupplyPlanVersionAndReview extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+            programId:-1
 
 
 
@@ -109,6 +110,15 @@ class SupplyPlanVersionAndReview extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.setProgramId=this.setProgramId.bind(this);
+    }
+
+    setProgramId(event){
+        this.setState({
+            programId:event.target.value
+        },()=>{
+            this.fetchData();
+        })
     }
 
     hideFirstComponent() {
@@ -142,7 +152,7 @@ class SupplyPlanVersionAndReview extends Component {
             data[4] = matricsList[j].createdBy.username
             data[5] = matricsList[j].versionStatus.id == 1 ? "" : getLabelText(matricsList[j].versionStatus.label, this.state.lang);
             data[6] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedBy.username) : ''
-            data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : null) : null
+            data[7] = matricsList[j].versionStatus.id == 2 || matricsList[j].versionStatus.id == 3 ? (matricsList[j].lastModifiedDate ? moment(matricsList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null) : null
             data[8] = matricsList[j].notes
             data[9] = matricsList[j].versionType.id
             data[10] = matricsList[j].versionStatus.id
@@ -201,8 +211,9 @@ class SupplyPlanVersionAndReview extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
-                    type: 'text',
-                    readOnly: true
+                    options:{isTime:1,format:"DD-Mon-YY HH24:MM PM"},
+                    readOnly: true,
+                    type:'calendar'
                 }, {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
@@ -432,7 +443,7 @@ class SupplyPlanVersionAndReview extends Component {
     }
     filterProgram = () => {
         let countryId = document.getElementById("countryId").value;
-        if (countryId != 0) {
+        if (countryId != 0 && countryId!=-1) {
             const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
             if (programLst.length > 0) {
 
@@ -444,6 +455,11 @@ class SupplyPlanVersionAndReview extends Component {
                     programLst: []
                 });
             }
+        }else if(countryId==-1){
+            const programLst = this.state.programs;
+            this.setState({
+                programLst: programLst
+            }, () => { this.fetchData() });
         }
     }
 
@@ -459,7 +475,7 @@ class SupplyPlanVersionAndReview extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    programs: listArray, loading: false
+                    programs: listArray, loading: false,programLst:listArray
                 })
             }).catch(
                 error => {
@@ -1223,7 +1239,8 @@ class SupplyPlanVersionAndReview extends Component {
                                                         name="programId"
                                                         id="programId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.fetchData(e) }}
+                                                        value={this.state.programId}
+                                                        onChange={(e) => { this.setProgramId(e) }}
 
 
                                                     >

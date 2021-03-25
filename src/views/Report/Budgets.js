@@ -458,6 +458,7 @@ class Budgets extends Component {
         if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length > 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
+                this.setState({ loading: true })
 
                 var db1;
                 getDatabase();
@@ -466,6 +467,12 @@ class Budgets extends Component {
                 var procurementAgentList = [];
                 var fundingSourceList = [];
                 var budgetList = [];
+
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -473,6 +480,11 @@ class Budgets extends Component {
                     var budgetOs = budgetTransaction.objectStore('budget');
                     var budgetRequest = budgetOs.getAll();
 
+                    budgetRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     budgetRequest.onsuccess = function (event) {
                         var budgetResult = [];
                         budgetResult = budgetRequest.result;
@@ -495,13 +507,19 @@ class Budgets extends Component {
                         var data = [];
                         var programRequest = programTransaction.get(program);
 
+                        programRequest.onerror = function (event) {
+                            this.setState({
+                                loading: false
+                            })
+                        }.bind(this);
                         programRequest.onsuccess = function (event) {
                             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
-                                var shipmentList = programJson.shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                                var shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                var shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
@@ -535,9 +553,33 @@ class Budgets extends Component {
                                 console.log("B** json ---", json);
                             }
                             console.log("B** data ---", data);
+
+                            data.sort(function (a, b) {
+                                var keyA = new Date(a.startDate),
+                                    keyB = new Date(b.startDate);
+                                // Compare the 2 dates
+                                if (keyA < keyB) return -1;
+                                if (keyA > keyB) return 1;
+                                return 0;
+                            });
+                            data.sort(function (a, b) {
+                                var keyA1 = new Date(a.startDate),
+                                    keyA11 = new Date(a.stopDate),
+                                    keyB1 = new Date(b.startDate),
+                                    keyB11 = new Date(b.stopDate);
+                                // Compare the 2 dates
+                                if (keyA1.getTime() === keyB1.getTime()) {
+                                    if (keyA11 < keyB11) return -1;
+                                    if (keyA11 > keyB11) return 1;
+                                }
+                                return 0;
+                            });
+
+                            console.log("data---->", data);
                             this.setState({
                                 selBudget: data,
-                                message: ''
+                                message: '',
+                                loading: false
                             })
 
 
@@ -888,20 +930,35 @@ class Budgets extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
+
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.filterData();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.filterData();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.filterData();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.filterData();
                     })
                 }
 
@@ -923,8 +980,10 @@ class Budgets extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
             this.filterData()
         })
