@@ -313,11 +313,21 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     filterProblemStatus = function (instance, cell, c, r, source) {
+
+        var hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                hasRole = true;
+
+            }
+        });
+
         var mylist = [];
         var json = instance.jexcel.getJson(null, false)
         mylist = this.state.problemStatusList;
-        mylist = mylist.filter(c => c.id != 4 && c.id != 2);
         // console.log(">>>",mylist);
+        mylist = hasRole == true ? mylist.filter(c => c.id != 4) : mylist.filter(c => c.id != 2 && c.id != 4);
+        console.log(">>>",mylist);
         return mylist;
     }.bind(this)
 
@@ -412,10 +422,17 @@ export default class ConsumptionDetails extends React.Component {
                         var json = elInstance.getJson();
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
+                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                        let username = decryptedUser.username;
+
+                        var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+
                         var changedProblemsList = json.filter(c => c[21] == 1);
                         var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
                         let problemList = this.state.data;
-                        let problemReportListForUpdate=this.state.problemReportListForUpdate;
+                        let problemReportListForUpdate = this.state.problemReportListForUpdate;
                         problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
                         console.log("changedProblemsList+++", changedProblemsList);
                         for (var i = 0; i < changedProblemsList.length; i++) {
@@ -434,6 +451,9 @@ export default class ConsumptionDetails extends React.Component {
 
                             var probObj = problemReportListForUpdate[indexToUpdate];
                             // var probObj = (changedProblemsList[i])[0] != 0 ? problemList.filter(c => c.problemReportId == indexToUpdate)[0] : problemList.filter(c => c.problemActionIndex == indexToUpdate)[0];
+                            probObj.lastModifiedBy = { userId: userId, username: username }
+                            probObj.lastModifiedDate = curDate;
+
                             var probTransList = probObj.problemTransList;
                             var changedProblemStatusId = parseInt((changedProblemsList[i])[10]);
                             var statusObj = this.state.problemListForUpdate.filter(c => parseInt(c.id) == changedProblemStatusId)[0];
@@ -444,9 +464,9 @@ export default class ConsumptionDetails extends React.Component {
                                 reviewed: false,
                                 createdBy: {
                                     userId: userId,
-                                    username: ''
+                                    username: username
                                 },
-                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                createdDate: curDate
                             }
                             probTransList.push(tempProblemTransObj);
                             probObj.problemTransList = probTransList;
@@ -499,8 +519,8 @@ export default class ConsumptionDetails extends React.Component {
                 problemCreatedDate = this.state.problemList.filter(c => c.problemReportId == problemReportId)[0].createdDate
             } else {
                 problemTransList = this.state.problemList.filter(c => c.problemActionIndex == problemActionIndex)[0].problemTransList;
-                problemType = getLabelText(this.state.problemList.filter(c => c.problemReportId == problemActionIndex)[0].problemType.label, this.state.lang)
-                problemCreatedDate = this.state.problemList.filter(c => c.problemReportId == problemActionIndex)[0].createdDate
+                problemType = getLabelText(this.state.problemList.filter(c => c.problemActionIndex == problemActionIndex)[0].problemType.label, this.state.lang)
+                problemCreatedDate = this.state.problemList.filter(c => c.problemActionIndex == problemActionIndex)[0].createdDate
             }
         }
         this.setState({
@@ -825,7 +845,7 @@ export default class ConsumptionDetails extends React.Component {
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
-                this.getNote(ele, this.state.lang) == null ? '' :  this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang) == null ? '' : this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
                 ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
                 (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
@@ -1139,7 +1159,7 @@ export default class ConsumptionDetails extends React.Component {
                     this.setState({
                         data: problemReportFilterList,
                         message: '',
-                        problemReportListForUpdate:problemReportList
+                        problemReportListForUpdate: problemReportList
                     },
                         () => {
                             this.buildJExcel();
