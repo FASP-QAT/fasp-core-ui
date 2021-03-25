@@ -527,6 +527,10 @@ class ListBudgetComponent extends Component {
       fundingSourceList: [],
       loading: true,
       programs: [],
+      programId: localStorage.getItem("sesBudPro") != "" ? localStorage.getItem("sesBudPro") : 0,
+      fundingSourceId: localStorage.getItem("sesBudFs") != "" ? localStorage.getItem("sesBudFs") : 0,
+      statusId: localStorage.getItem("sesBudStatus") != "" ? localStorage.getItem("sesBudStatus") : "true",
+
     }
 
     this.editBudget = this.editBudget.bind(this);
@@ -539,6 +543,36 @@ class ListBudgetComponent extends Component {
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
+    this.programChanged = this.programChanged.bind(this);
+    this.fundingSourceChanged = this.fundingSourceChanged.bind(this);
+    this.statusChanged = this.statusChanged.bind(this);
+  }
+
+  programChanged(event) {
+    localStorage.setItem("sesBudPro", event.target.value);
+    this.setState({
+      programId: event.target.value
+    }, () => {
+      this.filterData();
+    })
+  }
+
+  fundingSourceChanged(event) {
+    localStorage.setItem("sesBudFs", event.target.value);
+    this.setState({
+      fundingSourceId: event.target.value
+    }, () => {
+      this.filterData();
+    })
+  }
+
+  statusChanged(event) {
+    localStorage.setItem("sesBudStatus", event.target.value);
+    this.setState({
+      statusId: event.target.value
+    }, () => {
+      this.filterData();
+    })
   }
 
   hideFirstComponent() {
@@ -560,9 +594,9 @@ class ListBudgetComponent extends Component {
 
 
   filterData() {
-    let fundingSourceId = document.getElementById("fundingSourceId").value;
-    let programId = document.getElementById("programId").value;
-    var selStatus = document.getElementById("active").value;
+    let fundingSourceId = this.state.fundingSourceId;
+    let programId = this.state.programId;
+    var selStatus = this.state.statusId;
     let tempSelStatus = (selStatus == "true" ? true : false)
 
     if (fundingSourceId != 0 && programId != 0 && selStatus != "") {
@@ -1356,7 +1390,8 @@ class ListBudgetComponent extends Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.programId}
+                        onChange={(e) => this.programChanged(e)}
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {programList}
@@ -1374,7 +1409,8 @@ class ListBudgetComponent extends Component {
                         name="fundingSourceId"
                         id="fundingSourceId"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.fundingSourceId}
+                        onChange={(e) => this.fundingSourceChanged(e)}
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {fundingSources}
@@ -1391,7 +1427,8 @@ class ListBudgetComponent extends Component {
                         name="active"
                         id="active"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.statusId}
+                        onChange={(e) => this.statusChanged(e)}
                       >
                         <option value="">{i18n.t('static.common.all')}</option>
                         <option value="true" selected>{i18n.t('static.common.active')}</option>
