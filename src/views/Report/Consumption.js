@@ -1164,24 +1164,42 @@ class Consumption extends Component {
         }
 
         console.log(verList)
+        var versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        })
+        versionList.reverse();
 
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+              this.filterData()
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+              this.filterData()
+            })
+          }
+        } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
+            versions: versionList,
+            versionId: versionList[0].versionId
           }, () => {
             this.getPlanningUnit();
             this.filterData()
           })
-        } else {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
-          }, () => { this.filterData() })
         }
+
+
 
 
       }.bind(this);
@@ -1195,18 +1213,49 @@ class Consumption extends Component {
 
   setProgramId(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
 
   setVersionId(event) {
-    this.setState({
-      versionId: event.target.value
-    }, () => {
-      this.getPlanningUnit();
-    })
+    // this.setState({
+    //   versionId: event.target.value
+    // }, () => {
+    //   if (isSiteOnline()) {
+    //     if (this.state.consumptions.length != 0) {
+    //       localStorage.setItem("sesVersionIdReport", this.state.versionId);
+    //       this.filterData();
+    //     } else {
+    //       this.getPlanningUnit();
+    //     }
+    //   } else {
+    //     if (this.state.offlineConsumptionList.length != 0) {
+    //       localStorage.setItem("sesVersionIdReport", this.state.versionId);
+    //       this.filterData();
+    //     } else {
+    //       this.getPlanningUnit();
+    //     }
+    //   }
+    // })
+
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        this.getPlanningUnit();
+      })
+    }
   }
 
   toggle() {
@@ -1238,6 +1287,34 @@ class Consumption extends Component {
     this.refs.pickRange.show()
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+
+  dateFormatterLanguage = value => {
+    if (moment(value).format('MM') === '01') {
+      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '02') {
+      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '03') {
+      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '04') {
+      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '05') {
+      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '06') {
+      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '07') {
+      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '08') {
+      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '09') {
+      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '10') {
+      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '11') {
+      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+    } else {
+      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+    }
+  }
 
   render() {
     const { planningUnits } = this.state;
@@ -1342,9 +1419,11 @@ class Consumption extends Component {
 
     let bar = "";
     if (isSiteOnline()) {
+
       bar = {
 
-        labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
+        // labels: this.state.consumptions.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
+        labels: this.state.consumptions.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
           {
             type: "line",
@@ -1383,7 +1462,8 @@ class Consumption extends Component {
 
       bar = {
 
-        labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
+        // labels: this.state.offlineConsumptionList.map((item, index) => (moment(item.transDate, 'yyyy-MM-dd').format('MMM YY'))),
+        labels: this.state.offlineConsumptionList.map((item, index) => (this.dateFormatterLanguage(moment(item.transDate, 'yyyy-MM-dd')))),
         datasets: [
           {
             type: "line",
@@ -1434,29 +1514,29 @@ class Consumption extends Component {
 
         <Card style={{ display: this.state.loading ? "none" : "block" }}>
           <div className="Card-header-reporticon pb-2">
-          {checkOnline === 'Online' &&  
-                this.state.consumptions.length > 0 &&
-                <div className="card-header-actions">
-                  <a className="card-header-action">
+            {checkOnline === 'Online' &&
+              this.state.consumptions.length > 0 &&
+              <div className="card-header-actions">
+                <a className="card-header-action">
 
-                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                  <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
 
-                  </a>
-                  <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                </div>
-              }
-            {checkOnline === 'Offline' && 
-                this.state.offlineConsumptionList.length > 0 &&
-                <div className="card-header-actions">
-                  <a className="card-header-action">
+                </a>
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              </div>
+            }
+            {checkOnline === 'Offline' &&
+              this.state.offlineConsumptionList.length > 0 &&
+              <div className="card-header-actions">
+                <a className="card-header-action">
 
-                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                  <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
 
-                  </a>
-                  <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                </div>
-              }
+                </a>
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              </div>
+            }
           </div>
           <CardBody className="pb-lg-2 pt-lg-0 ">
             <div className="TableCust" >
@@ -1528,7 +1608,7 @@ class Consumption extends Component {
                       </FormGroup>
 
 
-                      {checkOnline === 'Online' && 
+                      {checkOnline === 'Online' &&
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls">
@@ -1555,8 +1635,8 @@ class Consumption extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-  }
-                      {checkOnline === 'Offline' && 
+                      }
+                      {checkOnline === 'Offline' &&
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                           <div className="controls ">
@@ -1610,44 +1690,44 @@ class Consumption extends Component {
 
                 <Col md="12 pl-0">
                   <div className="row">
-                  {checkOnline === 'Online' && 
-                        this.state.consumptions.length > 0
-                        &&
-                        <div className="col-md-12 p-0">
-                          <div className="col-md-12">
-                            <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                              <Bar id="cool-canvas" data={bar} options={options} />
-                              <div>
-
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-12">
-                            <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                            </button>
-
-                          </div>
-                        </div>}
-
-
-
-                        {checkOnline === 'Offline' && 
-                        this.state.offlineConsumptionList.length > 0
-                        &&
-                        <div className="col-md-12 p-0">
-                          <div className="col-md-12">
-                            <div className="chart-wrapper chart-graph-report">
-                              <Bar id="cool-canvas" data={bar} options={options} />
+                    {checkOnline === 'Online' &&
+                      this.state.consumptions.length > 0
+                      &&
+                      <div className="col-md-12 p-0">
+                        <div className="col-md-12">
+                          <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                            <Bar id="cool-canvas" data={bar} options={options} />
+                            <div>
 
                             </div>
                           </div>
-                          <div className="col-md-12">
-                            <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                              {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                            </button>
+                        </div>
+                        <div className="col-md-12">
+                          <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                          </button>
+
+                        </div>
+                      </div>}
+
+
+
+                    {checkOnline === 'Offline' &&
+                      this.state.offlineConsumptionList.length > 0
+                      &&
+                      <div className="col-md-12 p-0">
+                        <div className="col-md-12">
+                          <div className="chart-wrapper chart-graph-report">
+                            <Bar id="cool-canvas" data={bar} options={options} />
+
                           </div>
-                        </div>}
+                        </div>
+                        <div className="col-md-12">
+                          <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                          </button>
+                        </div>
+                      </div>}
 
                   </div>
 
@@ -1655,100 +1735,100 @@ class Consumption extends Component {
 
                   <div className="row">
                     <div className="col-md-12 pl-0 pr-0">
-                    {checkOnline === 'Online' &&  this.state.show && this.state.consumptions.length > 0 &&
-                          <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
+                      {checkOnline === 'Online' && this.state.show && this.state.consumptions.length > 0 &&
+                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
-                            <tbody>
-                              <>
-                                <tr style={{ fontWeight: 'bold' }}>
-                                  <th style={{ width: '140px' }}></th>
-                                  {
-                                    this.state.consumptions.length > 0
-                                    &&
-                                    this.state.consumptions.map((item, idx) =>
-                                      <td id="addr0" key={idx}>
-                                        {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
-                                      </td>
-                                    )
-                                  }
-                                </tr>
+                          <tbody>
+                            <>
+                              <tr style={{ fontWeight: 'bold' }}>
+                                <th style={{ width: '140px' }}></th>
+                                {
+                                  this.state.consumptions.length > 0
+                                  &&
+                                  this.state.consumptions.map((item, idx) =>
+                                    <td id="addr0" key={idx}>
+                                      {moment(this.state.consumptions[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
+                                    </td>
+                                  )
+                                }
+                              </tr>
 
-                                <tr>
-                                  <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
-                                  {
-                                    this.state.consumptions.length > 0
-                                    &&
-                                    this.state.consumptions.map((item, idx) =>
-                                      <td id="addr0" key={idx} className="textcolor-purple">
-                                        {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
-                                      </td>
-                                    )
-                                  }
-                                </tr>
+                              <tr>
+                                <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
+                                {
+                                  this.state.consumptions.length > 0
+                                  &&
+                                  this.state.consumptions.map((item, idx) =>
+                                    <td id="addr0" key={idx} className="textcolor-purple">
+                                      {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
+                                    </td>
+                                  )
+                                }
+                              </tr>
 
-                                <tr>
-                                  <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
-                                  {
-                                    this.state.consumptions.length > 0
-                                    &&
-                                    this.state.consumptions.map((item, idx) =>
-                                      <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.consumptions[idx].actualConsumption)}
-                                      </td>
-                                    )
-                                  }
-                                </tr>
-                              </>
-                            </tbody>
+                              <tr>
+                                <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
+                                {
+                                  this.state.consumptions.length > 0
+                                  &&
+                                  this.state.consumptions.map((item, idx) =>
+                                    <td id="addr0" key={idx}>
+                                      {this.formatter(this.state.consumptions[idx].actualConsumption)}
+                                    </td>
+                                  )
+                                }
+                              </tr>
+                            </>
+                          </tbody>
 
-                          </Table>}
-                          {checkOnline === 'Offline' &&  this.state.show && this.state.offlineConsumptionList.length > 0 &&
-                          <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
+                        </Table>}
+                      {checkOnline === 'Offline' && this.state.show && this.state.offlineConsumptionList.length > 0 &&
+                        <Table responsive className="table-striped table-hover table-bordered text-center mt-2" id="tab1">
 
-                            <tbody>
-                              <>
-                                <tr style={{ fontWeight: 'bold' }}>
-                                  <th style={{ width: '140px' }}></th>
-                                  {
-                                    this.state.offlineConsumptionList.length > 0
-                                    &&
-                                    this.state.offlineConsumptionList.map((item, idx) =>
-                                      <td id="addr0" key={idx}>
-                                        {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
-                                      </td>
-                                    )
-                                  }
-                                </tr>
+                          <tbody>
+                            <>
+                              <tr style={{ fontWeight: 'bold' }}>
+                                <th style={{ width: '140px' }}></th>
+                                {
+                                  this.state.offlineConsumptionList.length > 0
+                                  &&
+                                  this.state.offlineConsumptionList.map((item, idx) =>
+                                    <td id="addr0" key={idx}>
+                                      {moment(this.state.offlineConsumptionList[idx].transDate, 'yyyy-MM-dd').format('MMM YY')}
+                                    </td>
+                                  )
+                                }
+                              </tr>
 
-                                <tr >
-                                  <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
-                                  {
-                                    this.state.offlineConsumptionList.length > 0
-                                    &&
-                                    this.state.offlineConsumptionList.map((item, idx) =>
-                                      <td id="addr0" key={idx} className="textcolor-purple">
-                                        {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
-                                      </td>
-                                    )
-                                  }
-                                </tr>
+                              <tr >
+                                <th style={{ width: '140px' }}>{i18n.t('static.report.forecasted')}</th>
+                                {
+                                  this.state.offlineConsumptionList.length > 0
+                                  &&
+                                  this.state.offlineConsumptionList.map((item, idx) =>
+                                    <td id="addr0" key={idx} className="textcolor-purple">
+                                      {this.formatter(this.state.offlineConsumptionList[idx].forecastedConsumption)}
+                                    </td>
+                                  )
+                                }
+                              </tr>
 
-                                <tr>
-                                  <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
-                                  {
-                                    this.state.offlineConsumptionList.length > 0
-                                    &&
-                                    this.state.offlineConsumptionList.map((item, idx) =>
-                                      <td id="addr0" key={idx}>
-                                        {this.formatter(this.state.offlineConsumptionList[idx].actualConsumption)}
-                                      </td>
-                                    )
-                                  }
-                                </tr>
-                              </>
-                            </tbody>
+                              <tr>
+                                <th style={{ width: '140px' }}>{i18n.t('static.report.actual')}</th>
+                                {
+                                  this.state.offlineConsumptionList.length > 0
+                                  &&
+                                  this.state.offlineConsumptionList.map((item, idx) =>
+                                    <td id="addr0" key={idx}>
+                                      {this.formatter(this.state.offlineConsumptionList[idx].actualConsumption)}
+                                    </td>
+                                  )
+                                }
+                              </tr>
+                            </>
+                          </tbody>
 
-                          </Table>}
+                        </Table>}
                     </div>
                   </div>
 

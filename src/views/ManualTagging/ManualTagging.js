@@ -523,7 +523,7 @@ export default class ManualTagging extends Component {
 
     }
     editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
             console.log(country);
             this.props.history.push({
                 pathname: `/country/editCountry/${country.countryId}`,

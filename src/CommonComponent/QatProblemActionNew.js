@@ -1036,7 +1036,8 @@ export default class QatProblemActionNew extends Component {
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                         var mos = "";
                                                                         if (supplyPlanJson.length > 0) {
-                                                                            mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                            // mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                            mos = Number(supplyPlanJson[0].closingBalance);
                                                                             if (mos == 0) {
                                                                                 stockoutsWithing6months.push(moment(m).format('MMM-YY'));
                                                                             }
@@ -1049,7 +1050,8 @@ export default class QatProblemActionNew extends Component {
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                         var mos7to18 = "";
                                                                         if (supplyPlanJson7to18.length > 0) {
-                                                                            mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                            // mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                            mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
                                                                             if (mos7to18 == 0) {
                                                                                 stockoutsWithing7to18months.push(moment(m7to18).format('MMM-YY'));
                                                                             }

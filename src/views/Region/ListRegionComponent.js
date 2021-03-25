@@ -629,7 +629,7 @@ class RegionListComponent extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -746,33 +746,33 @@ class RegionListComponent extends Component {
             // state: { region }
         });
     }
-    selected = function (instance, cell, x, y, value) {
+    // selected = function (instance, cell, x, y, value) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
-                this.props.history.push({
-                    pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
-                });
-            }
-        }
-    }.bind(this);
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
-                    this.props.history.push({
-                        pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
-                        // state: { role }
-                    });
-                }
-            }
-        }
-    }.bind(this);
+    //     if ((x == 0 && value != 0) || (y == 0)) {
+    //         // console.log("HEADER SELECTION--------------------------");
+    //     } else {
+    //         // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+    //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+    //             this.props.history.push({
+    //                 pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+    //             });
+    //         }
+    //     }
+    // }.bind(this);
+    // selected = function (instance, cell, x, y, value) {
+    //     if ((x == 0 && value != 0) || (y == 0)) {
+    //         // console.log("HEADER SELECTION--------------------------");
+    //     } else {
+    //         if (this.state.selSource.length != 0) {
+    //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+    //                 this.props.history.push({
+    //                     pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+    //                     // state: { role }
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }.bind(this);
     addRegion(region) {
         this.props.history.push({
             pathname: "/region/addRegion"
