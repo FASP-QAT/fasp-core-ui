@@ -23,7 +23,6 @@ import { Prompt } from 'react-router'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
-const checkOnline = localStorage.getItem('typeOfSession');
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -501,6 +500,7 @@ export default class AddInventory extends Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -521,7 +521,7 @@ export default class AddInventory extends Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    {checkOnline === 'Online' && 
+                    {checkOnline === 'Online' && this.state.inventoryDataType != null &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -676,12 +676,12 @@ export default class AddInventory extends Component {
         }
         if (cont == true) {
             this.setState({
-                inventoryChangedFlag:0,
-                inventoryBatchInfoChangedFlag:0
-            },()=>{
+                inventoryChangedFlag: 0,
+                inventoryBatchInfoChangedFlag: 0
+            }, () => {
                 let id = AuthenticationService.displayDashboardBasedOnRole();
-            var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+                var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
             })
         }
     }

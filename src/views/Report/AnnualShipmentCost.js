@@ -70,7 +70,8 @@ class AnnualShipmentCost extends Component {
             outPutList: [],
             message: '',
             programId: '',
-            versionId: ''
+            versionId: '',
+            loading: false
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -193,6 +194,7 @@ class AnnualShipmentCost extends Component {
                                     var outPutList = [];
                                     var shipmentList = [];
                                     shipmentList = programJson.shipmentList;
+                                    shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
                                         var planningUnitId = p.value
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
@@ -289,6 +291,7 @@ class AnnualShipmentCost extends Component {
                         }.bind(this)
                     }.bind(this)
                 } else {
+                    this.setState({ loading: true })
                     // alert("in else online version");
                     console.log("json---", json);
                     // AuthenticationService.setupAxiosInterceptors();
@@ -318,15 +321,16 @@ class AnnualShipmentCost extends Component {
                             }
                             console.log("json final---", json);
                             this.setState({
-                                outPutList: outPutList, message: ''
+                                outPutList: outPutList, message: '', loading: false
                             })
                         }).catch(
                             error => {
                                 this.setState({
-                                    outPutList: []
+                                    outPutList: [],
+                                    loading: false
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -334,10 +338,10 @@ class AnnualShipmentCost extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             break;
                                     }
                                 }
@@ -948,21 +952,35 @@ class AnnualShipmentCost extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
 
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.getPlanningUnit();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
                 }
 
@@ -1369,19 +1387,40 @@ class AnnualShipmentCost extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
         })
 
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.getPlanningUnit();
-        })
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.outPutList.length != 0) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
 
     }
 
@@ -1477,7 +1516,7 @@ class AnnualShipmentCost extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
@@ -1712,6 +1751,17 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

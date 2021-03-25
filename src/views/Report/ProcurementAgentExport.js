@@ -42,7 +42,6 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const checkOnline = localStorage.getItem('typeOfSession');
 
 class ProcurementAgentExport extends Component {
     constructor(props) {
@@ -475,21 +474,35 @@ class ProcurementAgentExport extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
 
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.getPlanningUnit();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
                 }
 
@@ -910,7 +923,7 @@ class ProcurementAgentExport extends Component {
 
     buildJExcel() {
         let shipmentCosttList = this.state.data;
-        // console.log("shipmentCosttList---->", shipmentCosttList);
+        console.log("shipmentCosttList @@@---->", shipmentCosttList);
         let shipmentCostArray = [];
         let count = 0;
 
@@ -1177,7 +1190,7 @@ class ProcurementAgentExport extends Component {
                                 var shipmentList = (programJson.shipmentList);
                                 console.log("shipmentList----*********----", shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const activeFilter = shipmentList;
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
@@ -1221,7 +1234,6 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": isNaN(Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1230,46 +1242,48 @@ class ProcurementAgentExport extends Component {
                                     }
                                 })
                                 console.log("data----->", data);
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
-                                // console.log("userFilter===>", useFilter);
+                                // console.log("userFilter===>###", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
+                                    var procurementAgentIds = planningUnitFilterdata.map(q => parseInt(q.procurementAgent.id));
+                                    var uniqueProcurementAgentIds = procurementAgentIds.filter((q, idx) => procurementAgentIds.indexOf(q) === idx);
                                     // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
-                                    var qty = 0;
-                                    var productCost = 0;
-                                    var freightPerc = 0;
-                                    var freightCost = 0;
-                                    var totalCost = 0;
-                                    for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
-                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
-                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
-                                    }
-                                    myJson = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilterdata[0].shipmentId,
-                                        "procurementAgent": planningUnitFilterdata[0].procurementAgent,
-                                        "fundingSource": planningUnitFilterdata[0].fundingSource,
-                                        "planningUnit": planningUnitFilterdata[0].planningUnit,
-                                        "qty": qty,
-                                        "productCost": productCost,
-                                        "freightPerc": freightPerc,
-                                        "freightCost": freightCost,
-                                        "totalCost": totalCost,
-                                    }
+                                    for (var u = 0; u < uniqueProcurementAgentIds.length; u++) {
+                                        var pupaFilterdata = planningUnitFilterdata.filter(c => c.procurementAgent.id == uniqueProcurementAgentIds[u]);
+                                        var qty = 0;
+                                        var productCost = 0;
+                                        var freightPerc = 0;
+                                        var freightCost = 0;
+                                        var totalCost = 0;
+                                        for (var pf = 0; pf < pupaFilterdata.length; pf++) {
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
+                                        }
+                                        myJson = {
+                                            "active": true,
+                                            "shipmentId": pupaFilterdata[0].shipmentId,
+                                            "procurementAgent": pupaFilterdata[0].procurementAgent,
+                                            "fundingSource": pupaFilterdata[0].fundingSource,
+                                            "planningUnit": pupaFilterdata[0].planningUnit,
+                                            "qty": qty,
+                                            "productCost": productCost,
+                                            "freightPerc": Number((Number(freightCost) / Number(productCost)) * 100),
+                                            "freightCost": freightCost,
+                                            "totalCost": totalCost,
+                                        }
 
 
-                                    // }
-                                    filteredData.push(myJson);
+                                        // }
+                                        filteredData.push(myJson);
+                                    }
                                 }
-
-                                console.log("filteredData=====>", filteredData);
                                 this.setState({
                                     data: filteredData
                                     , message: ''
@@ -1481,7 +1495,7 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                                 let isPlannedShipment = [];
@@ -1526,7 +1540,6 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1534,7 +1547,7 @@ class ProcurementAgentExport extends Component {
                                         data.push(json);
                                     }
                                 })
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
@@ -1542,35 +1555,38 @@ class ProcurementAgentExport extends Component {
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
-                                    console.log("planningUnitFilterdata===>", planningUnitFilterdata);
-                                    var qty = 0;
-                                    var productCost = 0;
-                                    var freightPerc = 0;
-                                    var freightCost = 0;
-                                    var totalCost = 0;
-                                    for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
-                                    }
-                                    myJson = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilterdata[0].shipmentId,
-                                        "procurementAgent": planningUnitFilterdata[0].procurementAgent,
-                                        "fundingSource": planningUnitFilterdata[0].fundingSource,
-                                        "planningUnit": planningUnitFilterdata[0].planningUnit,
-                                        "qty": qty,
-                                        "productCost": productCost,
-                                        "freightPerc": freightPerc,
-                                        "freightCost": freightCost,
-                                        "totalCost": totalCost,
-                                    }
+                                    var fundingSourceIds = planningUnitFilterdata.map(q => parseInt(q.fundingSource.id));
+                                    var uniqueFundingSourceIds = fundingSourceIds.filter((q, idx) => fundingSourceIds.indexOf(q) === idx);
+                                    for (var u = 0; u < uniqueFundingSourceIds.length; u++) {
+                                        var pupaFilterdata = planningUnitFilterdata.filter(c => c.fundingSource.id == uniqueFundingSourceIds[u]);
+                                        var qty = 0;
+                                        var productCost = 0;
+                                        var freightPerc = 0;
+                                        var freightCost = 0;
+                                        var totalCost = 0;
+                                        for (var pf = 0; pf < pupaFilterdata.length; pf++) {
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
+                                        }
+                                        myJson = {
+                                            "active": true,
+                                            "shipmentId": pupaFilterdata[0].shipmentId,
+                                            "procurementAgent": pupaFilterdata[0].procurementAgent,
+                                            "fundingSource": pupaFilterdata[0].fundingSource,
+                                            "planningUnit": pupaFilterdata[0].planningUnit,
+                                            "qty": qty,
+                                            "productCost": productCost,
+                                            "freightPerc": Number((Number(freightCost) / Number(productCost)) * 100),
+                                            "freightCost": freightCost,
+                                            "totalCost": totalCost,
+                                        }
 
 
-                                    // }
-                                    filteredData.push(myJson);
+                                        // }
+                                        filteredData.push(myJson);
+                                    }
                                 }
                                 console.log("end offline data----", filteredData);
                                 this.setState({
@@ -1786,7 +1802,7 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
@@ -1821,7 +1837,6 @@ class ProcurementAgentExport extends Component {
                                         "planningUnit": planningUnitFilter[j].planningUnit,
                                         "qty": planningUnitFilter[j].shipmentQty,
                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                         "currency": planningUnitFilter[j].currency
@@ -1829,11 +1844,12 @@ class ProcurementAgentExport extends Component {
                                     data.push(json);
                                 }
 
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
+                                console.log("User Filter@@@", useFilter);
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
@@ -1843,12 +1859,12 @@ class ProcurementAgentExport extends Component {
                                     var freightPerc = 0;
                                     var freightCost = 0;
                                     var totalCost = 0;
+                                    console.log("@@@PlanningUnitFiltered data", planningUnitFilterdata);
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
+                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
+                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,
@@ -1857,10 +1873,10 @@ class ProcurementAgentExport extends Component {
                                         "fundingSource": planningUnitFilterdata[0].fundingSource,
                                         "planningUnit": planningUnitFilterdata[0].planningUnit,
                                         "qty": qty,
-                                        "productCost": productCost.toFixed(2),
-                                        "freightPerc": freightPerc,
+                                        "productCost": productCost,
+                                        "freightPerc": Number((Number(freightCost) / Number(productCost)) * 100),
                                         "freightCost": freightCost,
-                                        "totalCost": totalCost.toFixed(2),
+                                        "totalCost": totalCost,
                                     }
 
 
@@ -2073,19 +2089,41 @@ class ProcurementAgentExport extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
         })
 
     }
 
     setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.getPlanningUnit();
-        })
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.data.length != 0) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+        // })
+
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
 
     }
 
@@ -2434,6 +2472,7 @@ class ProcurementAgentExport extends Component {
                 text: 'All', value: this.state.selRegion.length
             }]
         }
+        const checkOnline = localStorage.getItem('typeOfSession');
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

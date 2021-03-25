@@ -35,7 +35,6 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const checkOnline = localStorage.getItem('typeOfSession');
 
 class FunderExport extends Component {
     constructor(props) {
@@ -805,7 +804,7 @@ class FunderExport extends Component {
 
                             var shipmentList = (programJson.shipmentList);
 
-                            const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                            const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                             // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                             let isPlannedShipment = [];
@@ -1008,7 +1007,7 @@ class FunderExport extends Component {
     }
 
     render() {
-
+        const checkOnline = localStorage.getItem('typeOfSession');
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">

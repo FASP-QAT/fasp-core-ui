@@ -23,7 +23,6 @@ import { Prompt } from 'react-router'
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
-const checkOnline = localStorage.getItem('typeOfSession');
 
 export default class ShipmentDetails extends React.Component {
 
@@ -49,6 +48,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentChangedFlag: 0,
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
+            shipmentTypeIds: [1],
             rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
@@ -107,9 +107,11 @@ export default class ShipmentDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
+            var shipmentTypeIds = value.map(ele => ele.value)
             this.setState({
                 shipmentType: value,
-                shipmentChangedFlag: 0
+                shipmentChangedFlag: 0,
+                shipmentTypeIds: shipmentTypeIds
             }, () => {
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
                 if (document.getElementById("addRowButtonId") != null) {
@@ -374,7 +376,9 @@ export default class ShipmentDetails extends React.Component {
                 localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
-                    if ((this.state.shipmentType).value == 1) {
+                    console.log("In if");
+                    if ((this.state.shipmentTypeIds).includes(1)) {
+                        console.log("in if 1")
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
                         if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
@@ -417,9 +421,9 @@ export default class ShipmentDetails extends React.Component {
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
-                        if ((this.state.shipmentType).value == 1) {
+                        if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
-                        } else {
+                        } else if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(2)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
                         }
                         shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
@@ -532,6 +536,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -623,7 +628,8 @@ export default class ShipmentDetails extends React.Component {
                                                                 name="shipmentType"
                                                                 id="shipmentType"
                                                                 bsSize="sm"
-                                                                options={[{ value: 2, label: i18n.t('static.shipment.erpShipment') }, { value: 1, label: i18n.t('static.shipment.manualShipments') }]}
+                                                                multi
+                                                                options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
                                                                 value={this.state.shipmentType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
                                                             />

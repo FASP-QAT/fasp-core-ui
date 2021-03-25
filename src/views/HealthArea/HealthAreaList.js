@@ -713,7 +713,7 @@ export default class HealthAreaListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_HEALTH_AREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -766,7 +766,7 @@ export default class HealthAreaListComponent extends Component {
         jExcelLoadedFunction(instance);
     }
     editHealthArea(healthArea) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
             this.props.history.push({
                 // pathname: "/healthArea/editHealthArea/",
                 // state: { healthArea: healthArea }
@@ -779,7 +779,7 @@ export default class HealthAreaListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
                     this.props.history.push({
                         pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
