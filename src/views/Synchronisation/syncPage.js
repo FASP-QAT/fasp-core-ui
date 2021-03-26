@@ -1429,8 +1429,8 @@ export default class syncPage extends Component {
                                       for (var i = 0; i < latestProgramData.regionList.length; i++) {
                                         var regionJson = {
                                           // name: // programJson.regionList[i].regionId,
-                                          name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                                          id: programJson.regionList[i].regionId
+                                          name: getLabelText(latestProgramData.regionList[i].label, this.state.lang),
+                                          id: latestProgramData.regionList[i].regionId
                                         }
                                         regionList.push(regionJson);
 
