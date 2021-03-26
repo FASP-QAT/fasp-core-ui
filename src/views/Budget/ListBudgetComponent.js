@@ -665,7 +665,7 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
       var budgetId = budget.budgetId
       this.props.history.push({
         pathname: `/budget/editBudget/${budgetId}`,
@@ -899,7 +899,7 @@ class ListBudgetComponent extends Component {
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
       if (this.state.selBudget.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
           this.props.history.push({
             pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
           });
@@ -1339,7 +1339,7 @@ class ListBudgetComponent extends Component {
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
