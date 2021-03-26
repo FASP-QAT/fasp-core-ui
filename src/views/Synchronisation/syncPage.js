@@ -3175,19 +3175,7 @@ export default class syncPage extends Component {
                       })
                       this.hideFirstComponent();
                     }
-                  })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({
-                            message: 'static.unkownError',
-                            color: "red",
-                            loading: false
-                          }, () => {
-                            this.hideFirstComponent();
-                          }
-                  })
-                    .catch(
+                  }).catch(
                       error => {
                         if (error.message === "Network Error") {
                           console.log("+++in catch 7")
