@@ -27,6 +27,7 @@ export default class PipelineProgramConsumption extends Component {
         this.saveConsumption = this.saveConsumption.bind(this);
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     startLoading() {
@@ -417,7 +418,10 @@ export default class PipelineProgramConsumption extends Component {
                                                 data[2] = consumptionList[j].regionId;
                                             };
                                             // data[2] = consumptionList[j].regionId;
-                                            data[6] = Math.round((cm == 0 || cm != consumptionList[j].consNumMonth - 1) ? Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) : Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth)));
+                                            // Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth))
+                                            // match.ceil(5 + 50 - (5 * 12))
+                                            data[6] = Math.round((cm == 0 || cm != consumptionList[j].consNumMonth - 1) ? Math.floor(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) : Math.floor(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.floor(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth)));
+                                            // console.log("data[6]***", data[6]);
                                             data[7] = consumptionList[j].dayOfStockOut;
                                             data[1] = consumptionList[j].dataSourceId;
                                             data[3] = consumptionList[j].realmCountryPlanningUnitId;
@@ -525,7 +529,7 @@ export default class PipelineProgramConsumption extends Component {
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: false,
                                         onchange: this.changed,
-                                        oneditionend: this.onedit,
+                                        // oneditionend: this.onedit,
                                         allowInsertRow: false,
                                         copyCompatibility: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -538,6 +542,7 @@ export default class PipelineProgramConsumption extends Component {
                                             entries: '',
                                         },
                                         onload: this.loadedJexcelCommonFunctionTwo,
+                                        oneditionend: this.oneditionend,
                                     };
 
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
@@ -860,6 +865,21 @@ export default class PipelineProgramConsumption extends Component {
     }
     loadedJexcelCommonFunctionTwo = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionPipeline(instance, 0);
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[4]));
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        }
+
     }
 
     render() {

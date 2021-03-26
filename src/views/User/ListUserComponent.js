@@ -480,7 +480,7 @@ class ListUserComponent extends Component {
     }
     addAccessControls(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
             // this.props.history.push({
             //     pathname: "/user/accessControl",
             //     state: {
@@ -514,7 +514,7 @@ class ListUserComponent extends Component {
         }
     }
     editUser(user) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
             this.props.history.push({
                 pathname: `/user/editUser/${user.userId}`,
                 // pathname: `/language/editLanguage/${language.languageId}`,
@@ -650,7 +650,7 @@ class ListUserComponent extends Component {
                             title: i18n.t('static.user.accessControlText'),
                             onclick: function () {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_ACCESS_CONTROL')) {
                                     this.props.history.push({
                                         pathname: `/user/accessControl/${this.el.getValueFromCoords(0, y)}`,
                                     });
@@ -679,7 +679,7 @@ class ListUserComponent extends Component {
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.selUserList.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
                     this.props.history.push({
                         pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
                     });
@@ -820,7 +820,7 @@ class ListUserComponent extends Component {
         return cell.label.label_en;
     }
     showLanguageLabel(cell, row) {
-        return cell.languageName;
+        return cell.label.label_en;
     }
     showStatus(cell, row) {
         if (cell) {
@@ -867,7 +867,7 @@ class ListUserComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>

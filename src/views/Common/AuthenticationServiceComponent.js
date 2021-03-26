@@ -6,6 +6,7 @@ import axios from 'axios'
 import LogoutService from "../../api/LogoutService";
 import moment from 'moment';
 import i18n from '../../i18n'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 export default class AuthenticationServiceComponent extends Component {
     constructor(props) {
@@ -36,7 +37,7 @@ export default class AuthenticationServiceComponent extends Component {
         console.log("result----" + result);
         if (result != "") {
             this.props.history.push(result)
-        } else if (navigator.onLine) {
+        } else if (isSiteOnline()) {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
             let basicAuthHeader = 'Bearer ' + decryptedToken
@@ -50,7 +51,7 @@ export default class AuthenticationServiceComponent extends Component {
                 console.log("result1----" + result1);
                 let url = config.url;
                 console.log("url---", url);
-                if (result1 != null && result1 != "" && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
+                if (result1 != null && result1 != "" && !url.includes("api/sync/language") && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
                     this.props.history.push(result1)
                 }
                 return config;

@@ -12,7 +12,7 @@ class RealmCountryService {
         return axios.get(`${API_URL}/api/realmCountry/`, {
         });
     }
-    
+
     getRealmCountryById(realmCountryId) {
         return axios.get(`${API_URL}/api/realmCountry/${realmCountryId}`, {
         });
@@ -30,7 +30,7 @@ class RealmCountryService {
         return axios.get(`${API_URL}/api/realmCountry/${realmCountryId}/planningUnit`, {}
         );
     }
-    editPlanningUnitCountry(json){
+    editPlanningUnitCountry(json) {
         return axios.put(`${API_URL}/api/realmCountry/planningUnit`, json, {}
         );
     }
@@ -38,13 +38,22 @@ class RealmCountryService {
         return axios.get(`${API_URL}/api/realmCountry/${realmCountryId}/planningUnit/all`, {}
         );
     }
+    getRealmCountryPlanningUnitByProgramId(json) {
+        return axios.put(`${API_URL}/api/realmCountry/programIds/planningUnit`, json, {}
+        );
+    }
 
-    getRealmCountryForProgram(json){
-        console.log("json realm id------------------------------------",json);
+    getRealmCountryForProgram(json) {
+        console.log("json realm id------------------------------------", json);
         return axios.get(`${API_URL}/api/realmCountry/program/realmId/${json}`, {
         });
     }
-    
+
+    getRealmCountryProgram() {
+        return axios.get(`${API_URL}/api/realmCountry/program`, {
+        });
+    }
+
 
 }
 export default new RealmCountryService();

@@ -16,6 +16,7 @@ import moment, { months } from 'moment';
 
 import React, { Component } from "react";
 import openProblem from '../CommonComponent/openProblem.js';
+import incomplianceProblem from '../CommonComponent/incomplianceProblem.js';
 
 export default class QatProblemActions extends Component {
 
@@ -102,12 +103,8 @@ export default class QatProblemActions extends Component {
                 realmRequest.onsuccess = function (event) {
                     var maxForMonths = 0;
                     var realm = realmRequest.result;
-
                     // }
-
                     // }
-                    // //console.log("program list=====>",programList)
-
                     // for (var d = 0; d < programList.length; d++) {
                     //     var index = latestVersionProgramList.findIndex(c => c.programId == programList[d].programId);
                     //     if (index == -1) {
@@ -121,7 +118,6 @@ export default class QatProblemActions extends Component {
 
                     // }
                     // programList = latestVersionProgramList;
-                    // //console.log("QPA 3====>", programList);
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
@@ -151,7 +147,6 @@ export default class QatProblemActions extends Component {
                             }
                         }.bind(this);
                         problemRequest.onsuccess = function (e) {
-
                             // problemList = problemRequest.result;
                             // if (realmId == -1) {
                             //     problemList = problemList;
@@ -160,8 +155,6 @@ export default class QatProblemActions extends Component {
                             // }
                             var planningUnitResult = [];
                             planningUnitResult = planningunitRequest.result;
-
-
 
                             var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
                             var puOs = puTransaction.objectStore('planningUnit');
@@ -178,7 +171,6 @@ export default class QatProblemActions extends Component {
                                 }
                             }.bind(this);
                             puRequest.onsuccess = function (e) {
-                                //console.log("+++++++++++++", puRequest.result);
                                 var planningUnitListAll = puRequest.result;
                                 if (programList.length == 0) {
 
@@ -220,27 +212,21 @@ export default class QatProblemActions extends Component {
 
                                         var programPlanningUnitList = planningunitRequest.result;
 
-
                                         for (var pp = 0; pp < programList.length; pp++) {
-                                            // //console.log("=====>in for====>", programList[pp]);
                                             var versionID = versionIDs[pp];
                                             var problemActionIndex = 0;
                                             problemActionList = programList[pp].problemReportList;
-                                            // //console.log("problemActionList=====>", problemActionList);
                                             problemActionIndex = programList[pp].problemReportList.length;
                                             var regionList = programList[pp].regionList;
                                             problemList = problemRequest.result.filter(c => c.realm.id == programList[pp].realmCountry.realm.realmId && c.active == true);
-                                            // //console.log("test=====>problem List===>", problemList);
                                             planningUnitList = planningUnitResult.filter(c => c.program.id == programList[pp].programId);
                                             // for (var r = 0; r < regionList.length; r++) {
                                             for (var p = 0; p < planningUnitList.length; p++) {
                                                 var checkPlanningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
                                                 var checkProgramPlanningUnitObj = planningUnitList[p];
-                                                console.log("planingUnitObj===>", checkPlanningUnitObj);
-                                                console.log("programPlaningUnitObj===>", checkProgramPlanningUnitObj);
 
                                                 if (checkPlanningUnitObj.active == true && checkProgramPlanningUnitObj.active == true) {
-                                                    console.log("in if====>");
+                                                    var shipmentListForMonths = programList[pp].shipmentList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.active.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
                                                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
                                                     // console.log("realm.minMosMaxGaurdrail", realm.minMosMaxGaurdrail);
                                                     var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
@@ -250,7 +236,6 @@ export default class QatProblemActions extends Component {
                                                         maxForMonths = planningUnitList[p].minMonthsOfStock
                                                     }
                                                     var minStockMoSQty = parseInt(maxForMonths);
-                                                    // console.log("minStockMosQty====>",minStockMoSQty,"planningUnitList[p].planningUnit.minMonthsOfStock====>",planningUnitList[p]);
                                                     // Calculations for Max Stock
                                                     var minForMonths = 0;
                                                     var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
@@ -260,13 +245,9 @@ export default class QatProblemActions extends Component {
                                                         minForMonths = (maxForMonths + planningUnitList[p].reorderFrequencyInMonths);
                                                     }
                                                     var maxStockMoSQty = parseInt(minForMonths);
-                                                    // console.log("maxStockMoSQty-------->", maxStockMoSQty);
-                                                    // console.log("DEFAULT_MIN_MAX_MONTHS_OF_STOCK------------->", DEFAULT_MIN_MAX_MONTHS_OF_STOCK)
                                                     if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                                                         maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                                                     }
-
-
 
                                                     for (var prob = 0; prob < problemList.length; prob++) {
 
@@ -280,73 +261,38 @@ export default class QatProblemActions extends Component {
                                                                 var myStartDate = moment(Date.now()).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                                 // var myEndDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
                                                                 var myEndDate = moment(Date.now()).endOf('month').format("YYYY-MM-DD");
-                                                                // var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true");
                                                                 var filteredConsumptionList = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate && c.actualFlag.toString() == "true" && c.active == true);
 
-                                                                if (problemActionList[prob] != undefined) {
-                                                                    var myStartDate1 = moment(problemActionList[prob].dt).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                // index1 logic----------------
+                                                                var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 1 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                problemActionListForIndex1.map(probObj => {
+                                                                    // if (probObj != undefined) {
+                                                                    var myStartDate1 = moment(probObj.dt).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                                     // var myEndDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    var myEndDate1 = moment(problemActionList[prob].dt).endOf('month').format("YYYY-MM-DD");
-                                                                    // //console.log("myStartDate1====>", myStartDate1);
-                                                                    // //console.log("myEndDate1====>", myEndDate1);
+                                                                    var myEndDate1 = moment(probObj.dt).endOf('month').format("YYYY-MM-DD");
                                                                     var filteredConsumptionList1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDate1 && c.actualFlag.toString() == "true" && c.active == true);
                                                                     var index1 = problemActionList.findIndex(
-                                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                        c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
                                                                             && c.realmProblem.problem.problemId == 1
                                                                         // && c.versionId == versionID
                                                                     );
-                                                                    // //console.log("filteredConsumptionList1====>", filteredConsumptionList1);
-                                                                    // //console.log("index1====>", index1);
 
                                                                     if (filteredConsumptionList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-                                                                        var filterObj = problemActionList[index1];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index1, username, userId, problemActionList);
                                                                     } else {
                                                                         // auto open logic for index -1 =====************=========
                                                                         if (filteredConsumptionList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
-                                                                }
+                                                                    // }
+
+                                                                });
+                                                                // index1 logic----------------
+
                                                                 var index = problemActionList.findIndex(
                                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                                         && c.region.id == regionList[r].regionId
@@ -448,45 +394,8 @@ export default class QatProblemActions extends Component {
 
                                                                 } else {
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                        // //console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        //console.log("****** in logic to make isfound 0 consumption**********",problemActionList[index]====problemActionList[index].isFound = 0);
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                                 // }
@@ -515,14 +424,17 @@ export default class QatProblemActions extends Component {
                                                                         && c.realmProblem.problem.problemId == 2
                                                                     // && c.versionId == versionID
                                                                 );
-                                                                // //console.log("prob====>", prob)
-                                                                if (problemActionList[prob] != undefined) {
-                                                                    var myStartDateInventory1 = moment(problemActionList[prob].dt).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                    // var myEndDateInventory1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    var myEndDateInventory1 = moment(problemActionList[prob].dt).endOf('month').format("YYYY-MM-DD");
+
+                                                                // index1 logic----------------
+                                                                var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 2 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                problemActionListForIndex1.map(probObj => {
+                                                                    // if (probObj != undefined) {
+                                                                    var myStartDateInventory1 = moment(probObj.dt).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                    // var myEndDateInventory1 = moment(probObj.dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                    var myEndDateInventory1 = moment(probObj.dt).endOf('month').format("YYYY-MM-DD");
                                                                     var filterInventoryList1 = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory1 && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory1 && c.active == true);
                                                                     var index1 = problemActionList.findIndex(
-                                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                        c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
@@ -531,52 +443,15 @@ export default class QatProblemActions extends Component {
                                                                     );
 
                                                                     if (filterInventoryList1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                        var filterObj = problemActionList[index1];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index1, username, userId, problemActionList);
                                                                     } else {
                                                                         if (filterInventoryList1.length == 0 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
-                                                                }
-
+                                                                    // }
+                                                                });
+                                                                // index1 logic----------------
 
                                                                 if (filterInventoryList.length == 0) {
                                                                     if (index == -1) {
@@ -671,45 +546,8 @@ export default class QatProblemActions extends Component {
                                                                 } else {
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                         // problemActionList[index].isFound = 0;
-                                                                        ////console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        //console.log("****** in logic to make isfound 0 inventory**********", problemActionList[index]);
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -720,7 +558,6 @@ export default class QatProblemActions extends Component {
 
                                                         if (problemList[prob].problem.problemId == 3) {
                                                             // 3 shipment which have received date in past but status is not yet received
-                                                            console.log("=====*****", planningUnitList[p].planningUnit.id);
                                                             var shipmentList = programList[pp].shipmentList;
                                                             // //console.log("shipmentList=======>", shipmentList);
                                                             var myDateShipment = moment(Date.now()).format("YYYY-MM-DD");
@@ -862,45 +699,8 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         } else {
                                                                             // make shipmentStatus resolved=============
-                                                                            ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
-                                                                            var filterObj = problemActionList[kb];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                            incomplianceProblem(kb, username, userId, problemActionList);
                                                                         }
                                                                     }
                                                                 }
@@ -910,44 +710,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var d = 0; d < problemActionList.length; d++) {
                                                                     if (problemActionList[d].realmProblem.problem.problemId == 3 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3) && problemActionList[d].planningUnit.id == planningUnitList[p].planningUnit.id && problemActionList[d].shipmentId != 0) {
                                                                         var index = d;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -974,14 +737,30 @@ export default class QatProblemActions extends Component {
                                                                     // && c.versionId == versionID
                                                                 );
 
-
-                                                                if (problemActionList[prob] != undefined) {
-
-                                                                    var myStartDateFuture1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                    var myEndDateFuture1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFunture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                // index1 logic----------------
+                                                                var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 8 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                problemActionListForIndex1.map(probObj => {
+                                                                    // if (problemActionList[prob] != undefined) {
+                                                                    var myStartDateFuture1 = moment(probObj.dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                    var myEndDateFuture1 = moment(probObj.dt).add(numberOfMonthsInFunture, 'months').endOf('month').format("YYYY-MM-DD");
                                                                     var filteredConsumptionListTwo1 = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDateFuture1 && moment(c.consumptionDate).format('YYYY-MM-DD') <= myEndDateFuture1 && c.actualFlag.toString() == "false" && c.active == true);
+
+                                                                    var monthsWithForecastedConsumption1 = [];
+                                                                    for (var fcm1 = 0; fcm1 < filteredConsumptionListTwo1.length; fcm1++) {
+                                                                        monthsWithForecastedConsumption1.push(moment(filteredConsumptionListTwo1[fcm1].consumptionDate).format("MMM-YY"));
+                                                                    }
+                                                                    // console.log("monthsWithForecastedConsumption+++",monthsWithForecastedConsumption1);
+                                                                    var eighteenmonthsArray1 = [];
+                                                                    for (var ema1 = 1; ema1 <= numberOfMonthsInFunture; ema1++) {
+                                                                        eighteenmonthsArray1.push(moment(Date.now()).add(ema1, 'months').format("MMM-YY"));
+                                                                    }
+                                                                    // console.log("eighteenmonthsArray+++",eighteenmonthsArray1);
+                                                                    var monthWithNoForecastedConsumption1 = eighteenmonthsArray1.filter(function (obj) { return monthsWithForecastedConsumption1.indexOf(obj) == -1; });
+                                                                    // console.log("monthWithNoForecastedConsumption+++",monthWithNoForecastedConsumption1);
+
+
                                                                     var index1 = problemActionList.findIndex(
-                                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                        c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
@@ -990,53 +769,34 @@ export default class QatProblemActions extends Component {
                                                                     );
 
                                                                     if (filteredConsumptionListTwo1.length == 18 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                        var filterObj = problemActionList[index1];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index1, username, userId, problemActionList);
 
                                                                     } else {
                                                                         if (filteredConsumptionListTwo1.length != 18 && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
+
+                                                                        problemActionList[index1].data5 = monthWithNoForecastedConsumption1.toString();
                                                                     }
+                                                                    // }
+                                                                });
+                                                                // index1 logic end----------------
+
+                                                                var monthsWithForecastedConsumption = [];
+                                                                for (var fcm = 0; fcm < filteredConsumptionListTwo.length; fcm++) {
+                                                                    monthsWithForecastedConsumption.push(moment(filteredConsumptionListTwo[fcm].consumptionDate).format("MMM-YY"));
                                                                 }
-                                                                if (filteredConsumptionListTwo.length != 18) {
+                                                                // console.log("monthsWithForecastedConsumption+++",monthsWithForecastedConsumption);
+                                                                var eighteenmonthsArray = [];
+                                                                for (var ema = 1; ema <= numberOfMonthsInFunture; ema++) {
+                                                                    eighteenmonthsArray.push(moment(Date.now()).add(ema, 'months').format("MMM-YY"));
+                                                                }
+                                                                // console.log("eighteenmonthsArray+++",eighteenmonthsArray);
+                                                                var monthWithNoForecastedConsumption = eighteenmonthsArray.filter(function (obj) { return monthsWithForecastedConsumption.indexOf(obj) == -1; });
+                                                                // console.log("monthWithNoForecastedConsumption+++",monthWithNoForecastedConsumption);
+
+
+                                                                if (filteredConsumptionListTwo.length < 18) {
                                                                     if (index == -1) {
                                                                         var json = {
                                                                             problemReportId: 0,
@@ -1059,7 +819,7 @@ export default class QatProblemActions extends Component {
 
                                                                             },
                                                                             shipmentId: '',
-                                                                            data5: '',
+                                                                            data5: monthWithNoForecastedConsumption.toString(),
                                                                             planningUnitActive: true,
                                                                             newAdded: false,
                                                                             problemActionIndex: problemActionIndex,
@@ -1122,50 +882,14 @@ export default class QatProblemActions extends Component {
                                                                         if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
                                                                         }
+                                                                        problemActionList[index].data5 = monthWithNoForecastedConsumption.toString();
                                                                     }
 
                                                                 } else {
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                         // problemActionList[index].isFound = 0;
                                                                         // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
 
                                                                     }
                                                                 }
@@ -1357,44 +1081,7 @@ export default class QatProblemActions extends Component {
                                                                         } else {
                                                                             // make shipmentStatus resolved=============
                                                                             ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
-                                                                            var filterObj = problemActionList[kb];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            incomplianceProblem(kb, username, userId, problemActionList);
                                                                         }
                                                                     }
                                                                 }
@@ -1402,44 +1089,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var d = 0; d < problemActionList.length; d++) {
                                                                     if (problemActionList[d].realmProblem.problem.problemId == 4 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3) && problemActionList[d].planningUnit.id == planningUnitList[p].planningUnit.id && problemActionList[d].shipmentId != 0) {
                                                                         var index = d;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -1497,7 +1147,7 @@ export default class QatProblemActions extends Component {
                                                                         submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                         // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                     }
-                                                                    ////console.log("approvedDate=====>", approvedDate);
+                                                                    //console.log("approvedDate=====>", approvedDate);
 
                                                                     if ((moment(approvedDate).add(parseInt(problemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
 
@@ -1634,45 +1284,8 @@ export default class QatProblemActions extends Component {
                                                                             }
                                                                         } else {
                                                                             // make shipmentStatus resolved=============
-                                                                            ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
-                                                                            var filterObj = problemActionList[kb];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            //console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
+                                                                            incomplianceProblem(kb, username, userId, problemActionList);
                                                                         }
                                                                     }
                                                                 }
@@ -1680,44 +1293,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var d = 0; d < problemActionList.length; d++) {
                                                                     if (problemActionList[d].realmProblem.problem.problemId == 5 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3) && problemActionList[d].planningUnit.id == planningUnitList[p].planningUnit.id && problemActionList[d].shipmentId != 0) {
                                                                         var index = d;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -1913,44 +1489,7 @@ export default class QatProblemActions extends Component {
                                                                         } else {
                                                                             // make shipmentStatus resolved=============
                                                                             ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
-                                                                            var filterObj = problemActionList[kb];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            incomplianceProblem(kb, username, userId, problemActionList);
                                                                         }
                                                                     }
                                                                 }
@@ -1958,44 +1497,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var d = 0; d < problemActionList.length; d++) {
                                                                     if (problemActionList[d].realmProblem.problem.problemId == 6 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3) && problemActionList[d].planningUnit.id == planningUnitList[p].planningUnit.id && problemActionList[d].shipmentId != 0) {
                                                                         var index = d;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -2188,44 +1690,7 @@ export default class QatProblemActions extends Component {
                                                                         } else {
                                                                             // make shipmentStatus resolved=============
                                                                             ////console.log("****** in logic to make status resolved  in shipmnet**********", problemActionList[index]);
-                                                                            var filterObj = problemActionList[kb];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            incomplianceProblem(kb, username, userId, problemActionList);
                                                                         }
                                                                     }
                                                                 }
@@ -2233,44 +1698,7 @@ export default class QatProblemActions extends Component {
                                                                 for (var d = 0; d < problemActionList.length; d++) {
                                                                     if (problemActionList[d].realmProblem.problem.problemId == 7 && problemActionList[d].program.id == programList[pp].programId && (problemActionList[d].problemStatus.id == 1 || problemActionList[d].problemStatus.id == 3) && problemActionList[d].planningUnit.id == planningUnitList[p].planningUnit.id && problemActionList[d].shipmentId != 0) {
                                                                         var index = d;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -2308,14 +1736,17 @@ export default class QatProblemActions extends Component {
                                                                         // && c.versionId == versionID
                                                                     );
 
-                                                                    if (problemActionList[prob] != undefined) {
+                                                                    // index1 logic----------------
+                                                                    var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 10 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                    problemActionListForIndex1.map(probObj => {
+                                                                        // if (problemActionList[prob] != undefined) {
                                                                         var consumptionList1 = programList[pp].consumptionList;
                                                                         consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
-                                                                        var myStartDate1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                        var myEndDate1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                        var myStartDate1 = moment(probObj.dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                        var myEndDate1 = moment(probObj.dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
                                                                         consumptionList1 = consumptionList1.filter(c => c.consumptionDate >= myStartDate1 && c.consumptionDate <= myEndDate1 && c.active == true);
                                                                         var index1 = problemActionList.findIndex(
-                                                                            c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                            c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                                 && c.region.id == regionList[r].regionId
                                                                                 && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                 && c.program.id == programList[pp].programId
@@ -2349,55 +1780,18 @@ export default class QatProblemActions extends Component {
                                                                             }
 
                                                                             if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                                var filterObj = problemActionList[index1];
-                                                                                var transList = filterObj.problemTransList;
-                                                                                let tempProblemTransObj = {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 4,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 27104,
-                                                                                            label_en: "In-Compliance",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: '',
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                                transList.push(tempProblemTransObj);
-                                                                                filterObj.problemTransList = transList;
-                                                                                filterObj.reviewed = false;
-                                                                                var problemStatusObject = {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                }
-                                                                                filterObj.problemStatus = problemStatusObject;
-
+                                                                                incomplianceProblem(index1, username, userId, problemActionList);
                                                                             } else {
                                                                                 // auto open problem logic==========>
                                                                                 if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                                     openProblem(index1, username, userId, problemActionList);
                                                                                 }
                                                                             }
-                                                                        }
+                                                                            // }
 
-                                                                    }
+                                                                        }
+                                                                    });
+                                                                    // index1 logic----------------
 
                                                                     if (consumptionList.length > problemList[prob].data2) {
                                                                         var conQtyArray = [];
@@ -2516,45 +1910,7 @@ export default class QatProblemActions extends Component {
                                                                             //console.log("dont flag problem=====>");
                                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                                 // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                                var filterObj = problemActionList[index];
-                                                                                var transList = filterObj.problemTransList;
-                                                                                let tempProblemTransObj = {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 4,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 27104,
-                                                                                            label_en: "In-Compliance",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: '',
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                                transList.push(tempProblemTransObj);
-                                                                                filterObj.problemTransList = transList;
-                                                                                filterObj.reviewed = false;
-                                                                                var problemStatusObject = {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                }
-                                                                                filterObj.problemStatus = problemStatusObject;
-
+                                                                                incomplianceProblem(index, username, userId, problemActionList);
                                                                             }
                                                                         }
                                                                         // ================================
@@ -2617,14 +1973,17 @@ export default class QatProblemActions extends Component {
                                                                         // && c.versionId == versionID
                                                                     );
 
-                                                                    if (problemActionList[prob] != undefined) {
+                                                                    // index1 logic----------------
+                                                                    var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 14 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                    problemActionListForIndex1.map(probObj => {
+                                                                        // if (problemActionList[prob] != undefined) {
                                                                         var consumptionList1 = programList[pp].consumptionList;
                                                                         consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
-                                                                        var myStartDate1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                        var myEndDate1 = moment(problemActionList[prob].dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                        var myStartDate1 = moment(probObj.dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                                                        var myEndDate1 = moment(probObj.dt).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
                                                                         consumptionList1 = consumptionList1.filter(c => c.consumptionDate >= myStartDate1 && c.consumptionDate <= myEndDate1 && c.active == true);
                                                                         var index1 = problemActionList.findIndex(
-                                                                            c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                            c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                                 && c.region.id == regionList[r].regionId
                                                                                 && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                 && c.program.id == programList[pp].programId
@@ -2658,46 +2017,7 @@ export default class QatProblemActions extends Component {
                                                                             }
 
                                                                             if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                                var filterObj = problemActionList[index1];
-                                                                                var transList = filterObj.problemTransList;
-                                                                                let tempProblemTransObj = {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 4,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 27104,
-                                                                                            label_en: "In-Compliance",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: '',
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                                transList.push(tempProblemTransObj);
-                                                                                filterObj.problemTransList = transList;
-                                                                                filterObj.reviewed = false;
-                                                                                var problemStatusObject = {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                }
-                                                                                filterObj.problemStatus = problemStatusObject;
-
+                                                                                incomplianceProblem(index1, username, userId, problemActionList);
                                                                             } else {
                                                                                 // auto open logic for index1
                                                                                 if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
@@ -2705,7 +2025,8 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             }
                                                                         }
-                                                                    }
+                                                                        // }
+                                                                    });
                                                                     if (consumptionList.length > problemList[prob].data2) {
                                                                         var conQtyArray = [];
                                                                         for (var i = 0; i < consumptionList.length; i++) {
@@ -2822,44 +2143,7 @@ export default class QatProblemActions extends Component {
                                                                             // //console.log("dont flag problem=====>");
                                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                                 // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                                var filterObj = problemActionList[index];
-                                                                                var transList = filterObj.problemTransList;
-                                                                                let tempProblemTransObj = {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 4,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 27104,
-                                                                                            label_en: "In-Compliance",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: '',
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                                transList.push(tempProblemTransObj);
-                                                                                filterObj.problemTransList = transList;
-                                                                                filterObj.reviewed = false;
-                                                                                var problemStatusObject = {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                }
-                                                                                filterObj.problemStatus = problemStatusObject;
+                                                                                incomplianceProblem(index, username, userId, problemActionList);
 
                                                                             }
                                                                         }
@@ -2906,9 +2190,10 @@ export default class QatProblemActions extends Component {
                                                                             && c.realmProblem.problem.problemId == 15
                                                                         // && c.versionId == versionID
                                                                     );
-
-                                                                    if (problemActionList[prob] != undefined) {
-
+                                                                    // index1 logic----------------
+                                                                    var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 15 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                    problemActionListForIndex1.map(probObj => {
+                                                                        // if (problemActionList[prob] != undefined) {
                                                                         var consumptionList1 = programList[pp].consumptionList;
                                                                         consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                         var myStartDate1 = moment(problemActionList[prob].dt).add(1, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2949,46 +2234,7 @@ export default class QatProblemActions extends Component {
                                                                             }
 
                                                                             if (check1 != true && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                                var filterObj = problemActionList[index1];
-                                                                                var transList = filterObj.problemTransList;
-                                                                                let tempProblemTransObj = {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 4,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 27104,
-                                                                                            label_en: "In-Compliance",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: '',
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                                transList.push(tempProblemTransObj);
-                                                                                filterObj.problemTransList = transList;
-                                                                                filterObj.reviewed = false;
-                                                                                var problemStatusObject = {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                }
-                                                                                filterObj.problemStatus = problemStatusObject;
-
+                                                                                incomplianceProblem(index1, username, userId, problemActionList);
                                                                             } else {
                                                                                 // auto open logic for index1
                                                                                 if (check1 == true && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
@@ -2996,7 +2242,9 @@ export default class QatProblemActions extends Component {
                                                                                 }
                                                                             }
                                                                         }
-                                                                    }
+                                                                        // }
+                                                                    });
+                                                                    // index1 logic----------------
                                                                     if (consumptionList.length > problemList[prob].data2) {
                                                                         var conQtyArray = [];
                                                                         for (var i = 0; i < consumptionList.length; i++) {
@@ -3115,45 +2363,7 @@ export default class QatProblemActions extends Component {
                                                                             // //console.log("dont flag problem=====>");
                                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                                 // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                                var filterObj = problemActionList[index];
-                                                                                var transList = filterObj.problemTransList;
-                                                                                let tempProblemTransObj = {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 4,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 27104,
-                                                                                            label_en: "In-Compliance",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: '',
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                                transList.push(tempProblemTransObj);
-                                                                                filterObj.problemTransList = transList;
-                                                                                filterObj.reviewed = false;
-                                                                                var problemStatusObject = {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                }
-                                                                                filterObj.problemStatus = problemStatusObject;
-
+                                                                                incomplianceProblem(index, username, userId, problemActionList);
                                                                             }
                                                                         }
                                                                         // ================================
@@ -3178,11 +2388,9 @@ export default class QatProblemActions extends Component {
                                                                 var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                 var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                                 var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
-
                                                                 var programId = programList[pp].programId;
                                                                 // var regionId = -1;
                                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
-
                                                                 var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                                 var mos = "";
@@ -3190,7 +2398,6 @@ export default class QatProblemActions extends Component {
                                                                 var minForMonths = "";
                                                                 var closingBalance = "";
                                                                 var amcCalcualted = "";
-
 
                                                                 if (supplyPlanJson.length > 0) {
                                                                     mos = supplyPlanJson[0].mos;
@@ -3217,7 +2424,11 @@ export default class QatProblemActions extends Component {
                                                             var monthWithMosLessThenMin = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
                                                                 // //console.log("mos element===>", mosArray[element]);
-                                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                                var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+
+                                                                if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
                                                                     break;
                                                                 } else {
@@ -3233,14 +2444,17 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
+                                                            // index1 logic-------------------------------------------
 
-                                                            if (problemActionList[prob] != undefined) {
+                                                            var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 11 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                            problemActionListForIndex1.map(probObj => {
+                                                                // if (problemActionList[prob] != undefined) {
                                                                 var mosArray1 = [];
                                                                 // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                                 // problemList[prob].data1=0
                                                                 // problemList[prob].data2=6
                                                                 for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
-                                                                    var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                                    var m1 = moment(probObj.dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                     var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                                     var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
                                                                     var programId1 = programList[pp].programId;
@@ -3274,13 +2488,17 @@ export default class QatProblemActions extends Component {
                                                                         });
 
                                                                 }
-                                                                // //console.log("planningUnitId====>", planningUnitId);
+                                                                // console.log("planningUnitId====>", planningUnitId);
                                                                 //console.log("mosArray============>$@##", mosArray1);
                                                                 // for loop on array mosArray
                                                                 var monthWithMosLessThenMin1 = '';
                                                                 for (var element = 0; element < mosArray1.length; element++) {
                                                                     // //console.log("mos element===>", mosArray[element]);
-                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                                    var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                    var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
+
+                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                         break;
                                                                     } else {
@@ -3288,7 +2506,7 @@ export default class QatProblemActions extends Component {
                                                                 }
                                                                 //console.log("monthWithMosLessThenMin======>", monthWithMosLessThenMin1);
                                                                 var index1 = problemActionList.findIndex(
-                                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                         // && c.region.id == regionList[r].regionId
                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                         && c.program.id == programList[pp].programId
@@ -3298,222 +2516,134 @@ export default class QatProblemActions extends Component {
 
 
                                                                 if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                    var filterObj = problemActionList[index1];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
-                                                                        problemStatus: {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        },
-                                                                        notes: '',
-                                                                        reviewed: false,
-                                                                        createdBy: {
-                                                                            userId: userId,
-                                                                            username: username
-                                                                        },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                    }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
-                                                                    }
-                                                                    filterObj.problemStatus = problemStatusObject;
-
+                                                                    incomplianceProblem(index1, username, userId, problemActionList);
                                                                 } else {
                                                                     // auto open logic for index1
                                                                     if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                         openProblem(index1, username, userId, problemActionList);
                                                                     }
                                                                 }
-                                                            }
+                                                                // }
+                                                            });
+
+                                                            // index1 logic---------------------------------------------------------
 
                                                             if (monthWithMosLessThenMin != '') {
-                                                                // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
-                                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
-                                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                                // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
+                                                                // if (filteredShipmentListForMonths.length > 0) {
+                                                                if (index == -1) {
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
 
-                                                                var shipmentListForMonths = programList[pp].shipmentList;
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                                // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: planningUnitList[p].planningUnit.id,
+                                                                            label: planningUnitList[p].planningUnit.label,
 
+                                                                        },
+                                                                        shipmentId: '',
+                                                                        data5: '',
+                                                                        planningUnitActive: true,
+                                                                        newAdded: false,
+                                                                        problemActionIndex: problemActionIndex,
 
-                                                                if (filteredShipmentListForMonths.length > 0) {
-                                                                    // //console.log("flag a problem mos is less then min and have shipment withing lead times");
-                                                                    if (index == -1) {
-                                                                        var json = {
-                                                                            problemReportId: 0,
-                                                                            program: {
-                                                                                id: programList[pp].programId,
-                                                                                label: programList[pp].label,
-                                                                                code: programList[pp].programCode
-                                                                            },
-                                                                            versionId: versionID,
-                                                                            realmProblem: problemList[prob],
-
-                                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                                            region: {
-                                                                                id: 0
-                                                                            },
-                                                                            planningUnit: {
-                                                                                id: planningUnitList[p].planningUnit.id,
-                                                                                label: planningUnitList[p].planningUnit.label,
-
-                                                                            },
-                                                                            shipmentId: '',
-                                                                            data5: '',
-                                                                            planningUnitActive: true,
-                                                                            newAdded: false,
-                                                                            problemActionIndex: problemActionIndex,
-
-                                                                            problemCategory: {
-                                                                                id: 3,
-                                                                                label: { label_en: 'Supply Planning' }
-                                                                            },
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: { label_en: 'Open' }
-                                                                            },
-                                                                            problemType: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    label_en: 'Automatic'
-                                                                                }
-                                                                            },
-                                                                            reviewed: false,
-                                                                            reviewNotes: '',
-                                                                            reviewedDate: '',
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            lastModifiedBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            problemTransList: [
-                                                                                {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 1,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 461,
-                                                                                            label_en: "Open",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: "",
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                        problemActionList.push(json);
-                                                                        problemActionIndex++;
-                                                                    } else {
-                                                                        //auto open for index=======>
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
-                                                                            openProblem(index, username, userId, problemActionList);
-                                                                        }
-                                                                    }
-                                                                } else {
-                                                                    //console.log("dont falg problem mos is not less then min ");
-                                                                }
-                                                            } else {
-                                                                //console.log("no months with MOS less then min ===#########");
-                                                                // //console.log("index*************>", index);
-                                                                // //console.log("versionId************", versionID);
-
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                                    //console.log("//////at this point resolve the problem.");
-                                                                    var filterObj = problemActionList[index];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
+                                                                        problemCategory: {
+                                                                            id: 3,
+                                                                            label: { label_en: 'Supply Planning' }
+                                                                        },
                                                                         problemStatus: {
-                                                                            id: 4,
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
                                                                             label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
+                                                                                label_en: 'Automatic'
                                                                             }
                                                                         },
-                                                                        notes: '',
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
                                                                         },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "",
+                                                                                reviewed: false,
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
                                                                     }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    //auto open for index=======>
+                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 4) {
+                                                                        openProblem(index, username, userId, problemActionList);
                                                                     }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                                // } else {
+                                                                //console.log("dont falg problem mos is not less then min ");
+                                                                // }
+                                                            } else {
+                                                                //console.log("no months with MOS less then min ===#########");
+                                                                //console.log("index*************>", index);
+                                                                //console.log("versionId************", versionID);
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
                                                         }
 
                                                         if (problemList[prob].problem.problemId == 16) {
                                                             // Inventory is above max with shipment(s) in the next 1-6 months. Critical = High============
-                                                            // //console.log("in problem id======>16", problemList[prob].data1, "====", problemList[prob].data2);
+                                                            //console.log("in problem id======>16", problemList[prob].data1, "====", problemList[prob].data2);
                                                             var mosArray = [];
                                                             // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                             // problemList[prob].data1=0
                                                             // problemList[prob].data2=6
                                                             for (var mosCounter = problemList[prob].data1; mosCounter <= problemList[prob].data2; mosCounter++) {
-
                                                                 var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                 var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                                 var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
 
-
                                                                 var programId = programList[pp].programId;
                                                                 // var regionId = -1;
                                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
-
                                                                 var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
 
                                                                 var mos = "";
@@ -3521,7 +2651,6 @@ export default class QatProblemActions extends Component {
                                                                 var minForMonths = "";
                                                                 var closingBalance = "";
                                                                 var amcCalcualted = "";
-
 
                                                                 if (supplyPlanJson.length > 0) {
                                                                     mos = supplyPlanJson[0].mos;
@@ -3548,8 +2677,13 @@ export default class QatProblemActions extends Component {
                                                             // var monthWithMosLessThenMin = '';
                                                             var monthWithMosGreaterThenMax = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
-                                                                // //console.log("mos element===>", mosArray[element]);
-                                                                if (mosArray[element].mos > mosArray[element].maxForMonths) {
+
+                                                                var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+
+                                                                if (mosArray[element].mos > mosArray[element].maxForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosGreaterThenMax = mosArray[element].month;
                                                                     break;
                                                                 } else {
@@ -3565,14 +2699,15 @@ export default class QatProblemActions extends Component {
                                                             );
 
 
-                                                            if (problemActionList[prob] != undefined) {
-
+                                                            // index1 logic----------------
+                                                            var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 16 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                            problemActionListForIndex1.map(probObj => {
+                                                                // if (problemActionList[prob] != undefined) {
                                                                 var mosArray1 = [];
                                                                 // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                                 // problemList[prob].data1=0
                                                                 // problemList[prob].data2=6
                                                                 for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
-
                                                                     var m1 = moment(Date.now()).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                     var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                                     var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
@@ -3612,15 +2747,19 @@ export default class QatProblemActions extends Component {
                                                                 // var monthWithMosLessThenMin = '';
                                                                 var monthWithMosGreaterThenMax1 = '';
                                                                 for (var element = 0; element < mosArray1.length; element++) {
-                                                                    // //console.log("mos element===>", mosArray[element]);
-                                                                    if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1) {
+                                                                    var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                    // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax1).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                    var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
+
+                                                                    if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosGreaterThenMax1 = mosArray1[element].month1;
                                                                         break;
                                                                     } else {
                                                                     }
                                                                 }
                                                                 var index1 = problemActionList.findIndex(
-                                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                         // && c.region.id == regionList[r].regionId
                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                         && c.program.id == programList[pp].programId
@@ -3629,200 +2768,122 @@ export default class QatProblemActions extends Component {
                                                                 );
 
                                                                 if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-                                                                    var filterObj = problemActionList[index1];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
-                                                                        problemStatus: {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        },
-                                                                        notes: '',
-                                                                        reviewed: false,
-                                                                        createdBy: {
-                                                                            userId: userId,
-                                                                            username: username
-                                                                        },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                    }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
-                                                                    }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                    incomplianceProblem(index1, username, userId, problemActionList);
                                                                 } else {
                                                                     // auto open logic for index1
                                                                     if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                         openProblem(index1, username, userId, problemActionList);
                                                                     }
                                                                 }
-                                                            }
+                                                                // }
+                                                            });
+                                                            // index1 logic----------------
+
 
                                                             if (monthWithMosGreaterThenMax != '') {
-                                                                // //console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
-                                                                var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
-                                                                var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
-                                                                // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-                                                                var shipmentListForMonths = programList[pp].shipmentList;
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                                // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-                                                                if (filteredShipmentListForMonths.length > 0) {
-                                                                    //console.log("flag a problem mos is greater then max and have shipment withing lead times");
-                                                                    if (index == -1) {
-                                                                        var json = {
-                                                                            problemReportId: 0,
-                                                                            program: {
-                                                                                id: programList[pp].programId,
-                                                                                label: programList[pp].label,
-                                                                                code: programList[pp].programCode
-                                                                            },
-                                                                            versionId: versionID,
-                                                                            realmProblem: problemList[prob],
+                                                                //console.log("min mos month from array ======>", monthWithMosGreaterThenMax);
+                                                                //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
+                                                                //if (filteredShipmentListForMonths.length > 0) {
+                                                                //console.log("flag a problem mos is greater then max and have shipment withing lead times");
+                                                                if (index == -1) {
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
 
-                                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                                            region: {
-                                                                                id: 0
-                                                                            },
-                                                                            planningUnit: {
-                                                                                id: planningUnitList[p].planningUnit.id,
-                                                                                label: planningUnitList[p].planningUnit.label,
+                                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: planningUnitList[p].planningUnit.id,
+                                                                            label: planningUnitList[p].planningUnit.label,
 
-                                                                            },
-                                                                            shipmentId: '',
-                                                                            data5: '',
-                                                                            planningUnitActive: true,
-                                                                            newAdded: false,
-                                                                            problemActionIndex: problemActionIndex,
-                                                                            problemCategory: {
-                                                                                id: 3,
-                                                                                label: { label_en: 'Supply Planning' }
-                                                                            },
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: { label_en: 'Open' }
-                                                                            },
-                                                                            problemType: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    label_en: 'Automatic'
-                                                                                }
-                                                                            },
-                                                                            reviewed: false,
-                                                                            reviewNotes: '',
-                                                                            reviewedDate: '',
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            lastModifiedBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            problemTransList: [
-                                                                                {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 1,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 461,
-                                                                                            label_en: "Open",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: "",
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                        problemActionList.push(json);
-                                                                        problemActionIndex++;
-                                                                    } else {
-                                                                        // auto open logic for index=======>
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
-                                                                            openProblem(index, username, userId, problemActionList);
-                                                                        }
-                                                                    }
-                                                                } else {
-                                                                    //console.log("dont falg problem mos is not greater then max ####### ");
-                                                                }
-                                                            } else {
-                                                                // //console.log("no months with MOS greater then max ===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                                    // //console.log("//////at this point resolve the problem. ###########");
-                                                                    var filterObj = problemActionList[index];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
+                                                                        },
+                                                                        shipmentId: '',
+                                                                        data5: '',
+                                                                        planningUnitActive: true,
+                                                                        newAdded: false,
+                                                                        problemActionIndex: problemActionIndex,
+                                                                        problemCategory: {
+                                                                            id: 3,
+                                                                            label: { label_en: 'Supply Planning' }
+                                                                        },
                                                                         problemStatus: {
-                                                                            id: 4,
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
                                                                             label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
+                                                                                label_en: 'Automatic'
                                                                             }
                                                                         },
-                                                                        notes: '',
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
                                                                         },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "",
+                                                                                reviewed: false,
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
                                                                     }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // auto open logic for index=======>
+                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 4) {
+                                                                        openProblem(index, username, userId, problemActionList);
                                                                     }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                                // } else {
+                                                                //     //console.log("dont falg problem mos is not greater then max ####### ");
+                                                                // }
+                                                            } else {
+                                                                // //console.log("no months with MOS greater then max ===#########");
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
                                                         }
 
                                                         if (problemList[prob].problem.problemId == 17) {
-
                                                             // problem for mos less then min and no shipment in coming  6 months 
-                                                            // //console.log("in problem id======>17", problemList[prob].data1, "====", problemList[prob].data2);
-
+                                                            //console.log("in problem id======>17", problemList[prob].data1, "====", problemList[prob].data2);
                                                             var mosArray = [];
                                                             // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                             // problemList[prob].data1=0
@@ -3864,18 +2925,25 @@ export default class QatProblemActions extends Component {
                                                                     });
 
                                                             }
-                                                            // //console.log("planningUnitId====>", planningUnitId);
-                                                            // //console.log("mosArray============>$@##", mosArray);
+                                                            // console.log("+++planningUnitId====>", planningUnitId);
+                                                            // console.log("######mosArray==========>", mosArray);
                                                             // for loop on array mosArray
                                                             var monthWithMosLessThenMin = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
-                                                                // //console.log("mos element===>", mosArray[element]);
-                                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                                var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
+                                                                // console.log("######getStartDate",getStartDate);
+                                                                // console.log("######getEndDate",getEndDate);
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+                                                                // console.log("######filteredShipmentListForMonths",filteredShipmentListForMonths);
+                                                                if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length == 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
                                                                     break;
                                                                 } else {
                                                                 }
                                                             }
+                                                            // console.log("+++monthWithMosLessThenMin====>", monthWithMosLessThenMin);
                                                             var index = problemActionList.findIndex(
                                                                 c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                                     // && c.region.id == regionList[r].regionId
@@ -3885,7 +2953,10 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-                                                            if (problemActionList[prob] != undefined) {
+                                                            // index1 logic----------------
+                                                            var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 17 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                            problemActionListForIndex1.map(probObj => {
+                                                                // if (problemActionList[prob] != undefined) {
 
                                                                 var mosArray1 = [];
                                                                 // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
@@ -3893,7 +2964,7 @@ export default class QatProblemActions extends Component {
                                                                 // problemList[prob].data2=6
                                                                 for (var mosCounter1 = problemList[prob].data1; mosCounter1 <= problemList[prob].data2; mosCounter1++) {
                                                                     // //console.log("mosCounter====>", mosCounter);
-                                                                    var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
+                                                                    var m1 = moment(probObj.dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                     var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                                     var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
 
@@ -3932,14 +3003,19 @@ export default class QatProblemActions extends Component {
                                                                 var monthWithMosLessThenMin1 = '';
                                                                 for (var element = 0; element < mosArray1.length; element++) {
                                                                     // //console.log("mos element===>", mosArray[element]);
-                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                                    var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                    // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin1).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                    var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
+
+                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length == 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                         break;
                                                                     } else {
                                                                     }
                                                                 }
                                                                 var index1 = problemActionList.findIndex(
-                                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                         // && c.region.id == regionList[r].regionId
                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                         && c.program.id == programList[pp].programId
@@ -3948,200 +3024,120 @@ export default class QatProblemActions extends Component {
                                                                 );
 
                                                                 if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                    var filterObj = problemActionList[index1];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
-                                                                        problemStatus: {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        },
-                                                                        notes: '',
-                                                                        reviewed: false,
-                                                                        createdBy: {
-                                                                            userId: userId,
-                                                                            username: username
-                                                                        },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                    }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
-                                                                    }
-                                                                    filterObj.problemStatus = problemStatusObject;
-
+                                                                    incomplianceProblem(index1, username, userId, problemActionList);
                                                                 } else {
                                                                     // auto open logic for index1=======>
                                                                     if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                         openProblem(index1, username, userId, problemActionList);
                                                                     }
                                                                 }
-                                                            }
+                                                                // }
+
+                                                            });
+                                                            // index1 logic----------------
 
                                                             if (monthWithMosLessThenMin != '') {
-                                                                // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
-                                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
-                                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                                // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-                                                                var shipmentListForMonths = programList[pp].shipmentList;
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                                // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-                                                                if (filteredShipmentListForMonths.length == 0) {
-                                                                    // //console.log("flag a problem mos is less then min and dont have shipment withing lead times");
-                                                                    if (index == -1) {
-                                                                        var json = {
-                                                                            problemReportId: 0,
-                                                                            program: {
-                                                                                id: programList[pp].programId,
-                                                                                label: programList[pp].label,
-                                                                                code: programList[pp].programCode
-                                                                            },
-                                                                            versionId: versionID,
-                                                                            realmProblem: problemList[prob],
+                                                                // if (filteredShipmentListForMonths.length == 0) {
+                                                                if (index == -1) {
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
 
-                                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                                            region: {
-                                                                                id: 0,
-                                                                                // label: regionList[r].label
-                                                                            },
-                                                                            planningUnit: {
-                                                                                id: planningUnitList[p].planningUnit.id,
-                                                                                label: planningUnitList[p].planningUnit.label,
+                                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                        region: {
+                                                                            id: 0,
+                                                                            // label: regionList[r].label
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: planningUnitList[p].planningUnit.id,
+                                                                            label: planningUnitList[p].planningUnit.label,
 
-                                                                            },
-                                                                            shipmentId: '',
-                                                                            data5: '',
-                                                                            planningUnitActive: true,
-                                                                            newAdded: false,
-                                                                            problemActionIndex: problemActionIndex,
-                                                                            problemCategory: {
-                                                                                id: 3,
-                                                                                label: { label_en: 'Supply Planning' }
-                                                                            },
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: { label_en: 'Open' }
-                                                                            },
-                                                                            problemType: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    label_en: 'Automatic'
-                                                                                }
-                                                                            },
-                                                                            reviewed: false,
-                                                                            reviewNotes: '',
-                                                                            reviewedDate: '',
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            lastModifiedBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            problemTransList: [
-                                                                                {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 1,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 461,
-                                                                                            label_en: "Open",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: "",
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                        problemActionList.push(json);
-                                                                        problemActionIndex++;
-                                                                    } else {
-                                                                        // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
-                                                                            openProblem(index, username, userId, problemActionList);
-                                                                        }
-                                                                    }
-                                                                } else {
-                                                                    //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
-                                                                }
-                                                            } else {
-                                                                //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                                    // //console.log("//////at this point resolve the problem.");
-                                                                    var filterObj = problemActionList[index];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
+                                                                        },
+                                                                        shipmentId: '',
+                                                                        data5: '',
+                                                                        planningUnitActive: true,
+                                                                        newAdded: false,
+                                                                        problemActionIndex: problemActionIndex,
+                                                                        problemCategory: {
+                                                                            id: 3,
+                                                                            label: { label_en: 'Supply Planning' }
+                                                                        },
                                                                         problemStatus: {
-                                                                            id: 4,
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
                                                                             label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
+                                                                                label_en: 'Automatic'
                                                                             }
                                                                         },
-                                                                        notes: '',
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
                                                                         },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "",
+                                                                                reviewed: false,
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
                                                                     }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // auto open logic for index
+                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 4) {
+                                                                        openProblem(index, username, userId, problemActionList);
                                                                     }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                                // } 
+                                                                // else {
+                                                                //     //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
+                                                                // }
+                                                            } else {
+                                                                console.log("+++no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    console.log("+++change status to incompliance");
+                                                                    incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
 
                                                         }
                                                         if (problemList[prob].problem.problemId == 18) {
-
                                                             // problem for mos is less then min having shipments within lead time 7-18 months ============
                                                             // //console.log("in problem id======>18", problemList[prob].data1, "====", problemList[prob].data2);
                                                             var mosArray = [];
@@ -4190,8 +3186,13 @@ export default class QatProblemActions extends Component {
                                                             // for loop on array mosArray
                                                             var monthWithMosLessThenMin = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
-                                                                // //console.log("mos element===>", mosArray[element]);
-                                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+
+                                                                var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+
+                                                                if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
                                                                     break;
                                                                 } else {
@@ -4207,8 +3208,10 @@ export default class QatProblemActions extends Component {
                                                             );
 
 
-
-                                                            if (problemActionList[prob] != undefined) {
+                                                            // index1 logic----------------
+                                                            var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 18 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                            problemActionListForIndex1.map(probObj => {
+                                                                // if (problemActionList[prob] != undefined) {
                                                                 var mosArray1 = [];
                                                                 // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                                 // problemList[prob].data1=0
@@ -4218,7 +3221,6 @@ export default class QatProblemActions extends Component {
                                                                     var m1 = moment(Date.now()).add(mosCounter181, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                     var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                                     var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
-
                                                                     // }
                                                                     var programId1 = programList[pp].programId;
                                                                     // var regionId = -1;
@@ -4248,20 +3250,25 @@ export default class QatProblemActions extends Component {
                                                                         });
 
                                                                 }
-                                                                // //console.log("planningUnitId====>", planningUnitId);
-                                                                // //console.log("mosArray============>$@##", mosArray);
+                                                                //console.log("planningUnitId====>", planningUnitId);
+                                                                //console.log("mosArray============>$@##", mosArray);
                                                                 // for loop on array mosArray
                                                                 var monthWithMosLessThenMin1 = '';
                                                                 for (var element = 0; element < mosArray1.length; element++) {
-                                                                    // //console.log("mos element===>", mosArray[element]);
-                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                                    //console.log("mos element===>", mosArray[element]);
+                                                                    var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                    // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin1).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                    var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate1).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate1).format('YYYY-MM-DD'));
+
+                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                         break;
                                                                     } else {
                                                                     }
                                                                 }
                                                                 var index1 = problemActionList.findIndex(
-                                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                         // && c.region.id == regionList[r].regionId
                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                         && c.program.id == programList[pp].programId
@@ -4270,192 +3277,113 @@ export default class QatProblemActions extends Component {
                                                                 );
 
                                                                 if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-                                                                    var filterObj = problemActionList[index1];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
-                                                                        problemStatus: {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        },
-                                                                        notes: '',
-                                                                        reviewed: false,
-                                                                        createdBy: {
-                                                                            userId: userId,
-                                                                            username: username
-                                                                        },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                    }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
-                                                                    }
-                                                                    filterObj.problemStatus = problemStatusObject;
-
+                                                                    incomplianceProblem(index1, username, userId, problemActionList);
                                                                 } else {
                                                                     // auto open logic for index1 ======>
                                                                     if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                         openProblem(index1, username, userId, problemActionList);
                                                                     }
                                                                 }
-                                                            }
+                                                                // }
+                                                            });
 
                                                             if (monthWithMosLessThenMin != '') {
-                                                                // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
-                                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
-                                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                                // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-                                                                var shipmentListForMonths = programList[pp].shipmentList;
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
                                                                 // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-                                                                if (filteredShipmentListForMonths.length > 0) {
-                                                                    // //console.log("flag a problem mos is less then min and have shipment withing lead times");
-                                                                    if (index == -1) {
-                                                                        var json = {
-                                                                            problemReportId: 0,
-                                                                            program: {
-                                                                                id: programList[pp].programId,
-                                                                                label: programList[pp].label,
-                                                                                code: programList[pp].programCode
-                                                                            },
-                                                                            versionId: versionID,
-                                                                            realmProblem: problemList[prob],
+                                                                // if (filteredShipmentListForMonths.length > 0) {
+                                                                // //console.log("flag a problem mos is less then min and have shipment withing lead times");
+                                                                if (index == -1) {
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
 
-                                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                                            region: {
-                                                                                id: 0
-                                                                            },
-                                                                            planningUnit: {
-                                                                                id: planningUnitList[p].planningUnit.id,
-                                                                                label: planningUnitList[p].planningUnit.label,
+                                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: planningUnitList[p].planningUnit.id,
+                                                                            label: planningUnitList[p].planningUnit.label,
 
-                                                                            },
-                                                                            shipmentId: '',
-                                                                            data5: '',
-                                                                            planningUnitActive: true,
-                                                                            newAdded: false,
-                                                                            problemActionIndex: problemActionIndex,
-                                                                            problemCategory: {
-                                                                                id: 3,
-                                                                                label: { label_en: 'Supply Planning' }
-                                                                            },
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: { label_en: 'Open' }
-                                                                            },
-                                                                            problemType: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    label_en: 'Automatic'
-                                                                                }
-                                                                            },
-                                                                            reviewed: false,
-                                                                            reviewNotes: '',
-                                                                            reviewedDate: '',
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            lastModifiedBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            problemTransList: [
-                                                                                {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 1,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 461,
-                                                                                            label_en: "Open",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: "",
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                        problemActionList.push(json);
-                                                                        problemActionIndex++;
-                                                                    } else {
-                                                                        // auto open logic for index =======>
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
-                                                                            openProblem(index, username, userId, problemActionList);
-                                                                        }
-                                                                    }
-                                                                } else {
-                                                                    //console.log("dont falg problem mos is not less then min ");
-                                                                }
-                                                            } else {
-                                                                // //console.log("no months with MOS less then min ===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                                    // //console.log("//////at this point resolve the problem.");
-                                                                    var filterObj = problemActionList[index];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
+                                                                        },
+                                                                        shipmentId: '',
+                                                                        data5: '',
+                                                                        planningUnitActive: true,
+                                                                        newAdded: false,
+                                                                        problemActionIndex: problemActionIndex,
+                                                                        problemCategory: {
+                                                                            id: 3,
+                                                                            label: { label_en: 'Supply Planning' }
+                                                                        },
                                                                         problemStatus: {
-                                                                            id: 4,
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
                                                                             label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
+                                                                                label_en: 'Automatic'
                                                                             }
                                                                         },
-                                                                        notes: '',
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
                                                                         },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "",
+                                                                                reviewed: false,
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
                                                                     }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // auto open logic for index =======>
+                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 4) {
+                                                                        openProblem(index, username, userId, problemActionList);
                                                                     }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                                // } else {
+                                                                //     //console.log("dont falg problem mos is not less then min ");
+                                                                // }
+                                                            } else {
+                                                                //console.log("no months with MOS less then min ===#########");
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    //console.log("//////at this point resolve the problem.");
+                                                                    incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
 
@@ -4509,8 +3437,13 @@ export default class QatProblemActions extends Component {
                                                             // var monthWithMosLessThenMin = '';
                                                             var monthWithMosGreaterThenMax = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
-                                                                // console.log("mos element===>", mosArray[element]);
-                                                                if (mosArray[element].mos > mosArray[element].maxForMonths) {
+
+                                                                var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+
+                                                                if (mosArray[element].mos > mosArray[element].maxForMonths && filteredShipmentListForMonths.length > 0) {
                                                                     monthWithMosGreaterThenMax = mosArray[element].month;
                                                                     break;
                                                                 } else {
@@ -4525,8 +3458,10 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-
-                                                            if (problemActionList[prob] != undefined) {
+                                                            // index1 logic----------------
+                                                            var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 19 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                            problemActionListForIndex1.map(probObj => {
+                                                                // if (problemActionList[prob] != undefined) {
                                                                 var mosArray1 = [];
                                                                 // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                                 // problemList[prob].data1=0
@@ -4574,14 +3509,18 @@ export default class QatProblemActions extends Component {
                                                                 var monthWithMosGreaterThenMax1 = '';
                                                                 for (var element = 0; element < mosArray1.length; element++) {
                                                                     // //console.log("mos element===>", mosArray[element]);
-                                                                    if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1) {
+                                                                    var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                    // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax1).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                    var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
+                                                                    if (mosArray1[element].mos1 > mosArray1[element].maxForMonths1 && filteredShipmentListForMonths1.length > 0) {
                                                                         monthWithMosGreaterThenMax1 = mosArray1[element].month1;
                                                                         break;
                                                                     } else {
                                                                     }
                                                                 }
                                                                 var index1 = problemActionList.findIndex(
-                                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                         // && c.region.id == regionList[r].regionId
                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                         && c.program.id == programList[pp].programId
@@ -4590,46 +3529,7 @@ export default class QatProblemActions extends Component {
                                                                 );
 
                                                                 if (monthWithMosGreaterThenMax1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-
-                                                                    var filterObj = problemActionList[index1];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
-                                                                        problemStatus: {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        },
-                                                                        notes: '',
-                                                                        reviewed: false,
-                                                                        createdBy: {
-                                                                            userId: userId,
-                                                                            username: username
-                                                                        },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                    }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
-                                                                    }
-                                                                    filterObj.problemStatus = problemStatusObject;
-
+                                                                    incomplianceProblem(index1, username, userId, problemActionList);
                                                                 } else {
                                                                     // auto open logic for index1
                                                                     if (monthWithMosGreaterThenMax1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
@@ -4637,162 +3537,121 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
 
-                                                            }
+                                                                // }
+                                                            });
+                                                            // index1 logic----------------
                                                             // console.log("D------------------->monthWithMosGreaterThenMax", monthWithMosGreaterThenMax)
                                                             if (monthWithMosGreaterThenMax != '') {
-                                                                // console.log("D------------------->min mos month from array ======>", monthWithMosGreaterThenMax);
-                                                                var getStartDate = moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosGreaterThenMax).subtract(3, 'months').format('YYYY-MM-DD');
-                                                                var getEndDate = moment(monthWithMosGreaterThenMax).add(4, 'months').format('YYYY-MM-DD');
-                                                                // console.log("D------------------->startDate=====>", getStartDate, "endDate=====>", getEndDate);
-                                                                var shipmentListForMonths = programList[pp].shipmentList;
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
+
                                                                 // console.log("D------------------->filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-                                                                if (filteredShipmentListForMonths.length > 0) {
-                                                                    // console.log("D------------------->flag a problem mos is greater then max and have shipment withing lead times");
-                                                                    if (index == -1) {
-                                                                        var json = {
-                                                                            problemReportId: 0,
-                                                                            program: {
-                                                                                id: programList[pp].programId,
-                                                                                label: programList[pp].label,
-                                                                                code: programList[pp].programCode
-                                                                            },
-                                                                            versionId: versionID,
-                                                                            realmProblem: problemList[prob],
+                                                                // if (filteredShipmentListForMonths.length > 0) {
+                                                                // console.log("D------------------->flag a problem mos is greater then max and have shipment withing lead times");
+                                                                if (index == -1) {
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
 
-                                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                                            region: {
-                                                                                id: 0
-                                                                            },
-                                                                            planningUnit: {
-                                                                                id: planningUnitList[p].planningUnit.id,
-                                                                                label: planningUnitList[p].planningUnit.label,
+                                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                        region: {
+                                                                            id: 0
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: planningUnitList[p].planningUnit.id,
+                                                                            label: planningUnitList[p].planningUnit.label,
 
-                                                                            },
-                                                                            shipmentId: '',
-                                                                            data5: '',
-                                                                            planningUnitActive: true,
-                                                                            newAdded: false,
-                                                                            problemActionIndex: problemActionIndex,
-                                                                            problemCategory: {
-                                                                                id: 3,
-                                                                                label: { label_en: 'Supply Planning' }
-                                                                            },
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: { label_en: 'Open' }
-                                                                            },
-                                                                            problemType: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    label_en: 'Automatic'
-                                                                                }
-                                                                            },
-                                                                            reviewed: false,
-                                                                            reviewNotes: '',
-                                                                            reviewedDate: '',
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            lastModifiedBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            problemTransList: [
-                                                                                {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 1,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 461,
-                                                                                            label_en: "Open",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: "",
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                        problemActionList.push(json);
-                                                                        problemActionIndex++;
-                                                                    } else {
-                                                                        // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
-                                                                            openProblem(index, username, userId, problemActionList);
-                                                                        }
-                                                                    }
-                                                                } else {
-                                                                    //console.log("dont falg problem mos is not greater then max ####### ");
-                                                                }
-                                                            } else {
-                                                                // //console.log("no months with MOS greater then max ===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                                    // //console.log("//////at this point resolve the problem. ###########");
-                                                                    var filterObj = problemActionList[index];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
+                                                                        },
+                                                                        shipmentId: '',
+                                                                        data5: '',
+                                                                        planningUnitActive: true,
+                                                                        newAdded: false,
+                                                                        problemActionIndex: problemActionIndex,
+                                                                        problemCategory: {
+                                                                            id: 3,
+                                                                            label: { label_en: 'Supply Planning' }
+                                                                        },
                                                                         problemStatus: {
-                                                                            id: 4,
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
                                                                             label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
+                                                                                label_en: 'Automatic'
                                                                             }
                                                                         },
-                                                                        notes: '',
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
                                                                         },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "",
+                                                                                reviewed: false,
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
                                                                     }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // auto open logic for index
+                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 4) {
+                                                                        openProblem(index, username, userId, problemActionList);
                                                                     }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                                // } else {
+                                                                //     //console.log("dont falg problem mos is not greater then max ####### ");
+                                                                // }
+                                                            } else {
+                                                                //console.log("no months with MOS greater then max ===#########");
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    //console.log("//////at this point resolve the problem. ###########");
+                                                                    incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
 
                                                         }
                                                         if (problemList[prob].problem.problemId == 20) {
-
                                                             // problem for mos less then min and no shipment in future 7 to 18 months 
                                                             // //console.log("in problem id======>20", problemList[prob].data1, "====", problemList[prob].data2);
-
                                                             var mosArray = [];
                                                             // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                             // problemList[prob].data1=0
                                                             // problemList[prob].data2=6
                                                             for (var mosCounter = parseInt(problemList[prob].data1); mosCounter <= parseInt(problemList[prob].data2); mosCounter++) {
-                                                                // //console.log("mosCounter====>", mosCounter);
+                                                                //console.log("mosCounter====>", mosCounter);
                                                                 var m = moment(Date.now()).add(mosCounter, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                 var mStartDate = moment(m).startOf('month').format("YYYY-MM-DD");
                                                                 var mEndDate = moment(m).endOf('month').format("YYYY-MM-DD");
@@ -4801,16 +3660,12 @@ export default class QatProblemActions extends Component {
                                                                 var programId = programList[pp].programId;
                                                                 // var regionId = -1;
                                                                 var planningUnitId = planningUnitList[p].planningUnit.id;
-
-
                                                                 var supplyPlanJson = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate).format("YYYY-MM-DD"));
-
                                                                 var mos = "";
                                                                 var maxForMonths = "";
                                                                 var minForMonths = "";
                                                                 var closingBalance = "";
                                                                 var amcCalcualted = "";
-
 
                                                                 if (supplyPlanJson.length > 0) {
                                                                     mos = supplyPlanJson[0].mos;
@@ -4831,13 +3686,18 @@ export default class QatProblemActions extends Component {
                                                                     });
 
                                                             }
-                                                            // //console.log("planningUnitId====>", planningUnitId);
-                                                            // //console.log("mosArray============>$@##", mosArray);
+                                                            //console.log("planningUnitId====>", planningUnitId);
+                                                            //console.log("mosArray============>$@##", mosArray);
                                                             // for loop on array mosArray
                                                             var monthWithMosLessThenMin = '';
                                                             for (var element = 0; element < mosArray.length; element++) {
-                                                                // //console.log("mos element===>", mosArray[element]);
-                                                                if (mosArray[element].mos < mosArray[element].minForMonths) {
+                                                                //console.log("mos element===>", mosArray[element]);
+                                                                var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM') < moment(Date.now()).format('YYYY-MM') ? moment(Date.now()).startOf('month').format('YYYY-MM-DD') : moment(mosArray[element].month).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                // var getStartDate = moment(mosArray[element].month).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                var getEndDate = moment(mosArray[element].month).add(4, 'months').format('YYYY-MM-DD');
+                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate).format('YYYY-MM'));
+
+                                                                if (mosArray[element].mos < mosArray[element].minForMonths && filteredShipmentListForMonths.length == 0) {
                                                                     monthWithMosLessThenMin = mosArray[element].month;
                                                                     break;
                                                                 } else {
@@ -4852,24 +3712,23 @@ export default class QatProblemActions extends Component {
                                                                 // && c.versionId == versionID
                                                             );
 
-
-                                                            if (problemActionList[prob] != undefined) {
+                                                            // index1 logic----------------
+                                                            var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 20 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                            problemActionListForIndex1.map(probObj => {
+                                                                // if (problemActionList[prob] != undefined) {
                                                                 var mosArray1 = [];
                                                                 // problemList[prob].data1 AND problemList[prob].data2 is the range  i:e t to t+6 months
                                                                 // problemList[prob].data1=0
                                                                 // problemList[prob].data2=6
                                                                 for (var mosCounter1 = parseInt(problemList[prob].data1); mosCounter1 <= parseInt(problemList[prob].data2); mosCounter1++) {
-                                                                    // //console.log("mosCounter====>", mosCounter);
+                                                                    //console.log("mosCounter====>", mosCounter);
                                                                     var m1 = moment(problemActionList[prob].dt).add(mosCounter1, 'months').utcOffset('-0500').format("YYYY-MM-DD");
                                                                     var mStartDate1 = moment(m1).startOf('month').format("YYYY-MM-DD");
                                                                     var mEndDate1 = moment(m1).endOf('month').format("YYYY-MM-DD");
-
                                                                     // }
                                                                     var programId1 = programList[pp].programId;
                                                                     // var regionId = -1;
                                                                     var planningUnitId1 = planningUnitList[p].planningUnit.id;
-
-
                                                                     var supplyPlanJson1 = programList[pp].supplyPlan.filter(c => c.planningUnitId == planningUnitId1 && moment(c.transDate).format("YYYY-MM-DD") == moment(mStartDate1).format("YYYY-MM-DD"));
 
                                                                     var mos1 = "";
@@ -4877,7 +3736,6 @@ export default class QatProblemActions extends Component {
                                                                     var minForMonths1 = "";
                                                                     var closingBalance1 = "";
                                                                     var amcCalcualted1 = "";
-
 
                                                                     if (supplyPlanJson1.length > 0) {
                                                                         mos1 = supplyPlanJson1[0].mos;
@@ -4898,20 +3756,25 @@ export default class QatProblemActions extends Component {
                                                                         });
 
                                                                 }
-                                                                // //console.log("planningUnitId====>", planningUnitId);
-                                                                // //console.log("mosArray============>$@##", mosArray);
+                                                                //console.log("planningUnitId====>", planningUnitId);
+                                                                //console.log("mosArray============>$@##", mosArray);
                                                                 // for loop on array mosArray
                                                                 var monthWithMosLessThenMin1 = '';
                                                                 for (var element = 0; element < mosArray1.length; element++) {
                                                                     // //console.log("mos element===>", mosArray[element]);
-                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1) {
+                                                                    var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM') < moment(probObj.dt).format('YYYY-MM') ? moment(probObj.dt).startOf('month').format('YYYY-MM-DD') : moment(mosArray1[element].month1).subtract(3, 'months').startOf('month').format('YYYY-MM-DD');
+                                                                    // var getStartDate1 = moment(mosArray1[element].month1).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin1).subtract(3, 'months').format('YYYY-MM-DD');
+                                                                    var getEndDate1 = moment(mosArray1[element].month1).add(4, 'months').format('YYYY-MM-DD');
+                                                                    var filteredShipmentListForMonths1 = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(getStartDate1).format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(getEndDate1).format('YYYY-MM'));
+
+                                                                    if (mosArray1[element].mos1 < mosArray1[element].minForMonths1 && filteredShipmentListForMonths1.length == 0) {
                                                                         monthWithMosLessThenMin1 = mosArray1[element].month1;
                                                                         break;
                                                                     } else {
                                                                     }
                                                                 }
                                                                 var index1 = problemActionList.findIndex(
-                                                                    c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                    c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                         // && c.region.id == regionList[r].regionId
                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                         && c.program.id == programList[pp].programId
@@ -4919,47 +3782,9 @@ export default class QatProblemActions extends Component {
                                                                     // && c.versionId == versionID
                                                                 );
 
-
                                                                 if (monthWithMosLessThenMin1 == '' && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
+                                                                    incomplianceProblem(index1, username, userId, problemActionList);
 
-                                                                    var filterObj = problemActionList[index1];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
-                                                                        problemStatus: {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        },
-                                                                        notes: '',
-                                                                        reviewed: false,
-                                                                        createdBy: {
-                                                                            userId: userId,
-                                                                            username: username
-                                                                        },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                    }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
-                                                                    }
-                                                                    filterObj.problemStatus = problemStatusObject;
                                                                 } else {
                                                                     // auto open logic for index1
                                                                     if (monthWithMosLessThenMin1 != '' && index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
@@ -4967,149 +3792,107 @@ export default class QatProblemActions extends Component {
                                                                     }
                                                                 }
 
-                                                            }
-
+                                                                // }
+                                                            });
+                                                            // index1 logic----------------
 
                                                             if (monthWithMosLessThenMin != '') {
-                                                                // //console.log("min mos month from array ======>", monthWithMosLessThenMin);
-                                                                var getStartDate = moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD') ? moment(Date.now()).format('YYYY-MM-DD') : moment(monthWithMosLessThenMin).subtract(3, 'months').format('YYYY-MM-DD');
-                                                                var getEndDate = moment(monthWithMosLessThenMin).add(4, 'months').format('YYYY-MM-DD');
-                                                                // //console.log("startDate=====>", getStartDate, "endDate=====>", getEndDate);
-                                                                var shipmentListForMonths = programList[pp].shipmentList;
-                                                                var filteredShipmentListForMonths = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM-DD') >= moment(getStartDate).format('YYYY-MM-DD') && moment(c.expectedDeliveryDate).format('YYYY-MM-DD') <= moment(getEndDate).format('YYYY-MM-DD'));
-                                                                // //console.log("filteredShipmentListForMonths=====>", filteredShipmentListForMonths);
-                                                                if (filteredShipmentListForMonths.length == 0) {
-                                                                    // //console.log("flag a problem mos is less then min and dont have shipment withing lead times");
-                                                                    if (index == -1) {
-                                                                        var json = {
-                                                                            problemReportId: 0,
-                                                                            program: {
-                                                                                id: programList[pp].programId,
-                                                                                label: programList[pp].label,
-                                                                                code: programList[pp].programCode
-                                                                            },
-                                                                            versionId: versionID,
-                                                                            realmProblem: problemList[prob],
+                                                                // if (filteredShipmentListForMonths.length == 0) {
+                                                                //console.log("flag a problem mos is less then min and dont have shipment withing lead times");
+                                                                if (index == -1) {
+                                                                    var json = {
+                                                                        problemReportId: 0,
+                                                                        program: {
+                                                                            id: programList[pp].programId,
+                                                                            label: programList[pp].label,
+                                                                            code: programList[pp].programCode
+                                                                        },
+                                                                        versionId: versionID,
+                                                                        realmProblem: problemList[prob],
 
-                                                                            dt: moment(Date.now()).format('YYYY-MM-DD'),
-                                                                            region: {
-                                                                                id: 0,
-                                                                                // label: regionList[r].label
-                                                                            },
-                                                                            planningUnit: {
-                                                                                id: planningUnitList[p].planningUnit.id,
-                                                                                label: planningUnitList[p].planningUnit.label,
+                                                                        dt: moment(Date.now()).format('YYYY-MM-DD'),
+                                                                        region: {
+                                                                            id: 0,
+                                                                            // label: regionList[r].label
+                                                                        },
+                                                                        planningUnit: {
+                                                                            id: planningUnitList[p].planningUnit.id,
+                                                                            label: planningUnitList[p].planningUnit.label,
 
-                                                                            },
-                                                                            shipmentId: '',
-                                                                            data5: '',
-                                                                            planningUnitActive: true,
-                                                                            newAdded: false,
-                                                                            problemActionIndex: problemActionIndex,
-                                                                            problemCategory: {
-                                                                                id: 3,
-                                                                                label: { label_en: 'Supply Planning' }
-                                                                            },
-                                                                            problemStatus: {
-                                                                                id: 1,
-                                                                                label: { label_en: 'Open' }
-                                                                            },
-                                                                            problemType: {
-                                                                                id: 1,
-                                                                                label: {
-                                                                                    label_en: 'Automatic'
-                                                                                }
-                                                                            },
-                                                                            reviewed: false,
-                                                                            reviewNotes: '',
-                                                                            reviewedDate: '',
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            lastModifiedBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-                                                                            problemTransList: [
-                                                                                {
-                                                                                    problemReportTransId: '',
-                                                                                    problemStatus: {
-                                                                                        id: 1,
-                                                                                        label: {
-                                                                                            active: true,
-                                                                                            labelId: 461,
-                                                                                            label_en: "Open",
-                                                                                            label_sp: null,
-                                                                                            label_fr: null,
-                                                                                            label_pr: null
-                                                                                        }
-                                                                                    },
-                                                                                    notes: "",
-                                                                                    reviewed: false,
-                                                                                    createdBy: {
-                                                                                        userId: userId,
-                                                                                        username: username
-                                                                                    },
-                                                                                    createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                        problemActionList.push(json);
-                                                                        problemActionIndex++;
-                                                                    } else {
-                                                                        // auto open logic for index
-                                                                        if (index != -1 && problemActionList[index].problemStatus.id == 4) {
-                                                                            openProblem(index, username, userId, problemActionList);
-                                                                        }
-                                                                    }
-                                                                } else {
-                                                                    //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
-                                                                }
-                                                            } else {
-                                                                // //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
-                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
-                                                                    // //console.log("//////at this point resolve the problem.");
-                                                                    var filterObj = problemActionList[index];
-                                                                    var transList = filterObj.problemTransList;
-                                                                    let tempProblemTransObj = {
-                                                                        problemReportTransId: '',
+                                                                        },
+                                                                        shipmentId: '',
+                                                                        data5: '',
+                                                                        planningUnitActive: true,
+                                                                        newAdded: false,
+                                                                        problemActionIndex: problemActionIndex,
+                                                                        problemCategory: {
+                                                                            id: 3,
+                                                                            label: { label_en: 'Supply Planning' }
+                                                                        },
                                                                         problemStatus: {
-                                                                            id: 4,
+                                                                            id: 1,
+                                                                            label: { label_en: 'Open' }
+                                                                        },
+                                                                        problemType: {
+                                                                            id: 1,
                                                                             label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
+                                                                                label_en: 'Automatic'
                                                                             }
                                                                         },
-                                                                        notes: '',
                                                                         reviewed: false,
+                                                                        reviewNotes: '',
+                                                                        reviewedDate: '',
                                                                         createdBy: {
                                                                             userId: userId,
                                                                             username: username
                                                                         },
-                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                        createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        lastModifiedBy: {
+                                                                            userId: userId,
+                                                                            username: username
+                                                                        },
+                                                                        lastModifiedDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+                                                                        problemTransList: [
+                                                                            {
+                                                                                problemReportTransId: '',
+                                                                                problemStatus: {
+                                                                                    id: 1,
+                                                                                    label: {
+                                                                                        active: true,
+                                                                                        labelId: 461,
+                                                                                        label_en: "Open",
+                                                                                        label_sp: null,
+                                                                                        label_fr: null,
+                                                                                        label_pr: null
+                                                                                    }
+                                                                                },
+                                                                                notes: "",
+                                                                                reviewed: false,
+                                                                                createdBy: {
+                                                                                    userId: userId,
+                                                                                    username: username
+                                                                                },
+                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+                                                                            }
+                                                                        ]
                                                                     }
-                                                                    transList.push(tempProblemTransObj);
-                                                                    filterObj.problemTransList = transList;
-                                                                    filterObj.reviewed = false;
-                                                                    var problemStatusObject = {
-                                                                        id: 4,
-                                                                        label: {
-                                                                            active: true,
-                                                                            labelId: 27104,
-                                                                            label_en: "In-Compliance",
-                                                                            label_sp: null,
-                                                                            label_fr: null,
-                                                                            label_pr: null
-                                                                        }
+                                                                    problemActionList.push(json);
+                                                                    problemActionIndex++;
+                                                                } else {
+                                                                    // auto open logic for index
+                                                                    if (index != -1 && problemActionList[index].problemStatus.id == 4) {
+                                                                        openProblem(index, username, userId, problemActionList);
                                                                     }
-                                                                    filterObj.problemStatus = problemStatusObject;
+                                                                }
+                                                                // } else {
+                                                                //     //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
+                                                                // }
+                                                            } else {
+                                                                //console.log("no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                                // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
+                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                    //console.log("//////at this point resolve the problem.");
+                                                                    incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }
 
@@ -5122,15 +3905,11 @@ export default class QatProblemActions extends Component {
                                                                 var tMinusOneDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
                                                                 var tMinusTwoDate = moment(Date.now()).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
                                                                 var tMinusThreeDate = moment(Date.now()).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                // //console.log("tMinusOneDate--->",tMinusOneDate);
-                                                                // //console.log("tMinusOneDate--->",tMinusTwoDate);
-                                                                // //console.log("tMinusOneDate--->",tMinusThreeDate);
+
                                                                 var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                 var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                 var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                                // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
-                                                                // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
-                                                                // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+
                                                                 var index = problemActionList.findIndex(
                                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                                         && c.region.id == regionList[r].regionId
@@ -5139,26 +3918,25 @@ export default class QatProblemActions extends Component {
                                                                         && c.realmProblem.problem.problemId == 21
                                                                     // && c.versionId == versionID
                                                                 );
+                                                                // index1 logic----------------
+                                                                var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 21 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                problemActionListForIndex1.map(probObj => {
 
-                                                                if (problemActionList[prob] != undefined) {
+                                                                    // if (problemActionList[prob] != undefined) {
 
                                                                     var consumptionList1 = programList[pp].consumptionList;
                                                                     consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
 
-                                                                    var tMinusOneDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    var tMinusTwoDate1 = moment(problemActionList[prob].dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    var tMinusThreeDate1 = moment(problemActionList[prob].dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    // //console.log("tMinusOneDate--->",tMinusOneDate);
-                                                                    // //console.log("tMinusOneDate--->",tMinusTwoDate);
-                                                                    // //console.log("tMinusOneDate--->",tMinusThreeDate);
+                                                                    var tMinusOneDate1 = moment(probObj.dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                    var tMinusTwoDate1 = moment(probObj.dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                    var tMinusThreeDate1 = moment(probObj.dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
+
                                                                     var consumptionListFortMinusOneDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                     var consumptionListFortMinusTwoDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                     var consumptionListFortMinusThreeDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                                    // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
-                                                                    // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
-                                                                    // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+
                                                                     var index1 = problemActionList.findIndex(
-                                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                        c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
@@ -5173,47 +3951,11 @@ export default class QatProblemActions extends Component {
                                                                         }
                                                                     } else {
                                                                         if (consumptionListFortMinusTwoDate1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-                                                                            var filterObj = problemActionList[index1];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            incomplianceProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
-                                                                }
+                                                                    // }
+                                                                });
 
                                                                 if (consumptionListFortMinusOneDate.length > 0 && consumptionListFortMinusThreeDate.length > 0 && consumptionListFortMinusTwoDate.length == 0) {
                                                                     // //console.log("rais prob--------");
@@ -5306,46 +4048,9 @@ export default class QatProblemActions extends Component {
                                                                 } else {
                                                                     // //console.log("dont rais prob--------");
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                        // //console.log("resolve the problem problem id 21");
+                                                                        //console.log("resolve the problem problem id 21");
                                                                         // problemActionList[index].isFound = 0;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
@@ -5360,18 +4065,10 @@ export default class QatProblemActions extends Component {
                                                                 var tMinusOneDate = moment(Date.now()).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
                                                                 var tMinusTwoDate = moment(Date.now()).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
                                                                 // var tMinusThreeDate = moment(Date.now()).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                // //console.log("tMinusOneDate--->",tMinusOneDate);
-                                                                // //console.log("tMinusOneDate--->",tMinusTwoDate);
-                                                                // //console.log("tMinusOneDate--->",tMinusThreeDate);
-
                                                                 var consumptionListFortDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                 var consumptionListFortMinusOneDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                 var consumptionListFortMinusTwoDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-
                                                                 // var consumptionListFortMinusThreeDate = consumptionList.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                                // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
-                                                                // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
-                                                                // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
                                                                 var index = problemActionList.findIndex(
                                                                     c => moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM")
                                                                         && c.region.id == regionList[r].regionId
@@ -5380,29 +4077,25 @@ export default class QatProblemActions extends Component {
                                                                         && c.realmProblem.problem.problemId == 22
                                                                     // && c.versionId == versionID
                                                                 );
-
-                                                                if (problemActionList[prob] != undefined) {
+                                                                // index1 logic----------------
+                                                                var problemActionListForIndex1 = problemActionList.filter(c => c.planningUnit.id == planningUnitList[p].planningUnit.id && c.realmProblem.problem.problemId == 22 && moment(c.dt).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"));
+                                                                problemActionListForIndex1.map(probObj => {
+                                                                    // if (problemActionList[prob] != undefined) {
 
                                                                     var consumptionList1 = programList[pp].consumptionList;
                                                                     consumptionList1 = consumptionList1.filter(c => c.region.id == regionList[r].regionId && c.planningUnit.id == planningUnitList[p].planningUnit.id);
 
-                                                                    var tDate1 = moment(problemActionList[prob].dt).endOf('month').format("YYYY-MM-DD");
-                                                                    var tMinusOneDate1 = moment(problemActionList[prob].dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    var tMinusTwoDate1 = moment(problemActionList[prob].dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    // var tMinusThreeDate1 = moment(problemActionList[prob].dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
-                                                                    // //console.log("tMinusOneDate--->",tMinusOneDate);
-                                                                    // //console.log("tMinusOneDate--->",tMinusTwoDate);
-                                                                    // //console.log("tMinusOneDate--->",tMinusThreeDate);
-
+                                                                    var tDate1 = moment(probObj.dt).endOf('month').format("YYYY-MM-DD");
+                                                                    var tMinusOneDate1 = moment(probObj.dt).subtract(1, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                    var tMinusTwoDate1 = moment(probObj.dt).subtract(2, 'months').endOf('month').format("YYYY-MM-DD");
+                                                                    // var tMinusThreeDate1 = moment(probObj.dt).subtract(3, 'months').endOf('month').format("YYYY-MM-DD");
                                                                     var consumptionListFortDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                     var consumptionListFortMinusOneDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusOneDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                     var consumptionListFortMinusTwoDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusTwoDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
                                                                     // var consumptionListFortMinusThreeDate1 = consumptionList1.filter(c => moment(c.consumptionDate).format('YYYY-MM') == moment(tMinusThreeDate1).format('YYYY-MM') && c.actualFlag.toString() == "true" && c.active == true);
-                                                                    // //console.log("consumptionListFortMinusOneDate--->",consumptionListFortMinusOneDate.length);
-                                                                    // //console.log("consumptionListFortMinusTwoDate--->",consumptionListFortMinusTwoDate.length);
-                                                                    // //console.log("consumptionListFortMinusThreeDate--->",consumptionListFortMinusThreeDate.length);
+
                                                                     var index1 = problemActionList.findIndex(
-                                                                        c => moment(c.dt).format("YYYY-MM") == moment(problemActionList[prob].dt).format("YYYY-MM")
+                                                                        c => moment(c.dt).format("YYYY-MM") == moment(probObj.dt).format("YYYY-MM")
                                                                             && c.region.id == regionList[r].regionId
                                                                             && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                             && c.program.id == programList[pp].programId
@@ -5411,60 +4104,19 @@ export default class QatProblemActions extends Component {
                                                                     );
 
                                                                     if (consumptionListFortDate1.length > 0 && consumptionListFortMinusTwoDate1.length > 0 && consumptionListFortMinusOneDate1.length == 0) {
-                                                                        // console.log("1============>");
                                                                         // auto open logic for index1
                                                                         if (index1 != -1 && problemActionList[index1].problemStatus.id == 4) {
                                                                             openProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     } else {
-                                                                        // console.log("2============>");
                                                                         if (consumptionListFortMinusOneDate1.length > 0 && index1 != -1 && (problemActionList[index1].problemStatus.id == 1 || problemActionList[index1].problemStatus.id == 3)) {
-                                                                            // console.log("3============>");
-                                                                            var filterObj = problemActionList[index1];
-                                                                            var transList = filterObj.problemTransList;
-                                                                            let tempProblemTransObj = {
-                                                                                problemReportTransId: '',
-                                                                                problemStatus: {
-                                                                                    id: 4,
-                                                                                    label: {
-                                                                                        active: true,
-                                                                                        labelId: 27104,
-                                                                                        label_en: "In-Compliance",
-                                                                                        label_sp: null,
-                                                                                        label_fr: null,
-                                                                                        label_pr: null
-                                                                                    }
-                                                                                },
-                                                                                notes: '',
-                                                                                reviewed: false,
-                                                                                createdBy: {
-                                                                                    userId: userId,
-                                                                                    username: username
-                                                                                },
-                                                                                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                            }
-                                                                            transList.push(tempProblemTransObj);
-                                                                            filterObj.problemTransList = transList;
-                                                                            filterObj.reviewed = false;
-                                                                            var problemStatusObject = {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            }
-                                                                            filterObj.problemStatus = problemStatusObject;
+                                                                            incomplianceProblem(index1, username, userId, problemActionList);
                                                                         }
                                                                     }
-                                                                }
+                                                                    // }
+                                                                });
 
                                                                 if (consumptionListFortDate.length > 0 && consumptionListFortMinusTwoDate.length > 0 && consumptionListFortMinusOneDate.length == 0) {
-                                                                    // //console.log("rais prob--------");
-                                                                    // console.log("4============>");
                                                                     if (index == -1) {
                                                                         var json = {
                                                                             problemReportId: 0,
@@ -5545,7 +4197,6 @@ export default class QatProblemActions extends Component {
                                                                         problemActionList.push(json);
                                                                         problemActionIndex++;
                                                                     } else {
-                                                                        // console.log("5============>");
                                                                         // problemActionList[index].isFound = 1 auot open logic for index;
                                                                         if (index != -1 && problemActionList[index].problemStatus.id == 4) {
                                                                             openProblem(index, username, userId, problemActionList);
@@ -5553,56 +4204,18 @@ export default class QatProblemActions extends Component {
                                                                     }
 
                                                                 } else {
-                                                                    // console.log("6============>");
-                                                                    // //console.log("dont rais prob--------");
+
                                                                     if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                        // //console.log("resolve the problem problem id 21");
+                                                                        // console.log("resolve the problem problem id 21");
                                                                         // problemActionList[index].isFound = 0;
-                                                                        var filterObj = problemActionList[index];
-                                                                        var transList = filterObj.problemTransList;
-                                                                        let tempProblemTransObj = {
-                                                                            problemReportTransId: '',
-                                                                            problemStatus: {
-                                                                                id: 4,
-                                                                                label: {
-                                                                                    active: true,
-                                                                                    labelId: 27104,
-                                                                                    label_en: "In-Compliance",
-                                                                                    label_sp: null,
-                                                                                    label_fr: null,
-                                                                                    label_pr: null
-                                                                                }
-                                                                            },
-                                                                            notes: '',
-                                                                            reviewed: false,
-                                                                            createdBy: {
-                                                                                userId: userId,
-                                                                                username: username
-                                                                            },
-                                                                            createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
-                                                                        }
-                                                                        transList.push(tempProblemTransObj);
-                                                                        filterObj.problemTransList = transList;
-                                                                        filterObj.reviewed = false;
-                                                                        var problemStatusObject = {
-                                                                            id: 4,
-                                                                            label: {
-                                                                                active: true,
-                                                                                labelId: 27104,
-                                                                                label_en: "In-Compliance",
-                                                                                label_sp: null,
-                                                                                label_fr: null,
-                                                                                label_pr: null
-                                                                            }
-                                                                        }
-                                                                        filterObj.problemStatus = problemStatusObject;
+                                                                        incomplianceProblem(index, username, userId, problemActionList);
                                                                     }
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 } else {
-                                                    console.log("in else====>");
+                                                    // console.log("in else====>");
                                                     for (var pal = 0; pal < problemActionList.length; pal++) {
                                                         if (problemActionList[pal].planningUnit.id == planningUnitList[p].planningUnit.id) {
                                                             problemActionList[pal].planningUnitActive = false;

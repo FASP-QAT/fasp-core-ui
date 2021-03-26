@@ -33,7 +33,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -51,6 +51,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 class warehouseCapacity extends Component {
     constructor(props) {
@@ -91,7 +92,7 @@ class warehouseCapacity extends Component {
 
     componentDidMount() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             this.getCountrylist();
             this.getPrograms();
@@ -110,7 +111,7 @@ class warehouseCapacity extends Component {
 
         var csvRow = [];
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.state.countryLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
@@ -209,7 +210,7 @@ class warehouseCapacity extends Component {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
 
-                    if (navigator.onLine) {
+                    if (isSiteOnline()) {
                         var y = 90
                         var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, y, planningText)
@@ -310,8 +311,15 @@ class warehouseCapacity extends Component {
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
+                var listArray = response.data.map(ele => ele.realmCountry);
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    countries: response.data.map(ele => ele.realmCountry), loading: false
+                    // countries: response.data.map(ele => ele.realmCountry), loading: false
+                    countries: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -448,13 +456,19 @@ class warehouseCapacity extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false,
+                        programs: listArray, loading: false,
                     })
                 }).catch(
                     error => {
@@ -588,7 +602,7 @@ class warehouseCapacity extends Component {
     }
 
     fetchData(e) {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
 
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
@@ -883,6 +897,7 @@ class warehouseCapacity extends Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         // const { programLst } = this.state;
         // let programList = programLst.length > 0
         //     && programLst.map((item, i) => {
@@ -937,7 +952,7 @@ class warehouseCapacity extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <Online>
+                                            {checkOnline === 'Online' &&
                                                 <FormGroup className="col-md-3 ">
                                                     <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -959,10 +974,10 @@ class warehouseCapacity extends Component {
                                                     </div>
 
                                                 </FormGroup>
-                                            </Online>
-                                            <Online>
+                                            }
 
-                                                {/* <FormGroup className="col-md-3">
+
+                                            {/* <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
                                                         <InputGroup>
@@ -982,6 +997,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup> */}
+                                            {checkOnline === 'Online' &&
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1001,9 +1017,9 @@ class warehouseCapacity extends Component {
                                                         )}
 
                                                 </FormGroup>
-                                            </Online>
+                                            }
 
-                                            <Offline>
+                                            {checkOnline === 'Offline' &&
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                     <div className="controls ">
@@ -1033,7 +1049,7 @@ class warehouseCapacity extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
-                                            </Offline>
+                                            }
 
                                         </div>
                                     </div>

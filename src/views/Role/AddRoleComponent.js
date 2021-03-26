@@ -614,8 +614,15 @@ class AddRoleComponent extends Component {
                     for (var i = 0; i < response.data.length; i++) {
                         businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    var listArray = businessFunctionList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    // console.log("listArray------>", listArray);
                     this.setState({
-                        businessFunctionList, loading: false
+                        businessFunctionList: listArray, loading: false
                     })
                 }
                 else {
@@ -697,8 +704,14 @@ class AddRoleComponent extends Component {
                     for (var i = 0; i < response.data.length; i++) {
                         canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    var listArray = canCreateRoleList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        canCreateRoleList,
+                        canCreateRoleList: listArray,
                         loading: false
                     })
                 } else {
@@ -931,7 +944,7 @@ class AddRoleComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}
-                                                        <span className="red Reqasterisk">*</span> </Label>
+                                                            <span className="red Reqasterisk">*</span> </Label>
 
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',

@@ -32,6 +32,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -58,7 +59,7 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
             programId: '',
@@ -79,7 +80,7 @@ class StockAdjustmentComponent extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -246,7 +247,7 @@ class StockAdjustmentComponent extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             // console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: []
                     }, () => {
@@ -407,8 +408,14 @@ class StockAdjustmentComponent extends Component {
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data, message: ''
+                            planningUnits: listArray, message: ''
                         }, () => {
                             this.fetchData();
                         })

@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -36,13 +36,12 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
-
 
 class ProcurementAgentExport extends Component {
     constructor(props) {
@@ -69,7 +68,7 @@ class ProcurementAgentExport extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
             programId: '',
@@ -90,7 +89,7 @@ class ProcurementAgentExport extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -247,13 +246,19 @@ class ProcurementAgentExport extends Component {
     }
 
     getProcurementAgent = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
                     // console.log(JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        procurementAgents: response.data, loading: false
+                        procurementAgents: listArray, loading: false
                     }, () => { this.consolidatedProcurementAgentList() })
                 }).catch(
                     error => {
@@ -401,7 +406,7 @@ class ProcurementAgentExport extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: []
                     }, () => {
@@ -904,7 +909,7 @@ class ProcurementAgentExport extends Component {
 
     buildJExcel() {
         let shipmentCosttList = this.state.data;
-        // console.log("shipmentCosttList---->", shipmentCosttList);
+        console.log("shipmentCosttList @@@---->", shipmentCosttList);
         let shipmentCostArray = [];
         let count = 0;
 
@@ -1171,13 +1176,13 @@ class ProcurementAgentExport extends Component {
                                 var shipmentList = (programJson.shipmentList);
                                 console.log("shipmentList----*********----", shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const activeFilter = shipmentList;
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
                                 this.state.procurementAgentValues.map(p => {
@@ -1215,7 +1220,6 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": isNaN(Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1224,46 +1228,48 @@ class ProcurementAgentExport extends Component {
                                     }
                                 })
                                 console.log("data----->", data);
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
-                                // console.log("userFilter===>", useFilter);
+                                // console.log("userFilter===>###", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
+                                    var procurementAgentIds = planningUnitFilterdata.map(q => parseInt(q.procurementAgent.id));
+                                    var uniqueProcurementAgentIds = procurementAgentIds.filter((q, idx) => procurementAgentIds.indexOf(q) === idx);
                                     // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
-                                    var qty = 0;
-                                    var productCost = 0;
-                                    var freightPerc = 0;
-                                    var freightCost = 0;
-                                    var totalCost = 0;
-                                    for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
-                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
-                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
-                                    }
-                                    myJson = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilterdata[0].shipmentId,
-                                        "procurementAgent": planningUnitFilterdata[0].procurementAgent,
-                                        "fundingSource": planningUnitFilterdata[0].fundingSource,
-                                        "planningUnit": planningUnitFilterdata[0].planningUnit,
-                                        "qty": qty,
-                                        "productCost": productCost,
-                                        "freightPerc": freightPerc,
-                                        "freightCost": freightCost,
-                                        "totalCost": totalCost,
-                                    }
+                                    for (var u = 0; u < uniqueProcurementAgentIds.length; u++) {
+                                        var pupaFilterdata = planningUnitFilterdata.filter(c => c.procurementAgent.id == uniqueProcurementAgentIds[u]);
+                                        var qty = 0;
+                                        var productCost = 0;
+                                        var freightPerc = 0;
+                                        var freightCost = 0;
+                                        var totalCost = 0;
+                                        for (var pf = 0; pf < pupaFilterdata.length; pf++) {
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
+                                        }
+                                        myJson = {
+                                            "active": true,
+                                            "shipmentId": pupaFilterdata[0].shipmentId,
+                                            "procurementAgent": pupaFilterdata[0].procurementAgent,
+                                            "fundingSource": pupaFilterdata[0].fundingSource,
+                                            "planningUnit": pupaFilterdata[0].planningUnit,
+                                            "qty": qty,
+                                            "productCost": productCost,
+                                            "freightPerc": Number((Number(freightCost)/Number(productCost))*100),
+                                            "freightCost": freightCost,
+                                            "totalCost": totalCost,
+                                        }
 
 
-                                    // }
-                                    filteredData.push(myJson);
+                                        // }
+                                        filteredData.push(myJson);
+                                    }
                                 }
-
-                                console.log("filteredData=====>", filteredData);
                                 this.setState({
                                     data: filteredData
                                     , message: ''
@@ -1301,8 +1307,8 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
-                                this.consolidatedProcurementAgentList();
+                                // this.consolidatedProgramList();
+                                // this.consolidatedProcurementAgentList();
                                 this.buildJExcel();
                             })
                         }).catch(
@@ -1310,7 +1316,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -1475,14 +1481,14 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
 
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
                                 let data = [];
                                 this.state.fundingSourceValues.map(f => {
@@ -1520,7 +1526,6 @@ class ProcurementAgentExport extends Component {
                                             "planningUnit": planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                            "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                             "currency": planningUnitFilter[j].currency
@@ -1528,7 +1533,7 @@ class ProcurementAgentExport extends Component {
                                         data.push(json);
                                     }
                                 })
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
@@ -1536,35 +1541,38 @@ class ProcurementAgentExport extends Component {
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
-                                    console.log("planningUnitFilterdata===>", planningUnitFilterdata);
-                                    var qty = 0;
-                                    var productCost = 0;
-                                    var freightPerc = 0;
-                                    var freightCost = 0;
-                                    var totalCost = 0;
-                                    for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
-                                    }
-                                    myJson = {
-                                        "active": true,
-                                        "shipmentId": planningUnitFilterdata[0].shipmentId,
-                                        "procurementAgent": planningUnitFilterdata[0].procurementAgent,
-                                        "fundingSource": planningUnitFilterdata[0].fundingSource,
-                                        "planningUnit": planningUnitFilterdata[0].planningUnit,
-                                        "qty": qty,
-                                        "productCost": productCost,
-                                        "freightPerc": freightPerc,
-                                        "freightCost": freightCost,
-                                        "totalCost": totalCost,
-                                    }
+                                    var fundingSourceIds = planningUnitFilterdata.map(q => parseInt(q.fundingSource.id));
+                                    var uniqueFundingSourceIds = fundingSourceIds.filter((q, idx) => fundingSourceIds.indexOf(q) === idx);
+                                    for (var u = 0; u < uniqueFundingSourceIds.length; u++) {
+                                        var pupaFilterdata = planningUnitFilterdata.filter(c => c.fundingSource.id == uniqueFundingSourceIds[u]);
+                                        var qty = 0;
+                                        var productCost = 0;
+                                        var freightPerc = 0;
+                                        var freightCost = 0;
+                                        var totalCost = 0;
+                                        for (var pf = 0; pf < pupaFilterdata.length; pf++) {
+                                            qty = Number(qty) + Number(pupaFilterdata[pf].qty);
+                                            productCost = Number(productCost) + Number(pupaFilterdata[pf].productCost);
+                                            freightCost = Number(freightCost) + Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd);
+                                            totalCost = Number(totalCost) + (Number(pupaFilterdata[pf].productCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd)) + (Number(pupaFilterdata[pf].freightCost) * Number(pupaFilterdata[pf].currency.conversionRateToUsd));
+                                        }
+                                        myJson = {
+                                            "active": true,
+                                            "shipmentId": pupaFilterdata[0].shipmentId,
+                                            "procurementAgent": pupaFilterdata[0].procurementAgent,
+                                            "fundingSource": pupaFilterdata[0].fundingSource,
+                                            "planningUnit": pupaFilterdata[0].planningUnit,
+                                            "qty": qty,
+                                            "productCost": productCost,
+                                            "freightPerc": Number((Number(freightCost)/Number(productCost))*100),
+                                            "freightCost": freightCost,
+                                            "totalCost": totalCost,
+                                        }
 
 
-                                    // }
-                                    filteredData.push(myJson);
+                                        // }
+                                        filteredData.push(myJson);
+                                    }
                                 }
                                 console.log("end offline data----", filteredData);
                                 this.setState({
@@ -1603,7 +1611,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.consolidatedFundingSourceList();
                                 this.buildJExcel();
                             })
@@ -1612,7 +1620,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedFundingSourceList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -1780,13 +1788,13 @@ class ProcurementAgentExport extends Component {
 
                                 var shipmentList = (programJson.shipmentList);
 
-                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true"));
+                                const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                                 let isPlannedShipment = [];
                                 if (isPlannedShipmentId == 1) {//yes includePlannedShipments = 1 means the report will include all shipments that are Active and not Cancelled
                                     isPlannedShipment = activeFilter.filter(c => c.shipmentStatus.id != 8);
                                 } else {//no includePlannedShipments = 0 means only(4,5,6,7) Approve, Shipped, Arrived, Delivered statuses will be included in the report
-                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 4 && c.shipmentStatus.id == 5 && c.shipmentStatus.id == 6 && c.shipmentStatus.id == 7));
+                                    isPlannedShipment = activeFilter.filter(c => (c.shipmentStatus.id == 3 || c.shipmentStatus.id == 4 || c.shipmentStatus.id == 5 || c.shipmentStatus.id == 6 || c.shipmentStatus.id == 7));
                                 }
 
                                 // const dateFilter = isPlannedShipment.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
@@ -1815,7 +1823,6 @@ class ProcurementAgentExport extends Component {
                                         "planningUnit": planningUnitFilter[j].planningUnit,
                                         "qty": planningUnitFilter[j].shipmentQty,
                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
-                                        "freightPerc": Number((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)),
                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                         "totalCost": (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd) + (planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd),
                                         "currency": planningUnitFilter[j].currency
@@ -1823,11 +1830,12 @@ class ProcurementAgentExport extends Component {
                                     data.push(json);
                                 }
 
-                                var planningUnitsinData = data.map(q => q.planningUnit.id);
+                                var planningUnitsinData = data.map(q => parseInt(q.planningUnit.id));
                                 var useFilter = planningUnitsinData.filter((q, idx) => planningUnitsinData.indexOf(q) === idx);
                                 // console.log("userFilter===>", useFilter);
                                 var filteredData = [];
                                 var myJson = [];
+                                console.log("User Filter@@@", useFilter);
                                 for (var uf = 0; uf < useFilter.length; uf++) {
                                     // for (var p = 0; p < data.length; p++) {
                                     var planningUnitFilterdata = data.filter(c => c.planningUnit.id == useFilter[uf]);
@@ -1837,12 +1845,12 @@ class ProcurementAgentExport extends Component {
                                     var freightPerc = 0;
                                     var freightCost = 0;
                                     var totalCost = 0;
+                                    console.log("@@@PlanningUnitFiltered data", planningUnitFilterdata);
                                     for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
-                                        qty = qty + planningUnitFilterdata[pf].qty;
-                                        productCost = productCost + planningUnitFilterdata[pf].productCost;
-                                        freightPerc = Number(freightPerc) + isNaN(Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2))) ? 0.00 : Number((((planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) / (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd)) * 100).toFixed(2));
-                                        freightCost = freightCost + planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd;
-                                        totalCost = totalCost + (planningUnitFilterdata[pf].productCost * planningUnitFilterdata[pf].currency.conversionRateToUsd) + (planningUnitFilterdata[pf].freightCost * planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
+                                        productCost = Number(productCost) + Number(planningUnitFilterdata[pf].productCost);
+                                        freightCost = Number(freightCost) + Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd);
+                                        totalCost = Number(totalCost) + (Number(planningUnitFilterdata[pf].productCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd)) + (Number(planningUnitFilterdata[pf].freightCost) * Number(planningUnitFilterdata[pf].currency.conversionRateToUsd));
                                     }
                                     myJson = {
                                         "active": true,
@@ -1851,10 +1859,10 @@ class ProcurementAgentExport extends Component {
                                         "fundingSource": planningUnitFilterdata[0].fundingSource,
                                         "planningUnit": planningUnitFilterdata[0].planningUnit,
                                         "qty": qty,
-                                        "productCost": productCost.toFixed(2),
-                                        "freightPerc": freightPerc,
+                                        "productCost": productCost,
+                                        "freightPerc": Number((Number(freightCost)/Number(productCost))*100),
                                         "freightCost": freightCost,
-                                        "totalCost": totalCost.toFixed(2),
+                                        "totalCost": totalCost,
                                     }
 
 
@@ -1897,7 +1905,7 @@ class ProcurementAgentExport extends Component {
                             this.setState({
                                 data: response.data
                             }, () => {
-                                this.consolidatedProgramList();
+                                // this.consolidatedProgramList();
                                 this.buildJExcel();
                             })
                         }).catch(
@@ -1905,7 +1913,7 @@ class ProcurementAgentExport extends Component {
                                 this.setState({
                                     data: [], loading: false
                                 }, () => {
-                                    this.consolidatedProgramList();
+                                    // this.consolidatedProgramList();
                                     this.consolidatedProcurementAgentList();
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
@@ -2067,7 +2075,8 @@ class ProcurementAgentExport extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
             this.filterVersion();
         })
@@ -2084,7 +2093,7 @@ class ProcurementAgentExport extends Component {
     }
 
     getFundingSource = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
@@ -2428,6 +2437,7 @@ class ProcurementAgentExport extends Component {
                 text: 'All', value: this.state.selRegion.length
             }]
         }
+        const checkOnline = localStorage.getItem('typeOfSession');
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -2441,34 +2451,30 @@ class ProcurementAgentExport extends Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
                         </div> */}
-                        <Online>
-                            {
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShippmentCost() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
-                                    </a>
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                </div>
-                            }
-                        </Online>
-                        <Offline>
-                            {
-                                this.state.data.length > 0 &&
-                                <div className="card-header-actions">
-                                    <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShippmentCost() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
-                                    </a>
-                                    <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
-                                    </a>
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                </div>
-                            }
-                        </Offline>
+                        {checkOnline === 'Online' &&
+                            this.state.data.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShippmentCost() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                </a>
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                            </div>
+                        }
+                        {checkOnline === 'Offline' &&
+                            this.state.data.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShippmentCost() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                </a>
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                            </div>
+                        }
                     </div>
                     <CardBody className="pt-lg-2 pb-lg-5">
 

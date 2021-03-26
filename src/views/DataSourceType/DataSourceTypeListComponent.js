@@ -346,6 +346,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.datasourcetype.datasourcetype');
 export default class DataSourceTypeListComponent extends Component {
@@ -434,7 +435,7 @@ export default class DataSourceTypeListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [0,150, 150, 100,100,100],
+            colWidths: [0, 150, 150, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -515,7 +516,7 @@ export default class DataSourceTypeListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE')) {
                 this.props.history.push({
                     pathname: `/dataSourceType/editDataSourceType/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -533,8 +534,14 @@ export default class DataSourceTypeListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data
+                        realms: listArray
                     })
                 } else {
                     this.setState({
@@ -652,7 +659,7 @@ export default class DataSourceTypeListComponent extends Component {
     }
 
     editDataSourceType(dataSourceType) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE')) {
             console.log(dataSourceType)
             this.props.history.push({
                 pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
@@ -663,7 +670,7 @@ export default class DataSourceTypeListComponent extends Component {
 
     addNewDataSourceType() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/dataSourceType/addDataSourceType`)
         } else {
             alert(i18n.t('static.common.online'))
@@ -701,7 +708,7 @@ export default class DataSourceTypeListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE_TYPE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSourceType}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE_TYPE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSourceType}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

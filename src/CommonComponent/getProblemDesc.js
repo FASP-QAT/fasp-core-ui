@@ -256,10 +256,30 @@ export default function getProblemDesc(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 11) {
-        // Inventory doen't fall within min/max range
+        var obj = JSON.parse(row.data5);
+        var desc_en = row.realmProblem.problem.label.label_en;
+        var desc_fr = row.realmProblem.problem.label.label_fr;
+        var desc_sp = row.realmProblem.problem.label.label_sp;
+        var desc_pr = row.realmProblem.problem.label.label_pr;
         var label = row.realmProblem.problem.label;
-        // label.label_en = "Inventory doen't fall within min/max range";
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_pr = result_pr;
+        }
         return getLabelText(label, lang);
+        // Inventory doen't fall within min/max range
+        // var label = row.realmProblem.problem.label;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        // return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 13) {
         // Inventory doen't fall within min/max range
@@ -268,16 +288,16 @@ export default function getProblemDesc(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 14) {
-       // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
-       var label = row.realmProblem.problem.label;
-       // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
-       return getLabelText(label, lang);
+        // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
+        var label = row.realmProblem.problem.label;
+        // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
+        return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 15) {
-       // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
-       var label = row.realmProblem.problem.label;
-       // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
-       return getLabelText(label, lang);
+        // Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)
+        var label = row.realmProblem.problem.label;
+        // label.label_en = "Dynamic forecasting is not used for certain commodity groups (Malaria, ARV, VMMC)";
+        return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 16) {
         // Inventory doen't fall within min/max range
@@ -315,6 +335,63 @@ export default function getProblemDesc(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 22) {
+        var label = row.realmProblem.problem.label;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 23) {
+        var obj = JSON.parse(row.data5);
+        var desc_en = row.realmProblem.problem.label.label_en;
+        var desc_fr = row.realmProblem.problem.label.label_fr;
+        var desc_sp = row.realmProblem.problem.label.label_sp;
+        var desc_pr = row.realmProblem.problem.label.label_pr;
+        var label = row.realmProblem.problem.label;
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%MOSABOVE_MAX_IN6MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing6months).split('<%MOSLESS_MIN_IN6MONTHS%>').join(obj.monthWithMosLessThenMinWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%MOSABOVE_MAX_IN7TO18MONTHS%>').join(obj.monthWithMosAboveThenMaxWithing7to18months).split('<%MOSLESS_MIN_IN7TO18MONTHS%>').join(obj.monthWithMosLessThenMinWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_pr = result_pr;
+        }
+        return getLabelText(label, lang);
+        // Inventory doen't fall within min/max range
+        // var label = row.realmProblem.problem.label;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        // return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 24) {
+        var obj = JSON.parse(row.data5);
+        var desc_en = row.realmProblem.problem.label.label_en;
+        var desc_fr = row.realmProblem.problem.label.label_fr;
+        var desc_sp = row.realmProblem.problem.label.label_sp;
+        var desc_pr = row.realmProblem.problem.label.label_pr;
+        var label = row.realmProblem.problem.label;
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%STOCKOUT_1TO6_MONTHS%>').join(obj.stockoutsWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%STOCKOUT_7TO18_MONTHS%>').join(obj.stockoutsWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%STOCKOUT_1TO6_MONTHS%>').join(obj.stockoutsWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%STOCKOUT_7TO18_MONTHS%>').join(obj.stockoutsWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%STOCKOUT_1TO6_MONTHS%>').join(obj.stockoutsWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%STOCKOUT_7TO18_MONTHS%>').join(obj.stockoutsWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%RANGE_1TO6_MONTHS%>').join(obj.range1to6months).split('<%STOCKOUT_1TO6_MONTHS%>').join(obj.stockoutsWithing6months).split('<%RANGE_7TO18_MONTHS%>').join(obj.range7to18months).split('<%STOCKOUT_7TO18_MONTHS%>').join(obj.stockoutsWithing7to18months).split('<%SHIPMENTS_IN6MONTHS%>').join(obj.shipmentListWithin6Months).split('<%SHIPMENTS_IN7TO18MONTHS%>').join(obj.shipmentListWithin7to18Months);
+            label.label_pr = result_pr;
+        }
+        return getLabelText(label, lang);
+        // Inventory doen't fall within min/max range
+        // var label = row.realmProblem.problem.label;
+        // label.label_en = "Inventory doen't fall within min/max range";
+        // return getLabelText(label, lang);
+    }
+    if (row.realmProblem.problem.problemId == 25) {
         var label = row.realmProblem.problem.label;
         // label.label_en = "Inventory doen't fall within min/max range";
         return getLabelText(label, lang);

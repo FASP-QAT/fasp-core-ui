@@ -12,6 +12,7 @@ import {
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import ProcurementUnitService from "../../api/ProcurementUnitService";
+import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, DECIMAL_NO_REGEX, INTEGER_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -61,6 +62,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.checkDuplicatePlanningUnit = this.checkDuplicatePlanningUnit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     addRowInJexcel = function () {
@@ -86,7 +88,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
                     (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
@@ -98,6 +100,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     }
 
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -542,6 +545,18 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return this.state.procurmentUnitListJexcel.filter(c => c.active.toString() == "true");
     }.bind(this);
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
+        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        }
+        this.el.setValueFromCoords(7, y, 1, true);
+    }
+
     componentDidMount() {
         var procurmentAgentListJexcel = [];
         var procurmentUnitListJexcel = [];
@@ -573,8 +588,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             ProcurementUnitService.getProcurementUnitList().then(response => {
                                 if (response.status == 200) {
                                     // console.log("third ffff---->", response.data);
-
-                                    for (var k = 0; k < (response.data).length; k++) {
+                                    var listArray = response.data;
+                                    listArray.sort((a, b) => {
+                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                        return itemLabelA > itemLabelB ? 1 : -1;
+                                    });
+                                    for (var k = 0; k < (listArray).length; k++) {
                                         var procurementUnitListJson = {
                                             name: response.data[k].label.label_en,
                                             id: response.data[k].procurementUnitId,
@@ -584,7 +604,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                     }
 
                                     this.setState({
-                                        procurementUnitList: response.data,
+                                        procurementUnitList: listArray,
                                         procurmentUnitListJexcel: procurmentUnitListJexcel
                                     });
 
@@ -682,10 +702,11 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: true,
                                         onchange: this.changed,
-                                        oneditionend: this.onedit,
+                                        // oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         parseFormulas: true,
                                         onpaste: this.onPaste,
+                                        oneditionend: this.oneditionend,
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,

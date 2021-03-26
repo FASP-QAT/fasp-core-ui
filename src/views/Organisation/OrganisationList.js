@@ -345,6 +345,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 const entityname = i18n.t('static.organisation.organisation');
 
@@ -513,8 +514,14 @@ export default class OrganisationListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data
+                        realms: listArray
                     }, () => { })
                 } else {
                     this.setState({
@@ -690,7 +697,7 @@ export default class OrganisationListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ORGANIZATION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addOrganisation}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_ORGANIZATION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addOrganisation}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -741,7 +748,7 @@ export default class OrganisationListComponent extends Component {
 
 
     editOrganisation(organisation) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ORGANIZATION')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
             this.props.history.push({
                 pathname: `/organisation/editOrganisation/${organisation.organisationId}`,
                 // state: { organisation: organisation }
@@ -753,7 +760,7 @@ export default class OrganisationListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ORGANIZATION')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
                     this.props.history.push({
                         pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -764,7 +771,7 @@ export default class OrganisationListComponent extends Component {
     }.bind(this);
 
     addOrganisation() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/organisation/addOrganisation`);
         } else {
             alert("You must be Online.")

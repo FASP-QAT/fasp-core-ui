@@ -44,7 +44,8 @@ export default class PipelineProgramShipment extends Component {
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
         this.SubmitShipment = this.SubmitShipment.bind(this);
-        this.SubmitProgram = this.SubmitProgram.bind(this)
+        this.SubmitProgram = this.SubmitProgram.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     loaded() {
@@ -1175,7 +1176,7 @@ export default class PipelineProgramShipment extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed,
-            oneditionend: this.onedit,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -1186,6 +1187,7 @@ export default class PipelineProgramShipment extends Component {
                 entries: '',
             },
             onload: this.loadedCommonFunctionJExcel,
+            oneditionend: this.oneditionend,
             license: JEXCEL_PRO_KEY,
 
         };
@@ -1195,6 +1197,23 @@ export default class PipelineProgramShipment extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[6]));
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
+        }
+
     }
 
     loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {

@@ -546,7 +546,7 @@ class ListProcurementAgentComponent extends Component {
 
     addPlanningUnitMapping(event, cell) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
             });
@@ -594,7 +594,7 @@ class ListProcurementAgentComponent extends Component {
 
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
             });
@@ -660,7 +660,7 @@ class ListProcurementAgentComponent extends Component {
         }
     }
     editProcurementAgent(procurementAgent) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
             this.props.history.push({
                 pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
                 // state: { procurementAgent }
@@ -809,7 +809,7 @@ class ListProcurementAgentComponent extends Component {
                             title: i18n.t('static.program.mapPlanningUnit'),
                             onclick: function () {
                                 console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${this.el.getValueFromCoords(0, y)}`,
                                     });
@@ -822,7 +822,7 @@ class ListProcurementAgentComponent extends Component {
                             title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
                             onclick: function () {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${this.el.getValueFromCoords(0, y)}`,
                                     });
@@ -850,7 +850,7 @@ class ListProcurementAgentComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
                 this.props.history.push({
                     pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -868,8 +868,14 @@ class ListProcurementAgentComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data
+                        realms: listArray
                     })
                 } else {
                     this.setState({
@@ -1128,7 +1134,7 @@ class ListProcurementAgentComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>

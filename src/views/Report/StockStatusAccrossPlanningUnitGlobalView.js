@@ -79,6 +79,11 @@ const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626",
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
 
+// const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+// { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+// { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+// { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },];
+
 const options = {
   title: {
     display: true,
@@ -183,7 +188,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       selData: [],
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true,
       programLstFiltered: []
@@ -516,8 +521,14 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
       .then(response => {
         console.log("tc respons==>", response.data);
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          tracerCategories: response.data
+          tracerCategories: listArray
         }, () => {
           this.filterData()
         });
@@ -613,6 +624,12 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
         console.log('programLstFiltered', programLstFiltered)
         if (programLstFiltered.length > 0) {
+
+          programLstFiltered.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
 
           this.setState({
             programLstFiltered: programLstFiltered
@@ -849,8 +866,15 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
     RealmCountryService.getRealmCountryForProgram(realmId)
       .then(response => {
+        var listArray = response.data.map(ele => ele.realmCountry);
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          countrys: response.data.map(ele => ele.realmCountry)
+          // countrys: response.data.map(ele => ele.realmCountry)
+          countrys: listArray
         })
       }).catch(
         error => {
@@ -928,8 +952,14 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
       if (response.status == 200) {
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          tracerCategories: response.data
+          tracerCategories: listArray
         })
       }
 
@@ -1009,8 +1039,14 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     ProgramService.getProgramList()
       .then(response => {
         console.log(JSON.stringify(response.data))
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          programs: response.data, loading: false
+          programs: listArray, loading: false
         })
       }).catch(
         error => {

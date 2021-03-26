@@ -386,7 +386,7 @@ export default class ListProcurementUnit extends Component {
   }
 
   editProcurementUnit(procurementUnit) {
-    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT')) {
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_UNIT')) {
       console.log(procurementUnit.procurementUnitId)
       this.props.history.push({
         pathname: `/procurementUnit/editProcurementUnit/${procurementUnit.procurementUnitId}`,
@@ -430,7 +430,7 @@ export default class ListProcurementUnit extends Component {
     var options = {
       data: data,
       columnDrag: true,
-      colWidths: [0,150, 150, 80, 60, 100, 100,100,100,100],
+      colWidths: [0, 150, 150, 80, 60, 100, 100, 100, 100, 100],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -532,7 +532,7 @@ export default class ListProcurementUnit extends Component {
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
       if (this.state.selProcurementUnit.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_UNIT')) {
           this.props.history.push({
             pathname: `/procurementUnit/editProcurementUnit/${this.el.getValueFromCoords(0, x)}`,
           });
@@ -610,8 +610,14 @@ export default class ListProcurementUnit extends Component {
     PlanningUnitService.getActivePlanningUnitList().then(response => {
       if (response.status == 200) {
         console.log("response--->", response.data);
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          planningUnitList: response.data,
+          planningUnitList: listArray,
         })
       } else {
         this.setState({ message: response.data.messageCode, loading: false })
@@ -782,7 +788,7 @@ export default class ListProcurementUnit extends Component {
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PROCUREMENT_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>

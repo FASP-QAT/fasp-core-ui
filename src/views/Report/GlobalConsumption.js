@@ -56,6 +56,7 @@ import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import MultiSelect from "react-multi-select-component";
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -74,8 +75,8 @@ let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const options = {
   title: {
     display: true,
-    // text: i18n.t('static.dashboard.globalconsumption'),
-    fontColor: 'black'
+    text: i18n.t('static.dashboard.globalconsumption'),
+    // fontColor: 'black'
   },
   scales: {
     yAxes: [{
@@ -202,7 +203,7 @@ class GlobalConsumption extends Component {
       realmList: [],
       message: '',
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true,
       programLst: []
@@ -605,7 +606,8 @@ class GlobalConsumption extends Component {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
                 "planningUnitQty": this.roundN((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
-                "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY')
+                "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
+                "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
               console.log("json--->", json);
               consumptions.push(json);
@@ -678,14 +680,21 @@ class GlobalConsumption extends Component {
   }
 
   getCountrys() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
 
       let realmId = AuthenticationService.getRealmId();
       // let realmId = document.getElementById('realmId').value
       RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
+          var listArray = response.data.map(ele => ele.realmCountry);
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            countrys: response.data.map(ele => ele.realmCountry)
+            // countrys: response.data.map(ele => ele.realmCountry)
+            countrys: listArray
           })
         }).catch(
           error => {
@@ -784,6 +793,12 @@ class GlobalConsumption extends Component {
               proList[i] = CountryJson
             }
           }
+
+          proList.sort((a, b) => {
+            var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
             countrys: proList
           })
@@ -807,8 +822,14 @@ class GlobalConsumption extends Component {
       if (programValues.length > 0) {
         PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
           .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-              planningUnits: response.data,
+              planningUnits: listArray,
             })
           }).catch(
             error => {
@@ -860,8 +881,14 @@ class GlobalConsumption extends Component {
     ProgramService.getProgramList()
       .then(response => {
         console.log(JSON.stringify(response.data))
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          programs: response.data, loading: false
+          programs: listArray, loading: false
         })
       }).catch(
         error => {
@@ -1047,6 +1074,35 @@ class GlobalConsumption extends Component {
     }
     return color;
   }
+
+  dateFormatterLanguage = value => {
+    if (moment(value).format('MM') === '01') {
+      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '02') {
+      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '03') {
+      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '04') {
+      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '05') {
+      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '06') {
+      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '07') {
+      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '08') {
+      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '09') {
+      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '10') {
+      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '11') {
+      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+    } else {
+      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+    }
+  }
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = [];
@@ -1134,7 +1190,8 @@ class GlobalConsumption extends Component {
     console.log("consumptionSummerydata---", consumptionSummerydata);
 
     const bar = {
-      labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
+      // labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],
+      labels: [...new Set(this.state.consumptions.map(ele => (this.dateFormatterLanguage(ele.consumptionDateString1))))],
       datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
     };
 

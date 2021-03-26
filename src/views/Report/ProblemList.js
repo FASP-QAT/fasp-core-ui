@@ -33,6 +33,7 @@ import actualIcon from '../../assets/img/actual.png';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
+import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import MultiSelect from 'react-multi-select-component';
 const entityname = i18n.t('static.report.problem');
 
@@ -80,8 +81,13 @@ export default class ConsumptionDetails extends React.Component {
         this.addDoubleQuoteToRowContent = this.addDoubleQuoteToRowContent.bind(this);
     }
 
-    updateState(ekValue) {
-        this.setState({ loading: ekValue });
+    // updateState(ekValue) {
+    //     this.setState({ loading: ekValue });
+    // }
+    updateState(key, value) {
+        this.setState({
+            [key]: value
+        })
     }
 
     hideFirstComponent() {
@@ -108,8 +114,8 @@ export default class ConsumptionDetails extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = [];
             var shipStatusList = []
@@ -123,20 +129,49 @@ export default class ConsumptionDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programJson);
+                        // var programJson = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programJson);
                         var programJson = {
                             // getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version
-                            name: programJson1.programCode + "~v" + myResult[i].version,
+                            name: myResult[i].programCode + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
                     }
                 }
 
-                if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                var needToCalculate = this.props.match.params.calculate;
+                var programIdd = this.props.match.params.programId;
+                if (programIdd != '' && programIdd != undefined) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: programIdd
+                    }, () => {
+                        if (this.state.programId != '' && this.state.programId != undefined) {
+                            this.fetchData();
+                        }
+                    })
+                }
+                else if (proList.length == 1) {
+                    this.setState({
+                        programList: proList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: proList[0].id
+                    }, () => {
+                        if (this.state.programId != '' && this.state.programId != undefined) {
+                                this.fetchData();
+                        }
+                    })
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                     this.setState({
                         programList: proList.sort(function (a, b) {
                             a = a.name.toLowerCase();
@@ -145,7 +180,15 @@ export default class ConsumptionDetails extends React.Component {
                         }),
                         programId: localStorage.getItem("sesProgramId")
                     }, () => {
-                        this.getProblemListAfterCalculation();
+                        if (this.state.programId != '' && this.state.programId != undefined) {
+                            // if (needToCalculate == "false") {
+                            //     this.fetchData();
+                            // } else {
+                                // this.getProblemListAfterCalculation();
+                                this.fetchData();
+
+                            // }
+                        }
                     })
 
                 } else {
@@ -179,6 +222,11 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         proList[i] = Json
                     }
+                    proList.sort((a, b) => {
+                        var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         problemStatusList: proList
                     })
@@ -205,6 +253,11 @@ export default class ConsumptionDetails extends React.Component {
                             }
                             procList[i] = Json
                         }
+                        procList.sort((a, b) => {
+                            var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
                             problemCategoryList: procList
                         })
@@ -214,18 +267,18 @@ export default class ConsumptionDetails extends React.Component {
                         document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
                         // console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
 
-                        var programIdd = this.props.match.params.programId;
-                        var needToCalculate = this.props.match.params.calculate;
-                        if (programIdd != '' && programIdd != undefined) {
-                            document.getElementById("programId").value = programIdd;
-                            // console.log("value==================>", needToCalculate);
-                            if (needToCalculate == "true") {
-                                // console.log("============>***");
-                                this.getProblemListAfterCalculation();
-                            } else {
-                                this.fetchData();
-                            }
-                        }
+                        // var programIdd = this.props.match.params.programId;
+                        // var needToCalculate = this.props.match.params.calculate;
+                        // if (programIdd != '' && programIdd != undefined) {
+                        //     document.getElementById("programId").value = programIdd;
+                        //     // console.log("value==================>", needToCalculate);
+                        //     if (needToCalculate == "true") {
+                        //         // console.log("============>***");
+                        //         this.getProblemListAfterCalculation();
+                        //     } else {
+                        //         this.fetchData();
+                        //     }
+                        // }
 
                     }.bind(this)
 
@@ -433,7 +486,8 @@ export default class ConsumptionDetails extends React.Component {
                 var items = [];
                 if (y != null) {
                     console.log("in context menue===>", this.el.getValueFromCoords(12, y));
-                    if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
+                    // if (obj.options.allowInsertRow == true && (this.el.getValueFromCoords(12, y) != 4 && this.el.getValueFromCoords(12, y) != 2)) {
+                        if (obj.options.allowInsertRow == true) {
                         items.push({
                             title: i18n.t('static.problemContext.editProblem'),
                             onclick: function () {
@@ -754,7 +808,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
         if (programId != 0) {
             localStorage.setItem("sesProgramId", programId);
-            this.refs.problemListChild.qatProblemActions(programId);
+            this.refs.problemListChild.qatProblemActions(programId, "loading",false);
         } else {
             this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false });
         }
@@ -1140,7 +1194,8 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated">
-                <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions>
+                {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions> */}
+                <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
@@ -1158,7 +1213,7 @@ export default class ConsumptionDetails extends React.Component {
                                 </a>
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />} &nbsp;
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
-                                {this.state.programId != 0 && <a href="javascript:void();" title="Recalculate" onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
+                                {this.state.programId != 0 && <a href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
                                 &nbsp;&nbsp;
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
 
@@ -1182,7 +1237,8 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
-                                                onChange={(e) => { this.getProblemListAfterCalculation() }}
+                                                // onChange={(e) => { this.getProblemListAfterCalculation() }}
+                                                onChange={(e) => { this.fetchData() }}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="0">{i18n.t('static.common.select')}</option>

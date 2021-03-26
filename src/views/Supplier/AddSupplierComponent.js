@@ -6,6 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import SupplierService from "../../api/SupplierService";
 import RealmService from "../../api/RealmService";
+import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
@@ -122,8 +123,14 @@ class AddSupplierComponent extends Component {
     // AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          realms: response.data, loading: false
+          realms: listArray, loading: false
         })
       }).catch(
         error => {

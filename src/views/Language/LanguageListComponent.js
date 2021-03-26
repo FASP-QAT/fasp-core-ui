@@ -271,6 +271,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.language.language');
@@ -323,7 +324,7 @@ export default class LanguageListComponent extends Component {
     }
 
     editLanguage(language) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE')) {
             this.props.history.push({
                 pathname: `/language/editLanguage/${language.languageId}`,
                 // state: { language }
@@ -332,7 +333,7 @@ export default class LanguageListComponent extends Component {
     }
 
     addLanguage() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/language/addLanguage`)
         } else {
             alert(i18n.t('static.common.online'))
@@ -361,11 +362,12 @@ export default class LanguageListComponent extends Component {
                             for (var j = 0; j < langaugeList.length; j++) {
                                 data = [];
                                 data[0] = langaugeList[j].languageId
-                                data[1] = langaugeList[j].languageName;
+                                data[1] = langaugeList[j].label.label_en;
                                 data[2] = langaugeList[j].languageCode;
-                                data[3] = langaugeList[j].lastModifiedBy.username;
-                                data[4] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                                data[5] = langaugeList[j].active;
+                                data[3] = langaugeList[j].countryCode;
+                                data[4] = langaugeList[j].lastModifiedBy.username;
+                                data[5] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                                data[6] = langaugeList[j].active;
 
                                 languageArray[count] = data;
                                 count++;
@@ -383,7 +385,7 @@ export default class LanguageListComponent extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [0,150, 150, 100,100,100],
+                                colWidths: [0,150, 150,150, 100,100,100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
                                     {
@@ -398,6 +400,11 @@ export default class LanguageListComponent extends Component {
                                     },
                                     {
                                         title: i18n.t('static.language.languageCode'),
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: i18n.t('static.language.countryCode'),
                                         type: 'text',
                                         readOnly: true
                                     },
@@ -517,7 +524,7 @@ export default class LanguageListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE')) {
                 this.props.history.push({
                     pathname: `/language/editLanguage/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -546,7 +553,7 @@ export default class LanguageListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_LANGUAGE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>

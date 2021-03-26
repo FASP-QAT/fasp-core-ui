@@ -272,8 +272,14 @@ export default class AddOrganisationComponent extends Component {
         CountryService.getCountryListAll()
             .then(response => {
                 console.log("country list---", response.data);
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    countries: response.data, loading: false,
+                    countries: listArray, loading: false,
                 })
             }).catch(
                 error => {
@@ -319,8 +325,14 @@ export default class AddOrganisationComponent extends Component {
         UserService.getRealmList()
             .then(response => {
                 console.log("realm list---", response.data);
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    realms: response.data,
+                    realms: listArray,
                     loading: false,
                 })
             }).catch(
@@ -424,13 +436,19 @@ export default class AddOrganisationComponent extends Component {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
                         var json = (response.data).filter(c => c.active == true);
-                        var regList = [{ value: "-1", label: i18n.t("static.common.all")  }];
+                        var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
                         for (var i = 0; i < json.length; i++) {
                             regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
+                        var listArray = regList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
                             realmCountryId: '',
-                            realmCountryList: regList,
+                            realmCountryList: listArray,
                             loading: false,
                         })
                     } else {

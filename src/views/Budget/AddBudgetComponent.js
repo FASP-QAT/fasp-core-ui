@@ -1,10 +1,8 @@
 import { Date } from 'core-js';
 import { Formik } from 'formik';
 import React, { Component } from 'react';
-import DatePicker from 'react-datepicker';
 import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import BudgetService from "../../api/BudgetService";
 import CurrencyService from '../../api/CurrencyService.js';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -16,6 +14,8 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import '../Forms/ValidationForms/ValidationForms.css';
 import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -24,8 +24,6 @@ const initialValues = {
     programId: '',
     fundingSourceId: '',
     budgetAmt: '',
-    startDate: '',
-    stopDate: '',
     programList: [],
     budgetCode: '',
     fundingSourceList: [],
@@ -49,11 +47,6 @@ const validationSchema = function (values, t) {
             // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
-        startDate: Yup
-            .string().required(i18n.t('static.budget.startdatetext')).nullable().default(undefined),
-        // .required(i18n.t('static.budget.startdatetext')),
-        stopDate: Yup.string()
-            .required(i18n.t('static.budget.stopdatetext')).nullable().default(undefined),
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
         budgetCode: Yup.string()
@@ -90,6 +83,8 @@ class AddBudgetComponent extends Component {
     constructor(props) {
 
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             loading: true,
             programs: [],
@@ -97,6 +92,9 @@ class AddBudgetComponent extends Component {
             currencyList: [],
             message: '',
             lang: localStorage.getItem('lang'),
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             budget: {
                 label: {
                     label_en: '',
@@ -151,7 +149,22 @@ class AddBudgetComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addMonths = this.addMonths.bind(this);
         this.CommaFormatted = this.CommaFormatted.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.pickRange = React.createRef();
 
+    }
+
+    _handleClickRangeBox(e) {
+        this.pickRange.current.show()
+    }
+
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
     }
 
     CommaFormatted(cell) {
@@ -253,9 +266,7 @@ class AddBudgetComponent extends Component {
             fundingSourceId: true,
             budgetAmt: true,
             currencyId: true,
-            budgetCode: true,
-            startDate: true,
-            stopDate: true
+            budgetCode: true
         }
         );
         this.validateForm(errors);
@@ -285,8 +296,14 @@ class AddBudgetComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }
                 else {
@@ -342,9 +359,15 @@ class AddBudgetComponent extends Component {
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
+                var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    // fundingSources: response.data
-                    fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+                    // fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+                    fundingSources: listArray
                     , loading: false
                 })
             }).catch(
@@ -390,8 +413,14 @@ class AddBudgetComponent extends Component {
 
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    currencyList: response.data, loading: false
+                    currencyList: listArray, loading: false
                 })
             } else {
                 this.setState({ message: response.data.messageCode, loading: false })
@@ -444,6 +473,17 @@ class AddBudgetComponent extends Component {
         const { fundingSources } = this.state;
         const { currencyList } = this.state;
 
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
+
 
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
@@ -494,13 +534,14 @@ class AddBudgetComponent extends Component {
 
                                     // alert("hiiiiii");
                                     // this.setState({ budget: budget });
+                                    let rangeValue = this.state.rangeValue;
+                                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                    // var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
+                                    budget.startDate = startDate;
 
-
-                                    var startDateString = this.state.budget.startDate.getFullYear() + "-" + ("0" + (this.state.budget.startDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.startDate.getDate()).slice(-2);
-                                    budget.startDate = new Date(startDateString);
-
-                                    var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
-                                    budget.stopDate = new Date(stopDateString);
+                                    // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
+                                    budget.stopDate = stopDate;
 
                                     // this.setState({
                                     //     loading: true
@@ -729,111 +770,20 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        {/* <Label for="startDate">{i18n.t('static.common.startdate')}</Label> */}
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText> */}
-                                                        {/* <Input */}
-                                                        {/* // value={this.state.budget.st} */}
-                                                        {/* className="fa fa-calendar Fa-right"
-                                                            name="startDate"
-                                                            id="startDate" */}
-                                                        {/* // bsSize="sm" */}
-                                                        {/* // valid={!errors.startDate} */}
-                                                        {/* // invalid={touched.startDate && !!errors.startDate} */}
-                                                        {/* onChange={(e) => { */}
-                                                        {/* // handleChange(e);  */}
-                                                        {/* this.dataChange(e) */}
-                                                        {/* }} */}
-                                                        {/* // onBlur={handleBlur} */}
-                                                        {/* type="date" */}
-                                                        {/* min={this.currentDate()} */}
-                                                        {/* value={this.state.budget.startDate} */}
-                                                        {/* placeholder={i18n.t('static.budget.budgetstartdate')} */}
-                                                        {/* // required  */}
-                                                        {/* /> */}
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        {/* <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label> */}
-                                                        {/* <InputGroupAddon addonType="prepend"> 
-                                                        {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
-                                                        {/* <Input
-
-                                                            className="fa fa-calendar Fa-right"
-                                                            value={this.state.budget.stopDate}
-                                                            name="stopDate"
-                                                            id="stopDate" */}
-                                                        {/* // bsSize="sm" */}
-                                                        {/* // valid={!errors.stopDate} */}
-                                                        {/* // invalid={touched.stopDate && !!errors.stopDate} */}
-                                                        {/* onChange={(e) => {/ */}
-                                                        {/* // handleChange(e);  */}
-                                                        {/* this.dataChange(e) */}
-                                                        {/* }} */}
-                                                        {/* onBlur={handleBlur} */}
-                                                        {/* type="date" */}
-                                                        {/* value={this.state.budget.stopDate} */}
-                                                        {/* min={this.state.budget.startDate} */}
-                                                        {/* placeholder={i18n.t('static.budget.budgetstopdate')} */}
-                                                        {/* // required  */}
-                                                        {/* /> */}
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span className="red Reqasterisk">*</span></Label>
-                                                        <DatePicker
-                                                            id="startDate"
-                                                            name="startDate"
-                                                            bsSize="sm"
-                                                            minDate={this.addMonths(new Date(), -6)}
-                                                            selected={this.state.budget.startDate}
-                                                            onChange={(date) => {
-                                                                handleChange(date);
-                                                                setFieldValue("startDate", date);
-                                                                this.dataChangeDate(date)
-                                                            }}
-                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            disabledKeyboardNavigation
-                                                            autoComplete={"off"}
-                                                            dateFormat={DATE_FORMAT_SM}
-                                                            onBlur={() => setFieldTouched("startDate", true)}
-                                                            // className="form-control-sm form-control date-color"
-                                                            className={classNames('form-control', 'd-block', 'w-100',
-                                                                { 'is-valid': !errors.startDate && this.state.budget.startDate != '' },
-                                                                { 'is-invalid': (touched.startDate && !!errors.startDate) }
-                                                            )}
-                                                        />
-                                                        <div className="red">{(touched.startDate && !!errors.startDate ? errors.startDate : '')}</div>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span className="red Reqasterisk">*</span></Label>
-
-                                                        <DatePicker
-                                                            id="stopDate"
-                                                            name="stopDate"
-                                                            bsSize="sm"
-                                                            minDate={this.state.budget.startDate}
-                                                            selected={this.state.budget.stopDate}
-                                                            // onChange={(date) => { this.dataChangeEndDate(date) }}
-                                                            onChange={(date) => {
-                                                                handleChange(date);
-                                                                setFieldValue("stopDate", date);
-                                                                this.dataChangeEndDate(date)
-                                                            }}
-                                                            onBlur={() => setFieldTouched("stopDate", true)}
-                                                            placeholderText={DATE_PLACEHOLDER_TEXT}
-                                                            // className="form-control-sm form-control date-color"
-                                                            className={classNames('form-control', 'd-block', 'w-100', 
-                                                                { 'is-valid': !errors.stopDate && this.state.budget.stopDate != '' },
-                                                                { 'is-invalid': (touched.stopDate && !!errors.stopDate) }
-                                                            )}
-                                                            disabledKeyboardNavigation
-                                                            autoComplete={"off"}
-                                                            dateFormat={DATE_FORMAT_SM}
-                                                        />
-                                                        <div className="red">{(touched.stopDate && !!errors.stopDate ? errors.stopDate : '')}</div>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
+                                                        <div className="controls edit">
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="notes">{i18n.t('static.program.notes')}</Label>
@@ -889,7 +839,8 @@ class AddBudgetComponent extends Component {
 
     resetClicked() {
         let { budget } = this.state;
-
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         budget.label.label_en = ''
         // budget.program.programId = ''
         budget.program.id = ''
@@ -903,7 +854,8 @@ class AddBudgetComponent extends Component {
 
 
         this.setState({
-            budget
+            budget,
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
         },
             () => { });
     }

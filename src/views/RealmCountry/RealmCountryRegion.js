@@ -81,6 +81,7 @@ class RealmCountryRegion extends Component {
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -202,11 +203,12 @@ class RealmCountryRegion extends Component {
                             allowManualInsertColumn: false,
                             allowDeleteRow: true,
                             onchange: this.changed,
-                            oneditionend: this.onedit,
+                            // oneditionend: this.onedit,
                             copyCompatibility: true,
                             allowManualInsertRow: false,
                             parseFormulas: true,
                             onpaste: this.onPaste,
+                            oneditionend: this.oneditionend,
                             text: {
                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -478,6 +480,17 @@ class RealmCountryRegion extends Component {
             );
 
     }
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[2]));
+            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
+        }
+        this.el.setValueFromCoords(7, y, 1, true);
+
+    }
     addRow = function () {
         var json = this.el.getJson(null, false);
         var data = [];
@@ -499,7 +512,7 @@ class RealmCountryRegion extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
                     (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);

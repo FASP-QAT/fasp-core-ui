@@ -73,6 +73,7 @@ export default class EditLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            editable: true,
             loading: true,
             problemStatusInputId: '',
             problemActionIndex: '',
@@ -443,7 +444,8 @@ export default class EditLanguageComponent extends Component {
             problemReportId: problemReportId,
             problemActionIndex: problemActionIndex,
             problemStatusId: problemStatusId,
-            problemTypeId: problemTypeId
+            problemTypeId: problemTypeId,
+            editable: problemStatusId == 4 || problemStatusId == 2 ? false : true
         })
 
         if (programId != null) {
@@ -1025,7 +1027,7 @@ export default class EditLanguageComponent extends Component {
                                                     </ToolkitProvider>
 
 
-                                                    <div className="col-md-12 bg-white pb-1">
+                                                    {this.state.editable && <div className="col-md-12 bg-white pb-1">
                                                         <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active"><b>{i18n.t('static.report.updateDetails')}</b></a></li></ul>
 
                                                         <div className="row">
@@ -1042,6 +1044,7 @@ export default class EditLanguageComponent extends Component {
                                                                     required
                                                                     // value={this.state.problemStatusInputId}
                                                                     value={this.state.problemReport.problemStatus.id}
+
                                                                 >
                                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                                     {problemStatus}
@@ -1067,6 +1070,7 @@ export default class EditLanguageComponent extends Component {
                                                                     onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                                     required
                                                                     value={this.state.notes}
+
                                                                 />
                                                                 <FormFeedback className="red">{errors.notes}</FormFeedback>
                                                             </FormGroup>
@@ -1077,14 +1081,16 @@ export default class EditLanguageComponent extends Component {
                                                                 value={(this.state.problemReport.problemStatus.id == 3 ? true : false)}
                                                             />
                                                         </div>
+
                                                     </div>
+                                                    }
 
                                                     <div className="col-md-12 card-footer">
                                                         <FormGroup>
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                             {/* <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button> */}
                                                             {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button> */}
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                            {this.state.editable && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                             &nbsp;
                                                     </FormGroup>
                                                     </div>

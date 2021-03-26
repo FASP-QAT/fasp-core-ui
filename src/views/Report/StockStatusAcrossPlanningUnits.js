@@ -30,7 +30,7 @@ import ReportService from '../../api/ReportService';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -49,6 +49,10 @@ const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626",
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+// const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+// { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+// { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+// { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },];
 
 class StockStatusAcrossPlanningUnits extends Component {
     constructor(props) {
@@ -67,7 +71,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             planningUnitList: [],
             loading: true,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             programId: '',
             versionId: ''
@@ -173,8 +177,14 @@ class StockStatusAcrossPlanningUnits extends Component {
                 TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            tracerCategories: response.data
+                            tracerCategories: listArray
                         }, () => { this.fetchData() })
                     }
 
@@ -361,7 +371,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -529,7 +539,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: []
                     }, () => {

@@ -665,7 +665,7 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
       var budgetId = budget.budgetId
       this.props.history.push({
         pathname: `/budget/editBudget/${budgetId}`,
@@ -696,22 +696,27 @@ class ListBudgetComponent extends Component {
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
       // data[5] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       // data[6] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[5] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[6] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[7] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-      data[8] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[9] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[10] = budgetList[j].lastModifiedBy.username;
-      data[11] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+
+      // data[5] = budgetList[j].currency.currencyCode + " " + (budgetList[j].budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      // data[6] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      // data[7] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      data[5] = budgetList[j].currency.currencyCode;
+      data[6] = budgetList[j].budgetAmt;
+      data[7] = (budgetList[j].usedUsdAmt).toFixed(2);
+      data[8] = (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2);
+      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[11] = budgetList[j].lastModifiedBy.username;
+      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
       // data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       // data[10] = budgetList[j].budgetAmt;
       // data[11] = budgetList[j].usedUsdAmt;
       // data[12] = budgetList[j].stopDate;
 
-      data[12] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
-      data[13] = budgetList[j].budgetAmt;
-      data[14] = budgetList[j].usedUsdAmt;
-      data[15] = budgetList[j].stopDate;
+      data[13] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
+      data[14] = budgetList[j].budgetAmt;
+      data[15] = budgetList[j].usedUsdAmt;
+      data[16] = budgetList[j].stopDate;
 
 
 
@@ -760,21 +765,26 @@ class ListBudgetComponent extends Component {
           // readOnly: true
         },
         {
+          title: i18n.t('static.country.currency'),
+          type: 'text',
+          // readOnly: true
+        },
+        {
           title: i18n.t('static.budget.budgetamount'),
-          // mask: '[-]#,##.00', decimal: '.', type: 'numeric'
-          type: 'text'
+          mask: '[-]#,##.00', decimal: '.', type: 'numeric'
+          // type: 'text'
           // readOnly: true
         },
         {
           title: i18n.t('static.budget.usedUSDAmount'),
-          // mask: '[-]#,##.00', decimal: '.', type: 'numeric'
-          type: 'text'
+          mask: '[-]#,##.00', decimal: '.', type: 'numeric'
+          // type: 'text'
           // readOnly: true
         },
         {
           title: i18n.t('static.budget.availableAmt'),
-          // mask: '[-]#,##.00', decimal: '.', type: 'numeric'
-          type: 'text'
+          mask: '[-]#,##.00', decimal: '.', type: 'numeric'
+          // type: 'text'
           // readOnly: true
         },
         {
@@ -889,7 +899,7 @@ class ListBudgetComponent extends Component {
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
       if (this.state.selBudget.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
           this.props.history.push({
             pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
           });
@@ -904,7 +914,7 @@ class ListBudgetComponent extends Component {
     var elInstance = instance.jexcel;
     var json = elInstance.getJson();
 
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
     for (var j = 0; j < json.length; j++) {
 
 
@@ -914,9 +924,9 @@ class ListBudgetComponent extends Component {
       // var budgetAmt = rowData[10];
       // var usedUsdAmt = rowData[11];
 
-      var stopDate = rowData[15];
-      var budgetAmt = rowData[13];
-      var usedUsdAmt = rowData[14];
+      var stopDate = rowData[16];
+      var budgetAmt = rowData[14];
+      var usedUsdAmt = rowData[15];
 
       if (((moment(stopDate)).isBefore(moment(Date.now())) || ((budgetAmt - usedUsdAmt) <= 0))) {
         for (var i = 0; i < colArr.length; i++) {
@@ -940,8 +950,14 @@ class ListBudgetComponent extends Component {
     ProgramService.getProgramList()
       .then(response => {
         if (response.status == 200) {
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            programs: response.data, loading: false
+            programs: listArray, loading: false
           })
         }
 
@@ -1066,8 +1082,15 @@ class ListBudgetComponent extends Component {
           // this.setState({
           //   fundingSourceList: response.data
           // })
+          var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            fundingSourceList: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+            // fundingSourceList: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+            fundingSourceList: listArray
           })
         } else {
           this.setState({ message: response.data.messageCode, loading: false })
@@ -1316,7 +1339,7 @@ class ListBudgetComponent extends Component {
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>

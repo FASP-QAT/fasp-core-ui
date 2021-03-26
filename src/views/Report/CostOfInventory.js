@@ -30,6 +30,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.dashboard.costOfInventory');
@@ -59,7 +60,7 @@ export default class CostOfInventory extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
@@ -81,7 +82,7 @@ export default class CostOfInventory extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             //let realmId = AuthenticationService.getRealmId();
             ProgramService.getProgramList()
@@ -256,7 +257,7 @@ export default class CostOfInventory extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         costOfInventoryInput,
                         versions: []

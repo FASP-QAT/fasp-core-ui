@@ -19,7 +19,7 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY, JEXCEL_PRO_KEY, FORECASTED_CONSUMPTION_MODIFIED } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
@@ -217,7 +217,23 @@ export default class QunatimedImportStepFive extends Component {
 
 
                                         var consumptionDataList = (programJson.consumptionList);
+                                        var actionList = (programJson.actionList);
+                                        if (actionList == undefined) {
+                                            actionList = []
+                                        }
                                         var qunatimedData = this.state.finalImportData;
+                                        var finalPuList = []
+                                        for (var i = 0; i < finalImportQATData.length; i++) {
+                                            var index = finalPuList.findIndex(c => c == finalImportQATData[i].product.programPlanningUnitId)
+                                            if (index == -1) {
+                                                finalPuList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
+                                                actionList.push({
+                                                    planningUnitId: parseInt(finalImportQATData[i].product.programPlanningUnitId),
+                                                    type: FORECASTED_CONSUMPTION_MODIFIED,
+                                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                                                })
+                                            }
+                                        }
 
                                         for (var i = 0; i < qunatimedData.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
@@ -270,7 +286,7 @@ export default class QunatimedImportStepFive extends Component {
                                         }
 
                                         programJson.consumptionList = consumptionDataList;
-
+                                        programJson.actionList = actionList;
 
                                         programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
 
@@ -490,14 +506,14 @@ export default class QunatimedImportStepFive extends Component {
                 <br></br>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
-                    
+
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
 
-                    <Col xs="12" sm="12">
-                        <h6>
-                            {i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * {i18n.t('static.quantimed.importpercentage')} * {i18n.t('static.quantimed.conversionFactor')} = {i18n.t('static.quantimed.newconsupmtionqty')}
-                        </h6>
-                    </Col>
+                        <Col xs="12" sm="12">
+                            <h6>
+                                {i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * {i18n.t('static.quantimed.importpercentage')} * {i18n.t('static.quantimed.conversionFactor')} = {i18n.t('static.quantimed.newconsupmtionqty')}
+                            </h6>
+                        </Col>
 
                         <Col xs="12" sm="12">
 

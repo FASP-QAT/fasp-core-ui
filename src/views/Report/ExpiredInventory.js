@@ -44,6 +44,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -68,7 +69,7 @@ export default class ExpiredInventory extends Component {
             versions: [],
             planningUnits: [],
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
             programId: '',
@@ -115,7 +116,7 @@ export default class ExpiredInventory extends Component {
         return '?'
     }
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -283,7 +284,7 @@ export default class ExpiredInventory extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: []
                     }, () => {
@@ -609,7 +610,7 @@ export default class ExpiredInventory extends Component {
                                         planningUnit: pu.planningUnit,
                                         shelfLife: pu.shelfLife,
                                         batchInfo: ele1,
-                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty > 0 ? ele1.expiredQty : ele1.openingBalance : ele1.expiredQtyWps > 0 ? ele1.expiredQtyWps : ele1.openingBalanceWps,
+                                        expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps,
                                         program: { id: programJson.programId, label: programJson.label, code: programJson.programCode }
                                     }
                                     data.push(json)

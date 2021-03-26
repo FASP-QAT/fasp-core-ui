@@ -28,13 +28,15 @@ import {
 } from 'reactstrap';
 import ProgramService from '../../api/ProgramService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const options = {
     title: {
         display: true,
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
+        // fontColor: 'black',
+        // fontStyle: "normal",
+        // fontSize: "12",
+        text: i18n.t('static.dashboard.stockstatusovertime')
     },
     scales: {
         yAxes: [
@@ -145,7 +147,7 @@ class StockStatusOverTime extends Component {
                 date: []
             },
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
             programId: '',
@@ -176,6 +178,33 @@ class StockStatusOverTime extends Component {
     }
     dateFormatter = value => {
         return moment(value).format('MMM YY')
+    }
+    dateFormatterLanguage = value => {
+        if (moment(value).format('MM') === '01') {
+            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '02') {
+            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '03') {
+            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '04') {
+            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '05') {
+            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '06') {
+            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '07') {
+            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '08') {
+            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '09') {
+            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '10') {
+            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '11') {
+            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+        } else {
+            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+        }
     }
     formatter = value => {
         if (value != null) {
@@ -331,7 +360,7 @@ class StockStatusOverTime extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -528,7 +557,7 @@ class StockStatusOverTime extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -820,7 +849,7 @@ class StockStatusOverTime extends Component {
         console.log(monthsInFutureForAmc, monthsInPastForAmc)
         if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != 0) {
             if (versionId.includes('Local')) {
-
+                this.setState({ loading: true })
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                 let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
 
@@ -828,6 +857,11 @@ class StockStatusOverTime extends Component {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false
+                    })
+                }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
@@ -840,6 +874,11 @@ class StockStatusOverTime extends Component {
                     var data = [];
                     var programRequest = programTransaction.get(program);
 
+                    programRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
+                    }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -983,7 +1022,8 @@ class StockStatusOverTime extends Component {
                                     if (month == this.state.rangeValue.to.month && from == to) {
                                         this.setState({
                                             matricsList: data,
-                                            message: ''
+                                            message: '',
+                                            loading: false
                                         })
 
                                         return;
@@ -993,6 +1033,7 @@ class StockStatusOverTime extends Component {
                                 monthstartfrom = 1
 
                             }
+                            this.setState({ loading: false })
 
 
 
@@ -1389,7 +1430,7 @@ class StockStatusOverTime extends Component {
         ]
         console.log(this.state.matricsList)
         var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
-        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
+        var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
         console.log(dts)
         const bar = {
             labels: dts,

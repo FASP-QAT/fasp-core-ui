@@ -356,6 +356,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from 'moment';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 export default class HealthAreaListComponent extends Component {
@@ -407,7 +408,7 @@ export default class HealthAreaListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [0,100, 200, 100,100,100,100],
+            colWidths: [0, 100, 200, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -522,8 +523,14 @@ export default class HealthAreaListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data
+                        realms: listArray
                     },
                         () => { })
                 } else {
@@ -706,7 +713,7 @@ export default class HealthAreaListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_HEALTH_AREA') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addHealthArea}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -759,7 +766,7 @@ export default class HealthAreaListComponent extends Component {
         jExcelLoadedFunction(instance);
     }
     editHealthArea(healthArea) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
             this.props.history.push({
                 // pathname: "/healthArea/editHealthArea/",
                 // state: { healthArea: healthArea }
@@ -772,7 +779,7 @@ export default class HealthAreaListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_HEALTH_AREA')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {
                     this.props.history.push({
                         pathname: `/healthArea/editHealthArea/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -782,7 +789,7 @@ export default class HealthAreaListComponent extends Component {
         }
     }.bind(this);
     addHealthArea() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/healthArea/addHealthArea`);
         } else {
             alert("You must be Online.")

@@ -321,7 +321,7 @@
 
 
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col, Form } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n'
 import RegionService from "../../api/RegionService";
@@ -344,6 +344,8 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import ReportService from '../../api/ReportService';
+import MultiSelect from 'react-multi-select-component';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 
 
@@ -358,7 +360,9 @@ class RegionListComponent extends Component {
             selRegion: [],
             realmCountryList: [],
             lang: localStorage.getItem('lang'),
-            loading: true
+            loading: true,
+            countryValues: [],
+            countryLabels: [],
         }
         this.editRegion = this.editRegion.bind(this);
         this.addRegion = this.addRegion.bind(this);
@@ -416,9 +420,22 @@ class RegionListComponent extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                        align: 'left'
-                    })
+                    // doc.text(i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    //     align: 'left'
+                    // })
+
+                    var y = 90
+                    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, y, planningText)
+                    for (var i = 0; i < planningText.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+
+                        } else {
+                            y = y + 10
+                        }
+                    }
 
                 }
 
@@ -447,8 +464,8 @@ class RegionListComponent extends Component {
         // columns.map((item, idx) => { headers[idx] = (item.text) });
 
         let data = this.state.selRegion.map(ele => [
-            getLabelText(ele.realmCountry.country.label, this.state.lang),
-            getLabelText(ele.label, this.state.lang),
+            getLabelText(ele.realmCountry.label, this.state.lang),
+            getLabelText(ele.region.label, this.state.lang),
             this.formatter(ele.capacityCbm),
             ele.gln,
             ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
@@ -476,7 +493,10 @@ class RegionListComponent extends Component {
 
         var csvRow = [];
 
-        csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        this.state.countryLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+
+        // csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
 
@@ -489,7 +509,7 @@ class RegionListComponent extends Component {
         headers.push(i18n.t('static.common.status'));
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
+        this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -512,6 +532,21 @@ class RegionListComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
+
+    handleChange(countrysId) {
+
+        countrysId = countrysId.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            countryValues: countrysId.map(ele => ele),
+            countryLabels: countrysId.map(ele => ele.label)
+        }, () => {
+            this.filterData()
+
+        })
+    }
+
     buildJexcel() {
         let regionList = this.state.selRegion;
         // console.log("regionList---->", regionList);
@@ -519,9 +554,9 @@ class RegionListComponent extends Component {
         let count = 0;
         for (var j = 0; j < regionList.length; j++) {
             data = [];
-            data[0] = regionList[j].regionId
-            data[1] = getLabelText(regionList[j].realmCountry.country.label, this.state.lang)
-            data[2] = getLabelText(regionList[j].label, this.state.lang)
+            data[0] = regionList[j].region.id
+            data[1] = getLabelText(regionList[j].realmCountry.label, this.state.lang)
+            data[2] = getLabelText(regionList[j].region.label, this.state.lang)
             data[3] = (regionList[j].capacityCbm);
             data[4] = regionList[j].gln
             data[5] = regionList[j].active;
@@ -594,7 +629,7 @@ class RegionListComponent extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -615,18 +650,94 @@ class RegionListComponent extends Component {
     }
 
     filterData() {
-        let countryId = document.getElementById("realmCountryId").value;
-        if (countryId != 0) {
-            const selRegion = this.state.regionList.filter(c => c.realmCountry.realmCountryId == countryId)
-            this.setState({
-                selRegion: selRegion
-            },
-                () => { this.buildJexcel() })
-        } else {
-            this.setState({
-                selRegion: this.state.regionList
-            },
-                () => { this.buildJexcel() })
+        // let countryId = document.getElementById("realmCountryId").value;
+        // if (countryId != 0) {
+        //     const selRegion = this.state.regionList.filter(c => c.realmCountry.realmCountryId == countryId)
+        //     this.setState({
+        //         selRegion: selRegion
+        //     },
+        //         () => { this.buildJexcel() })
+        // } else {
+        //     this.setState({
+        //         selRegion: this.state.regionList
+        //     },
+        //         () => { this.buildJexcel() })
+        // }
+
+        // let CountryIds = this.state.countryValues.length == this.state.realmCountryList.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+        // console.log("CountryIds---", CountryIds);
+        let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
+        console.log("CountryIds123---", this.state.countryValues.map(ele => (ele.value).toString()));
+        if (this.state.countryValues.length > 0) {
+            this.setState({ loading: true, message: '' })
+            // AuthenticationService.setupAxiosInterceptors();
+            let inputjson = {
+                realmCountryIds: CountryIds
+            }
+            ReportService.wareHouseCapacityByCountry(inputjson)
+                .then(response => {
+                    console.log("RESP-------->>", response.data)
+                    this.setState({
+                        regionList: response.data,
+                        selRegion: response.data,
+                        loading: false
+                    }, () => {
+                        this.buildJexcel()
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            regionList: [],
+                            selRegion: [],
+                            loading: false
+                        }, () => {
+                            this.el = jexcel(document.getElementById("tableDiv"), '');
+                            this.el.destroy();
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else if (this.state.countryValues.length == 0) {
+            this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            });
         }
     }
     editRegion(region) {
@@ -635,33 +746,33 @@ class RegionListComponent extends Component {
             // state: { region }
         });
     }
-    selected = function (instance, cell, x, y, value) {
+    // selected = function (instance, cell, x, y, value) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
-                this.props.history.push({
-                    pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
-                });
-            }
-        }
-    }.bind(this);
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
-                    this.props.history.push({
-                        pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
-                        // state: { role }
-                    });
-                }
-            }
-        }
-    }.bind(this);
+    //     if ((x == 0 && value != 0) || (y == 0)) {
+    //         // console.log("HEADER SELECTION--------------------------");
+    //     } else {
+    //         // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+    //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
+    //             this.props.history.push({
+    //                 pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+    //             });
+    //         }
+    //     }
+    // }.bind(this);
+    // selected = function (instance, cell, x, y, value) {
+    //     if ((x == 0 && value != 0) || (y == 0)) {
+    //         // console.log("HEADER SELECTION--------------------------");
+    //     } else {
+    //         if (this.state.selSource.length != 0) {
+    //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+    //                 this.props.history.push({
+    //                     pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
+    //                     // state: { role }
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }.bind(this);
     addRegion(region) {
         this.props.history.push({
             pathname: "/region/addRegion"
@@ -670,64 +781,64 @@ class RegionListComponent extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        RegionService.getRegionList()
-            .then(response => {
-                console.log(response.data);
-                if (response.status == 200) {
+        // RegionService.getRegionList()
+        //     .then(response => {
+        //         console.log(response.data);
+        //         if (response.status == 200) {
 
-                    this.setState({
-                        regionList: response.data,
-                        selRegion: response.data,
-                        loading: false
-                    },
-                        () => { this.buildJexcel() })
-                } else {
-                    this.setState({ message: response.data.messageCode },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-            })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        //             this.setState({
+        //                 regionList: response.data,
+        //                 selRegion: response.data,
+        //                 loading: false
+        //             },
+        //                 () => { this.buildJexcel() })
+        //         } else {
+        //             this.setState({ message: response.data.messageCode },
+        //                 () => {
+        //                     this.hideSecondComponent();
+        //                 })
+        //         }
+        //     })
+        //     .catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     loading: false
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
 
         // RealmCountryService.getRealmCountryListAll()
         //     .then(response => {
@@ -751,8 +862,16 @@ class RegionListComponent extends Component {
             .then(response => {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
+                    var listArray = response.data.map(ele => ele.realmCountry);
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realmCountryList: response.data.map(ele => ele.realmCountry)
+                        // realmCountryList: response.data.map(ele => ele.realmCountry)
+                        realmCountryList: listArray,
+                        loading: false
                     },
                         () => { })
                 } else {
@@ -817,15 +936,21 @@ class RegionListComponent extends Component {
             </span>
         );
 
+        // const { realmCountryList } = this.state;
+        // let realmCountries = realmCountryList.length > 0
+        //     && realmCountryList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
+
         const { realmCountryList } = this.state;
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        let countryList = realmCountryList.length > 0 && realmCountryList.map((item, i) => {
+            return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+        }, this);
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -840,7 +965,7 @@ class RegionListComponent extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-0">
+                    {/* <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
@@ -856,13 +981,41 @@ class RegionListComponent extends Component {
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmCountries}
                                         </Input>
-                                        {/* <InputGroupAddon addonType="append">
-                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>
                         </Col><div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                    </CardBody> */}
+                    <CardBody className="pb-lg-5 pt-lg-2 ">
+                        <div className="" >
+                            <div>
+                                <Form >
+                                    <div className="pl-0">
+                                        <div className="row">
+                                            <FormGroup className="col-md-3 ">
+                                                <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+
+                                                <div className="controls edit">
+                                                    <MultiSelect
+                                                        bsSize="sm"
+                                                        name="countrysId"
+                                                        id="countrysId"
+                                                        value={this.state.countryValues}
+                                                        onChange={(e) => { this.handleChange(e) }}
+                                                        options={countryList && countryList.length > 0 ? countryList : []}
+                                                    />
+                                                </div>
+                                            </FormGroup>
+                                        </div>
+                                    </div>
+                                </Form>
+
+                                <div className="werehousecapacitySearchposition">
+                                    <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                </div>
+                            </div>
+                        </div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

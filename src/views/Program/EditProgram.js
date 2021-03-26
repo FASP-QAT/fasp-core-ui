@@ -279,6 +279,12 @@ export default class EditProgram extends Component {
                 .then(response => {
                     console.log("realm list---", response.data);
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
                             programManagerList: response.data, loading: false
                         })
@@ -340,6 +346,11 @@ export default class EditProgram extends Component {
                         for (var i = 0; i < json.length; i++) {
                             regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                         }
+                        regList.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
                             regionList: regList, loading: false
                         })

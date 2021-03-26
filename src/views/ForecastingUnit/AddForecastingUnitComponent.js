@@ -168,8 +168,14 @@ export default class AddForecastingUnitComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         UnitService.getUnitListAll()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    units: response.data, loading: false
+                    units: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -213,8 +219,14 @@ export default class AddForecastingUnitComponent extends Component {
             );
         RealmService.getRealmListAll()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    realms: response.data,
+                    realms: listArray,
                     loading: false
                 })
             }).catch(
@@ -260,8 +272,14 @@ export default class AddForecastingUnitComponent extends Component {
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    tracerCategories: response.data,
+                    tracerCategories: listArray,
                     loading: false
                 })
             }).catch(
@@ -344,8 +362,15 @@ export default class AddForecastingUnitComponent extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log("productCategory------>", response.data.slice(1))
+                    var listArray = response.data.slice(1);
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        productcategories: response.data.slice(1),
+                        // productcategories: response.data.slice(1),
+                        productcategories: listArray
                     })
                 }).catch(
                     error => {

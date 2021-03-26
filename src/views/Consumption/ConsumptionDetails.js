@@ -5,9 +5,10 @@ import {
     Label, Input, FormGroup,
     CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody
 } from 'reactstrap';
+import { Prompt } from 'react-router'
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, API_URL, polling } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -20,6 +21,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from "react-detect-offline";
+import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -110,11 +112,19 @@ export default class ConsumptionDetails extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     toggleLarge(method) {
         var cont = false;
-        console.log("this.state.consumptionBatchInfoChangedFlag", this.state.consumptionBatchInfoChangedFlag);
         if (method != "submit" && this.state.consumptionBatchInfoChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
@@ -151,8 +161,8 @@ export default class ConsumptionDetails extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -169,13 +179,13 @@ export default class ConsumptionDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -195,10 +205,10 @@ export default class ConsumptionDetails extends React.Component {
                 var programIdd = '';
                 if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
                     programIdd = this.props.match.params.programId;
-                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-                    programIdd = localStorage.getItem("sesProgramId");
                 } else if (proList.length == 1) {
                     programIdd = proList[0].value;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
@@ -306,7 +316,6 @@ export default class ConsumptionDetails extends React.Component {
                                     proList.push(productJson)
                                 }
                             }
-                            console.log("RegionList", regionList)
                             this.setState({
                                 planningUnitList: proList.sort(function (a, b) {
                                     a = a.label.toLowerCase();
@@ -366,8 +375,6 @@ export default class ConsumptionDetails extends React.Component {
             this.setState({ loading: true, consumptionChangedFlag: 0, regionId: document.getElementById("regionId").value, consumptionType: document.getElementById("consumptionType").value, showActive: document.getElementById("showActive").value })
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            console.log("startDate", startDate);
-            console.log("Stop Date", stopDate);
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
             var planningUnitId = value != "" && value != undefined ? value.value : 0;
@@ -381,7 +388,6 @@ export default class ConsumptionDetails extends React.Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    console.log("RoleList------------>", roleList);
                     if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
@@ -435,8 +441,6 @@ export default class ConsumptionDetails extends React.Component {
                             c.region != null && c.region.id != 0 &&
                             moment(c.consumptionDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.consumptionDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
                         if (regionId != "") {
-                            console.log("consumptionList", consumptionList)
-                            console.log("regionId", regionId);
                             consumptionList = consumptionList.filter(c => c.region.id == regionId);
                         }
                         if (consumptionType != "") {
@@ -477,7 +481,6 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     updateState(parameterName, value) {
-        console.log("Updated state", parameterName, "Value------->", value);
         this.setState({
             [parameterName]: value
         })
@@ -496,8 +499,13 @@ export default class ConsumptionDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            this.setState({
+                consumptionChangedFlag: 0,
+                consumptionBatchInfoChangedFlag:0
+            }, () => {
+                let id = AuthenticationService.displayDashboardBasedOnRole();
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })
         }
     }
 
@@ -526,6 +534,7 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('typeOfSession');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -547,11 +556,15 @@ export default class ConsumptionDetails extends React.Component {
         }, this);
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Online>
+                    {checkOnline === 'Online' && 
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -562,7 +575,7 @@ export default class ConsumptionDetails extends React.Component {
                                 </div>
                             </div>
                         </div>
-                    </Online>
+                    }
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
@@ -731,7 +744,6 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 }
