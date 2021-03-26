@@ -256,6 +256,9 @@ export default class EditProgram extends Component {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
+            if (uniqueCode == undefined) {
+                uniqueCode = ""
+            }
             this.setState({
                 program: response.data, loading: false,
                 uniqueCode: uniqueCode,
@@ -753,8 +756,8 @@ export default class EditProgram extends Component {
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
                                     let pro = this.state.program;
-                                    pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ?  ("-" + this.state.uniqueCode) : "");
-                                    console.log("Pro=---------------->+++",pro)
+                                    pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
+                                    console.log("Pro=---------------->+++", pro)
                                     ProgramService.editProgram(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
