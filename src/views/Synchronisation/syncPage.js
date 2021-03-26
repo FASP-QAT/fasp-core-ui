@@ -1425,8 +1425,8 @@ export default class syncPage extends Component {
                                       for (var i = 0; i < latestProgramData.regionList.length; i++) {
                                         var regionJson = {
                                           // name: // programJson.regionList[i].regionId,
-                                          name: getLabelText(programJson.regionList[i].label, this.state.lang),
-                                          id: programJson.regionList[i].regionId
+                                          name: getLabelText(latestProgramData.regionList[i].label, this.state.lang),
+                                          id: latestProgramData.regionList[i].regionId
                                         }
                                         regionList.push(regionJson);
 
@@ -3032,7 +3032,8 @@ export default class syncPage extends Component {
                   var putRequest1 = downloadedProgramSaveData.put(item);
                   var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
-                  this.redirectToDashbaord();
+                  this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
+                  // this.redirectToDashbaord();
                 }.bind(this)
               } else {
                 this.setState({
