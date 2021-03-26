@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import DimensionService from '../../api/DimensionService.js';
+import IntegrationService from '../../api/IntegrationService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
@@ -17,89 +17,64 @@ import i18n from '../../i18n';
 import moment from 'moment';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-const entityname = i18n.t('static.dimension.dimension');
-export default class DimensionListComponent extends Component {
+const entityname = i18n.t('static.integration.integration');
+export default class IntegrationListComponent extends Component {
 
     constructor(props) {
         super(props);
-        /*this.table = data.rows;
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: true,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                // console.log("row--------------", row);
-                this.editDimension(row);
-            }.bind(this)
 
-        }*/
         this.state = {
-            dimensionList: [],
+            integrationList: [],
             message: '',
             selSource: [],
             loading: true
         }
-        this.addNewDimension = this.addNewDimension.bind(this);
-        this.editDimension = this.editDimension.bind(this);
+        this.addNewIntegration = this.addNewIntegration.bind(this);
+        this.editIntegration = this.editIntegration.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
     }
     buildJexcel() {
-        let dimensionList = this.state.selSource;
-        // console.log("dimensionList---->", dimensionList);
-        let dimensionArray = [];
+        let integrationList = this.state.selSource;
+        // console.log("integrationList---->", integrationList);
+        let integrationArray = [];
         let count = 0;
 
-        for (var j = 0; j < dimensionList.length; j++) {
+        for (var j = 0; j < integrationList.length; j++) {
             data = [];
-            data[0] = dimensionList[j].dimensionId
-            data[1] = getLabelText(dimensionList[j].label, this.state.lang)
-            data[2] = dimensionList[j].lastModifiedBy.username;
-            data[3] = (dimensionList[j].lastModifiedDate ? moment(dimensionList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-            dimensionArray[count] = data;
+            data[0] = integrationList[j].integrationId
+            data[1] = getLabelText(integrationList[j].realm.label, this.state.lang)
+            data[2] = integrationList[j].integrationName;
+            integrationArray[count] = data;
             count++;
         }
-        // if (dimensionList.length == 0) {
-        //     data = [];
-        //     dimensionArray[0] = data;
-        // }
-        // console.log("dimensionArray---->", dimensionArray);
+
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
-        var data = dimensionArray;
+        var data = integrationArray;
 
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [50, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'dimensionId',
+                    title: 'integrationId',
                     type: 'hidden',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.dimension.dimension'),
+                    title: i18n.t('static.product.realm'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.common.lastModifiedBy'),
+                    title: i18n.t('static.integration.integration'),
                     type: 'text',
                     readOnly: true
-                },
-                {
-                    title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'calendar',
-                    readOnly: true,
-                    options: { format: JEXCEL_DATE_FORMAT_SM }
                 },
             ],
             text: {
@@ -129,10 +104,10 @@ export default class DimensionListComponent extends Component {
                 return [];
             }.bind(this),
         };
-        var DimensionListEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = DimensionListEl;
+        var IntegrationListEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = IntegrationListEl;
         this.setState({
-            DimensionListEl: DimensionListEl, loading: false
+            IntegrationListEl: IntegrationListEl, loading: false
         })
     }
     hideSecondComponent() {
@@ -151,19 +126,17 @@ export default class DimensionListComponent extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         // AuthenticationService.setupAxiosInterceptors();
-        DimensionService.getDimensionListAll().then(response => {
+        IntegrationService.getIntegrationListAll().then(response => {
             if (response.status == 200) {
                 console.log("response.data---->", response.data)
-                // this.setState({
-                //     dimensionList: response.data,
-                //     selSource: response.data, loading: false
 
-                // })
                 this.setState({
-                    dimensionList: response.data,
+                    integrationList: response.data,
                     selSource: response.data
                 },
-                    () => { this.buildJexcel() })
+                    () => {
+                        this.buildJexcel()
+                    })
 
             }
             else {
@@ -221,36 +194,22 @@ export default class DimensionListComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    editDimension(dimension) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION')) {
+    editIntegration(integration) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_INTEGRATION')) {
             this.props.history.push({
-                pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
-                // state: { dimension: dimension }
+                pathname: `/integration/editIntegration/${integration.integrationId}`,
             });
         }
     }
-    selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
-                this.props.history.push({
-                    pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { currency: currency }
-                });
-            }
-        }
-    }.bind(this);
 
     selected = function (instance, cell, x, y, value) {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_INTEGRATION')) {
                     this.props.history.push({
-                        pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
+                        pathname: `/integration/editIntegration/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
                     });
                 }
@@ -258,7 +217,7 @@ export default class DimensionListComponent extends Component {
         }
     }.bind(this);
 
-    addNewDimension() {
+    addNewIntegration() {
         if (isSiteOnline()) {
             this.props.history.push(`/integration/addIntegration`)
         } else {
@@ -292,7 +251,7 @@ export default class DimensionListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DIMENSION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewIntegration}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
