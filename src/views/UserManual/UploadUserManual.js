@@ -89,7 +89,7 @@ export default class uploadUserManual extends Component {
                                 case 404:
                                 case 406:
                                     this.setState({
-                                        message: error.response.data.messageCode,
+                                        message: i18n.t("static.unkownError"),
                                         loading: false,
                                         color: 'red'
                                     }, () => {
