@@ -2276,7 +2276,7 @@ class ShipmentGlobalDemandView extends Component {
             return '?'
         }
 
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
 
         return (
             <div className="animated fadeIn" >

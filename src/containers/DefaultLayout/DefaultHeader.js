@@ -40,7 +40,7 @@ class DefaultHeader extends Component {
 
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
 
     return (
       <React.Fragment>

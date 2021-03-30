@@ -455,7 +455,7 @@ export default class StepSix extends Component {
                                             invalid={touched.programNotes && !!errors.programNotes}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            maxLength={600}
+                                            // maxLength={600}
                                             type="textarea" name="programNotes" id="programNotes" />
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
