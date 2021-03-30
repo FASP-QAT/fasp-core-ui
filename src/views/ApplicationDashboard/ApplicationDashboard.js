@@ -644,7 +644,7 @@ class ApplicationDashboard extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
     const { activeIndex } = this.state;
     const { activeIndexProgram } = this.state;
     // const { problemActionlist } = this.state;

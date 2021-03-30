@@ -1499,7 +1499,7 @@ class Consumption extends Component {
       from: 'From', to: 'To',
     }
     const { rangeValue } = this.state
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
 
     const makeText = m => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
