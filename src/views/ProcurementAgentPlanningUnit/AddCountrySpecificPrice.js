@@ -144,9 +144,11 @@ class CountrySpecificPrices extends Component {
                                         data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
                                         data[2] = parseInt(papuList[j].program.id);
                                         data[3] = papuList[j].price;
-                                        data[4] = papuList[j].procurementAgentPlanningUnitId;
-                                        data[5] = papuList[j].procurementAgentPlanningUnitProgramId;
-                                        data[6] = 0;
+                                        data[4] = papuList[j].active;
+                                        data[5] = papuList[j].procurementAgentPlanningUnitId;
+                                        data[6] = papuList[j].procurementAgentPlanningUnitProgramId;
+                                        data[7] = 0;
+                                        
                                         papuDataArr[count] = data;
                                         count++;
                                     }
@@ -157,9 +159,10 @@ class CountrySpecificPrices extends Component {
                                     data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
                                     data[2] = "";
                                     data[3] = "";
-                                    data[4] = this.props.match.params.procurementAgentPlanningUnitId;
-                                    data[5] = 0;
-                                    data[6] = 1;
+                                    data[4] = true;
+                                    data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+                                    data[6] = 0;
+                                    data[7] = 1;
                                     papuDataArr[0] = data;
                                 }
                                 this.el = jexcel(document.getElementById("paputableDiv"), '');
@@ -199,6 +202,10 @@ class CountrySpecificPrices extends Component {
                                             disabledMaskOnEdition: true
                                         },
                                         {
+                                            title: i18n.t('static.checkbox.active'),
+                                            type: 'checkbox'
+                                        },
+                                        {
                                             title: 'procurementAgentPlanningUnitId',
                                             type: 'hidden'
                                         },
@@ -209,7 +216,7 @@ class CountrySpecificPrices extends Component {
                                         {
                                             title: 'isChange',
                                             type: 'hidden'
-                                        }
+                                        },
 
                                     ],
                                     pagination: localStorage.getItem("sesRecordCount"),
@@ -313,9 +320,11 @@ class CountrySpecificPrices extends Component {
                                                         data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
                                                         data[2] = "";
                                                         data[3] = "";
-                                                        data[4] = this.props.match.params.procurementAgentPlanningUnitId;
-                                                        data[5] = 0;
-                                                        data[6] = 1;
+                                                        data[4] = true;
+                                                        data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+                                                        data[6] = 0;
+                                                        data[7] = 1;
+                                                        
                                                         obj.insertRow(data, parseInt(y), 1);
                                                     }.bind(this)
                                                 });
@@ -330,9 +339,11 @@ class CountrySpecificPrices extends Component {
                                                         data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
                                                         data[2] = "";
                                                         data[3] = "";
-                                                        data[4] = this.props.match.params.procurementAgentPlanningUnitId;
-                                                        data[5] = 0;
-                                                        data[6] = 1;
+                                                        data[4] = true;
+                                                        data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+                                                        data[6] = 0;
+                                                        data[7] = 1;
+                                                        
                                                         obj.insertRow(data, parseInt(y));
                                                     }.bind(this)
                                                 });
@@ -340,7 +351,7 @@ class CountrySpecificPrices extends Component {
                                             // Delete a row
                                             if (obj.options.allowDeleteRow == true) {
                                                 // region id
-                                                if (obj.getRowData(y)[6] == 0) {
+                                                if (obj.getRowData(y)[7] == 0) {
                                                     items.push({
                                                         title: i18n.t("static.common.deleterow"),
                                                         onclick: function () {
@@ -559,7 +570,8 @@ class CountrySpecificPrices extends Component {
             // console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
         }
-        elInstance.setValueFromCoords(6, y, 1, true);
+        elInstance.setValueFromCoords(7, y, 1, true);
+        console.log("7 map---11");
 
     }
 
@@ -570,9 +582,11 @@ class CountrySpecificPrices extends Component {
         data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
         data[2] = "";
         data[3] = "";
-        data[4] = this.props.match.params.procurementAgentPlanningUnitId;
-        data[5] = 0;
-        data[6] = 1;
+        data[4] = true;
+        data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+        data[6] = 0;
+        data[7] = 1;
+        
 
         this.el.insertRow(
             data, 0, 1
@@ -586,8 +600,8 @@ class CountrySpecificPrices extends Component {
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en, true);
                     (instance.jexcel).setValueFromCoords(1, data[i].y, this.state.procurementAgentPlanningUnit.planningUnit.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -602,8 +616,8 @@ class CountrySpecificPrices extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("6 map---" + map1.get("6"))
-                if (parseInt(map1.get("6")) === 1) {
+                console.log("7 map---" + map1.get("7"))
+                if (parseInt(map1.get("7")) === 1) {
                     let json = {
                         procurementAgent: {
                             id: this.props.match.params.procurementAgentId
@@ -615,8 +629,9 @@ class CountrySpecificPrices extends Component {
                             id: parseInt(map1.get("2"))
                         },
                         price: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        procurementAgentPlanningUnitId: parseInt(map1.get("4")),
-                        procurementAgentPlanningUnitProgramId: parseInt(map1.get("5"))
+                        procurementAgentPlanningUnitId: parseInt(map1.get("5")),
+                        procurementAgentPlanningUnitProgramId: parseInt(map1.get("6")),
+                        active: map1.get("4"),
                     }
                     changedpapuList.push(json);
                 }
@@ -738,6 +753,11 @@ class CountrySpecificPrices extends Component {
             }
         }
 
+         //Active
+         if (x != 7) {
+            this.el.setValueFromCoords(7, y, 1, true);
+        }
+
 
 
     }.bind(this);
@@ -745,7 +765,7 @@ class CountrySpecificPrices extends Component {
 
     onedit = function (instance, cell, x, y, value) {
         console.log("------------onedit called")
-        this.el.setValueFromCoords(6, y, 1, true);
+        this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
@@ -753,7 +773,7 @@ class CountrySpecificPrices extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(6, y);
+            var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
 
                 //Country
