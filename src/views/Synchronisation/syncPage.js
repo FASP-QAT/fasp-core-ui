@@ -8,7 +8,7 @@ import {
   Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -918,6 +918,7 @@ export default class syncPage extends Component {
   }
 
   generateDataAfterResolveConflictsForQPL() {
+    console.log("+++in generate QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     this.setState({ loading: true });
     var db1;
     var storeOS;
@@ -930,68 +931,132 @@ export default class syncPage extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-      var programDataOs = programDataTransaction.objectStore('programData');
-      var programRequest = programDataOs.get((this.state.programId).value);
-      programRequest.onerror = function (event) {
-        this.setState({
-          supplyPlanError: i18n.t('static.program.errortext')
-        })
-      }.bind(this);
-      programRequest.onsuccess = function (e) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        var programJson = JSON.parse(programData);
+      // var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+      // var programDataOs = programDataTransaction.objectStore('programData');
+      // var programRequest = programDataOs.get((this.state.programId).value);
+      // programRequest.onerror = function (event) {
+      //   this.setState({
+      //     supplyPlanError: i18n.t('static.program.errortext')
+      //   })
+      // }.bind(this);
+      // programRequest.onsuccess = function (e) {
+      //   var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+      //   var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        var programJson = this.state.programRequestProgramJson;
+        var actionList = programJson.actionList;
+        if (actionList == undefined) {
+          actionList = []
+        }
         var planningUnitList = [];
-        var consumptionData = [];
+        var consumptionData = (this.state.oldProgramDataConsumption).filter(c => c.consumptionId != 0);
         var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
         var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
         var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
         for (var c = 0; c < consumptionJson.length; c++) {
           if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-            consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+            // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
           } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
-            consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+            var index = consumptionData.findIndex(p => p.consumptionId == (consumptionJson[c])[0]);
+            if (index == -1) {
+              consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+            } else {
+              consumptionData[index] = latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0];
+            }
           }
         }
         consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+        var uniquePlanningUnitsInConsumption = [];
+        consumptionJson.map(c => uniquePlanningUnitsInConsumption = uniquePlanningUnitsInConsumption.concat(parseInt(c[1])));
+        console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
 
-        var inventoryData = [];
+        uniquePlanningUnitsInConsumption.map(c => {
+          actionList.push({
+            planningUnitId: c,
+            type: ACTUAL_CONSUMPTION_MODIFIED,
+            date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+          });
+          actionList.push({
+            planningUnitId: c,
+            type: FORECASTED_CONSUMPTION_MODIFIED,
+            date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+          });
+        })
+
+        var inventoryData = (this.state.oldProgramDataInventory).filter(c => c.inventoryId != 0);
         var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
         var oldProgramDataInventory = this.state.oldProgramDataInventory;
         var latestProgramDataInventory = this.state.latestProgramDataInventory;
         for (var c = 0; c < inventoryJson.length; c++) {
           if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-            inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+            // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
           } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
-            inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+            var index = inventoryData.findIndex(p => p.inventoryId == (inventoryJson[c])[0]);
+            if (index == -1) {
+              inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+            } else {
+              inventoryData[index] = latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0];
+            }
           }
         }
         inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-        var shipmentData = [];
+        var uniquePlanningUnitsInInventory = [];
+        inventoryJson.map(c => uniquePlanningUnitsInInventory = uniquePlanningUnitsInInventory.concat(parseInt(c[1])));
+
+        uniquePlanningUnitsInInventory.map(c => {
+          actionList.push({
+            planningUnitId: c,
+            type: INVENTORY_MODIFIED,
+            date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+          });
+          actionList.push({
+            planningUnitId: c,
+            type: ADJUSTMENT_MODIFIED,
+            date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+          });
+        })
+
+        var shipmentData = (this.state.oldProgramDataShipment).filter(c => c.shipmentId != 0);
         var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
         var oldProgramDataShipment = this.state.oldProgramDataShipment;
         var latestProgramDataShipment = this.state.latestProgramDataShipment;
         for (var c = 0; c < shipmentJson.length; c++) {
           if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
-            shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+            // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
           } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
-            shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+            var index = shipmentData.findIndex(p => p.shipmentId == (shipmentJson[c])[0]);
+            if (index == -1) {
+              shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+            } else {
+              shipmentData[index] = latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0];
+            }
           }
         }
         shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+        var uniquePlanningUnitsInShipment = [];
+        shipmentJson.map(c => uniquePlanningUnitsInShipment = uniquePlanningUnitsInShipment.concat(parseInt(c[1])));
+        console.log("uniquePlanningUnitsInConsumption+++", uniquePlanningUnitsInConsumption);
+
+        uniquePlanningUnitsInShipment.map(c => {
+          actionList.push({
+            planningUnitId: c,
+            type: SHIPMENT_MODIFIED,
+            date: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+          });
+        })
 
 
         programJson.consumptionList = consumptionData;
         programJson.inventoryList = inventoryData;
         programJson.shipmentList = shipmentData;
-        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+        var proRequestResult=this.state.programRequestResult;
+        proRequestResult.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
 
         var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
         var programOs = programTransaction.objectStore('whatIfProgramData');
 
-        var putRequest = programOs.put(programRequest.result);
+        var putRequest = programOs.put(proRequestResult);
 
         putRequest.onerror = function (event) {
           this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
@@ -999,10 +1064,11 @@ export default class syncPage extends Component {
           this.props.hideFirstComponent();
         }.bind(this);
         putRequest.onsuccess = function (event) {
-          this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", true);
+          console.log("+++Ready data for QPL ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+          this.refs.problemListChild.qatProblemActions((this.state.programId).value, "loading", false);
         }.bind(this);
       }.bind(this);
-    }.bind(this);
+    // }.bind(this);
   }
 
   componentDidMount() {
@@ -1086,6 +1152,7 @@ export default class syncPage extends Component {
           .catch(
             error => {
               if (error.message === "Network Error") {
+                console.log("+++in catch 1")
                 this.setState({
                   message: 'static.unkownError',
                   loading: false,
@@ -1117,6 +1184,7 @@ export default class syncPage extends Component {
                     });
                     break;
                   default:
+                    console.log("+++in catch 2")
                     this.setState({
                       message: 'static.unkownError',
                       loading: false,
@@ -1133,6 +1201,7 @@ export default class syncPage extends Component {
   }
 
   getDataForCompare(value) {
+    console.log("+++Started with commit version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
       programId: value,
@@ -1166,14 +1235,14 @@ export default class syncPage extends Component {
       ProgramService.getProgramData(programRequestJson)
         .then(response => {
           if (response.status == 200) {
-
+            console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
             AuthenticationService.setupAxiosInterceptors();
             var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
             ProgramService.getProgramData(programRequestJson1)
               .then(response1 => {
                 if (response1.status == 200) {
-
+                  console.log("+++Response for downloaded version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                   var db1;
                   var storeOS;
@@ -1211,7 +1280,11 @@ export default class syncPage extends Component {
                       var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                       var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                       var programJson = JSON.parse(programData);
-
+                      this.setState({
+                        programRequestResult:programRequest.result,
+                        programRequestProgramJson:programJson
+                      })
+                      console.log("+++Response of local version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                       // var dProgramDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                       // var dProgramDataOs = dProgramDataTransaction.objectStore('downloadedProgramData');
                       // var dProgramRequest = dProgramDataOs.get(value != "" && value != undefined ? value.value : 0);
@@ -1420,8 +1493,8 @@ export default class syncPage extends Component {
 
                                       var latestProgramData = response.data;
                                       this.setState({
-                                        comparedLatestVersion:latestProgramData.currentVersion.versionId,
-                                        singleProgramId:latestProgramData.programId
+                                        comparedLatestVersion: latestProgramData.currentVersion.versionId,
+                                        singleProgramId: latestProgramData.programId
                                       })
                                       var oldProgramData = programJson;
                                       var downloadedProgramData = response1.data;
@@ -1435,38 +1508,56 @@ export default class syncPage extends Component {
                                         regionList.push(regionJson);
 
                                       }
-
+                                      console.log("+++Completion of basic flow", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                       var latestProgramDataConsumption = latestProgramData.consumptionList;
                                       var oldProgramDataConsumption = oldProgramData.consumptionList;
                                       var downloadedProgramDataConsumption = downloadedProgramData.consumptionList;
+
+                                      var modifiedConsumptionIds = []
+                                      latestProgramDataConsumption.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedConsumptionIds.push(item.consumptionId) });
+                                      oldProgramData.consumptionList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedConsumptionIds.push(item.consumptionId));
+
+                                      var latestModifiedConsumptionData = latestProgramDataConsumption.filter(c => modifiedConsumptionIds.includes(c.consumptionId));
+                                      var oldModifiedConsumptionData = oldProgramDataConsumption.filter(c => c.consumptionId == 0 || modifiedConsumptionIds.includes(c.consumptionId));
+
                                       var mergedConsumptionData = [];
                                       var existingConsumptionId = [];
-                                      for (var c = 0; c < oldProgramDataConsumption.length; c++) {
-                                        if (oldProgramDataConsumption[c].consumptionId != 0) {
-                                          mergedConsumptionData.push(oldProgramDataConsumption[c]);
-                                          existingConsumptionId.push(oldProgramDataConsumption[c].consumptionId);
+                                      for (var c = 0; c < oldModifiedConsumptionData.length; c++) {
+                                        if (oldModifiedConsumptionData[c].consumptionId != 0) {
+                                          mergedConsumptionData.push(oldModifiedConsumptionData[c]);
+                                          existingConsumptionId.push(oldModifiedConsumptionData[c].consumptionId);
                                         } else {
                                           // If 0 check whether that exists in latest version or not
                                           var index = latestProgramDataConsumption.findIndex(f =>
-                                            f.planningUnit.id == oldProgramDataConsumption[c].planningUnit.id &&
-                                            moment(f.consumptionDate).format("YYYY-MM") == moment(oldProgramDataConsumption[c].consumptionDate).format("YYYY-MM") &&
-                                            f.region.id == oldProgramDataConsumption[c].region.id &&
-                                            f.actualFlag.toString() == oldProgramDataConsumption[c].actualFlag.toString() &&
-                                            f.realmCountryPlanningUnit.id == oldProgramDataConsumption[c].realmCountryPlanningUnit.id &&
+                                            f.planningUnit.id == oldModifiedConsumptionData[c].planningUnit.id &&
+                                            moment(f.consumptionDate).format("YYYY-MM") == moment(oldModifiedConsumptionData[c].consumptionDate).format("YYYY-MM") &&
+                                            f.region.id == oldModifiedConsumptionData[c].region.id &&
+                                            f.actualFlag.toString() == oldModifiedConsumptionData[c].actualFlag.toString() &&
+                                            f.realmCountryPlanningUnit.id == oldModifiedConsumptionData[c].realmCountryPlanningUnit.id &&
                                             !existingConsumptionId.includes(f.consumptionId)
                                           );
                                           if (index == -1) { // Does not exists
-                                            mergedConsumptionData.push(oldProgramDataConsumption[c]);
+                                            mergedConsumptionData.push(oldModifiedConsumptionData[c]);
                                           } else { // Exists
-                                            oldProgramDataConsumption[c].consumptionId = latestProgramDataConsumption[index].consumptionId;
+                                            oldModifiedConsumptionData[c].consumptionId = latestProgramDataConsumption[index].consumptionId;
+                                            var index1 = oldProgramDataConsumption.findIndex(f =>
+                                              f.planningUnit.id == oldModifiedConsumptionData[c].planningUnit.id &&
+                                              moment(f.consumptionDate).format("YYYY-MM") == moment(oldModifiedConsumptionData[c].consumptionDate).format("YYYY-MM") &&
+                                              f.region.id == oldModifiedConsumptionData[c].region.id &&
+                                              f.actualFlag.toString() == oldModifiedConsumptionData[c].actualFlag.toString() &&
+                                              f.realmCountryPlanningUnit.id == oldModifiedConsumptionData[c].realmCountryPlanningUnit.id &&
+                                              !existingConsumptionId.includes(f.consumptionId)
+                                            );
+                                            oldProgramDataConsumption[index1].consumptionId = latestProgramDataConsumption[index].consumptionId;
+                                            oldProgramDataConsumption[index1].versionId = latestProgramDataConsumption[index].versionId;
                                             existingConsumptionId.push(latestProgramDataConsumption[index].consumptionId);
-                                            mergedConsumptionData.push(oldProgramDataConsumption[c]);
+                                            mergedConsumptionData.push(oldModifiedConsumptionData[c]);
                                           }
 
                                         }
                                       }
                                       // Getting other entries of latest consumption data
-                                      var latestOtherConsumptionEntries = latestProgramDataConsumption.filter(c => !(existingConsumptionId.includes(c.consumptionId)));
+                                      var latestOtherConsumptionEntries = latestModifiedConsumptionData.filter(c => !(existingConsumptionId.includes(c.consumptionId)));
                                       mergedConsumptionData = mergedConsumptionData.concat(latestOtherConsumptionEntries);
                                       var data = [];
                                       var mergedConsumptionJexcel = [];
@@ -1598,45 +1689,63 @@ export default class syncPage extends Component {
                                         fundingSourceList: fundingSourceList,
                                         procurementAgentList: procurementAgentList
                                       })
-
+                                      console.log("+++Consumption jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                                       // Inventory part
                                       var latestProgramDataInventory = latestProgramData.inventoryList;
                                       var oldProgramDataInventory = oldProgramData.inventoryList;
                                       var downloadedProgramDataInventory = downloadedProgramData.inventoryList;
+
+                                      var modifiedInventoryIds = []
+                                      latestProgramDataInventory.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedInventoryIds.push(item.inventoryId) });
+                                      oldProgramDataInventory.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedInventoryIds.push(item.inventoryId));
+
+                                      var latestModifiedInventoryData = latestProgramDataInventory.filter(c => modifiedInventoryIds.includes(c.inventoryId));
+                                      var oldModifiedInventoryData = oldProgramDataInventory.filter(c => c.inventoryId == 0 || modifiedInventoryIds.includes(c.inventoryId));
+
                                       var mergedInventoryData = [];
                                       var existingInventoryId = [];
-                                      for (var c = 0; c < oldProgramDataInventory.length; c++) {
-                                        if (oldProgramDataInventory[c].inventoryId != 0) {
-                                          mergedInventoryData.push(oldProgramDataInventory[c]);
-                                          existingInventoryId.push(oldProgramDataInventory[c].inventoryId);
+                                      for (var c = 0; c < oldModifiedInventoryData.length; c++) {
+                                        if (oldModifiedInventoryData[c].inventoryId != 0) {
+                                          mergedInventoryData.push(oldModifiedInventoryData[c]);
+                                          existingInventoryId.push(oldModifiedInventoryData[c].inventoryId);
                                         } else {
                                           // If 0 check whether that exists in latest version or not
                                           var index = 0;
-                                          if (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) {
+                                          if (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) {
                                             index = latestProgramDataInventory.findIndex(f =>
-                                              f.planningUnit.id == oldProgramDataInventory[c].planningUnit.id &&
-                                              moment(f.inventoryDate).format("YYYY-MM") == moment(oldProgramDataInventory[c].inventoryDate).format("YYYY-MM") &&
-                                              f.region != null && f.region.id != 0 && oldProgramDataInventory[c].region != null && oldProgramDataInventory[c].region.id != 0 && f.region.id == oldProgramDataInventory[c].region.id &&
-                                              (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldProgramDataInventory[c].actualQty != null && oldProgramDataInventory[c].actualQty != "" && oldProgramDataInventory[c].actualQty != undefined) &&
-                                              f.realmCountryPlanningUnit.id == oldProgramDataInventory[c].realmCountryPlanningUnit.id &&
+                                              f.planningUnit.id == oldModifiedInventoryData[c].planningUnit.id &&
+                                              moment(f.inventoryDate).format("YYYY-MM") == moment(oldModifiedInventoryData[c].inventoryDate).format("YYYY-MM") &&
+                                              f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
+                                              (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
+                                              f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
                                               !existingInventoryId.includes(f.inventoryId)
                                             );
                                           } else {
                                             index = -1;
                                           }
                                           if (index == -1) { // Does not exists
-                                            mergedInventoryData.push(oldProgramDataInventory[c]);
+                                            mergedInventoryData.push(oldModifiedInventoryData[c]);
                                           } else { // Exists
-                                            oldProgramDataInventory[c].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                            oldModifiedInventoryData[c].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                            var index1 = oldProgramDataInventory.findIndex(f =>
+                                              f.planningUnit.id == oldModifiedInventoryData[c].planningUnit.id &&
+                                              moment(f.inventoryDate).format("YYYY-MM") == moment(oldModifiedInventoryData[c].inventoryDate).format("YYYY-MM") &&
+                                              f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
+                                              (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
+                                              f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                              !existingInventoryId.includes(f.inventoryId)
+                                            );
+                                            oldProgramDataInventory[index1].inventoryId = latestProgramDataInventory[index].inventoryId;
+                                            oldProgramDataInventory[index1].versionId = latestProgramDataInventory[index].versionId;
                                             existingInventoryId.push(latestProgramDataInventory[index].inventoryId);
-                                            mergedInventoryData.push(oldProgramDataInventory[c]);
+                                            mergedInventoryData.push(oldModifiedInventoryData[c]);
                                           }
 
                                         }
                                       }
                                       // Getting other entries of latest inventory data
-                                      var latestOtherInventoryEntries = latestProgramDataInventory.filter(c => !(existingInventoryId.includes(c.inventoryId)));
+                                      var latestOtherInventoryEntries = latestModifiedInventoryData.filter(c => !(existingInventoryId.includes(c.inventoryId)));
                                       mergedInventoryData = mergedInventoryData.concat(latestOtherInventoryEntries);
                                       var data = [];
                                       var mergedInventoryJexcel = [];
@@ -1756,6 +1865,7 @@ export default class syncPage extends Component {
                                       this.setState({
                                         mergedInventoryJexcel: mergedInventoryJexcel
                                       })
+                                      console.log("+++Inventory jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                                       // Batch info
                                       var latestProgramDataBatchInfo = latestProgramData.batchInfoList;
@@ -1765,24 +1875,32 @@ export default class syncPage extends Component {
                                       var latestProgramDataShipment = latestProgramData.shipmentList;
                                       var oldProgramDataShipment = oldProgramData.shipmentList;
                                       var downloadedProgramDataShipment = downloadedProgramData.shipmentList;
+
+                                      var modifiedShipmentIds = []
+                                      latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedShipmentIds.push(item.shipmentId) });
+                                      oldProgramDataShipment.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedShipmentIds.push(item.shipmentId));
+
+                                      var latestModifiedShipmentData = latestProgramDataShipment.filter(c => modifiedShipmentIds.includes(c.shipmentId));
+                                      var oldModifiedShipmentData = oldProgramDataShipment.filter(c => c.shipmentId == 0 || modifiedShipmentIds.includes(c.shipmentId));
+
                                       var mergedShipmentData = [];
                                       var existingShipmentId = [];
-                                      for (var c = 0; c < oldProgramDataShipment.length; c++) {
-                                        if (oldProgramDataShipment[c].shipmentId != 0) {
-                                          if ((oldProgramDataShipment[c].budget.id == "undefined" || oldProgramDataShipment[c].budget.id == undefined) && oldProgramDataShipment[c].active.toString() == "false") {
-                                            oldProgramDataShipment[c].budget.id = '';
+                                      for (var c = 0; c < oldModifiedShipmentData.length; c++) {
+                                        if (oldModifiedShipmentData[c].shipmentId != 0) {
+                                          if ((oldModifiedShipmentData[c].budget.id == "undefined" || oldModifiedShipmentData[c].budget.id == undefined) && oldModifiedShipmentData[c].active.toString() == "false") {
+                                            oldModifiedShipmentData[c].budget.id = '';
                                           }
-                                          mergedShipmentData.push(oldProgramDataShipment[c]);
-                                          existingShipmentId.push(oldProgramDataShipment[c].shipmentId);
+                                          mergedShipmentData.push(oldModifiedShipmentData[c]);
+                                          existingShipmentId.push(oldModifiedShipmentData[c].shipmentId);
                                         } else {
                                           // If 0 check whether that exists in latest version or not
-                                          if (oldProgramDataShipment[c].active.toString() == "true") {
-                                            mergedShipmentData.push(oldProgramDataShipment[c]);
+                                          if (oldModifiedShipmentData[c].active.toString() == "true") {
+                                            mergedShipmentData.push(oldModifiedShipmentData[c]);
                                           }
                                         }
                                       }
                                       // Getting other entries of latest shipment data
-                                      var latestOtherShipmentEntries = latestProgramDataShipment.filter(c => !(existingShipmentId.includes(c.shipmentId)));
+                                      var latestOtherShipmentEntries = latestModifiedShipmentData.filter(c => !(existingShipmentId.includes(c.shipmentId)));
                                       mergedShipmentData = mergedShipmentData.concat(latestOtherShipmentEntries);
                                       var data = [];
                                       var mergedShipmentJexcel = [];
@@ -1928,6 +2046,7 @@ export default class syncPage extends Component {
                                       this.setState({
                                         mergedShipmentJexcel: mergedShipmentJexcel,
                                       })
+                                      console.log("+++Shipment Jexcel completed", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                       this.setState({
                                         oldProgramDataConsumption: oldProgramDataConsumption,
                                         oldProgramDataInventory: oldProgramDataInventory,
@@ -1972,6 +2091,7 @@ export default class syncPage extends Component {
               .catch(
                 error => {
                   if (error.message === "Network Error") {
+                    console.log("+++in catch 3")
                     this.setState({
                       message: 'static.unkownError',
                       loading: false
@@ -2000,6 +2120,7 @@ export default class syncPage extends Component {
                         });
                         break;
                       default:
+                        console.log("+++in catch 4")
                         this.setState({
                           message: 'static.unkownError',
                           loading: false
@@ -2023,6 +2144,7 @@ export default class syncPage extends Component {
         .catch(
           error => {
             if (error.message === "Network Error") {
+              console.log("+++in catch 5")
               this.setState({
                 message: 'static.unkownError',
                 loading: false
@@ -2051,6 +2173,7 @@ export default class syncPage extends Component {
                   });
                   break;
                 default:
+                  console.log("+++in catch 6")
                   this.setState({
                     message: 'static.unkownError',
                     loading: false
@@ -2967,153 +3090,156 @@ export default class syncPage extends Component {
             // programJson.inventoryList = inventoryData;
             // programJson.shipmentList = shipmentData;
             programJson.problemReportList = problemReportList;
+            console.log("ProgramJson.consumption+++", programJson.consumptionList);
             // programJson.problemReportList = [];
             programJson.versionType = { id: document.getElementById("versionType").value };
             programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
             programJson.notes = document.getElementById("notes").value;
             ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
               if (response.status == 200) {
-                if(response.data==this.state.comparedLatestVersion){
-            ProgramService.saveProgramData(programJson).then(response => {
-              if (response.status == 200) {
-                var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-                var programDataOs1 = programDataTransaction1.objectStore('programData');
-                var programRequest1 = programDataOs1.delete((this.state.programId).value);
+                if (response.data == this.state.comparedLatestVersion) {
+                  ProgramService.saveProgramData(programJson).then(response => {
+                    if (response.status == 200) {
+                      var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                      var programDataOs1 = programDataTransaction1.objectStore('programData');
+                      var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
-                var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-                var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-                var programRequest3 = programDataOs3.delete((this.state.programId).value);
+                      var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                      var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                      var programRequest3 = programDataOs3.delete((this.state.programId).value);
 
-                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-                var programRequest2 = programDataOs2.delete((this.state.programId).value);
+                      var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                      var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                      var programRequest2 = programDataOs2.delete((this.state.programId).value);
 
-                programRequest1.onerror = function (event) {
-                  this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                  })
-                }.bind(this);
-                programRequest2.onsuccess = function (e) {
+                      programRequest1.onerror = function (event) {
+                        this.setState({
+                          supplyPlanError: i18n.t('static.program.errortext')
+                        })
+                      }.bind(this);
+                      programRequest2.onsuccess = function (e) {
 
-                  var json = response.data;
-                  json.actionList = [];
-                  var version = json.requestedProgramVersion;
-                  if (version == -1) {
-                    version = json.currentVersion.versionId
-                  }
+                        var json = response.data;
+                        json.actionList = [];
+                        var version = json.requestedProgramVersion;
+                        if (version == -1) {
+                          version = json.currentVersion.versionId
+                        }
 
-                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                  var programSaveData = transactionForSavingData.objectStore('programData');
+                        var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                        var programSaveData = transactionForSavingData.objectStore('programData');
 
-                  var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                  var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
 
-                  var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
-                  var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-                  // for (var i = 0; i < json.length; i++) {
-                  var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                  var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                  var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                  var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1)).length;
-                  var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3)).length;
+                        var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+                        var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
+                        // for (var i = 0; i < json.length; i++) {
+                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1)).length;
+                        var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3)).length;
 
-                  var item = {
-                    id: json.programId + "_v" + version + "_uId_" + userId,
-                    programId: json.programId,
-                    version: version,
-                    programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                    programData: encryptedText.toString(),
-                    userId: userId
-                  };
-                  var programQPLDetails = {
-                    id: json.programId + "_v" + version + "_uId_" + userId,
-                    programId: json.programId,
-                    version: version,
-                    userId: userId,
-                    programCode: json.programCode,
-                    openCount: openCount,
-                    addressedCount: addressedCount,
-                    programModified: 0
-                  }
-                  var putRequest = programSaveData.put(item);
-                  var putRequest1 = downloadedProgramSaveData.put(item);
-                  var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                        var item = {
+                          id: json.programId + "_v" + version + "_uId_" + userId,
+                          programId: json.programId,
+                          version: version,
+                          programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                          programData: encryptedText.toString(),
+                          userId: userId
+                        };
+                        var programQPLDetails = {
+                          id: json.programId + "_v" + version + "_uId_" + userId,
+                          programId: json.programId,
+                          version: version,
+                          userId: userId,
+                          programCode: json.programCode,
+                          openCount: openCount,
+                          addressedCount: addressedCount,
+                          programModified: 0
+                        }
+                        var putRequest = programSaveData.put(item);
+                        var putRequest1 = downloadedProgramSaveData.put(item);
+                        var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
-                  this.redirectToDashbaord();
-                }.bind(this)
-              } else {
-                this.setState({
-                  message: response.data.messageCode,
-                  color: "red",
-                  loading: false
-                })
-                this.hideFirstComponent();
-              }
-            })
-              .catch(
-                error => {
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: 'static.unkownError',
-                      color: "red",
-                      loading: false
-                    }, () => {
+                        this.redirectToDashbaord();
+                      }.bind(this)
+                    } else {
+                      this.setState({
+                        message: response.data.messageCode,
+                        color: "red",
+                        loading: false
+                      })
                       this.hideFirstComponent();
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          color: "red",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
                     }
-                  }
-                }
-              );
-              }else{
-                alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                this.setState({
-                  message: i18n.t("static.commitVersion.versionIsOutDated"),
-                  loading: false,
-                  color: "red"
-                }, () => {
-                  this.hideFirstComponent()
-                  this.getDataForCompare(this.state.programId);
-                });
+                  })
+                    .catch(
+                      error => {
+                        if (error.message === "Network Error") {
+                          console.log("+++in catch 7")
+                          this.setState({
+                            message: 'static.unkownError',
+                            color: "red",
+                            loading: false
+                          }, () => {
+                            this.hideFirstComponent();
+                          });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
 
-              }
+                            case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`)
+                              break;
+                            case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                            case 500:
+                            case 404:
+                            case 406:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                color: "red",
+                                loading: false
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                            case 412:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false,
+                                color: "red"
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                            default:
+                              console.log("+++in catch 8")
+                              this.setState({
+                                message: 'static.unkownError',
+                                loading: false,
+                                color: "red"
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                          }
+                        }
+                      }
+                    );
+                } else {
+                  alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                  this.setState({
+                    message: i18n.t("static.commitVersion.versionIsOutDated"),
+                    loading: false,
+                    color: "red"
+                  }, () => {
+                    this.hideFirstComponent()
+                    this.getDataForCompare(this.state.programId);
+                  });
+
+                }
               } else {
                 this.setState({
                   message: response.data.messageCode,
@@ -3126,6 +3252,7 @@ export default class syncPage extends Component {
               .catch(
                 error => {
                   if (error.message === "Network Error") {
+                    console.log("+++in catch 9")
                     this.setState({
                       message: 'static.unkownError',
                       color: "red",
@@ -3163,6 +3290,7 @@ export default class syncPage extends Component {
                         });
                         break;
                       default:
+                        console.log("+++in catch 10")
                         this.setState({
                           message: 'static.unkownError',
                           loading: false,
@@ -3202,6 +3330,7 @@ export default class syncPage extends Component {
   }
 
   fetchData() {
+    console.log("+++in fetch data", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -3248,7 +3377,7 @@ export default class syncPage extends Component {
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
-                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId && 
+                  && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
                   !existingProblemReportId.includes(f.problemReportId));
             } else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 13) {
               index = -1;
@@ -3458,6 +3587,7 @@ export default class syncPage extends Component {
 
         var mergedProblemListJexcel = jexcel(document.getElementById("mergedVersionProblemList"), options);
         this.el = mergedProblemListJexcel;
+        console.log("+++QPL jexcel completed ", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
         this.setState({
           mergedProblemListJexcel: mergedProblemListJexcel,
           oldProgramDataProblemList: oldProgramDataProblemList,
