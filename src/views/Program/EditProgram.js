@@ -214,7 +214,10 @@ export default class EditProgram extends Component {
             programManagerList: [],
             regionList: [],
             message: '',
-            loading: true
+            loading: true,
+            healthAreaCode: '',
+            organisationCode: '',
+            realmCountryCode: ''
 
         }
 
@@ -225,6 +228,8 @@ export default class EditProgram extends Component {
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
+        this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
+        this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
     }
 
     changeMessage(message) {
@@ -251,9 +256,15 @@ export default class EditProgram extends Component {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
+            if (uniqueCode == undefined) {
+                uniqueCode = ""
+            }
             this.setState({
                 program: response.data, loading: false,
-                uniqueCode: uniqueCode
+                uniqueCode: uniqueCode,
+                healthAreaCode: response.data.healthArea.code,
+                organisationCode: response.data.organisation.code,
+                realmCountryCode: response.data.realmCountry.country.countryCode
             })
             // initialValues = {
             //     programName: getLabelText(this.state.program.label, lang),
@@ -400,6 +411,122 @@ export default class EditProgram extends Component {
                     }
                 );
 
+            ProgramService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            organisationList: listArray
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+            ProgramService.getHealthAreaListByRealmCountryId(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            healthAreaList: listArray
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -442,6 +569,21 @@ export default class EditProgram extends Component {
         );
 
     }
+
+    generateHealthAreaCode(event) {
+        let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
+        this.setState({
+            healthAreaCode: healthAreaCode
+        })
+    }
+
+    generateOrganisationCode(event) {
+        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        this.setState({
+            organisationCode: organisationCode
+        })
+    }
+
     updateFieldData(value) {
         let { program } = this.state;
         this.setState({ regionId: value });
@@ -494,12 +636,10 @@ export default class EditProgram extends Component {
         if (event.target.name === "active") {
             program.active = event.target.id === "active2" ? false : true
         }
-        if (event.target.name == 'uniqueCode') {
-            var dname = this.state.program.programCode;
-            var email_array = dname.split('-');
-            var new_string = email_array[3];
-            program.programCode = dname.replace(new_string, "").concat(event.target.value.toUpperCase());
-            this.state.uniqueCode = event.target.value.toUpperCase()
+        if (event.target.name == 'programCode1') {
+            this.setState({
+                uniqueCode: event.target.value
+            })
         }
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
@@ -556,6 +696,28 @@ export default class EditProgram extends Component {
                     </option>
                 )
             }, this);
+        const { healthAreaList } = this.state;
+        let realmHealthArea = healthAreaList.length > 0
+            && healthAreaList.map((item, i) => {
+                return (
+                    <option key={i} value={item.healthAreaId}>
+                        {/* {item.healthAreaCode} */}
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { organisationList } = this.state;
+        let realmOrganisation = organisationList.length > 0
+            && organisationList.map((item, i) => {
+                return (
+                    <option key={i} value={item.organisationId}>
+                        {/* {item.organisationCode} */}
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
 
         return (
 
@@ -593,7 +755,10 @@ export default class EditProgram extends Component {
                                         loading: true
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    ProgramService.editProgram(this.state.program).then(response => {
+                                    let pro = this.state.program;
+                                    pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
+                                    console.log("Pro=---------------->+++", pro)
+                                    ProgramService.editProgram(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
@@ -683,19 +848,39 @@ export default class EditProgram extends Component {
                                                             id="programName" />
                                                         <FormFeedback>{errors.programName}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-
-                                                        <Label htmlFor="company">{i18n.t('static.program.programDisplayName')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            type="text" name="programCode" valid={!errors.programCode}
-                                                            bsSize="sm"
-                                                            invalid={touched.programCode && !!errors.programCode || this.state.program.programCode == ''}
-                                                            readOnly
-                                                            onBlur={handleBlur}
-                                                            value={this.state.program.programCode}
-                                                            id="programCode" />
-                                                        <FormFeedback>{errors.programCode}</FormFeedback>
+                                                    <FormGroup style={{ display: 'flex' }}>
+                                                        <Col xs="6" className="pl-0">
+                                                            <FormGroup >
+                                                                <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
+                                                                <Input
+                                                                    type="text" name="programCode"
+                                                                    bsSize="sm"
+                                                                    disabled
+                                                                    value={this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode}
+                                                                    id="programCode" />
+                                                                <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col xs="1" className="" style={{ marginTop: '32px' }}>
+                                                            <i class="fa fa-minus" aria-hidden="true"></i>
+                                                        </Col>
+                                                        <Col xs="5" className="pr-0">
+                                                            <FormGroup className="pt-2">
+                                                                <Label htmlFor="company"></Label>
+                                                                <Input
+                                                                    onBlur={handleBlur}
+                                                                    // valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
+                                                                    // invalid={touched.airFreightPerc && !!errors.airFreightPerc}
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    type="text"
+                                                                    maxLength={6}
+                                                                    value={this.state.uniqueCode}
+                                                                    disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                                    name="programCode1" id="programCode1" />
+                                                                <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                                            </FormGroup>
+                                                        </Col>
                                                     </FormGroup>
 
                                                     {/* <FormGroup>
@@ -774,36 +959,44 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
-
                                                         <Input
-                                                            value={getLabelText(this.state.program.organisation.label, this.state.lang)}
-                                                            bsSize="sm"
-                                                            valid={!errors.organisationId}
+                                                            valid={!errors.organisationId && this.state.program.organisation.id != ''}
                                                             invalid={touched.organisationId && !!errors.organisationId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            disabled
-                                                            type="text" name="organisationId" id="organisationId">
-
-                                                        </Input>
-                                                        <FormFeedback>{errors.organisationId}</FormFeedback>
-
-                                                    </FormGroup>
-                                                    <FormGroup>
-
-                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            value={getLabelText(this.state.program.healthArea.label, this.state.lang)}
                                                             bsSize="sm"
-                                                            valid={!errors.healthAreaId}
-                                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur} disabled type="text" name="healthAreaId" id="healthAreaId">
+                                                            type="select"
+                                                            name="organisationId"
+                                                            id="organisationId"
+                                                            disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                            value={this.state.program.organisation.id}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {realmOrganisation}
 
                                                         </Input>
-                                                        <FormFeedback>{errors.healthAreaId}</FormFeedback>
 
+                                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            valid={!errors.healthAreaId && this.state.program.healthArea.id != ''}
+                                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
+                                                            onBlur={handleBlur}
+                                                            bsSize="sm"
+                                                            type="select"
+                                                            name="healthAreaId"
+                                                            id="healthAreaId"
+                                                            disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                            value={this.state.program.healthArea.id}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.generateHealthAreaCode(e); }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {realmHealthArea}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
