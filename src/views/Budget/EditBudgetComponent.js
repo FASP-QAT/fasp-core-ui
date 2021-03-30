@@ -15,13 +15,15 @@ import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX } from '../../Constants.js';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import FundingSourceService from '../../api/FundingSourceService';
 
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
     budgetName: '',
     budgetAmt: '',
-    budgetCode: ''
+    budgetCode: '',
+    fundingSourceId: '',
 }
 
 const validationSchema = function (values) {
@@ -41,6 +43,8 @@ const validationSchema = function (values) {
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .max(30, i18n.t('static.common.max30digittext'))
             .required(i18n.t('static.budget.budgetDisplayNameText')),
+        fundingSourceId: Yup.string()
+            .required(i18n.t('static.budget.fundingtext')),
     })
 }
 
@@ -73,6 +77,7 @@ class EditBudgetComponent extends Component {
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
             loading: true,
+            fundingSources: [],
             rangeValue: "",
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
@@ -93,6 +98,7 @@ class EditBudgetComponent extends Component {
                     }
                 },
                 fundingSource: {
+                    fundingSourceId: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -217,7 +223,7 @@ class EditBudgetComponent extends Component {
 
                     this.setState({
                         budget: response.data, loading: false,
-                        rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth()+1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth()+1 } }
+                        rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
                     });
                 }
                 else {
@@ -236,6 +242,60 @@ class EditBudgetComponent extends Component {
 
 
 
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        FundingSourceService.getFundingSourceListAll()
+            .then(response => {
+                var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    // fundingSources: response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"))
+                    fundingSources: listArray
+                    , loading: false
+                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -303,6 +363,9 @@ class EditBudgetComponent extends Component {
 
             budget.budgetAmt = event.target.value;
         }
+        if (event.target.name === "fundingSourceId") {
+            budget.fundingSource.fundingSourceId = event.target.value;
+        }
         // if (event.target.name === "startDate") {
         //     budget.startDate = event.target.value;
         //     budget.stopDate = ''
@@ -327,7 +390,8 @@ class EditBudgetComponent extends Component {
         setTouched({
             budgetName: true,
             budgetAmt: true,
-            budgetCode: true
+            budgetCode: true,
+            fundingSourceId: true,
         });
         this.validateForm(errors)
     }
@@ -357,6 +421,14 @@ class EditBudgetComponent extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+        const { fundingSources } = this.state;
+        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
+            return (
+                <option key={i} value={item.fundingSourceId}>
+                    {getLabelText(item.label, this.state.lang)}
+                </option>
+            )
+        }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -374,7 +446,8 @@ class EditBudgetComponent extends Component {
                                     budgetAmt: this.state.budget.budgetAmt,
                                     budgetCode: this.state.budget.budgetCode,
                                     startDate: this.state.budget.startDate,
-                                    stopDate: this.state.budget.stopDate
+                                    stopDate: this.state.budget.stopDate,
+                                    fundingSourceId:this.state.budget.fundingSource.fundingSourceId
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -500,17 +573,20 @@ class EditBudgetComponent extends Component {
                                                         <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            type="text"
+                                                            type="select"
                                                             name="fundingSourceId"
                                                             id="fundingSourceId"
                                                             bsSize="sm"
-                                                            valid={!errors.fundingSourceId}
+                                                            valid={!errors.fundingSourceId && this.state.budget.fundingSource.fundingSourceId != ''}
                                                             invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            readOnly
-                                                            value={getLabelText(this.state.budget.fundingSource.label, this.state.lang)}
+                                                            required
+                                                            disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                            value={this.state.budget.fundingSource.fundingSourceId}
                                                         >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {fundingSourceList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
@@ -604,7 +680,7 @@ class EditBudgetComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
-                                                    {this.state.rangeValue!="" && <FormGroup>
+                                                    {this.state.rangeValue != "" && <FormGroup>
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -665,7 +741,7 @@ class EditBudgetComponent extends Component {
                                                             id="notes"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
-                                                            maxLength={600}
+                                                            // maxLength={600}
                                                             type="textarea"
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>
@@ -719,7 +795,7 @@ class EditBudgetComponent extends Component {
                 var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                 this.setState({
                     budget: response.data,
-                    rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth()+1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth()+1 } }
+                    rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
                 });
             }).catch(
                 error => {

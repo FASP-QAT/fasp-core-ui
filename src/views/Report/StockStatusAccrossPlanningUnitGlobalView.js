@@ -77,7 +77,9 @@ let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }
+];
 
 // const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 // { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
@@ -366,7 +368,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   cellstyleWithData = (item) => {
     console.log(item)
-    if (this.roundN(item.mos) == 0 || item.mos == null) {
+    if (item.mos != null && this.roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color }
     } else if (this.roundN(item.mos) != 0 && this.roundN(item.mos) != null && this.roundN(item.mos) < item.minMos) {
       return { backgroundColor: legendcolor[1].color }
@@ -374,6 +376,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       return { backgroundColor: legendcolor[2].color }
     } else if (this.roundN(item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color }
+    } else if (item.mos == null) {
+      return { backgroundColor: legendcolor[4].color }
     }
   }
 
@@ -813,7 +817,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var max = ele.maxMos
           //  var reorderFrequency = ele.reorderFrequency
           if (stockStatusId == 0) {
-            if ((ele.mos == null && this.roundN(ele.mos) == 0)) {
+            if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
               console.log('in 0')
               filterProgramData.push(ele)
             }
@@ -830,6 +834,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           } else if (stockStatusId == 2) {
             if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
               console.log('in 3')
+              filterProgramData.push(ele)
+            }
+          } else if (stockStatusId == 4) {
+            if (ele.mos == null) {
               filterProgramData.push(ele)
             }
           }

@@ -25,6 +25,7 @@ export default function createSupplyPlanningProblems(programObj, versionID, prob
         shipmentId: '',
         data5: JSON.stringify(causeJson),
         planningUnitActive: true,
+        regionActive: true,
         newAdded: false,
         problemActionIndex: problemActionIndex,
         problemCategory: {
