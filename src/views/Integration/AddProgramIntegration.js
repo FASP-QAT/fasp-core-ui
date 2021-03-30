@@ -178,8 +178,9 @@ class ProgramIntegration extends Component {
                                                             data[1] = parseInt(papuList[j].integration.integrationId);
                                                             data[2] = parseInt(papuList[j].versionType.id);
                                                             data[3] = parseInt(papuList[j].versionStatus.id);
-                                                            data[4] = papuList[j].integrationProgramId;
-                                                            data[5] = 0;
+                                                            data[4] = papuList[j].active;
+                                                            data[5] = papuList[j].integrationProgramId;
+                                                            data[6] = 0;
                                                             papuDataArr[count] = data;
                                                             count++;
                                                         }
@@ -190,8 +191,9 @@ class ProgramIntegration extends Component {
                                                         data[1] = "";
                                                         data[2] = "";
                                                         data[3] = "";
-                                                        data[4] = 0;
-                                                        data[5] = 1;
+                                                        data[4] = true
+                                                        data[5] = 0;
+                                                        data[6] = 1;
                                                         papuDataArr[0] = data;
                                                     }
                                                     this.el = jexcel(document.getElementById("paputableDiv"), '');
@@ -225,7 +227,10 @@ class ProgramIntegration extends Component {
                                                                 type: 'autocomplete',
                                                                 source: versionStatusArr,
                                                             },
-
+                                                            {
+                                                                title: i18n.t('static.checkbox.active'),
+                                                                type: 'checkbox'
+                                                            },
                                                             {
                                                                 title: 'integrationProgramId',
                                                                 type: 'hidden'
@@ -241,7 +246,7 @@ class ProgramIntegration extends Component {
                                                                 var elInstance = el.jexcel;
                                                                 var rowData = elInstance.getRowData(y);
                                                                 // var productCategoryId = rowData[0];
-                                                                var integrationProgramId = rowData[4];
+                                                                var integrationProgramId = rowData[5];
                                                                 if (integrationProgramId == 0) {
                                                                     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                     cell1.classList.remove('readonly');
@@ -368,8 +373,9 @@ class ProgramIntegration extends Component {
                                                                             data[1] = "";
                                                                             data[2] = "";
                                                                             data[3] = "";
-                                                                            data[4] = 0;
-                                                                            data[5] = 1;
+                                                                            data[4] = true;
+                                                                            data[5] = 0;
+                                                                            data[6] = 1;
                                                                             obj.insertRow(data, parseInt(y), 1);
                                                                         }.bind(this)
                                                                     });
@@ -384,8 +390,9 @@ class ProgramIntegration extends Component {
                                                                             data[1] = "";
                                                                             data[2] = "";
                                                                             data[3] = "";
-                                                                            data[4] = 0;
-                                                                            data[5] = 1;
+                                                                            data[4] = true;
+                                                                            data[5] = 0;
+                                                                            data[6] = 1;
                                                                             obj.insertRow(data, parseInt(y));
                                                                         }.bind(this)
                                                                     });
@@ -393,7 +400,7 @@ class ProgramIntegration extends Component {
                                                                 // Delete a row
                                                                 if (obj.options.allowDeleteRow == true) {
                                                                     // region id
-                                                                    if (obj.getRowData(y)[4] == 0) {
+                                                                    if (obj.getRowData(y)[5] == 0) {
                                                                         items.push({
                                                                             title: i18n.t("static.common.deleterow"),
                                                                             onclick: function () {
@@ -712,8 +719,9 @@ class ProgramIntegration extends Component {
         data[1] = "";
         data[2] = "";
         data[3] = "";
-        data[4] = 0;
-        data[5] = 1;
+        data[4] = true;
+        data[5] = 0;
+        data[6] = 1;
 
         this.el.insertRow(
             data, 0, 1
@@ -726,8 +734,8 @@ class ProgramIntegration extends Component {
                 var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.program.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(4, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(5, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(5, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -741,8 +749,8 @@ class ProgramIntegration extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("6 map---" + map1.get("5"))
-                if (parseInt(map1.get("5")) === 1) {
+                console.log("6 map---" + map1.get("6"))
+                if (parseInt(map1.get("6")) === 1) {
                     let json = {
                         integration: {
                             integrationId: parseInt(map1.get("1")),
@@ -756,7 +764,8 @@ class ProgramIntegration extends Component {
                         program: {
                             id: this.state.program.programId,
                         },
-                        integrationProgramId: parseInt(map1.get("4"))
+                        integrationProgramId: parseInt(map1.get("5")),
+                        active: map1.get("4")
                     }
                     changedpapuList.push(json);
                 }
@@ -879,7 +888,10 @@ class ProgramIntegration extends Component {
                 this.el.setComments(col, "");
             }
         }
-
+        //Active
+        if (x != 6) {
+            this.el.setValueFromCoords(6, y, 1, true);
+        }
 
 
 
@@ -888,7 +900,7 @@ class ProgramIntegration extends Component {
 
     onedit = function (instance, cell, x, y, value) {
         console.log("------------onedit called")
-        this.el.setValueFromCoords(5, y, 1, true);
+        this.el.setValueFromCoords(6, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
@@ -896,7 +908,7 @@ class ProgramIntegration extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(5, y);
+            var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
 
                 //Integration
