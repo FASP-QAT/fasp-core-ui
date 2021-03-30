@@ -66,7 +66,7 @@ const chartoptions =
             scaleLabel: {
                 display: true,
                 // labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
-                labelString: i18n.t('static.supplyPlan.amountInUSD'), 
+                labelString: i18n.t('static.supplyPlan.amountInUSD'),
                 // + '' + i18n.t('static.report.inmillions'),
                 fontColor: 'black',
                 fontStyle: "normal",
@@ -88,7 +88,7 @@ const chartoptions =
                     if (value != null) {
                         return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     }
-                    
+
 
                 }
             }
@@ -96,6 +96,8 @@ const chartoptions =
     },
 
     tooltips: {
+        mode: 'index',
+        intersect: false,
         enabled: false,
         custom: CustomTooltips,
         callbacks: {
@@ -117,6 +119,10 @@ const chartoptions =
                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
             }
         }
+    },
+    hover: {
+        mode: 'index',
+        intersect: false
     },
     maintainAspectRatio: false,
     legend: {
