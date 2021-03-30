@@ -898,7 +898,7 @@ export default class QatProblemActionNew extends Component {
                                                                         var minForMonths = "";
                                                                         // var closingBalance = "";
                                                                         // var amcCalcualted = "";
-                                                                        if (supplyPlanJson.length > 0) {
+                                                                        if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
                                                                             mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
                                                                             maxForMonths = maxStockMoSQty;
                                                                             minForMonths = minStockMoSQty;
