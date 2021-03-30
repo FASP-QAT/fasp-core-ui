@@ -245,19 +245,19 @@ class ProgramIntegration extends Component {
                                                                 if (integrationProgramId == 0) {
                                                                     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                     cell1.classList.remove('readonly');
-        
+
                                                                     // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
                                                                     // cell2.classList.remove('readonly');
-        
-        
+
+
                                                                 } else {
                                                                     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                                                                     cell1.classList.add('readonly');
-        
+
                                                                     // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
                                                                     // cell2.classList.add('readonly');
-        
-        
+
+
                                                                 }
                                                             }
                                                         },
@@ -745,7 +745,7 @@ class ProgramIntegration extends Component {
                 if (parseInt(map1.get("5")) === 1) {
                     let json = {
                         integration: {
-                            id: parseInt(map1.get("1")),
+                            integrationId: parseInt(map1.get("1")),
                         },
                         versionType: {
                             id: parseInt(map1.get("2")),
