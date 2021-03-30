@@ -26,6 +26,7 @@ export default function createMinMaxProblems(programObj, versionID, problemObj, 
         shipmentId: '',
         data5: JSON.stringify(causeJson),
         planningUnitActive: true,
+        regionActive: true,
         newAdded: false,
         problemActionIndex: problemActionIndex,
         problemCategory: {

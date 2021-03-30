@@ -176,8 +176,8 @@ export default class ImportProgram extends Component {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             var selectedPrgArr = this.state.programId;
-            console.log("@@@selectedPrgArr",selectedPrgArr)
-            if (selectedPrgArr==undefined || selectedPrgArr.length == 0) {
+            console.log("@@@selectedPrgArr", selectedPrgArr)
+            if (selectedPrgArr == undefined || selectedPrgArr.length == 0) {
                 this.setState({ loading: false })
                 alert(i18n.t('static.budget.programtext'));
             } else {
@@ -383,8 +383,8 @@ export default class ImportProgram extends Component {
                                                 var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
                                                 console.log("LastModifiedDate@@@", lastModifiedDate);
                                                 console.log("LastModifiedDate1@@@", lastModifiedDate1);
-                                                var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
-                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                 var programModified = 0;
                                                 if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
                                                     programModified = 1;
@@ -598,8 +598,8 @@ export default class ImportProgram extends Component {
                                                                 var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
                                                                 console.log("LastModifiedDate@@@", lastModifiedDate);
                                                                 console.log("LastModifiedDate1@@@", lastModifiedDate1);
-                                                                var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
-                                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
+                                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                                 var programModified = 0;
                                                                 if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
                                                                     programModified = 1;

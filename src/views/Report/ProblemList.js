@@ -548,7 +548,7 @@ export default class ConsumptionDetails extends React.Component {
     buildJExcel() {
         var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.data;
-        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
         let problemArray = [];
