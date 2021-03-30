@@ -497,18 +497,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         var options = {
                                             data: shipmentsArr,
                                             columns: [
-                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80,readOnly:!shipmentEditable },
+                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                 { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 150 },
                                                 { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
-                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80,readOnly:!shipmentEditable },
+                                                { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
                                                 { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
                                                 { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100, readOnly: true },
                                                 { type: 'numeric', title: i18n.t("static.supplyPlan.adjustesOrderQty"), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100,readOnly:!shipmentEditable },
+                                                { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
                                                 { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
@@ -1328,7 +1328,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[20].classList.add('AsteriskTheadtrTd');
         var shipmentInstance = (instance).jexcel;
         var json = shipmentInstance.getJson(null, false);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG']
         var jsonLength;
         if (this.props.shipmentPage == "shipmentDataEntry") {
             if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
@@ -1345,10 +1345,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         for (var i = 0; i < jsonLength; i++) {
             var rowData = shipmentInstance.getRowData(i);
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
-                if (rowData[21].toString() == "true") {
+                if (rowData[22].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
                     cell.classList.add('readonly');
@@ -1408,7 +1408,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     onchangepage(el, pageNo, oldPageNo) {
         var shipmentInstance = el.jexcel;
         var json = shipmentInstance.getJson(null, false);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG']
         var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
@@ -1419,10 +1419,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         for (var i = start; i < jsonLength; i++) {
             var rowData = shipmentInstance.getRowData(i);
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(i) + 1);
-                if (rowData[21].toString() == "true") {
+                if (rowData[22].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
                     cell.classList.add('readonly');
@@ -1983,78 +1983,70 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 11 || x == 0 || x == 30 || x == 3) {
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG']
             for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
-                if (rowData[21].toString() == "true") {
+                if (rowData[22].toString() == "true") {
                     var cell = elInstance.getCell(col)
                     cell.classList.add('readonly');
                 }
-                if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    // elInstance.setStyle(col, "background-color", "#D3D3D3");
-                    var cell = elInstance.getCell(col);
-                    cell.classList.add('shipmentEntryDoNotInclude');
-                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
-                    // cell.classList.add('shipmentEntryDoNotInclude');
-                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
-                    // cell.classList.add('shipmentEntryDoNotInclude');
-                    var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.remove("jexcelremoveReadonlybackground");
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    var cell = elInstance.getCell(col);
-                    cell.classList.remove('shipmentEntryDoNotInclude');
-                    // cell.classList.add('readonly');
-                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
-                    // cell.classList.remove('shipmentEntryDoNotInclude');
-                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
-                    // cell.classList.remove('shipmentEntryDoNotInclude');
-                    // cell.classList.add('readonly');
-                    var element = document.getElementById("shipmentsDetailsTable");
-                    element.classList.remove("jexcelremoveReadonlybackground");
-                }
-
-                if (rowData[11].toString() == "true") {
-                    elInstance.setStyle(col, "color", "#000");
-                    // elInstance.setStyle(col, "color", "red");
-                    var cell = elInstance.getCell(col);
-                    cell.classList.add('shipmentEntryEmergency');
-                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
-                    // cell.classList.add('shipmentEntryEmergency');
-                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
-                    // cell.classList.add('shipmentEntryEmergency');
-                } else {
-                    elInstance.setStyle(col, "color", "#000");
-                    var cell = elInstance.getCell(col);
-                    cell.classList.remove('shipmentEntryEmergency');
-                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
-                    // cell.classList.remove('shipmentEntryEmergency');
-                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
-                    // cell.classList.remove('shipmentEntryEmergency');
-                }
-
-                if (rowData[29].toString() == "false") {
-                    console.log("In if");
+                if (rowData[30].toString() == "false") {
+                    console.log("In if+++");
                     elInstance.setStyle(col, "color", "#000");
                     // elInstance.setStyle(col, "color", "red");
                     var cell = elInstance.getCell(col);
                     cell.classList.add('shipmentEntryActive');
+                    cell.classList.remove('shipmentEntryDoNotInclude');
                     // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
                     // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
                 } else {
-                    console.log("In else")
-                    elInstance.setStyle(col, "color", "#000");
-                    var cell = elInstance.getCell(col);
-                    cell.classList.remove('shipmentEntryActive');
-                    // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
-                    // cell.classList.remove('shipmentEntryEmergency');
-                    // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
-                    // cell.classList.remove('shipmentEntryEmergency');
-                }
+                    console.log("In else+++");
+                    if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        // elInstance.setStyle(col, "background-color", "#D3D3D3");
+                        var cell = elInstance.getCell(col);
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                        // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
+                        // cell.classList.add('shipmentEntryDoNotInclude');
+                        // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
+                        // cell.classList.add('shipmentEntryDoNotInclude');
+                        var element = document.getElementById("shipmentsDetailsTable");
+                        element.classList.remove("jexcelremoveReadonlybackground");
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        var cell = elInstance.getCell(col);
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                        // cell.classList.add('readonly');
+                        // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
+                        // cell.classList.remove('shipmentEntryDoNotInclude');
+                        // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
+                        // cell.classList.remove('shipmentEntryDoNotInclude');
+                        // cell.classList.add('readonly');
+                        var element = document.getElementById("shipmentsDetailsTable");
+                        element.classList.remove("jexcelremoveReadonlybackground");
+                    }
 
+                    if (rowData[11].toString() == "true") {
+                        elInstance.setStyle(col, "color", "#000");
+                        // elInstance.setStyle(col, "color", "red");
+                        var cell = elInstance.getCell(col);
+                        cell.classList.add('shipmentEntryEmergency');
+                        // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
+                        // cell.classList.add('shipmentEntryEmergency');
+                        // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
+                        // cell.classList.add('shipmentEntryEmergency');
+                    } else {
+                        elInstance.setStyle(col, "color", "#000");
+                        var cell = elInstance.getCell(col);
+                        cell.classList.remove('shipmentEntryEmergency');
+                        // var cell = elInstance.getCell(`K${parseInt(i) + 1}`)
+                        // cell.classList.remove('shipmentEntryEmergency');
+                        // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
+                        // cell.classList.remove('shipmentEntryEmergency');
+                    }
+                }
             }
         }
         this.props.updateState("shipmentChangedFlag", 1);
@@ -3024,8 +3016,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var shipmentDataList = (programJson.shipmentList);
                     var actionList = programJson.actionList;
                     if (actionList == undefined) {
-                                            actionList = []
-                                        }
+                        actionList = []
+                    }
                     var planningUnitId = document.getElementById("planningUnitId").value
                     var batchInfoList = (programJson.batchInfoList);
                     var minDate = "";
@@ -3489,7 +3481,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (this.props.shipmentPage == "supplyPlanCompare") {
                 tableEditable = false;
             }
-            if (this.props.shipmentPage == "shipmentDataEntry" && rowData[21].toString() == "true") {
+            if (this.props.shipmentPage == "shipmentDataEntry" && rowData[22].toString() == "true") {
                 tableEditable = false;
             }
 
