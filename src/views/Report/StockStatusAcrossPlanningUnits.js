@@ -48,7 +48,9 @@ const pickerLang = {
 const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }
+];
 // const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 // { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 // { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
@@ -269,7 +271,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (this.roundN(ele.mos) == 0 || ele.mos == null ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))).replaceAll(' ', '%20'), ele.mos != null ? isNaN(ele.mos) ? '' : this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : ele.minMos, isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : ele.maxMos, ele.stock, isNaN(ele.amc) ? '' : this.round(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? (new moment(ele.lastStockCount).format('MMM-yy')).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos==null?i18n.t('static.supplyPlanFormula.na'):this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))).replaceAll(' ', '%20'), ele.mos != null ? isNaN(ele.mos) ? '' : this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : ele.minMos, isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : ele.maxMos, ele.stock, isNaN(ele.amc) ? '' : this.round(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? (new moment(ele.lastStockCount).format('MMM-yy')).replaceAll(' ', '%20') : ''])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -351,7 +353,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (this.roundN(ele.mos) == 0 || ele.mos == null ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))), ele.mos != null ? isNaN(ele.mos) ? '' : this.formatterDouble(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : this.formatterDouble(ele.minMos), isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : this.formatterDouble(ele.maxMos), this.formatter(ele.stock), isNaN(ele.amc) ? '' : this.formatter(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? new moment(ele.lastStockCount).format('MMM-yy') : '']);
+        const data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (ele.mos == null?i18n.t("static.supplyPlanFormula.na"):this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))), ele.mos != null ? isNaN(ele.mos) ? '' : this.formatterDouble(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : this.formatterDouble(ele.minMos), isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : this.formatterDouble(ele.maxMos), this.formatter(ele.stock), isNaN(ele.amc) ? '' : this.formatter(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? new moment(ele.lastStockCount).format('MMM-yy') : '']);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -745,7 +747,10 @@ class StockStatusAcrossPlanningUnits extends Component {
         console.log("DataStockStatus+++", dataStockStatus);
         for (var j = 0; j < dataStockStatus.length; j++) {
             let data1 = '';
-            if (this.roundN(dataStockStatus[j].mos) == 0 || dataStockStatus[j].mos == null) {
+            if(dataStockStatus[j].mos == null){
+                data1 = i18n.t('static.supplyPlanFormula.na')
+            }
+            else if (this.roundN(dataStockStatus[j].mos) == 0) {
                 data1 = i18n.t('static.report.stockout')
             } else
                 if (this.roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
@@ -960,11 +965,18 @@ class StockStatusAcrossPlanningUnits extends Component {
             var minMos = parseFloat(rowData[3]);
             var maxMos = parseFloat(rowData[4]);
             //------------B--------------
-            if (mos == 0 || rowData[2]==i18n.t("static.supplyPlanFormula.na")) {
+            if (mos == 0) {
                 console.log('1')
                 for (var i = 0; i < colArrB.length; i++) {
                     elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[0].color);
+                    let textColor = contrast(legendcolor[1].color);
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            }else if(rowData[2]==i18n.t("static.supplyPlanFormula.na")){
+                for (var i = 0; i < colArrB.length; i++) {
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[4].color);
                     let textColor = contrast(legendcolor[1].color);
                     elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
@@ -1008,7 +1020,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 var max = ele.maxMos
                 //  var reorderFrequency = ele.reorderFrequency
                 if (stockStatusId == 0) {
-                    if ((ele.mos == null || this.roundN(ele.mos) == 0)) {
+                    if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
                         console.log('in 0')
                         filteredData.push(ele)
                     }
@@ -1025,6 +1037,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                 } else if (stockStatusId == 2) {
                     if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
                         console.log('in 3')
+                        filteredData.push(ele)
+                    }
+                }else if(stockStatusId==4){
+                    if(ele.mos==null){
                         filteredData.push(ele)
                     }
                 }

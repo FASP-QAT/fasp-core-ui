@@ -1244,7 +1244,7 @@ export default class ShipmentDelinking extends Component {
                                                         id="notesTxt"
                                                         bsSize="sm"
                                                         autocomplete="off"
-                                                        maxLength={600}
+                                                        // maxLength={600}
                                                     >
                                                     </Input>
                                                 </InputGroup>
