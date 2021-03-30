@@ -662,7 +662,7 @@ class AddRoleComponent extends Component {
                           <FormGroup>
                             <Label>{i18n.t('static.common.notes')}</Label>
                             <Input type="textarea"
-                              maxLength={600}
+                              // maxLength={600}
                               bsSize="sm"
                               name="notes"
                               id="notes"
