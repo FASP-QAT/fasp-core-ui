@@ -256,6 +256,7 @@ const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../view
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
 const QuantimedImport = React.lazy(() => import('../../views/Quantimed/QuantimedImportOnboarding'));
+const UploadUserManual = React.lazy(() => import('../../views/UserManual/UploadUserManual'));
 // const EditProblem = React.lazy(() => import('../../views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -528,6 +529,7 @@ const routes = [
   { path: '/report/shipmentSummery/:message', name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
+  { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
 
 
 
@@ -909,7 +911,7 @@ class DefaultLayout extends Component {
   render() {
     // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
-    const checkOnline = localStorage.getItem('typeOfSession');
+    const checkOnline = localStorage.getItem('sessionType');
     return (
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
@@ -996,6 +998,12 @@ class DefaultLayout extends Component {
                         || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT'))
                         ? false : true) },
                         children: [
+                          {
+                            name: i18n.t('static.dashboard.uploadUserManual'),
+                            url: '/userManual/uploadUserManual',
+                            icon: 'fa fa-upload',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL') ? false : true) }
+                          },
                           {
                             name: i18n.t('static.dashboard.country'),
                             url: '/country/listCountry',

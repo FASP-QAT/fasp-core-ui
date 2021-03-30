@@ -39,7 +39,8 @@ const pickerLang = {
 const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }];
 // const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 // { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 // { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
@@ -160,12 +161,12 @@ export default class StockStatusMatrix extends React.Component {
         var min = ele.minMonthsOfStock
         var reorderFrequency = ele.reorderFrequency
         if (stockStatusId == 0) {
-          if ((ele.jan == null || ele.feb == null || ele.mar == null || ele.apr == null || ele.may == null || ele.jun == null || ele.jul == null || ele.aug == null || ele.sep == null || ele.oct == null || ele.nov == null || ele.dec == null) || ((this.roundN(ele.jan) == 0) || (this.roundN(ele.feb) == 0) || (this.roundN(ele.mar) == 0) || (this.roundN(ele.apr) == 0) || (this.roundN(ele.may) == 0) || (this.roundN(ele.jun) == 0) || (this.roundN(ele.jul) == 0) || (this.roundN(ele.aug) == 0) || (this.roundN(ele.sep) == 0) || (this.roundN(ele.oct) == 0) || (this.roundN(ele.nov) == 0) || (this.roundN(ele.dec) == 0))) {
+          if (((ele.jan != null && this.roundN(ele.jan) == 0) || (ele.feb != null && this.roundN(ele.feb) == 0) || (ele.mar != null && this.roundN(ele.mar) == 0) || (ele.apr != null && this.roundN(ele.apr) == 0) || (ele.may != null && this.roundN(ele.may) == 0) || (ele.jun != null && this.roundN(ele.jun) == 0) || (ele.jul != null && this.roundN(ele.jul) == 0) || (ele.aug != null && this.roundN(ele.aug) == 0) || (ele.sep != null && this.roundN(ele.sep) == 0) || (ele.oct != null && this.roundN(ele.oct) == 0) || (ele.nov != null && this.roundN(ele.nov) == 0) || (ele.dec != null && this.roundN(ele.dec) == 0))) {
             console.log('in 0')
             filteredData.push(ele)
           }
         } else if (stockStatusId == 1) {
-          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) != 0 && this.roundN(ele.feb) != 0 && this.roundN(ele.mar) != 0 && this.roundN(ele.apr) != 0 && this.roundN(ele.may) != 0 && this.roundN(ele.jun) != 0 && this.roundN(ele.jul) != 0 && this.roundN(ele.aug) != 0 && this.roundN(ele.sep) != 0 && this.roundN(ele.oct) != 0 && this.roundN(ele.nov) != 0 && this.roundN(ele.dec) != 0)) && ((this.roundN(ele.jan) < min) || (this.roundN(ele.feb) < min) || (this.roundN(ele.mar) < min) || (this.roundN(ele.apr) < min) || (this.roundN(ele.may) < min) || (this.roundN(ele.jun) < min) || (this.roundN(ele.jul) < min) || (this.roundN(ele.aug) < min) || (this.roundN(ele.sep) < min) || (this.roundN(ele.oct) < min) || (this.roundN(ele.nov) < min) || (this.roundN(ele.dec) < min))) {
+          if (((ele.jan != null && this.roundN(ele.jan) != 0 && this.roundN(ele.jan) < min) || (ele.feb != null && this.roundN(ele.feb) != 0 && this.roundN(ele.feb) < min) || (ele.mar != null && this.roundN(ele.mar) != 0 && this.roundN(ele.mar) < min) || (ele.apr != null && this.roundN(ele.apr) != 0 && this.roundN(ele.apr) < min) || (ele.may != null && this.roundN(ele.may) != 0 && this.roundN(ele.may) < min) || (ele.jun != null && this.roundN(ele.jun) != 0 && this.roundN(ele.jun) < min) || (ele.jul != null && this.roundN(ele.jul) != 0 && this.roundN(ele.jul) < min) || (ele.aug != null && this.roundN(ele.aug) != 0 && this.roundN(ele.aug) < min) || (ele.sep != null && this.roundN(ele.sep) != 0 && this.roundN(ele.sep) < min) || (ele.oct != null && this.roundN(ele.oct) != 0 && this.roundN(ele.oct) < min) || (ele.nov != null && this.roundN(ele.nov) != 0 && this.roundN(ele.nov) < min) || (ele.dec != null && this.roundN(ele.dec) != 0 && this.roundN(ele.dec) < min))) {
             console.log('in 1')
             filteredData.push(ele)
           }
@@ -177,6 +178,10 @@ export default class StockStatusMatrix extends React.Component {
         } else if (stockStatusId == 2) {
           if ((this.roundN(ele.jan) < (min + reorderFrequency) && this.roundN(ele.jan) > min) || (this.roundN(ele.feb) < (min + reorderFrequency) && this.roundN(ele.feb) > min) || (this.roundN(ele.mar) < (min + reorderFrequency) && this.roundN(ele.mar) > min) || (this.roundN(ele.apr) < (min + reorderFrequency) && this.roundN(ele.apr) > min) || (this.roundN(ele.may) < (min + reorderFrequency) && this.roundN(ele.may) > min) || (this.roundN(ele.jun) < (min + reorderFrequency) && this.roundN(ele.jun) > min) || (this.roundN(ele.jul) < (min + reorderFrequency) && this.roundN(ele.jul) > min) || (this.roundN(ele.aug) < (min + reorderFrequency) && this.roundN(ele.aug) > min) || (this.roundN(ele.sep) < (min + reorderFrequency) && this.roundN(ele.sep) > min) || (this.roundN(ele.oct) < (min + reorderFrequency) && this.roundN(ele.act) > min) || (this.roundN(ele.nov) < (min + reorderFrequency) && this.roundN(ele.nov) > min) || (this.roundN(ele.dec) < (min + reorderFrequency) && this.roundN(ele.dec) > min)) {
             console.log('in 3')
+            filteredData.push(ele)
+          }
+        } else if (stockStatusId == 4) {
+          if ((ele.jan == null || ele.feb == null || ele.mar == null || ele.apr == null || ele.may == null || ele.jun == null || ele.jul == null || ele.aug == null || ele.sep == null || ele.oct == null || ele.nov == null || ele.dec == null)) {
             filteredData.push(ele)
           }
         }
@@ -1254,7 +1259,7 @@ export default class StockStatusMatrix extends React.Component {
       }
     }
     else {
-      return { backgroundColor: legendcolor[0].color }
+      return { backgroundColor: legendcolor[4].color }
     }
   }
   render() {

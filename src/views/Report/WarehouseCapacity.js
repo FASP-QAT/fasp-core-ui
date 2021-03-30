@@ -897,7 +897,7 @@ class warehouseCapacity extends Component {
     }
 
     render() {
-        const checkOnline = localStorage.getItem('typeOfSession');
+        const checkOnline = localStorage.getItem('sessionType');
         // const { programLst } = this.state;
         // let programList = programLst.length > 0
         //     && programLst.map((item, i) => {

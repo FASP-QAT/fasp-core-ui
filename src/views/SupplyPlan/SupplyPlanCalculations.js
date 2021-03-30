@@ -333,19 +333,23 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 }
 
                                             } else {
-                                                myArray[index].shipment = Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                                myArray[index].shipment = Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
                                                 if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
+                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number(batchListForShipments[b].shipmentQty);
                                                 }
                                             }
                                             var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
                                             if (index != -1) {
-                                                shipmentBatchQtyTotal += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                                shipmentBatchQtyTotal += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
                                                 if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                                    shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
                                                 }
                                             }
                                         }
+                                    }
+                                    console.log("Trans Date+++",startDate)
+                                    for(var b=0;b<myArray.length;b++){
+                                        console.log("MyArray[b]+++",myArray[b])
                                     }
 
                                     // Inventory part

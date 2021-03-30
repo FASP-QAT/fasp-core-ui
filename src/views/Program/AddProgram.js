@@ -908,7 +908,7 @@ export default class AddProgram extends Component {
                                                             // invalid={touched.programNotes && !!errors.programNotes}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            maxLength={600}
+                                                            // maxLength={600}
                                                             type="textarea" name="programNotes" id="programNotes" />
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>
