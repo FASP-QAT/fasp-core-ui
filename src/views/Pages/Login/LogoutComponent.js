@@ -20,7 +20,7 @@ class LogoutComponent extends Component {
     componentDidMount() {
         console.log("########### Logout component did mount start ####################")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken","sessionType"];
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (isSiteOnline() && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                 // AuthenticationService.setupAxiosInterceptors();

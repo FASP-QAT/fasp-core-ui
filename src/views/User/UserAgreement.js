@@ -60,7 +60,7 @@ export default class UserAgreementComponent extends Component {
         );
     }
     decline() {
-        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "user-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "user-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken","sessionType"];
         keysToRemove.forEach(k => localStorage.removeItem(k));
         this.props.history.push(`/login`)
     }
