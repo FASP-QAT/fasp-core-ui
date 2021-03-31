@@ -455,15 +455,15 @@ class StockStatus extends Component {
     doc.save(i18n.t('static.dashboard.stockstatus') + ".pdf")
 
   }
-  renderBars = () => {
-    //return  <div id="bars_div">
-    var txt = '<div id="bars_div">';
-    this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value).map((ele, index) => {
-      txt = txt + (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={options} /></div>)
-    })
-    txt = txt + '</div>';
-    return txt
-  }
+  // renderBars = () => {
+  //   //return  <div id="bars_div">
+  //   var txt = '<div id="bars_div">';
+  //   this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value).map((ele, index) => {
+  //     txt = txt + (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={options} /></div>)
+  //   })
+  //   txt = txt + '</div>';
+  //   return txt
+  // }
 
   filterData() {
     let programId = document.getElementById("programId").value;
