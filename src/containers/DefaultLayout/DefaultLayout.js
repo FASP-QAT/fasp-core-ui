@@ -66,6 +66,7 @@ const EditRegion = React.lazy(() => import('../../views/Region/EditRegionCompone
 const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListRealmCountryComponent'));
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
+const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
 const Logout = React.lazy(() => import('../../views/Pages/Login/LogoutComponent'));
 const AddRole = React.lazy(() => import('../../views/Role/AddRoleComponent'));
@@ -259,6 +260,10 @@ const QuantimedImport = React.lazy(() => import('../../views/Quantimed/Quantimed
 const UploadUserManual = React.lazy(() => import('../../views/UserManual/UploadUserManual'));
 // const EditProblem = React.lazy(() => import('../../views/Problem/EditProblem'));
 
+const AddIntegration = React.lazy(() => import('../../views/Integration/AddIntegrationComponent'));
+const IntegrationList = React.lazy(() => import('../../views/Integration/IntegrationListComponent'));
+const EditIntegration = React.lazy(() => import('../../views/Integration/EditIntegrationComponent'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
@@ -395,6 +400,7 @@ const routes = [
   { path: '/realmCountry/listRealmCountry', exact: true, name: 'static.dashboard.realmcountry', component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'static.breadcrum.add', entityname: 'static.dashboard.realmcountry', component: AddRealmCountry },
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
+  { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
 
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -601,7 +607,14 @@ const routes = [
   { path: '/report/stockAdjustment', name: 'static.report.stockAdjustment', component: StockAdjustment },
   // { path: '/report/expiredInventory', name:static.report.expiredInventory' ,component: ExpiredInventory },
   { path: '/report/expiredInventory', name: 'static.report.expiredInventory', component: ExpiredInventory },
-  { path: '/quantimed/quantimedImport', name: 'static.quantimed.quantimedImport', component: QuantimedImport }
+  { path: '/quantimed/quantimedImport', name: 'static.quantimed.quantimedImport', component: QuantimedImport },
+
+  { path: '/integration/AddIntegration', name: 'static.breadcrum.add', entityname: 'static.integration.integration', component: AddIntegration },
+  { path: '/integration/listIntegration', exact: true, name: 'static.breadcrum.list', entityname: 'static.integration.integration', component: IntegrationList },
+  // { path: '/integration/listIntegration/:message', component: IntegrationList },
+  { path: '/integration/listIntegration/:color/:message', name: 'static.breadcrum.list', entityname: 'static.integration.integration', component: IntegrationList },
+  { path: '/integration/listIntegration/:message', component: IntegrationList },
+  { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration }
 ];
 
 class DefaultLayout extends Component {
@@ -937,7 +950,7 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-              {checkOnline === 'Online' && 
+              {checkOnline === 'Online' &&
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -1054,6 +1067,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT') ? false : true) }
                           }
                           ,
+                          {
+                            name: i18n.t('static.dashboard.integration'),
+                            url: '/integration/listIntegration',
+                            icon: 'fa fa-map',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') ? false : true) }
+                          },
                           // {
                           //   name: i18n.t('static.dashboard.realmheader'),
                           //   icon: 'fa fa-list',
@@ -2094,7 +2113,7 @@ class DefaultLayout extends Component {
 
                 }} {...this.props} />
               }
-              {checkOnline === 'Offline' &&  
+              {checkOnline === 'Offline' &&
                 <AppSidebarNav navConfig={{
                   items:
                     [
