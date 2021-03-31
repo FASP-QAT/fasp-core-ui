@@ -30,6 +30,7 @@ import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
 import MultiSelect from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
+import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -38,7 +39,13 @@ const pickerLang = {
 const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }];
+// const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+// { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
+// { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
+// { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },];
+
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
@@ -63,7 +70,9 @@ export default class StockStatusMatrix extends React.Component {
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
-      loading: true
+      loading: true,
+      programId: '',
+      versionId: ''
 
     }
     this.filterData = this.filterData.bind(this);
@@ -71,6 +80,8 @@ export default class StockStatusMatrix extends React.Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+    this.setProgramId = this.setProgramId.bind(this);
+    this.setVersionId = this.setVersionId.bind(this);
 
   }
 
@@ -150,12 +161,12 @@ export default class StockStatusMatrix extends React.Component {
         var min = ele.minMonthsOfStock
         var reorderFrequency = ele.reorderFrequency
         if (stockStatusId == 0) {
-          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) == 0) || (this.roundN(ele.feb) == 0) || (this.roundN(ele.mar) == 0) || (this.roundN(ele.apr) == 0) || (this.roundN(ele.may) == 0) || (this.roundN(ele.jun) == 0) || (this.roundN(ele.jul) == 0) || (this.roundN(ele.aug) == 0) || (this.roundN(ele.sep) == 0) || (this.roundN(ele.oct) == 0) || (this.roundN(ele.nov) == 0) || (this.roundN(ele.dec) == 0))) {
+          if (((ele.jan != null && this.roundN(ele.jan) == 0) || (ele.feb != null && this.roundN(ele.feb) == 0) || (ele.mar != null && this.roundN(ele.mar) == 0) || (ele.apr != null && this.roundN(ele.apr) == 0) || (ele.may != null && this.roundN(ele.may) == 0) || (ele.jun != null && this.roundN(ele.jun) == 0) || (ele.jul != null && this.roundN(ele.jul) == 0) || (ele.aug != null && this.roundN(ele.aug) == 0) || (ele.sep != null && this.roundN(ele.sep) == 0) || (ele.oct != null && this.roundN(ele.oct) == 0) || (ele.nov != null && this.roundN(ele.nov) == 0) || (ele.dec != null && this.roundN(ele.dec) == 0))) {
             console.log('in 0')
             filteredData.push(ele)
           }
         } else if (stockStatusId == 1) {
-          if ((ele.jan != null && ele.feb != null && ele.mar != null && ele.apr != null && ele.may != null && ele.jun != null && ele.jul != null && ele.aug != null && ele.sep != null && ele.oct != null && ele.nov != null && ele.dec != null) && ((this.roundN(ele.jan) != 0 && this.roundN(ele.feb) != 0 && this.roundN(ele.mar) != 0 && this.roundN(ele.apr) != 0 && this.roundN(ele.may) != 0 && this.roundN(ele.jun) != 0 && this.roundN(ele.jul) != 0 && this.roundN(ele.aug) != 0 && this.roundN(ele.sep) != 0 && this.roundN(ele.oct) != 0 && this.roundN(ele.nov) != 0 && this.roundN(ele.dec) != 0)) && ((this.roundN(ele.jan) < min) || (this.roundN(ele.feb) < min) || (this.roundN(ele.mar) < min) || (this.roundN(ele.apr) < min) || (this.roundN(ele.may) < min) || (this.roundN(ele.jun) < min) || (this.roundN(ele.jul) < min) || (this.roundN(ele.aug) < min) || (this.roundN(ele.sep) < min) || (this.roundN(ele.oct) < min) || (this.roundN(ele.nov) < min) || (this.roundN(ele.dec) < min))) {
+          if (((ele.jan != null && this.roundN(ele.jan) != 0 && this.roundN(ele.jan) < min) || (ele.feb != null && this.roundN(ele.feb) != 0 && this.roundN(ele.feb) < min) || (ele.mar != null && this.roundN(ele.mar) != 0 && this.roundN(ele.mar) < min) || (ele.apr != null && this.roundN(ele.apr) != 0 && this.roundN(ele.apr) < min) || (ele.may != null && this.roundN(ele.may) != 0 && this.roundN(ele.may) < min) || (ele.jun != null && this.roundN(ele.jun) != 0 && this.roundN(ele.jun) < min) || (ele.jul != null && this.roundN(ele.jul) != 0 && this.roundN(ele.jul) < min) || (ele.aug != null && this.roundN(ele.aug) != 0 && this.roundN(ele.aug) < min) || (ele.sep != null && this.roundN(ele.sep) != 0 && this.roundN(ele.sep) < min) || (ele.oct != null && this.roundN(ele.oct) != 0 && this.roundN(ele.oct) < min) || (ele.nov != null && this.roundN(ele.nov) != 0 && this.roundN(ele.nov) < min) || (ele.dec != null && this.roundN(ele.dec) != 0 && this.roundN(ele.dec) < min))) {
             console.log('in 1')
             filteredData.push(ele)
           }
@@ -167,6 +178,10 @@ export default class StockStatusMatrix extends React.Component {
         } else if (stockStatusId == 2) {
           if ((this.roundN(ele.jan) < (min + reorderFrequency) && this.roundN(ele.jan) > min) || (this.roundN(ele.feb) < (min + reorderFrequency) && this.roundN(ele.feb) > min) || (this.roundN(ele.mar) < (min + reorderFrequency) && this.roundN(ele.mar) > min) || (this.roundN(ele.apr) < (min + reorderFrequency) && this.roundN(ele.apr) > min) || (this.roundN(ele.may) < (min + reorderFrequency) && this.roundN(ele.may) > min) || (this.roundN(ele.jun) < (min + reorderFrequency) && this.roundN(ele.jun) > min) || (this.roundN(ele.jul) < (min + reorderFrequency) && this.roundN(ele.jul) > min) || (this.roundN(ele.aug) < (min + reorderFrequency) && this.roundN(ele.aug) > min) || (this.roundN(ele.sep) < (min + reorderFrequency) && this.roundN(ele.sep) > min) || (this.roundN(ele.oct) < (min + reorderFrequency) && this.roundN(ele.act) > min) || (this.roundN(ele.nov) < (min + reorderFrequency) && this.roundN(ele.nov) > min) || (this.roundN(ele.dec) < (min + reorderFrequency) && this.roundN(ele.dec) > min)) {
             console.log('in 3')
+            filteredData.push(ele)
+          }
+        } else if (stockStatusId == 4) {
+          if ((ele.jan == null || ele.feb == null || ele.mar == null || ele.apr == null || ele.may == null || ele.jun == null || ele.jul == null || ele.aug == null || ele.sep == null || ele.oct == null || ele.nov == null || ele.dec == null)) {
             filteredData.push(ele)
           }
         }
@@ -184,9 +199,11 @@ export default class StockStatusMatrix extends React.Component {
     //console.log('In filter data---' + this.state.rangeValue.from.year)
     let startDate = this.state.startYear + '-01-01';
     let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
-    let programId = document.getElementById("programId").value;
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    let versionId = document.getElementById("versionId").value;
+    // let versionId = document.getElementById("versionId").value;
+    let versionId = this.state.versionId;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
     if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
 
@@ -576,7 +593,7 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   getPrograms = () => {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -702,13 +719,29 @@ export default class StockStatusMatrix extends React.Component {
 
         }
         var lang = this.state.lang;
-        this.setState({
-          programs: proList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
+
+        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: localStorage.getItem("sesProgramIdReport")
+          }, () => {
+            this.filterVersion();
+            this.filterData();
           })
-        })
+        } else {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          })
+        }
+
 
       }.bind(this);
 
@@ -719,13 +752,15 @@ export default class StockStatusMatrix extends React.Component {
 
 
   filterVersion = () => {
-    let programId = document.getElementById("programId").value;
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     if (programId != 0) {
 
+      localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
           this.setState({
             versions: []
           }, () => {
@@ -793,12 +828,38 @@ export default class StockStatusMatrix extends React.Component {
 
         }
 
-        console.log(verList)
-        this.setState({
-          versions: verList.filter(function (x, i, a) {
-            return a.indexOf(x) === i;
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+        if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+        } else {
+          this.setState({
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
-        })
+        }
+
 
       }.bind(this);
 
@@ -824,6 +885,7 @@ export default class StockStatusMatrix extends React.Component {
       if (versionId == 0) {
         this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
       } else {
+        localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
           const lan = 'en';
           var db1;
@@ -846,7 +908,7 @@ export default class StockStatusMatrix extends React.Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                   proList[i] = myResult[i]
                 }
@@ -954,6 +1016,47 @@ export default class StockStatusMatrix extends React.Component {
 
   }
 
+  setProgramId(event) {
+    this.setState({
+      programId: event.target.value,
+      versionId: ''
+    }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
+      this.filterVersion();
+      this.filterData()
+    })
+
+  }
+
+  setVersionId(event) {
+    // this.setState({
+    //   versionId: event.target.value
+    // }, () => {
+    //   if (this.state.selData.length != 0) {
+    //     localStorage.setItem("sesVersionIdReport", this.state.versionId);
+    //     this.filterData();
+    //   } else {
+    //     this.getPlanningUnit();
+    //   }
+    // })
+
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        this.getPlanningUnit();
+      })
+    }
+
+  }
+
   formatter = value => {
     if (value != null) {
       var cell1 = this.roundN(value)
@@ -997,7 +1100,7 @@ export default class StockStatusMatrix extends React.Component {
     columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20').replaceAll('#', '%23')) });
     var A = [this.addDoubleQuoteToRowContent(headers)]
     var re = this.state.data
-    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan) ? '' : this.roundN(ele.jan), isNaN(ele.feb) ? '' : this.roundN(ele.feb), isNaN(ele.mar) ? '' : this.roundN(ele.mar), isNaN(ele.apr) ? '' : this.roundN(ele.apr), isNaN(ele.may) ? '' : this.roundN(ele.may), isNaN(ele.jun) ? '' : this.roundN(ele.jun), isNaN(ele.jul) ? '' : this.roundN(ele.jul), isNaN(ele.aug) ? '' : this.roundN(ele.aug), isNaN(ele.sep) ? '' : this.roundN(ele.sep), isNaN(ele.oct) ? '' : this.roundN(ele.oct), isNaN(ele.nov) ? '' : this.roundN(ele.nov), isNaN(ele.dec) ? '' : this.roundN(ele.dec)])));
+    this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.unit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, ele.jan != null ? isNaN(ele.jan) ? '' : this.roundN(ele.jan) : i18n.t("static.supplyPlanFormula.na"), ele.feb != null ? isNaN(ele.feb) ? '' : this.roundN(ele.feb) : i18n.t("static.supplyPlanFormula.na"), ele.mar != null ? isNaN(ele.mar) ? '' : this.roundN(ele.mar) : i18n.t("static.supplyPlanFormula.na"), ele.apr != null ? isNaN(ele.apr) ? '' : this.roundN(ele.apr) : i18n.t("static.supplyPlanFormula.na"), ele.may != null ? isNaN(ele.may) ? '' : this.roundN(ele.may) : i18n.t("static.supplyPlanFormula.na"), ele.jun != null ? isNaN(ele.jun) ? '' : this.roundN(ele.jun) : i18n.t("static.supplyPlanFormula.na"), ele.jul != null ? isNaN(ele.jul) ? '' : this.roundN(ele.jul) : i18n.t("static.supplyPlanFormula.na"), ele.aug != null ? isNaN(ele.aug) ? '' : this.roundN(ele.aug) : i18n.t("static.supplyPlanFormula.na"), ele.sep != null ? isNaN(ele.sep) ? '' : this.roundN(ele.sep) : i18n.t("static.supplyPlanFormula.na"), ele.oct != null ? isNaN(ele.oct) ? '' : this.roundN(ele.oct) : i18n.t("static.supplyPlanFormula.na"), ele.nov != null ? isNaN(ele.nov) ? '' : this.roundN(ele.nov) : i18n.t("static.supplyPlanFormula.na"), ele.dec != null ? isNaN(ele.dec) ? '' : this.roundN(ele.dec) : i18n.t("static.supplyPlanFormula.na")])));
     for (var i = 0; i < A.length; i++) {
       console.log(A[i])
       csvRow.push(A[i].join(","))
@@ -1106,7 +1209,7 @@ export default class StockStatusMatrix extends React.Component {
       { content: i18n.t('static.month.dec'), styles: { halign: 'center' } },]
     ]
     let data;
-    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, isNaN(ele.jan) ? '' : this.formatter(ele.jan), isNaN(ele.feb) ? '' : this.formatter(ele.feb), isNaN(ele.mar) ? '' : this.formatter(ele.mar), isNaN(ele.apr) ? '' : this.formatter(ele.apr), isNaN(ele.may) ? '' : this.formatter(ele.may), isNaN(ele.jun) ? '' : this.formatter(ele.jun), isNaN(ele.jul) ? '' : this.formatter(ele.jul), isNaN(ele.aug) ? '' : this.formatter(ele.aug), isNaN(ele.sep) ? '' : this.formatter(ele.sep), isNaN(ele.oct) ? '' : this.formatter(ele.oct), isNaN(ele.nov) ? '' : this.formatter(ele.nov), isNaN(ele.dec) ? '' : this.formatter(ele.dec)]);
+    data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, ele.jan != null ? isNaN(ele.jan) ? '' : this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na"), ele.feb != null ? isNaN(ele.feb) ? '' : this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na"), ele.mar != null ? isNaN(ele.mar) ? '' : this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na"), ele.apr != null ? isNaN(ele.apr) ? '' : this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na"), ele.may != null ? isNaN(ele.may) ? '' : this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na"), ele.jun != null ? isNaN(ele.jun) ? '' : this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na"), ele.jul != null ? isNaN(ele.jul) ? '' : this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na"), ele.aug != null ? isNaN(ele.aug) ? '' : this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na"), ele.sep != null ? isNaN(ele.sep) ? '' : this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na"), ele.oct != null ? isNaN(ele.oct) ? '' : this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na"), ele.nov != null ? isNaN(ele.nov) ? '' : this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na"), ele.dec != null ? isNaN(ele.dec) ? '' : this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na")]);
 
     var startY = 180 + (this.state.planningUnitValues.length * 3)
     let content = {
@@ -1156,7 +1259,7 @@ export default class StockStatusMatrix extends React.Component {
       }
     }
     else {
-      return {}
+      return { backgroundColor: legendcolor[4].color }
     }
   }
   render() {
@@ -1445,8 +1548,9 @@ export default class StockStatusMatrix extends React.Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={(e) => { this.filterVersion(); this.filterData(e) }}
-
+                        // onChange={(e) => { this.filterVersion(); this.filterData(e) }}
+                        onChange={(e) => { this.setProgramId(e); }}
+                        value={this.state.programId}
 
                       >
                         <option value="0">{i18n.t('static.common.select')}</option>
@@ -1465,7 +1569,9 @@ export default class StockStatusMatrix extends React.Component {
                         name="versionId"
                         id="versionId"
                         bsSize="sm"
-                        onChange={(e) => { this.getPlanningUnit(); }}
+                        // onChange={(e) => { this.getPlanningUnit(); }}
+                        onChange={(e) => { this.setVersionId(e); }}
+                        value={this.state.versionId}
                       >
                         <option value="0">{i18n.t('static.common.select')}</option>
                         {versionList}
@@ -1579,18 +1685,18 @@ export default class StockStatusMatrix extends React.Component {
                         <td className="text-center">{ele.minMonthsOfStock}</td>
                         <td className="text-center">{ele.reorderFrequency}</td>
                         <td className="text-center">{ele.year}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan) ? '' : this.formatter(ele.jan)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb) ? '' : this.formatter(ele.feb)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar) ? '' : this.formatter(ele.mar)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr) ? '' : this.formatter(ele.apr)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may) ? '' : this.formatter(ele.may)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun) ? '' : this.formatter(ele.jun)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul) ? '' : this.formatter(ele.jul)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug) ? '' : this.formatter(ele.aug)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep) ? '' : this.formatter(ele.sep)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct) ? '' : this.formatter(ele.oct)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov) ? '' : this.formatter(ele.nov)}</td>
-                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec) ? '' : this.formatter(ele.dec)}</td></tr>)
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jan)}>{isNaN(ele.jan) ? '' : ele.jan != null ? this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.feb)} > {isNaN(ele.feb) ? '' : ele.feb != null ? this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.mar)} > {isNaN(ele.mar) ? '' : ele.mar != null ? this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.apr)}> {isNaN(ele.apr) ? '' : ele.apr != null ? this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.may)}> {isNaN(ele.may) ? '' : ele.may != null ? this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jun)}> {isNaN(ele.jun) ? '' : ele.jun != null ? this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.jul)}> {isNaN(ele.jul) ? '' : ele.jul != null ? this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.aug)}> {isNaN(ele.aug) ? '' : ele.aug != null ? this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.sep)}> {isNaN(ele.sep) ? '' : ele.sep != null ? this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.oct)}> {isNaN(ele.oct) ? '' : ele.oct != null ? this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.nov)}> {isNaN(ele.nov) ? '' : ele.nov != null ? this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na")}</td>
+                        <td className="text-center" style={this.cellStyle(ele.minMonthsOfStock, ele.reorderFrequency, ele.dec)}> {isNaN(ele.dec) ? '' : ele.dec != null ? this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na")}</td></tr>)
                     })}
 
                   </tbody>

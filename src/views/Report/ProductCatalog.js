@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online, Offline } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -37,6 +37,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { act } from 'react-test-renderer';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 // const { getToggledOptions } = utils;
@@ -245,12 +246,18 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
 
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            tracerCategories: response.data
+                            tracerCategories: listArray
                         })
                     }
 
@@ -409,13 +416,32 @@ class ProductCatalog extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             ProgramService.getProgramList()
                 .then(response => {
                     console.log(JSON.stringify(response.data))
-                    this.setState({
-                        programs: response.data, loading: false
-                    }, () => { })
+                    console.log("sesProgramIdReport----->", localStorage.getItem("sesProgramIdReport"));
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                        this.setState({
+                            programs: listArray, loading: false,
+                            programId: localStorage.getItem("sesProgramIdReport")
+                        }, () => {
+                            this.fetchData();
+                            this.getProductCategories();
+                            this.getTracerCategoryList();
+                        })
+                    } else {
+                        this.setState({
+                            programs: listArray, loading: false
+                        }, () => { })
+                    }
+
                 }).catch(
                     error => {
                         this.setState({
@@ -534,13 +560,29 @@ class ProductCatalog extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.fetchData();
+                        this.getProductCategories();
+                        this.getTracerCategoryList();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -560,12 +602,17 @@ class ProductCatalog extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 ProductService.getProductCategoryListByProgram(realmId, programId)
                     .then(response => {
                         console.log(response.data);
                         // var list = response.data.slice(1);
                         var list = response.data;
+                        list.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         console.log("my list=======", list);
 
                         this.setState({
@@ -821,8 +868,11 @@ class ProductCatalog extends Component {
         }
 
         if (programId > 0) {
-
-            if (navigator.onLine) {
+            localStorage.setItem("sesProgramIdReport", programId);
+            this.setState({
+                programId: programId
+            })
+            if (isSiteOnline()) {
 
                 this.setState({ loading: true })
                 console.log("json---", json);
@@ -1068,7 +1118,7 @@ class ProductCatalog extends Component {
             }
 
         } else {
-            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] },
+            this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [], programId: '' },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -1272,6 +1322,7 @@ class ProductCatalog extends Component {
                 text: 'All', value: this.state.outPutList.length
             }]
         }
+        const checkOnline = localStorage.getItem('sessionType');
 
         return (
             <div className="animated fadeIn" >
@@ -1304,6 +1355,7 @@ class ProductCatalog extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
+                                                value={this.state.programId}
                                                 // onChange={this.filterVersion}
                                                 onChange={(e) => { this.fetchData(); this.getProductCategories(); this.getTracerCategoryList(); }}
                                             >
@@ -1320,7 +1372,7 @@ class ProductCatalog extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <Online>
+                                {checkOnline === 'Online' &&
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1335,21 +1387,35 @@ class ProductCatalog extends Component {
                                                 >
 
                                                     {/* <option value="-1">{i18n.t('static.common.all')}</option> */}
-                                                    {productCategories.length > 0
+                                                    {/* {productCategories.length > 0
                                                         && productCategories.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
                                                                     {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
                                                                 </option>
                                                             )
-                                                        }, this)}
+                                                        }, this)} */}
+
+                                                    {
+                                                        (productCategories.length > 0 ? productCategories.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                                                </option>
+                                                            )
+                                                        }, this) :
+                                                            <option value={-1}>
+                                                                {i18n.t('static.common.allCategories')}
+                                                            </option>
+                                                        )
+                                                    }
 
                                                 </Input>
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Online>
-                                <Offline>
+                                }
+                                {checkOnline === 'Offline' &&
                                     <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
                                         <div className="controls SelectField">
@@ -1378,7 +1444,7 @@ class ProductCatalog extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </Offline>
+                                }
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectField">

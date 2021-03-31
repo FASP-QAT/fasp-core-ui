@@ -15,6 +15,7 @@ import moment from 'moment';
 import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
+import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 
 
 
@@ -154,12 +155,12 @@ class UpdateExpiredPasswordComponent extends Component {
                                         }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            if (navigator.onLine) {
+                                            if (isSiteOnline()) {
                                                 console.log("Update expired password email id on submit method--->" + this.props.location.state.emailId)
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
-                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
+                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -167,6 +168,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                                         // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
+                                                        localStorage.setItem('sessionType', "Online");
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('lang', decoded.user.language.languageCode);

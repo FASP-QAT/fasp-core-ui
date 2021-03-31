@@ -53,8 +53,11 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import ReportService from '../../api/ReportService'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
+
+const entityname1 = i18n.t('static.dashboard.stockstatus')
 
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -66,125 +69,6 @@ const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
 
-const options = {
-  scales: {
-
-    yAxes: [{
-      id: 'A',
-      position: 'left',
-      scaleLabel: {
-        labelString: i18n.t('static.shipment.qty'),
-        display: true,
-        fontSize: "12",
-        fontColor: 'black'
-      },
-      ticks: {
-        beginAtZero: true,
-        fontColor: 'black',
-        callback: function (value) {
-          var cell1 = value
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-
-        }
-
-      }, gridLines: {
-        color: 'rgba(171,171,171,1)',
-        lineWidth: 0
-      }
-
-    }, {
-      id: 'B',
-      position: 'right',
-      scaleLabel: {
-        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-        fontColor: 'black',
-        display: true,
-
-      },
-      ticks: {
-        beginAtZero: true,
-        fontColor: 'black',
-        callback: function (value) {
-          var cell1 = value
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-
-        }
-
-      },
-      gridLines: {
-        color: 'rgba(171,171,171,1)',
-        lineWidth: 0
-      }
-    }],
-    xAxes: [{
-
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.common.month'),
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
-      },
-      ticks: {
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
-      },
-      gridLines: {
-        color: 'rgba(171,171,171,1)',
-        lineWidth: 0
-      }
-    }]
-  },
-
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips,
-    callbacks: {
-      label: function (tooltipItem, data) {
-
-        let label = data.labels[tooltipItem.index];
-        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }
-    }
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-      fontColor: 'black'
-    }
-  }
-}
 
 
 
@@ -230,10 +114,11 @@ class StockStatus extends Component {
       versions: [],
       show: false,
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       programId: '',
-      versionId: ''
+      versionId: '',
+      planningUnitLabel: ''
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -246,20 +131,39 @@ class StockStatus extends Component {
 
   programChange(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
+    }, () => {
+      console.log("ProgramId-------->1", this.state.programId);
+      localStorage.setItem("sesVersionIdReport", '');
+      this.filterVersion();
     })
   }
 
   versionChange(event) {
-    this.setState({
-      versionId: event.target.value
-    })
+    // this.setState({
+    //   versionId: event.target.value
+    // })
+    if (this.state.versionId != '' || this.state.versionId != undefined) {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.filterData();
+      })
+    } else {
+      this.setState({
+        versionId: event.target.value
+      }, () => {
+        this.getPlanningUnit();
+      })
+    }
   }
 
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   roundN = num => {
-    if (num != '') {
+    if (num !== '') {
       return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     } else {
       return ''
@@ -340,7 +244,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
+      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
 
     /*for(var item=0;item<re.length;item++){
       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
@@ -449,7 +353,7 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
+        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -518,127 +422,130 @@ class StockStatus extends Component {
 
 
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
-                var realmOs = realmTransaction.objectStore('realm');
-                var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
-                realmRequest.onerror = function (event) {
-                    this.setState({
-                        loading: false,
+            var realmOs = realmTransaction.objectStore('realm');
+            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            realmRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            realmRequest.onsuccess = function (event) {
+              var maxForMonths = 0;
+              var realm = realmRequest.result;
+              var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+              var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+              if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+              } else {
+                maxForMonths = pu.minMonthsOfStock
+              }
+              var minStockMoS = parseInt(maxForMonths);
+
+              // Calculations for Max Stock
+              var minForMonths = 0;
+              var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+              if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+              } else {
+                minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+              }
+              var maxStockMoS = parseInt(minForMonths);
+              if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+              }
+
+
+
+
+              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+              var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
+              var monthstartfrom = this.state.rangeValue.from.month
+              for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                var monthlydata = [];
+                console.log(programJson)
+                for (var month = monthstartfrom; month <= 12; month++) {
+                  var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                  var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                  console.log(dtstr, ' ', enddtStr)
+                  var dt = dtstr
+                  var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
+                  console.log(list)
+                  if (list.length > 0) {
+                    var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+                    var totalShipmentQty = 0;
+                    shiplist.map(elt => {
+                      totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
                     })
-                    this.hideFirstComponent()
-                }.bind(this);
-                realmRequest.onsuccess = function (event) {
-                    var maxForMonths = 0;
-                    var realm = realmRequest.result;
-                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-                    if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
-                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                    } else {
-                        maxForMonths = pu.minMonthsOfStock
+                    var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                    var totalforecastConsumption = null;
+                    conList.map(elt => {
+                      totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
+                    })
+
+                    var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                    var totalActualConsumption = null;
+                    conListAct.map(elt => {
+                      totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
+                    })
+                    console.log(conList)
+                    console.log(totalforecastConsumption)
+                    var json = {
+                      dt: new Date(from, month - 1),
+                      forecastedConsumptionQty: totalforecastConsumption,
+                      actualConsumptionQty: totalActualConsumption,
+                      actualConsumption: list[0].actualFlag,
+                      finalConsumptionQty: list[0].consumptionQty,
+                      shipmentQty: totalShipmentQty,
+                      shipmentInfo: shiplist,
+                      adjustment: list[0].adjustmentQty,
+                      closingBalance: list[0].closingBalance,
+                      openingBalance: list[0].openingBalance,
+                      mos: list[0].mos,
+                      amc: list[0].amc,
+                      minMos: minStockMoS,
+                      maxMos: maxStockMoS
                     }
-                    var minStockMoS = parseInt(maxForMonths);
-
-                    // Calculations for Max Stock
-                    var minForMonths = 0;
-                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                    } else {
-                        minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                  } else {
+                    var json = {
+                      dt: new Date(from, month - 1),
+                      consumptionQty: 0,
+                      actualConsumption: false,
+                      shipmentQty: 0,
+                      shipmentInfo: [],
+                      adjustment: 0,
+                      closingBalance: 0,
+                      openingBalance: '',
+                      mos: '',
+                      amc: '',
+                      minMos: minStockMoS,
+                      maxMos: maxStockMoS
                     }
-                    var maxStockMoS = parseInt(minForMonths);
-                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                        maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-                    }
-
-
-
-            
-            var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
-            var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
-            var monthstartfrom = this.state.rangeValue.from.month
-            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-              var monthlydata = [];
-              console.log(programJson)
-              for (var month = monthstartfrom; month <= 12; month++) {
-                var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                console.log(dtstr, ' ', enddtStr)
-                var dt = dtstr
-                var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-                console.log(list)
-                if (list.length > 0) {
-                  var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-                  var totalShipmentQty = 0;
-                  shiplist.map(elt => {
-                    totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
-                  })
-                  var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                  var totalforecastConsumption = null;
-                  conList.map(elt => {
-                    totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
-                  })
-
-                  var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                  var totalActualConsumption = null;
-                  conListAct.map(elt => {
-                    totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
-                  })
-                  console.log(conList)
-                  console.log(totalforecastConsumption)
-                  var json = {
-                    dt: new Date(from, month - 1),
-                    forecastedConsumptionQty: totalforecastConsumption,
-                    actualConsumptionQty: totalActualConsumption,
-                    actualConsumption: list[0].actualFlag,
-                    finalConsumptionQty:list[0].consumptionQty,
-                    shipmentQty: totalShipmentQty,
-                    shipmentInfo: shiplist,
-                    adjustment: list[0].adjustmentQty,
-                    closingBalance: list[0].closingBalance,
-                    openingBalance: list[0].openingBalance,
-                    mos: list[0].mos,
-                    amc: list[0].amc,
-                    minMos: minStockMoS,
-                    maxMos: maxStockMoS
                   }
-                } else {
-                  var json = {
-                    dt: new Date(from, month - 1),
-                    consumptionQty: 0,
-                    actualConsumption: false,
-                    shipmentQty: 0,
-                    shipmentInfo: [],
-                    adjustment: 0,
-                    closingBalance: 0,
-                    openingBalance: '',
-                    mos: '',
-                    amc: '',
-                    minMos: minStockMoS,
-                    maxMos: maxStockMoS
+                  data.push(json)
+                  console.log(json)
+                  if (month == this.state.rangeValue.to.month && from == to) {
+                    this.setState({
+                      stockStatusList: data,
+                      message: '', loading: false
+                    })
+
+                    return;
                   }
-                }
-                data.push(json)
-                console.log(json)
-                if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
-                    stockStatusList: data,
-                    message: '', loading: false
+                    loading: false,
+                    planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
                   })
 
-                  return;
                 }
-                this.setState({ loading: false })
+                monthstartfrom = 1
 
               }
-              monthstartfrom = 1
 
-            }
+            }.bind(this)
 
           }.bind(this)
-
         }.bind(this)
-      }.bind(this)
 
 
 
@@ -694,7 +601,8 @@ class StockStatus extends Component {
             console.log(JSON.stringify(response.data));
             this.setState({
               stockStatusList: response.data,
-              message: '', loading: false
+              message: '', loading: false,
+              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
             })
           }).catch(
             error => {
@@ -771,13 +679,13 @@ class StockStatus extends Component {
       this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [], planningUnitLabel: '' });
 
     }
   }
 
   getPrograms = () => {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -906,6 +814,7 @@ class StockStatus extends Component {
         }
         var lang = this.state.lang;
         if (proList.length == 1) {
+          console.log("*****1");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -916,7 +825,21 @@ class StockStatus extends Component {
           }, () => {
             this.filterVersion();
           })
+        } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+          //from session
+          console.log("*****2");
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: localStorage.getItem("sesProgramIdReport")
+          }, () => {
+            this.filterVersion();
+          })
         } else {
+          console.log("*****3");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -936,13 +859,16 @@ class StockStatus extends Component {
 
 
   filterVersion = () => {
-    let programId = document.getElementById("programId").value;
+    console.log("ProgramId-------->2", this.state.programId);
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     if (programId != 0) {
 
+      localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
           this.setState({
             versions: []
           }, () => {
@@ -1010,21 +936,50 @@ class StockStatus extends Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+
         if (verList.length == 1) {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
+            versions: versionList,
             versionId: verList[0].versionId
           }, () => {
             this.getPlanningUnit();
           })
+        } else if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+          // this.setState({
+          //   versions: versionList,
+          //   versionId: localStorage.getItem("sesVersionIdReport")
+          // }, () => {
+          //   this.getPlanningUnit();
+          // })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar.length != 0) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
         }
 
@@ -1041,6 +996,7 @@ class StockStatus extends Component {
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
+    console.log("VERSION-------->", versionId);
     this.setState({
       planningUnits: []
     }, () => {
@@ -1048,6 +1004,7 @@ class StockStatus extends Component {
       if (versionId == 0) {
         this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
       } else {
+        localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
           const lan = 'en';
           var db1;
@@ -1243,6 +1200,131 @@ class StockStatus extends Component {
         )
       }, this);
 
+
+    const options = {
+      title: {
+        display: true,
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? entityname1 + " - " + this.state.planningUnitLabel : entityname1
+      },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          position: 'left',
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+
+            }
+
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+
+        }, {
+          id: 'B',
+          position: 'right',
+          scaleLabel: {
+            labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+            fontColor: 'black',
+            display: true,
+
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+
+            }
+
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }],
+        xAxes: [{
+
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.common.month'),
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          ticks: {
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }]
+      },
+
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black'
+        }
+      }
+    }
+
+
     const bar = {
 
       labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
@@ -1261,7 +1343,7 @@ class StockStatus extends Component {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
 
-              ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+              ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1279,7 +1361,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1298,7 +1380,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1316,7 +1398,7 @@ class StockStatus extends Component {
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
-              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
             }))
             return count
           })
@@ -1375,7 +1457,7 @@ class StockStatus extends Component {
           showInLegend: true,
           pointStyle: 'line',
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (this.roundN(item.mos)))
+          data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
         }
         , {
           type: "line",
@@ -1475,7 +1557,8 @@ class StockStatus extends Component {
                               id="programId"
                               bsSize="sm"
                               // onChange={this.filterVersion}
-                              onChange={(e) => { this.programChange(e); this.filterVersion(e) }}
+                              // onChange={(e) => { this.programChange(e); this.filterVersion(e) }}
+                              onChange={(e) => { this.programChange(e); }}
                               value={this.state.programId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
@@ -1496,7 +1579,8 @@ class StockStatus extends Component {
                               id="versionId"
                               bsSize="sm"
                               // onChange={(e) => { this.getPlanningUnit(); }}
-                              onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              // onChange={(e) => { this.versionChange(e); this.getPlanningUnit(e) }}
+                              onChange={(e) => { this.versionChange(e); }}
                               value={this.state.versionId}
                             >
                               <option value="0">{i18n.t('static.common.select')}</option>
@@ -1612,7 +1696,7 @@ class StockStatus extends Component {
                               {this.formatter(this.formatAmc(this.state.stockStatusList[idx].amc))}
                             </td>
                             <td>
-                              {this.roundN(this.state.stockStatusList[idx].mos)}
+                              {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
                             </td>
                             <td>
                               {this.roundN(this.state.stockStatusList[idx].minMos)}

@@ -229,8 +229,14 @@ export default class UserTicketComponent extends Component {
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.label_en.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.label_en.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        languages: response.data, loading: false
+                        languages: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -285,8 +291,14 @@ export default class UserTicketComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data,
+                        realms: listArray,
                         realmId: this.props.items.userRealmId, loading: false
                     });
                     if (this.props.items.userRealmId !== "") {
@@ -359,6 +371,11 @@ export default class UserTicketComponent extends Component {
                     for (var i = 0; i < response.data.length; i++) {
                         roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    roleList.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         roleList
                     })
@@ -461,7 +478,7 @@ export default class UserTicketComponent extends Component {
             && languages.map((item, i) => {
                 return (
                     <option key={i} value={item.languageId}>
-                        {item.languageName}
+                        {item.label.label_en}
                     </option>
                 )
             }, this);

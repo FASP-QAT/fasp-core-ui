@@ -53,6 +53,7 @@ import RealmCountryService from '../../api/RealmCountryService';
 import ReportService from '../../api/ReportService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -69,114 +70,7 @@ const pickerLang = {
 }
 
 
-const options = {
-  title: {
-    display: true,
-    fontColor: 'black',
-    fontStyle: "normal",
-    fontSize: "12"
-  },
-  scales: {
-    yAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: i18n.t('static.report.error'),
-          fontColor: 'black',
-          fontStyle: "normal",
-          fontSize: "12"
-        },
-        ticks: {
-          yValueFormatString: "$#####%",
-          beginAtZero: true,
-          Max: 900,
-          callback: function (value) {
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2 + "%";
-          }
-        }
-      }
-    ], xAxes: [{
 
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.report.month'),
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
-      },
-      ticks: {
-        fontColor: 'black',
-        fontStyle: "normal",
-        fontSize: "12"
-      }
-    }]
-  },
-  hover: {
-    animationDuration: 0
-  },
-  animation: {
-    onComplete: function () {
-      const chartInstance = this.chart,
-        ctx = chartInstance.ctx;
-
-
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
-      this.data.datasets.forEach(function (dataset, i) {
-        const meta = chartInstance.controller.getDatasetMeta(i);
-        meta.data.forEach(function (bar, index) {
-          const data = dataset.data[index];
-          ctx.fillStyle = "#000";
-          ctx.fillText(data, bar._model.x, bar._model.y - 2);
-        });
-      });
-    }
-  },
-  tooltips: {
-    mode: 'index',
-    callbacks: {
-      label: function (tooltipItem, data) {
-
-        let label = data.labels[tooltipItem.index];
-        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }
-    },
-    enabled: true,
-    //    custom: CustomTooltips
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-      fontColor: 'black',
-      fontStyle: "normal",
-      fontSize: "12"
-    }
-  },
-
-}
 
 
 
@@ -222,8 +116,11 @@ class ForcastMatrixOverTime extends Component {
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      programId: '',
+      versionId: '',
+      planningUnitLabel: ''
 
 
     };
@@ -236,6 +133,8 @@ class ForcastMatrixOverTime extends Component {
     // this.getProductCategories = this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    this.setProgramId = this.setProgramId.bind(this);
+    this.setVersionId = this.setVersionId.bind(this);
   }
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
@@ -436,7 +335,7 @@ class ForcastMatrixOverTime extends Component {
       doc.save('canvas.pdf');*/
   }
   getPrograms = () => {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
@@ -563,13 +462,28 @@ class ForcastMatrixOverTime extends Component {
 
         }
         var lang = this.state.lang;
-        this.setState({
-          programs: proList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-          }),
-        })
+
+        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            programId: localStorage.getItem("sesProgramIdReport")
+          }, () => {
+            this.filterVersion();
+          })
+        } else {
+          this.setState({
+            programs: proList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+          })
+        }
+
 
       }.bind(this);
 
@@ -580,13 +494,15 @@ class ForcastMatrixOverTime extends Component {
 
 
   filterVersion = () => {
-    let programId = document.getElementById("programId").value;
+    // let programId = document.getElementById("programId").value;
+    let programId = this.state.programId;
     if (programId != 0) {
 
+      localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
       console.log(program)
       if (program.length == 1) {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
           this.setState({
             versions: [],
             planningUnits: []
@@ -658,12 +574,41 @@ class ForcastMatrixOverTime extends Component {
 
         }
 
-        console.log(verList)
-        this.setState({
-          versions: verList.filter(function (x, i, a) {
-            return a.indexOf(x) === i;
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+
+        if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
+
+        } else {
+          this.setState({
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
-        })
+        }
+
 
       }.bind(this);
 
@@ -686,6 +631,7 @@ class ForcastMatrixOverTime extends Component {
           this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
         })
       } else {
+        localStorage.setItem("sesVersionIdReport", versionId);
         if (versionId.includes('Local')) {
           const lan = 'en';
           var db1;
@@ -708,7 +654,7 @@ class ForcastMatrixOverTime extends Component {
               var proList = []
               console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                   proList[i] = myResult[i]
                 }
@@ -816,6 +762,30 @@ class ForcastMatrixOverTime extends Component {
 
 
   }
+
+  setProgramId(event) {
+    this.setState({
+      programId: event.target.value,
+      versionId: ''
+    }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
+      this.filterVersion();
+    })
+  }
+
+  setVersionId(event) {
+    this.setState({
+      versionId: event.target.value
+    }, () => {
+      if (this.state.matricsList.length != 0) {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.fetchData();
+      } else {
+        this.getPlanningUnit();
+      }
+    })
+  }
+
   rowtextFormatClassName(row) {
     return (row.forecastError > 50) ? 'textcolor-red' : '';
   }
@@ -831,11 +801,16 @@ class ForcastMatrixOverTime extends Component {
     var input = { "programId": programId, "versionId": versionId, "planningUnitId": planningUnitId, "startDate": startDate, "stopDate": stopDate, "previousMonths": monthInCalc }
     if (programId > 0 && planningUnitId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
-
+        this.setState({ loading: true })
 
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            loading: false
+          })
+        }.bind(this);
         openRequest.onsuccess = function (e) {
           db1 = e.target.result;
 
@@ -848,6 +823,11 @@ class ForcastMatrixOverTime extends Component {
           var data = [];
           var programRequest = programTransaction.get(program);
 
+          programRequest.onerror = function (event) {
+            this.setState({
+              loading: false
+            })
+          }.bind(this);
           programRequest.onsuccess = function (event) {
             // this.setState({ loading: true })
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
@@ -929,8 +909,12 @@ class ForcastMatrixOverTime extends Component {
                 }
               }
               monthstartfrom = 1
+              this.setState({
+                planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+              })
 
             }
+            this.setState({ loading: false })
 
           }.bind(this)
         }.bind(this)
@@ -943,7 +927,9 @@ class ForcastMatrixOverTime extends Component {
             console.log(JSON.stringify(response.data));
             this.setState({
               matricsList: response.data,
-              message: '', loading: false
+              message: '', loading: false,
+              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+
             })
           }).catch(
             error => {
@@ -1021,7 +1007,7 @@ class ForcastMatrixOverTime extends Component {
       this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
 
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [], planningUnitLabel: '' });
 
     }
     /*   this.setState({
@@ -1079,6 +1065,34 @@ class ForcastMatrixOverTime extends Component {
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
+  dateFormatterLanguage = value => {
+    if (moment(value).format('MM') === '01') {
+      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '02') {
+      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '03') {
+      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '04') {
+      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '05') {
+      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '06') {
+      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '07') {
+      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '08') {
+      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '09') {
+      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '10') {
+      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '11') {
+      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+    } else {
+      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+    }
+  }
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
@@ -1108,9 +1122,120 @@ class ForcastMatrixOverTime extends Component {
         )
       }, this);
 
+    const options = {
+      title: {
+        display: true,
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? i18n.t('static.report.forecasterrorovertime') + " - " + this.state.planningUnitLabel : i18n.t('static.report.forecasterrorovertime')
+        // fontColor: 'black',
+        // fontStyle: "normal",
+        // fontSize: "12"
+      },
+      scales: {
+        yAxes: [
+          {
+            scaleLabel: {
+              display: true,
+              labelString: i18n.t('static.report.error'),
+              fontColor: 'black',
+              fontStyle: "normal",
+              fontSize: "12"
+            },
+            ticks: {
+              yValueFormatString: "$#####%",
+              beginAtZero: true,
+              Max: 900,
+              callback: function (value) {
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return x1 + x2 + "%";
+              }
+            }
+          }
+        ], xAxes: [{
+
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.report.month'),
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          ticks: {
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          }
+        }]
+      },
+      hover: {
+        animationDuration: 0
+      },
+      animation: {
+        onComplete: function () {
+          const chartInstance = this.chart,
+            ctx = chartInstance.ctx;
+
+
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+          this.data.datasets.forEach(function (dataset, i) {
+            const meta = chartInstance.controller.getDatasetMeta(i);
+            meta.data.forEach(function (bar, index) {
+              const data = dataset.data[index];
+              ctx.fillStyle = "#000";
+              ctx.fillText(data, bar._model.x, bar._model.y - 2);
+            });
+          });
+        }
+      },
+      tooltips: {
+        mode: 'index',
+        callbacks: {
+          label: function (tooltipItem, data) {
+
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        },
+        enabled: true,
+        //    custom: CustomTooltips
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black',
+          fontStyle: "normal",
+          fontSize: "12"
+        }
+      },
+
+    }
+
     const bar = {
 
-      labels: this.state.matricsList.map((item, index) => (this.dateFormatter(item.month))),
+      // labels: this.state.matricsList.map((item, index) => (this.dateFormatter(item.month))),
+      labels: this.state.matricsList.map((item, index) => (this.dateFormatterLanguage(item.month))),
       datasets: [
         {
           type: "line",
@@ -1225,7 +1350,9 @@ class ForcastMatrixOverTime extends Component {
                                   name="programId"
                                   id="programId"
                                   bsSize="sm"
-                                  onChange={this.filterVersion}
+                                  // onChange={this.filterVersion}
+                                  onChange={(e) => { this.setProgramId(e) }}
+                                  value={this.state.programId}
                                 >
                                   <option value="0">{i18n.t('static.common.select')}</option>
                                   {programs.length > 0
@@ -1290,7 +1417,9 @@ class ForcastMatrixOverTime extends Component {
                                   name="versionId"
                                   id="versionId"
                                   bsSize="sm"
-                                  onChange={(e) => { this.getPlanningUnit(); }}
+                                  // onChange={(e) => { this.getPlanningUnit(); }}
+                                  onChange={(e) => { this.setVersionId(e) }}
+                                  value={this.state.versionId}
                                 >
                                   <option value="0">{i18n.t('static.common.select')}</option>
                                   {versionList}

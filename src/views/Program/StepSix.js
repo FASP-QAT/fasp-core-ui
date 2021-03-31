@@ -171,8 +171,14 @@ export default class StepSix extends Component {
         ProgramService.getProgramManagerList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programManagerList: response.data
+                        programManagerList: listArray
                     })
                 } else {
                     this.setState({
@@ -449,7 +455,7 @@ export default class StepSix extends Component {
                                             invalid={touched.programNotes && !!errors.programNotes}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            maxLength={600}
+                                            // maxLength={600}
                                             type="textarea" name="programNotes" id="programNotes" />
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>

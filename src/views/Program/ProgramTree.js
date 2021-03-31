@@ -27,6 +27,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
@@ -82,16 +83,20 @@ class Program extends Component {
                         message: response.data.messageCode,
                         loading: false,
                         color: "red"
+                    }, () => {
+                        this.hideFirstComponent()
                     })
-                    this.hideFirstComponent()
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false
-                        });
+                            loading: false,
+                            color: "red"
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
                     } else {
                         switch (error.response ? error.response.status : "") {
 
@@ -106,20 +111,29 @@ class Program extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                                 break;
                         }
                     }
@@ -128,7 +142,7 @@ class Program extends Component {
     }
     checkNewerVersions(programs) {
         // console.log("T***going to call check newer versions")
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
                 .then(response => {
@@ -161,23 +175,33 @@ class Program extends Component {
             RealmService.getRealmListAll()
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            realmList: response.data,
+                            realmList: listArray,
                             loading: false
                         })
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false, color: "red"
+                        }, () => {
+                            this.hideFirstComponent()
                         })
-                        this.hideFirstComponent()
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
-                            });
+                                loading: false,
+                                color: "red"
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
                         } else {
                             switch (error.response ? error.response.status : "") {
 
@@ -192,20 +216,29 @@ class Program extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                             }
                         }
@@ -230,13 +263,14 @@ class Program extends Component {
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
                 color: "red"
+            }, () => {
+                this.hideFirstComponent()
             })
-            this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -256,12 +290,12 @@ class Program extends Component {
                     if (myResult[i].userId == userId) {
                         // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            programId: programJson1.programId,
-                            versionId: programJson1.currentVersion.versionId
+                            programId: myResult[i].programId,
+                            versionId: myResult[i].version
                         }
                         proList.push(programJson);
                     }
@@ -313,16 +347,20 @@ class Program extends Component {
                                         message: response.data.messageCode,
                                         loading: false,
                                         color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
                                     })
-                                    this.hideFirstComponent()
                                 }
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                     } else {
                                         switch (error.response ? error.response.status : "") {
 
@@ -337,20 +375,29 @@ class Program extends Component {
                                             case 406:
                                                 this.setState({
                                                     message: error.response.data.messageCode,
-                                                    loading: false
-                                                });
+                                                    loading: false,
+                                                    color: "red"
+                                                }, () => {
+                                                    this.hideFirstComponent()
+                                                })
                                                 break;
                                             case 412:
                                                 this.setState({
                                                     message: error.response.data.messageCode,
-                                                    loading: false
-                                                });
+                                                    loading: false,
+                                                    color: "red"
+                                                }, () => {
+                                                    this.hideFirstComponent()
+                                                })
                                                 break;
                                             default:
                                                 this.setState({
                                                     message: 'static.unkownError',
-                                                    loading: false
-                                                });
+                                                    loading: false,
+                                                    color: "red"
+                                                }, () => {
+                                                    this.hideFirstComponent()
+                                                })
                                                 break;
                                         }
                                     }
@@ -392,16 +439,20 @@ class Program extends Component {
                         this.setState({
                             message: response.data.messageCode,
                             loading: false, color: "red"
+                        }, () => {
+                            this.hideFirstComponent()
                         })
-                        this.hideFirstComponent()
                     }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
-                            });
+                                loading: false,
+                                color: "red"
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
                         } else {
                             switch (error.response ? error.response.status : "") {
 
@@ -416,20 +467,29 @@ class Program extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false
-                                    });
+                                        loading: false,
+                                        color: "red"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
                                     break;
                             }
                         }
@@ -441,8 +501,9 @@ class Program extends Component {
             this.setState({
                 message: i18n.t('static.common.realmtext'),
                 color: "red"
+            }, () => {
+                this.hideFirstComponent()
             })
-            this.hideFirstComponent()
             this.setState({ loading: false });
         }
     }
@@ -475,6 +536,8 @@ class Program extends Component {
             this.setState({
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
+            }, () => {
+                this.hideFirstComponent()
             })
             // if (this.props.updateState != undefined) {
             //     this.props.updateState(false);
@@ -482,8 +545,8 @@ class Program extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -491,6 +554,8 @@ class Program extends Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red',
                     loading: false
+                }, () => {
+                    this.hideFirstComponent()
                 })
                 // if (this.props.updateState != undefined) {
                 //     this.props.updateState(false);
@@ -503,14 +568,14 @@ class Program extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         // console.log("programData---", programData);
                         var programJson = {
-                            programId: programJson1.programId,
+                            programId: myResult[i].programId,
                             versionId: myResult[i].version
                         }
                         proList.push(programJson)
@@ -796,7 +861,7 @@ class Program extends Component {
             var programThenCount = 0;
             // for (var i = 0; i < checkboxesChecked.length; i++) {
             // var version = (checkboxesChecked[i]).versionId;
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 // AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
@@ -820,8 +885,8 @@ class Program extends Component {
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
-                            var transaction = db1.transaction(['programData'], 'readwrite');
-                            var program = transaction.objectStore('programData');
+                            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                            var program = transaction.objectStore('programQPLDetails');
                             var count = 0;
                             var getRequest = program.getAll();
                             getRequest.onerror = function (event) {
@@ -865,6 +930,10 @@ class Program extends Component {
                                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                                     for (var r = 0; r < json.length; r++) {
+                                                        json[r].actionList = [];
+                                                        // json[r].openCount = 0;
+                                                        // json[r].addressedCount = 0;
+                                                        // json[r].programCode = json[r].programCode;
                                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -878,7 +947,10 @@ class Program extends Component {
                                                             version: version,
                                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                                             programData: encryptedText.toString(),
-                                                            userId: userId
+                                                            userId: userId,
+                                                            programCode: json[r].programCode,
+                                                            // openCount: 0,
+                                                            // addressedCount: 0
                                                         };
                                                         // console.log("Item------------>", item);
                                                         var putRequest = programSaveData.put(item);
@@ -908,18 +980,38 @@ class Program extends Component {
 
                                                         }
                                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                                            this.setState({
-                                                                message: 'static.program.downloadsuccess',
-                                                                color: 'green',
-                                                                loading: false
-                                                            })
-                                                            this.hideFirstComponent();
-                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                                            this.setState({ loading: false })
-                                                            // this.refs.programListChild.checkNewerVersions();
-                                                            this.getPrograms();
-                                                            this.getLocalPrograms();
-                                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                            var programIds = []
+                                                            for (var r = 0; r < json.length; r++) {
+                                                                var programQPLDetailsJson = {
+                                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                                    programId: json[r].programId,
+                                                                    version: json[r].currentVersion.versionId,
+                                                                    userId: userId,
+                                                                    programCode: json[r].programCode,
+                                                                    openCount: 0,
+                                                                    addressedCount: 0,
+                                                                    programModified: 0
+                                                                };
+                                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                            }
+                                                            programQPLDetailsTransaction.oncomplete = function (event) {
+                                                                this.setState({
+                                                                    message: 'static.program.downloadsuccess',
+                                                                    color: 'green',
+                                                                    loading: false
+                                                                }, () => {
+                                                                    this.hideFirstComponent()
+                                                                })
+                                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                                this.setState({ loading: false })
+                                                                // this.refs.programListChild.checkNewerVersions();
+                                                                this.getPrograms();
+                                                                this.getLocalPrograms();
+                                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                            }.bind(this)
                                                         }.bind(this)
                                                     }.bind(this)
                                                 }
@@ -929,8 +1021,9 @@ class Program extends Component {
                                                     this.setState({
                                                         message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
                                                     })
-                                                    this.setState({ loading: false, color: "red" })
-                                                    this.hideFirstComponent()
+                                                    this.setState({ loading: false, color: "red" }, () => {
+                                                        this.hideFirstComponent()
+                                                    })
                                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                 }
                                             }
@@ -944,6 +1037,10 @@ class Program extends Component {
                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {
+                                        json[r].actionList = [];
+                                        // json[r].openCount = 0;
+                                        // json[r].addressedCount = 0;
+                                        // json[r].programCode = json[r].programCode;
                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -957,7 +1054,10 @@ class Program extends Component {
                                             version: version,
                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                             programData: encryptedText.toString(),
-                                            userId: userId
+                                            userId: userId,
+                                            programCode: json[r].programCode,
+                                            // openCount: 0,
+                                            // addressedCount: 0
                                         };
                                         // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
@@ -987,18 +1087,37 @@ class Program extends Component {
 
                                         }
                                         transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                            this.setState({
-                                                message: 'static.program.downloadsuccess',
-                                                color: 'green',
-                                                loading: false
-                                            })
-                                            this.hideFirstComponent();
-                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                            this.setState({ loading: false })
-                                            // this.refs.programListChild.checkNewerVersions();
-                                            this.getPrograms();
-                                            this.getLocalPrograms();
-                                            this.props.history.push(`/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'))
+                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                            var programIds = []
+                                            for (var r = 0; r < json.length; r++) {
+                                                var programQPLDetailsJson = {
+                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                    programId: json[r].programId,
+                                                    version: json[r].currentVersion.versionId,
+                                                    userId: userId,
+                                                    programCode: json[r].programCode,
+                                                    openCount: 0,
+                                                    addressedCount: 0,
+                                                    programModified: 0
+                                                };
+                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                            }
+                                            programQPLDetailsTransaction.oncomplete = function (event) {
+                                                this.setState({
+                                                    message: 'static.program.downloadsuccess',
+                                                    color: 'green',
+                                                    loading: false
+                                                })
+                                                this.hideFirstComponent();
+                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                this.setState({ loading: false })
+                                                // this.refs.programListChild.checkNewerVersions();
+                                                this.getPrograms();
+                                                this.getLocalPrograms();
+                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                            }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
                                 }
@@ -1010,8 +1129,11 @@ class Program extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
-                                });
+                                    loading: false,
+                                    color: "red"
+                                }, () => {
+                                    this.hideFirstComponent()
+                                })
                             } else {
                                 switch (error.response ? error.response.status : "") {
 
@@ -1026,20 +1148,29 @@ class Program extends Component {
                                     case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                         break;
                                     case 412:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                         break;
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
-                                            loading: false
-                                        });
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
                                         break;
                                 }
                             }
@@ -1047,7 +1178,9 @@ class Program extends Component {
                     );
 
             } else {
-                this.setState({ loading: false, color: "red" })
+                this.setState({ loading: false, color: "red" }, () => {
+                    this.hideFirstComponent()
+                })
                 alert(i18n.t('static.common.online'))
             }
             // }

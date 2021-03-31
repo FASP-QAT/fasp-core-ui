@@ -11,7 +11,7 @@ import IdleTimer from 'react-idle-timer';
 import moment from 'moment';
 import CryptoJS from 'crypto-js';
 import {
-  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME
+  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -20,6 +20,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 // routes config
 //import routes from '../../routes';
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
@@ -255,6 +256,7 @@ const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../view
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
 const QuantimedImport = React.lazy(() => import('../../views/Quantimed/QuantimedImportOnboarding'));
+const UploadUserManual = React.lazy(() => import('../../views/UserManual/UploadUserManual'));
 // const EditProblem = React.lazy(() => import('../../views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -265,6 +267,7 @@ const routes = [
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
   { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   { path: '/report/problemList/:programId/:calculate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
+  { path: '/report/problemList/1/:programId/:calculate', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
   // { path: '/report/problemList', name: 'Qat Problem List', component: ProblemList },
 
   { path: '/problem/editProblem', name: ' Edit Problem', component: EditProblem },
@@ -526,6 +529,7 @@ const routes = [
   { path: '/report/shipmentSummery/:message', name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
+  { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
 
 
 
@@ -626,8 +630,8 @@ class DefaultLayout extends Component {
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
     this.getProgramData = this.getProgramData.bind(this);
-    this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
-    this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
+    // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
+    // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
@@ -650,7 +654,8 @@ class DefaultLayout extends Component {
     // console.log('user is idle', e)
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      // console.log("user timed out")
+      console.log("user timed out")
+      localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
     } else {
       this.setState({ showModal: true })
@@ -672,6 +677,7 @@ class DefaultLayout extends Component {
     }
   }
   componentDidMount() {
+    console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
@@ -715,7 +721,7 @@ class DefaultLayout extends Component {
   }
   goToCommitProgram(e) {
     e.preventDefault();
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       this.props.history.push(`/program/syncPage/`)
     } else {
       confirmAlert({
@@ -748,10 +754,9 @@ class DefaultLayout extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      var proList = []
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -764,120 +769,127 @@ class DefaultLayout extends Component {
         myResult = getRequest.result;
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var programModified = 0;
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
-           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-            let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-            let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-            let pmax = moment.max(cmax, imax, smax)
-            var programJson = {
-              lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+            if (myResult[i].programModified == 1) {
+              programModified = 1;
+              break;
             }
-            proList.push(programJson)
           }
         }
-        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         this.setState({
-          programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        }, () => {
-          // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+          programModified: programModified
         })
-        this.getDownloadedPrograms();
+        console.log("Program modified@@@", programModified);
+        if (programModified == 1) {
+          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          localStorage.setItem("sesLocalVersionChange", true);
+          this.setState({ changeIcon: true });
+          console.log("P***d--------in if---------------")
+        } else {
+          localStorage.setItem("sesLocalVersionChange", false);
+          this.setState({ changeIcon: false });
+          console.log("P***d--------in else---------------")
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // this.setState({
+        //   programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // }, () => {
+        //   // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        // })
+        // this.getDownloadedPrograms();
       }.bind(this);
     }.bind(this)
 
   }
-  getDownloadedPrograms() {
-    console.log("P***get programs called 1");
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onerror = function (event) {
-      this.setState({
-        message: i18n.t('static.program.errortext'),
-        color: 'red'
-      })
-    }.bind(this);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-      var program = transaction.objectStore('downloadedProgramData');
-      var getRequest = program.getAll();
-      var proList = []
-      getRequest.onerror = function (event) {
-        this.setState({
-          message: i18n.t('static.program.errortext'),
-          color: 'red',
-          loading: false
-        })
-      }.bind(this);
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
-            console.log("1---programJson program id 1---", programJson1.programId);
-            console.log("1---programData 1---", programData);
-            console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
-            console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
-            console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
-            let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
-            let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
-            let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-            console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
-            let pmax = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
-            console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
-            var programJson = {
-              lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
-            }
-            proList.push(programJson)
-          }
-        }
-        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
-        console.log("P***proList downloaded program data---",proList)
-        this.setState({
-          downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
-        }, () => {
-          // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
-        })
-        this.checkIfLocalProgramVersionChanged();
-      }.bind(this);
-    }.bind(this)
+  // getDownloadedPrograms() {
+  //   console.log("P***get programs called 1");
+  //   var db1;
+  //   getDatabase();
+  //   var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+  //   openRequest.onerror = function (event) {
+  //     this.setState({
+  //       message: i18n.t('static.program.errortext'),
+  //       color: 'red'
+  //     })
+  //   }.bind(this);
+  //   openRequest.onsuccess = function (e) {
+  //     db1 = e.target.result;
+  //     var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+  //     var program = transaction.objectStore('downloadedProgramData');
+  //     var getRequest = program.getAll();
+  //     var proList = []
+  //     getRequest.onerror = function (event) {
+  //       this.setState({
+  //         message: i18n.t('static.program.errortext'),
+  //         color: 'red',
+  //         loading: false
+  //       })
+  //     }.bind(this);
+  //     getRequest.onsuccess = function (event) {
+  //       var myResult = [];
+  //       myResult = getRequest.result;
+  //       var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+  //       var userId = userBytes.toString(CryptoJS.enc.Utf8);
+  //       for (var i = 0; i < myResult.length; i++) {
+  //         if (myResult[i].userId == userId) {
+  //           var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+  //           var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+  //           var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+  //           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+  //           var programJson1 = JSON.parse(programData);
+  //           console.log("1---programJson program id 1---", programJson1.programId);
+  //           console.log("1---programData 1---", programData);
+  //           console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
+  //           console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
+  //           console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
+  //           let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
+  //           console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+  //           let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
+  //           console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
+  //           let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
+  //           console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+  //           let pmax = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+  //           console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
+  //           var programJson = {
+  //             lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
+  //           }
+  //           proList.push(programJson)
+  //         }
+  //       }
+  //       // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+  //       // console.log("finalmax1---", moment.max(proList.map(d => moment(d.lastModifiedDate))))
+  //       console.log("P***proList downloaded program data---",proList)
+  //       this.setState({
+  //         downloadedProgramDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+  //       }, () => {
+  //         // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+  //       })
+  //       this.checkIfLocalProgramVersionChanged();
+  //     }.bind(this);
+  //   }.bind(this)
 
-  }
-  checkIfLocalProgramVersionChanged() {
-    // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
-    // e.preventDefault();
-    console.log("P***d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
-    console.log("P***d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
-    console.log("P***d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
-    localStorage.removeItem("sesLocalVersionChange");
-    if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
-      console.log("P***d---hurrey local version changed-------------------------------------------------------------");
-      localStorage.setItem("sesLocalVersionChange", true);
-      this.setState({ changeIcon: true });
-      console.log("P***d--------in if---------------")
-    } else {
-      localStorage.setItem("sesLocalVersionChange", false);
-      this.setState({ changeIcon: false });
-      console.log("P***d--------in else---------------")
-    }
-    //   }
-  }
+  // }
+  // checkIfLocalProgramVersionChanged() {
+  //   // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
+  //   // e.preventDefault();
+  //   console.log("P***d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
+  //   console.log("P***d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
+  //   console.log("P***d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+  //   localStorage.removeItem("sesLocalVersionChange");
+  //   if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
+  //     console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+  //     localStorage.setItem("sesLocalVersionChange", true);
+  //     this.setState({ changeIcon: true });
+  //     console.log("P***d--------in if---------------")
+  //   } else {
+  //     localStorage.setItem("sesLocalVersionChange", false);
+  //     this.setState({ changeIcon: false });
+  //     console.log("P***d--------in else---------------")
+  //   }
+  //   //   }
+  // }
   // componentDidUpdate() {
   //   console.log("Parent component did update called---",this.refs)
   // }
@@ -899,6 +911,7 @@ class DefaultLayout extends Component {
   render() {
     // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
+    const checkOnline = localStorage.getItem('sessionType');
     return (
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
@@ -924,8 +937,7 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-
-              <Online>
+              {checkOnline === 'Online' && 
 
                 <AppSidebarNav navConfig={{
                   items:
@@ -959,7 +971,8 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_TRANSLATIONS') ? false : true) },
+                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_TRANSLATIONS') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS')) || (this.state.businessFunctions.includes('ROLE_BF_DATABASE_TRANSLATION')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.label.labelTranslations'),
@@ -979,56 +992,66 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
+                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM')) 
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT'))
+                        ? false : true) },
                         children: [
+                          {
+                            name: i18n.t('static.dashboard.uploadUserManual'),
+                            url: '/userManual/uploadUserManual',
+                            icon: 'fa fa-upload',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL') ? false : true) }
+                          },
                           {
                             name: i18n.t('static.dashboard.country'),
                             url: '/country/listCountry',
                             icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_COUNTRY') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.currency'),
                             url: '/currency/listCurrency',
                             icon: 'fa fa-money',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_CURRENCY') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.dimension'),
                             url: '/dimension/listDimension',
                             icon: 'fa fa-map',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_DIMENSION') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.language'),
                             url: '/language/listLanguage',
                             icon: 'fa fa-language',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_LANGUAGE') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE') ? false : true) }
                           },
                           {
                             name: i18n.t('static.roleHead.role'),
                             url: '/role/listRole',
                             icon: 'fa fa-dot-circle-o',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_ROLE') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.realmheader'),
                             url: '/realm/listRealm',
                             icon: 'fa fa-th-large',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
                           },
                           // (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
                           {
                             name: i18n.t('static.userHead.user'),
                             url: '/user/listUser',
                             icon: 'fa fa-users',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_USER') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USER') ? false : true) }
                           },
                           , {
                             name: i18n.t('static.dashboard.unit'),
                             url: '/unit/listUnit',
                             icon: 'fa fa-th',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_UNIT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT') ? false : true) }
                           }
                           ,
                           // {
@@ -1061,13 +1084,19 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
+                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) 
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))
+                        ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.realmcountry'),
                             url: '/realmCountry/listRealmCountry',
                             icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_REALM_COUNTRY') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') ? false : true) }
                           },
 
                           {
@@ -1098,19 +1127,19 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.supplier'),
                             url: '/supplier/listSupplier',
                             icon: 'fa fa-user-circle-o',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLIER') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER') ? false : true) }
                           },
                           {
                             name: i18n.t('static.organisationHead.organisation'),
                             url: '/organisation/listOrganisation',
                             icon: 'fa fa-building',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ORGANIZATION') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
                             icon: 'fa fa-link',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') ? false : true) }
                           },
 
                           ////Product
@@ -1118,6 +1147,8 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.Productmenu'),
                             icon: 'fa fa-cubes',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboad.planningunitcountry'),
@@ -1140,13 +1171,13 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.product.productcategory'),
                                 url: '/productCategory/productCategoryTree',
                                 icon: 'fa fa-cubes',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATEGORY') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.planningUnitVolumeHead.planningUnitVolume'),
                                 url: '/planningUnitCapacity/listPlanningUnitcapacity',
                                 icon: 'fa fa-tasks',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANAGE_PLANNING_UNIT_CAPACITY') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY') ? false : true) }
                               },
 
                               {
@@ -1160,7 +1191,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.tracerCategoryHead.tracerCategory'),
                                 url: '/tracerCategory/listTracerCategory',
                                 icon: 'fa fa-th-large',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_TRACER_CATEGORY') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY') ? false : true) }
                               },
                             ]
                           },
@@ -1170,7 +1201,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.healtharea.healtharea'),
                             url: '/healthArea/listHealthArea',
                             icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_HEALTH_AREA') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
                           },
 
                           // {
@@ -1188,7 +1219,10 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.programmaster'),
                         // url: '/program',
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_MASTERS') ? false : true) },
+                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_MASTERS') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM')) 
+                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')) 
+                        || (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.setupprogram'),
@@ -1240,13 +1274,13 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
                             icon: 'fa fa-cloud-download',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
                             icon: 'fa fa-sign-in',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.downloadprogram'),
@@ -1430,25 +1464,26 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
                             url: '/consumptionDetails',
                             icon: 'fa fa-bar-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA') ? false : true) }
                           },
                           {
                             name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
                             url: '/shipment/shipmentDetails',
                             icon: 'fa fa-truck',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA') ? false : true) }
                           },
                           {
                             name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
                             url: '/inventory/addInventory',
                             icon: 'fa fa-cube',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.manualTagging'),
@@ -1476,7 +1511,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.supplyPlan'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.supplyPlan'),
@@ -1488,13 +1523,13 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.whatIf'),
                             url: '/report/whatIf',
                             icon: 'fa fa-calculator',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
 
                           },
                           // {
@@ -1715,7 +1750,13 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
+                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT')) 
+                        || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')) 
+                        || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_REGION')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
@@ -1735,7 +1776,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatusmain'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')) ? false : true) },
                             children: [
                               // {
                               //   name: i18n.t('static.dashboard.stockstatus'),
@@ -1811,7 +1852,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.shipmentReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -1823,20 +1864,20 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
                                 url: '/report/shipmentGlobalDemandView',
                                 icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.shipmentDetailReport'),
                                 url: '/report/shipmentSummery',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') ? false : true) }
                               },
 
                               {
                                 name: i18n.t('static.report.shipmentCostReport'),
                                 url: '/report/procurementAgentExport',
                                 icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.annualshipmentcost'),
@@ -1848,7 +1889,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.budgetHead.budget'),
                                 url: '/report/budgets',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.supplierLeadTimes'),
@@ -1865,13 +1906,13 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.inventoryReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_REGION')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_REGION')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.report.expiredInventory'),
                                 url: '/report/expiredInventory',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.costOfInventory'),
@@ -1890,13 +1931,13 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.report.stockAdjustment'),
                                 url: '/report/stockAdjustment',
                                 icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.warehouseCapacity'),
                                 url: '/report/warehouseCapacity',
                                 icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.regionHead.region'),
@@ -2052,15 +2093,15 @@ class DefaultLayout extends Component {
                     ]
 
                 }} {...this.props} />
-              </Online>
-              <Offline>
+              }
+              {checkOnline === 'Offline' &&  
                 <AppSidebarNav navConfig={{
                   items:
                     [
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) ? false : true) },
                         children: [
                           // {
                           //   name: i18n.t('static.dashboard.programs'),
@@ -2095,13 +2136,13 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
                             icon: 'fa fa-cloud-download',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
                             icon: 'fa fa-sign-in',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') ? false : true) }
                           },
                           {
                             name: i18n.t('static.program.deleteLocalProgram'),
@@ -2135,24 +2176,25 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
                         // attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
                             url: '/consumptionDetails',
                             icon: 'fa fa-bar-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA') ? false : true) }
                           },
                           {
                             name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
                             url: '/shipment/shipmentDetails',
                             icon: 'fa fa-truck',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA') ? false : true) }
                           },
                           {
                             name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
                             url: '/inventory/addInventory',
                             icon: 'fa fa-cube',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') ? false : true) }
                           },
 
 
@@ -2163,7 +2205,8 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.supplyPlan'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) ? false : true) },
+                        // attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.supplyPlan'),
@@ -2175,13 +2218,13 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.whatIf'),
                             url: '/report/whatIf',
                             icon: 'fa fa-calculator',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
 
                           },
 
@@ -2315,7 +2358,11 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
+                        // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
+                        || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
@@ -2340,7 +2387,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatusmain'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) ? false : true) },
                             children: [
                               // {
                               //   name: i18n.t('static.dashboard.stockstatus'),
@@ -2376,7 +2423,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.consumptionReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboard.consumption'),
@@ -2397,13 +2444,13 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.shipmentReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.report.shipmentDetailReport'),
                                 url: '/report/shipmentSummery',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') ? false : true) }
                               },
                               // {
                               //   name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
@@ -2415,7 +2462,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.report.shipmentCostReport'),
                                 url: '/report/procurementAgentExport',
                                 icon: 'fa fa-wpforms',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.annualshipmentcost'),
@@ -2427,7 +2474,7 @@ class DefaultLayout extends Component {
                                 name: i18n.t('static.budgetHead.budget'),
                                 url: '/report/budgets',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.dashboard.supplierLeadTimes'),
@@ -2443,38 +2490,38 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.inventoryReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT')) ? false : true) },
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.report.expiredInventory'),
                                 url: '/report/expiredInventory',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') ? false : true) }
                               },
 
                               {
                                 name: i18n.t('static.dashboard.costOfInventory'),
                                 url: '/report/costOfInventory',
                                 icon: 'fa fa-exchange',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') ? false : true) }
                               }, {
                                 name: i18n.t('static.dashboard.inventoryTurns'),
                                 url: '/report/inventoryTurns',
                                 icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') ? false : true) }
                               },
 
                               {
                                 name: i18n.t('static.report.stockAdjustment'),
                                 url: '/report/stockAdjustment',
                                 icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') ? false : true) }
                               },
                               {
                                 name: i18n.t('static.report.warehouseCapacity'),
                                 url: '/report/warehouseCapacity',
                                 icon: 'fa fa-line-chart',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') ? false : true) }
                               },
 
                             ]
@@ -2536,7 +2583,7 @@ class DefaultLayout extends Component {
 
                     ]
                 }} {...this.props} />
-              </Offline>
+              }
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />
@@ -2552,11 +2599,11 @@ class DefaultLayout extends Component {
                         key={idx}
                         path={route.path}
                         exact={route.exact}
-                        name={route.name!=undefined?(route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name):''}
+                        name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
                           AuthenticationService.authenticatedRoute(route.path) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name!=undefined?((route.name.includes("static.")?(route.entityname==''||route.entityname==undefined?i18n.t(route.name):i18n.t(route.name, { entityname: i18n.t(route.entityname) })):route.name)):'')} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '')} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )

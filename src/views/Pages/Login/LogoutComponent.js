@@ -4,6 +4,7 @@ import LogoutService from "../../../api/LogoutService";
 import axios from 'axios';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../../Constants.js'
+import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions.js';
 
 
 
@@ -19,9 +20,9 @@ class LogoutComponent extends Component {
     componentDidMount() {
         console.log("########### Logout component did mount start ####################")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+            let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken","sessionType"];
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+            if (isSiteOnline() && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                 // AuthenticationService.setupAxiosInterceptors();
                 console.log("########### Going to call Logout api####################")
                 LogoutService.logout()
@@ -38,7 +39,11 @@ class LogoutComponent extends Component {
                         error => {
                             console.log("logout component error");
                             keysToRemove.forEach(k => localStorage.removeItem(k));
+                            if(localStorage.getItem("sessionTimedOut")==1){
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                            }else{
                             this.props.history.push(`/login/static.logoutError`)
+                            }
                         }
                     );
             } else {
@@ -46,7 +51,12 @@ class LogoutComponent extends Component {
                 this.props.history.push(`/login/${this.props.match.params.message}`)
             }
         } else {
+            console.log("logout access denied error-------------");
+            if(localStorage.getItem("sessionTimedOut")==1){
+                this.props.history.push(`/login/static.message.sessionExpired`)
+            }else{
             this.props.history.push(`/login/static.accessDenied`)
+            }
         }
 
     }

@@ -71,6 +71,7 @@ class AddprogramPlanningUnit extends Component {
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -110,6 +111,7 @@ class AddprogramPlanningUnit extends Component {
         return mylist;
     }
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -438,11 +440,12 @@ class AddprogramPlanningUnit extends Component {
                                                             allowManualInsertColumn: false,
                                                             allowDeleteRow: true,
                                                             onchange: this.changed,
-                                                            oneditionend: this.onedit,
+                                                            // oneditionend: this.onedit,
                                                             copyCompatibility: true,
                                                             allowManualInsertRow: false,
                                                             parseFormulas: true,
                                                             onpaste: this.onPaste,
+                                                            oneditionend: this.oneditionend,
                                                             text: {
                                                                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -837,11 +840,34 @@ class AddprogramPlanningUnit extends Component {
         );
     }
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[2]));
+            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
+        } else if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
+        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        }
+
+    }
+
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`J${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, 0, true);
@@ -1556,7 +1582,8 @@ class AddprogramPlanningUnit extends Component {
 
                         <CardFooter>
                             <FormGroup>
-                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
+                                &nbsp;
                                 {this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                                 {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
@@ -1582,7 +1609,9 @@ class AddprogramPlanningUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/programProduct/addProgramProduct/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        // this.props.history.push(`/programProduct/addProgramProduct/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

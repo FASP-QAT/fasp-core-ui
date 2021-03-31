@@ -335,6 +335,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import i18n from '../../i18n';
 import { boolean } from 'yup';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 
 
@@ -403,7 +404,7 @@ export default class CountryListComponent extends Component {
 
 
     addNewCountry() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/country/addCountry`)
         } else {
             alert("You must be Online.")
@@ -411,7 +412,7 @@ export default class CountryListComponent extends Component {
 
     }
     editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
             console.log(country);
             this.props.history.push({
                 pathname: `/country/editCountry/${country.countryId}`,
@@ -613,7 +614,7 @@ export default class CountryListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
                 this.props.history.push({
                     pathname: `/country/editCountry/${this.el.getValueFromCoords(0, x)}`,
                 });
@@ -644,7 +645,7 @@ export default class CountryListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_COUNTRY') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

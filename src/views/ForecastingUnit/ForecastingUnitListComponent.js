@@ -529,6 +529,7 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -926,8 +927,14 @@ export default class ForecastingUnitListComponent extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log("product category list---", JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        productCategories: response.data
+                        productCategories: listArray
                     })
                 }).catch(
                     error => {
@@ -975,8 +982,14 @@ export default class ForecastingUnitListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data,
+                        realms: listArray,
                         realmId: response.data[0].realmId,
                         // loading: false
                     })
@@ -1053,8 +1066,14 @@ export default class ForecastingUnitListComponent extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        tracerCategories: response.data,
+                        tracerCategories: listArray,
                         // loading: false
                     })
                 } else {
@@ -1176,7 +1195,7 @@ export default class ForecastingUnitListComponent extends Component {
     }
 
     editForecastingUnit(forecastingUnit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
             this.props.history.push({
                 pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
                 // state: { forecastingUnit: forecastingUnit }
@@ -1188,7 +1207,7 @@ export default class ForecastingUnitListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
                     this.props.history.push({
                         pathname: `/forecastingUnit/editForecastingUnit/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -1200,7 +1219,7 @@ export default class ForecastingUnitListComponent extends Component {
 
     addNewForecastingUnit() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/forecastingUnit/addForecastingUnit`)
         } else {
             alert(i18n.t('static.common.online'))
@@ -1256,7 +1275,7 @@ export default class ForecastingUnitListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong> {i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

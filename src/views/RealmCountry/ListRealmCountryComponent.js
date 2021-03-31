@@ -542,7 +542,7 @@ class ListRealmCountryComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [0,150, 150, 100,100,100,100],
+            colWidths: [0, 150, 150, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -631,7 +631,7 @@ class ListRealmCountryComponent extends Component {
                             title: i18n.t('static.realmcountry.regionupdate'),
                             onclick: function () {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REGION')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
                                     this.props.history.push({
                                         pathname: `/realmCountry/realmCountryRegion/${this.el.getValueFromCoords(0, y)}`,
                                     })
@@ -677,7 +677,7 @@ class ListRealmCountryComponent extends Component {
     }
     RealmCountryRegion(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REGION')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
             console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
@@ -693,8 +693,14 @@ class ListRealmCountryComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: listArray, loading: false
                     })
                 } else {
                     this.setState({

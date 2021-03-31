@@ -730,23 +730,23 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validSupplierIdText')),
         heightQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         lengthQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         widthQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         weightQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         volumeQty: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d+(\.\d{1,6})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         unitsPerCase: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -888,8 +888,14 @@ export default class AddProcurementUnit extends Component {
         PlanningUnitService.getActivePlanningUnitList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        planningUnitList: response.data, loading: false
+                        planningUnitList: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -944,8 +950,14 @@ export default class AddProcurementUnit extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        unitList: response.data, loading: false
+                        unitList: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -1000,8 +1012,14 @@ export default class AddProcurementUnit extends Component {
         SupplierService.getSupplierListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        supplierList: response.data, loading: false
+                        supplierList: listArray, loading: false
                     })
                 } else {
                     this.setState({

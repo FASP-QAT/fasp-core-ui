@@ -22,7 +22,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
-import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { JEXCEL_DECIMAL_NO_REGEX_NEW, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 
@@ -790,6 +790,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.changed = this.changed.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -826,8 +827,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                     .then(response => {
                                         // console.log(response.data.data);
                                         if (response.status == 200) {
+                                            var listArray = response.data;
+                                            listArray.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
+                                            });
                                             this.setState({
-                                                planningUnitList: response.data
+                                                planningUnitList: listArray
                                             },
                                                 () => {
                                                     //jexcel start
@@ -915,6 +922,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             data[11] = papuList[j].procurementAgentPlanningUnitId;
                                                             data[12] = 0;
                                                             papuDataArr[count] = data;
+                                                            console.log("data---",papuList[j].volume)
                                                             count++;
 
 
@@ -1010,7 +1018,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'numeric',
                                                                 decimal: '.',
                                                                 textEditor: true,
-                                                                mask: '#,##.00',
+                                                                mask: '#,##.000000',
                                                                 disabledMaskOnEdition: true
 
                                                             },
@@ -1019,7 +1027,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                 type: 'numeric',
                                                                 textEditor: true,
                                                                 decimal: '.',
-                                                                mask: '#,##.00',
+                                                                mask: '#,##.000000',
                                                                 disabledMaskOnEdition: true
                                                             },
                                                             {
@@ -1048,10 +1056,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         allowManualInsertColumn: false,
                                                         allowDeleteRow: true,
                                                         onchange: this.changed,
-                                                        oneditionend: this.onedit,
+                                                        // oneditionend: this.onedit,
                                                         copyCompatibility: true,
                                                         parseFormulas: true,
                                                         onpaste: this.onPaste,
+                                                        oneditionend: this.oneditionend,
                                                         text: {
                                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1382,6 +1391,29 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
     }
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[3]));
+            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
+        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
+        }
+        elInstance.setValueFromCoords(12, y, 1, true);
+
+    }
 
     addRow = function () {
         var json = this.el.getJson(null, false);
@@ -1409,7 +1441,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`L${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
@@ -1432,6 +1464,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("value ---",this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         planningUnit: {
@@ -1730,7 +1763,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //volume
         if (x == 8) {
-            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
             var col = ("I").concat(parseInt(y) + 1);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
@@ -1753,7 +1786,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
         //weight
         if (x == 9) {
-            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
             var col = ("J").concat(parseInt(y) + 1);
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
@@ -1777,9 +1810,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }.bind(this);
     // -----end of changed function
 
-    onedit = function (instance, cell, x, y, value) {
-        this.el.setValueFromCoords(12, y, 1, true);
-    }.bind(this);
+    // onedit = function (instance, cell, x, y, value) {
+    //     console.log("hi anchal-------------------");
+    //     this.el.setValueFromCoords(12, y, 1, true);
+    // }.bind(this);
 
 
     checkValidation() {
@@ -1956,7 +1990,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //volume
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
@@ -1992,7 +2026,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //weight
                 var col = ("J").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");

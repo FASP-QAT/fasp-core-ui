@@ -350,7 +350,7 @@ class ListRoleComponent extends Component {
         this.props.history.push("/role/addRole");
     }
     editRole(role) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE')) {
             this.props.history.push({
                 pathname: `/role/editRole/${role.roleId}`,
                 // state: { role }
@@ -363,7 +363,7 @@ class ListRoleComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE')) {
                     this.props.history.push({
                         pathname: `/role/editRole/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
@@ -440,21 +440,7 @@ class ListRoleComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    selected = function (instance, cell, x, y, value) {
-
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
-                this.props.history.push({
-                    pathname: `/role/editRole/${this.el.getValueFromCoords(0, x)}`,
-                    // state: { role }
-                });
-            }
-        }
-    }.bind(this);
-
-
+    
 
     showRoleLabel(cell, row) {
         return cell.label_en;
@@ -483,7 +469,7 @@ class ListRoleComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_ROLE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>}
                                 {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a> */}
                             </div>
                         </div>

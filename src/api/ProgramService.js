@@ -169,5 +169,10 @@ class ProgramService {
         );
     }
 
+    getLatestVersionForProgram(programId) {
+        return axios.get(`${API_URL}/api/programData/getLatestVersionForProgram/${programId}`, {}
+        );
+    }
+
 }
 export default new ProgramService()

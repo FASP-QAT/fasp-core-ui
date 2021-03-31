@@ -8,7 +8,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL, polling } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -19,6 +19,8 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from 'react-detect-offline';
+import { Prompt } from 'react-router'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
@@ -104,6 +106,15 @@ export default class AddInventory extends Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     toggleLarge(method) {
@@ -144,8 +155,8 @@ export default class AddInventory extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -162,13 +173,13 @@ export default class AddInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -188,12 +199,11 @@ export default class AddInventory extends Component {
                 var programIdd = '';
                 if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
                     programIdd = this.props.match.params.programId;
-                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-                    programIdd = localStorage.getItem("sesProgramId");
                 } else if (proList.length == 1) {
                     programIdd = proList[0].value;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
                 }
-                console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -289,10 +299,7 @@ export default class AddInventory extends Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
-                            console.log("myResult", myResult);
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                            console.log('programId----->>>', programId)
-                            console.log(myResult);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -303,7 +310,6 @@ export default class AddInventory extends Component {
                                     proList.push(productJson)
                                 }
                             }
-                            console.log("proList---" + proList);
                             this.setState({
                                 planningUnitList: proList.sort(function (a, b) {
                                     a = a.label.toLowerCase();
@@ -328,7 +334,6 @@ export default class AddInventory extends Component {
                             } else if (proList.length == 1) {
                                 planningUnitIdProp = proList[0].value;
                             }
-                            console.log("planningUnitIdProp===>", planningUnitIdProp);
                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                 var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                 this.setState({
@@ -364,7 +369,6 @@ export default class AddInventory extends Component {
         if (cont == true) {
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            console.log("In form submit");
             this.setState({ loading: true, inventoryChangedFlag: 0 })
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
@@ -377,7 +381,6 @@ export default class AddInventory extends Component {
                     document.getElementById("addRowButtonId").style.display = "block";
                     var roleList = AuthenticationService.getLoggedInUserRole();
                     if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
-                        console.log("In if");
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }
@@ -409,7 +412,6 @@ export default class AddInventory extends Component {
                         var programJson = JSON.parse(programData);
                         var batchList = []
                         var batchInfoList = programJson.batchInfoList;
-                        console.log("Batch info list from program json", batchInfoList);
 
                         var batchList = [];
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
@@ -463,7 +465,6 @@ export default class AddInventory extends Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
         this.setState({
             [parameterName]: value
         })
@@ -499,6 +500,7 @@ export default class AddInventory extends Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('sessionType');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -511,11 +513,15 @@ export default class AddInventory extends Component {
         }
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Online>
+                    {checkOnline === 'Online' && this.state.inventoryDataType != null &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -526,7 +532,7 @@ export default class AddInventory extends Component {
                                 </div>
                             </div>
                         </div>
-                    </Online>
+                    }
                     <CardBody className="pb-lg-2 pt-lg-2" >
                         <Formik
                             render={
@@ -586,7 +592,7 @@ export default class AddInventory extends Component {
                                                                 name="inventoryDataType"
                                                                 id="inventoryDataType"
                                                                 bsSize="sm"
-                                                                options={[{ value: 1, label: i18n.t('static.inventory.inventory') }, { value: 2, label: i18n.t('static.inventoryType.adjustment') }]}
+                                                                options={[{ value: 2, label: i18n.t('static.inventoryType.adjustment') }, { value: 1, label: i18n.t('static.inventory.inventory') }]}
                                                                 value={this.state.inventoryDataType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
                                                             />
@@ -669,10 +675,14 @@ export default class AddInventory extends Component {
             cont = true;
         }
         if (cont == true) {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
-            console.log("Entity name", entityname)
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            this.setState({
+                inventoryChangedFlag: 0,
+                inventoryBatchInfoChangedFlag: 0
+            }, () => {
+                let id = AuthenticationService.displayDashboardBasedOnRole();
+                var entityname = this.state.inventoryType == 1 ? i18n.t("static.inventoryDetailHead.inventoryDetail") : i18n.t("static.inventory.adjustmentdetails");
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })
         }
     }
 
@@ -702,7 +712,6 @@ export default class AddInventory extends Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 }

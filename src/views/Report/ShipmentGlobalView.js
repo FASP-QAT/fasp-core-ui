@@ -395,10 +395,10 @@ class ShipmentGlobalView extends Component {
             table1Headers: [],
             viewby: 1,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true,
-            programLst:[]
+            programLst: []
 
 
         };
@@ -412,7 +412,7 @@ class ShipmentGlobalView extends Component {
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.getProductCategories = this.getProductCategories.bind(this)
-        this.filterProgram=this.filterProgram.bind(this);
+        this.filterProgram = this.filterProgram.bind(this);
     }
 
     makeText = m => {
@@ -647,7 +647,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 700 / displaylabel.length, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 550 / displaylabel.length, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 100 },
                 // 1: { cellWidth: 100 },
@@ -729,7 +729,7 @@ class ShipmentGlobalView extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
-            
+
             this.fetchData()
         })
 
@@ -754,8 +754,15 @@ class ShipmentGlobalView extends Component {
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         RealmCountryService.getRealmCountryForProgram(realmId)
             .then(response => {
+                var listArray = response.data.map(ele => ele.realmCountry);
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    countrys: response.data.map(ele => ele.realmCountry)
+                    // countrys: response.data.map(ele => ele.realmCountry)
+                    countrys: listArray
                 }, () => { this.fetchData(); })
             }).catch(
                 error => {
@@ -807,12 +814,12 @@ class ShipmentGlobalView extends Component {
 
         let productCategoryId = document.getElementById("productCategoryId").value;
         // AuthenticationService.setupAxiosInterceptors();
-       var lang=this.state.lang
+        var lang = this.state.lang
         if (productCategoryId != -1) {
             PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                  (response.data).sort(function (a, b) {
+                (response.data).sort(function (a, b) {
                     return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
-                  });
+                });
                 this.setState({
                     planningUnits: response.data,
                 }, () => {
@@ -932,8 +939,14 @@ class ShipmentGlobalView extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    programs: response.data, loading: false
+                    programs: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1065,8 +1078,14 @@ class ShipmentGlobalView extends Component {
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    procurementAgents: response.data, loading: false
+                    procurementAgents: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1099,8 +1118,14 @@ class ShipmentGlobalView extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 // console.log(JSON.stringify(response.data))
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    fundingSources: response.data, loading: false
+                    fundingSources: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1178,6 +1203,11 @@ class ShipmentGlobalView extends Component {
                 // console.log(response.data)
                 // var list = response.data.slice(1);
                 var list = response.data;
+                list.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
                     productCategories: list, loading: false
                 })
@@ -1300,7 +1330,7 @@ class ShipmentGlobalView extends Component {
 
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let fundingSourceProcurementAgentIds = [];
         if (viewby == 1) {
             fundingSourceProcurementAgentIds = fundingSourceIds;
@@ -1339,7 +1369,7 @@ class ShipmentGlobalView extends Component {
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
                     console.log("RESP------", response.data);
-                    if (response.data.shipmentList.length != 0) {
+                    if (response.data.countrySplitList.length != 0) {
                         var table1Headers = [];
                         var lab = [];
                         var val = [];
@@ -1674,6 +1704,34 @@ class ShipmentGlobalView extends Component {
         })
     }
 
+    dateFormatterLanguage = value => {
+        if (moment(value).format('MM') === '01') {
+            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '02') {
+            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '03') {
+            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '04') {
+            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '05') {
+            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '06') {
+            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '07') {
+            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '08') {
+            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '09') {
+            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '10') {
+            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '11') {
+            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+        } else {
+            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+        }
+    }
+
     render() {
         const { planningUnits } = this.state;
         let planningUnitList = [];
@@ -1771,18 +1829,19 @@ class ShipmentGlobalView extends Component {
         }
 
         // let displaylabel = Object.keys(this.state.dateSplitList[0].amount);
-        let displaylabel = [];
-        if (this.state.viewby == 1) {
-            displaylabel = this.state.fundingSourceValues.map(ele => ele.label)
-        }
-        else {
-            displaylabel = this.state.procurementAgentValues.map(ele => ele.label)
-        }//this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
+        // let displaylabel = [];
+        // if (this.state.viewby == 1) {
+        //     displaylabel = this.state.fundingSourceValues.map(ele => ele.label)
+        // }
+        // else {
+        //     displaylabel = this.state.procurementAgentValues.map(ele => ele.label)
+        // }
+        //this.state.dateSplitList.filter((i, index) => (index < 1 && i)).map(ele => (Object.keys(ele.amount)));
         // if (displaylabel.length > 0) {
         //     displaylabel = displaylabel[0];
         // }
         // displaylabel = displaylabel[0];
-
+        let displaylabel = (this.state.dateSplitList.length > 0 ? Object.keys(this.state.dateSplitList[0].amount) : []);
         console.log("displaylabel------->>>>", displaylabel);
         let dateSplitList = this.state.dateSplitList;
         let displayObject = [];
@@ -1819,7 +1878,8 @@ class ShipmentGlobalView extends Component {
 
 
 
-            labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
+            // labels: [...new Set(this.state.dateSplitList.map(ele => (moment(ele.transDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
+            labels: [...new Set(this.state.dateSplitList.map(ele => (this.dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
 
         }

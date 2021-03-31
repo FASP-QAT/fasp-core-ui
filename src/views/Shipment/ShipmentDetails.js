@@ -6,7 +6,7 @@ import {
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, API_URL, polling } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -19,6 +19,8 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from "react-detect-offline";
+import { Prompt } from 'react-router'
+import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -46,6 +48,7 @@ export default class ShipmentDetails extends React.Component {
             shipmentChangedFlag: 0,
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
+            shipmentTypeIds: [1],
             rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
@@ -104,14 +107,14 @@ export default class ShipmentDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            console.log("In update", value);
+            var shipmentTypeIds = value.map(ele => ele.value)
             this.setState({
                 shipmentType: value,
-                shipmentChangedFlag: 0
+                shipmentChangedFlag: 0,
+                shipmentTypeIds: shipmentTypeIds
             }, () => {
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
                 if (document.getElementById("addRowButtonId") != null) {
-                    console.log("In if");
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
                 if (this.state.planningUnit != 0 && (value != "" && value != undefined ? value.value : 0) != 0) {
@@ -158,6 +161,15 @@ export default class ShipmentDetails extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     componentDidMount = function () {
@@ -173,8 +185,8 @@ export default class ShipmentDetails extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -191,13 +203,13 @@ export default class ShipmentDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            label: programJson1.programCode + "~v" + myResult[i].version,
+                            label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -218,12 +230,11 @@ export default class ShipmentDetails extends React.Component {
                 var programIdd = '';
                 if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
                     programIdd = this.props.match.params.programId;
-                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-                    programIdd = localStorage.getItem("sesProgramId");
                 } else if (proList.length == 1) {
                     programIdd = proList[0].value;
+                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                    programIdd = localStorage.getItem("sesProgramId");
                 }
-                console.log("programIdd", programIdd);
                 if (programIdd != '' && programIdd != undefined) {
                     var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
                     this.setState({
@@ -293,10 +304,7 @@ export default class ShipmentDetails extends React.Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
-                        console.log("myResult", myResult);
                         var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        console.log('programId----->>>', programId)
-                        console.log(myResult);
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -307,7 +315,6 @@ export default class ShipmentDetails extends React.Component {
                                 proList.push(productJson)
                             }
                         }
-                        console.log("proList---" + proList);
                         this.setState({
                             planningUnitList: proList.sort(function (a, b) {
                                 a = a.label.toLowerCase();
@@ -326,7 +333,6 @@ export default class ShipmentDetails extends React.Component {
                         } else if (proList.length == 1) {
                             planningUnitIdProp = proList[0].value;
                         }
-                        console.log("planningUnitIdProp===>", planningUnitIdProp);
                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                             var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                             this.setState({
@@ -369,19 +375,16 @@ export default class ShipmentDetails extends React.Component {
             if (planningUnitId != 0) {
                 localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
-                console.log("(this.state.shipmentType).value", (this.state.shipmentType).value);
                 if (document.getElementById("addRowButtonId") != null) {
                     console.log("In if");
-                    if ((this.state.shipmentType).value == 1) {
+                    if ((this.state.shipmentTypeIds).includes(1)) {
                         console.log("in if 1")
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
-                        console.log("RoleList------------>", roleList);
                         if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {
-                        console.log("in else")
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }
@@ -412,20 +415,18 @@ export default class ShipmentDetails extends React.Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
-                        console.log("this.state.planningUnitListAll", this.state.planningUnitListAll);
                         var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
                         var shipmentListUnFiltered = programJson.shipmentList;
                         this.setState({
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
-                        if ((this.state.shipmentType).value == 1) {
+                        if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
-                        } else {
+                        } else if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(2)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true");
                         }
                         shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
-                        console.log("Shipment list", shipmentList);
                         this.setState({
                             shelfLife: programPlanningUnit.shelfLife,
                             catalogPrice: programPlanningUnit.catalogPrice,
@@ -460,8 +461,15 @@ export default class ShipmentDetails extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            let id = AuthenticationService.displayDashboardBasedOnRole();
-            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            this.setState({
+                shipmentChangedFlag:0,
+                shipmentBatchInfoChangedFlag:0,
+                shipmentQtyChangedFlag:0,
+                shipmentDatesChangedFlag:0
+            },()=>{
+                let id = AuthenticationService.displayDashboardBasedOnRole();
+                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+            })            
         }
     }
 
@@ -521,7 +529,6 @@ export default class ShipmentDetails extends React.Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
         this.setState({
             [parameterName]: value
         })
@@ -529,6 +536,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     render() {
+        const checkOnline = localStorage.getItem('sessionType');
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -541,11 +549,15 @@ export default class ShipmentDetails extends React.Component {
         }
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Online>
+                {checkOnline === 'Online' && 
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -556,7 +568,7 @@ export default class ShipmentDetails extends React.Component {
                                 </div>
                             </div>
                         </div>
-                    </Online>
+    }
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
@@ -616,6 +628,7 @@ export default class ShipmentDetails extends React.Component {
                                                                 name="shipmentType"
                                                                 id="shipmentType"
                                                                 bsSize="sm"
+                                                                multi
                                                                 options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
                                                                 value={this.state.shipmentType}
                                                                 onChange={(e) => { this.updateDataType(e); }}
@@ -712,7 +725,6 @@ export default class ShipmentDetails extends React.Component {
     }
 
     _handleClickRangeBox(e) {
-        console.log("Thuis.refs", this);
         this.pickRange.current.show()
     }
 }

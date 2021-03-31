@@ -850,8 +850,14 @@ export default class UpdateCountryComponent extends Component {
 
             CurrencyService.getCurrencyListActive().then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        currencyList: response.data, loading: false
+                        currencyList: listArray, loading: false
                     })
                 } else {
                     this.setState({

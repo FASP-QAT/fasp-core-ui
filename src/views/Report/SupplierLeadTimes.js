@@ -33,6 +33,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -69,7 +70,8 @@ class SupplierLeadTimes extends Component {
             procurementAgenttValues: [],
             procurementAgentLabels: [],
             outPutList: [],
-            loading: true
+            loading: true,
+            programId: ''
         };
         this.filterData = this.filterData.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
@@ -84,6 +86,7 @@ class SupplierLeadTimes extends Component {
         this.handleProcurementAgentChange = this.handleProcurementAgentChange.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.setprogramId = this.setprogramId.bind(this);
     }
     buildJexcel() {
 
@@ -581,7 +584,7 @@ class SupplierLeadTimes extends Component {
 
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -705,13 +708,28 @@ class SupplierLeadTimes extends Component {
                     }
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.getPlanningUnit();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -723,7 +741,7 @@ class SupplierLeadTimes extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -801,10 +819,12 @@ class SupplierLeadTimes extends Component {
 
     getPlanningUnit = () => {
 
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         // alert(programId);
         // let versionId = document.getElementById("versionId").value;
         if (programId > 0) {
+            localStorage.setItem("sesProgramIdReport", programId);
             this.setState({
                 planningUnits: [],
                 planningUnitValues: [],
@@ -813,7 +833,7 @@ class SupplierLeadTimes extends Component {
 
             }, () => {
                 // if (versionId.includes('Local')) {
-                if (!navigator.onLine) {
+                if (!isSiteOnline()) {
                     const lan = 'en';
                     var db1;
                     var storeOS;
@@ -835,7 +855,7 @@ class SupplierLeadTimes extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -861,9 +881,14 @@ class SupplierLeadTimes extends Component {
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         console.log('**' + JSON.stringify(response.data));
-
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data,
+                            planningUnits: listArray,
                             message: ''
                         }, () => {
                             this.fetchData();
@@ -949,7 +974,7 @@ class SupplierLeadTimes extends Component {
     }
 
     getProcurementAgent = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
@@ -1099,7 +1124,7 @@ class SupplierLeadTimes extends Component {
 
 
         if (programId > 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgenttValues.length > 0) {
-            if (navigator.onLine) {
+            if (isSiteOnline()) {
                 this.setState({ loading: true })
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),
@@ -1501,6 +1526,15 @@ class SupplierLeadTimes extends Component {
         this.getProcurementAgent();
     }
 
+    setprogramId(event) {
+        this.setState({
+            programId: event.target.value
+        }, () => {
+            this.getPlanningUnit();
+        })
+
+    }
+
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     onRadioBtnClick(radioSelected) {
@@ -1751,7 +1785,9 @@ class SupplierLeadTimes extends Component {
                                                 id="programId"
                                                 bsSize="sm"
                                                 // onChange={this.filterVersion}
-                                                onChange={(e) => { this.getPlanningUnit(); }}
+                                                // onChange={(e) => { this.getPlanningUnit(); }}
+                                                onChange={(e) => { this.setprogramId(e); }}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs.length > 0

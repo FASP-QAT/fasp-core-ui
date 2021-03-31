@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { Online } from "react-detect-offline";
 import jwt_decode from 'jwt-decode'
-import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME, MONTHS_IN_PAST_FOR_SUPPLY_PLAN } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import i18n from '../../i18n';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 let myDt;
 class AuthenticationService {
 
@@ -80,6 +81,27 @@ class AuthenticationService {
         }
     }
 
+    getLoggedInUserRoleIdArr() {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            let roleList = [];
+            for (let i = 0; i < decryptedUser.roleList.length; i++) {
+                console.log("decryptedUser.roleList[i]", (decryptedUser.roleList[i]).roleId);
+                roleList.push((decryptedUser.roleList[i]).roleId);
+                // if (role != null && role != "") {
+                //     if (i > 0) {
+                //         roles += "," + role.label.label_en;
+                //     } else {
+                //         roles += role.label.label_en;
+                //     }
+                // }
+            }
+            // console.log("decryptedUser.roles---" + decryptedUser.roleList);
+            return roleList;
+        }
+    }
+
     displayDashboardBasedOnRole() {
         console.log("M sync role based dashboard 1");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
@@ -126,10 +148,18 @@ class AuthenticationService {
     }
 
     checkTypeOfSession() {
+        let sessionType = localStorage.getItem('sessionType');
         let typeOfSession = localStorage.getItem('typeOfSession');
-        if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
+        let checkSite = isSiteOnline();
+        if (checkSite && sessionType === 'Offline' && typeOfSession === 'Online') {
+            localStorage.setItem("sessionType", 'Online')
+        } else if (!checkSite && sessionType === 'Online') {
+            localStorage.setItem("sessionType", 'Offline')
+        }
+        if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite)) {
             return true;
         } else {
+            console.log("offline to online false");
             return false;
 
 
@@ -440,11 +470,16 @@ class AuthenticationService {
     authenticatedRoute(route) {
         console.log("route---" + route);
 
-
+        localStorage.setItem("isOfflinePage", 0);
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId","/program/importProgram","/program/exportProgram","/program/deleteLocalProgram","/supplyPlan","/supplyPlanFormulas","/supplyPlan/:programId/:versionId/:planningUnitId","/report/whatIf","/report/stockStatus","/report/problemList","/report/productCatalog","/report/stockStatusOverTime","/report/stockStatusMatrix","/report/stockStatusAcrossPlanningUnits","/report/consumption","/report/forecastOverTheTime","/report/shipmentSummery","/report/procurementAgentExport","/report/annualShipmentCost","/report/budgets","/report/supplierLeadTimes","/report/expiredInventory","/report/costOfInventory","/report/inventoryTurns","/report/stockAdjustment","/report/warehouseCapacity"];
+        if (urlarr.includes(route)) {
+            localStorage.setItem("isOfflinePage", 1);
+        }
+        console.log("offline 1---------------")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             console.log("cur user available");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (navigator.onLine && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+            if (isSiteOnline() && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
                 return true;
             }
@@ -454,120 +489,120 @@ class AuthenticationService {
             // console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
             switch (route) {
                 case "/user/addUser":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
+                    if (bfunction.includes("ROLE_BF_ADD_USER")) {
                         return true;
                     }
                     break;
                 case "/user/editUser/:userId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_USER")) {
                         return true;
                     }
                     break;
                 case "/user/accessControl/:userId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
+                    if (bfunction.includes("ROLE_BF_MAP_ACCESS_CONTROL")) {
                         return true;
                     }
                     break;
                 case "/user/listUser":
                 case "/user/listUser/:message":
                 case "/user/listUser/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_USER")) {
+                    if (bfunction.includes("ROLE_BF_LIST_USER")) {
                         return true;
                     }
                     break;
                 case "/role/addRole":
-                    if (bfunction.includes("ROLE_BF_MANAGE_ROLE")) {
+                    if (bfunction.includes("ROLE_BF_ADD_ROLE")) {
                         return true;
                     }
                     break;
                 case "/role/editRole/:roleId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_ROLE")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_ROLE")) {
                         return true;
                     }
                     break;
                 case "/role/listRole":
                 case "/role/listRole/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_ROLE")) {
+                    if (bfunction.includes("ROLE_BF_LIST_ROLE")) {
                         return true;
                     }
                     break;
                 case "/language/addLanguage":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_ADD_LANGUAGE")) {
                         return true;
                     }
                     break;
                 case "/language/editLanguage/:languageId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_LANGUAGE")) {
                         return true;
                     }
                     break;
                 case "/language/listLanguage":
                 case "/language/listLanguage/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_LANGUAGE")) {
+                    if (bfunction.includes("ROLE_BF_LIST_LANGUAGE")) {
                         return true;
                     }
                     break;
                 case "/country/addCountry":
-                    if (bfunction.includes("ROLE_BF_MANAGE_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_ADD_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/country/editCountry/:countryId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/country/listCountry":
                 case "/country/listCountry/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/currency/addCurrency":
-                    if (bfunction.includes("ROLE_BF_MANAGE_CURRENCY")) {
+                    if (bfunction.includes("ROLE_BF_ADD_CURRENCY")) {
                         return true;
                     }
                     break;
                 case "/currency/editCurrency/:currencyId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_CURRENCY")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_CURRENCY")) {
                         return true;
                     }
                     break;
                 case "/currency/listCurrency":
                 case "/currency/listCurrency/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_CURRENCY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_CURRENCY")) {
                         return true;
                     }
                     break;
                 case "/diamension/AddDiamension":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
+                    if (bfunction.includes("ROLE_BF_ADD_DIMENSION")) {
                         return true;
                     }
                     break;
                 case "/diamension/editDiamension/:dimensionId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_DIMENSION")) {
                         return true;
                     }
                     break;
                 case "/dimension/listDimension":
                 case "/dimension/listDimension/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DIMENSION")) {
+                    if (bfunction.includes("ROLE_BF_LIST_DIMENSION")) {
                         return true;
                     }
                     break;
                 case "/unit/addUnit":
-                    if (bfunction.includes("ROLE_BF_MANAGE_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_ADD_UNIT")) {
                         return true;
                     }
                     break;
                 case "/unit/editUnit/:unitId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_UNIT")) {
                         return true;
                     }
                     break;
                 case "/unit/listUnit":
                 case "/unit/listUnit/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_LIST_UNIT")) {
                         return true;
                     }
                     break;
@@ -583,14 +618,14 @@ class AuthenticationService {
                     break;
                 case "/realm/listRealm":
                 case "/realm/listRealm/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_REALM")) {
                         return true;
                     }
                     break;
                 case "/realmCountry/listRealmCountry":
                 case "/realmCountry/listRealmCountry/:message":
                 case "/realmCountry/listRealmCountry/:color/:message":
-                    if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                         return true;
                     }
                     break;
@@ -601,12 +636,12 @@ class AuthenticationService {
                     }
                     break;
                 case "/dataSourceType/addDataSourceType":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DATA_SOURCE_TYPE")) {
+                    if (bfunction.includes("ROLE_BF_ADD_DATA_SOURCE_TYPE")) {
                         return true;
                     }
                     break;
                 case "/dataSourceType/editDataSourceType/:dataSourceTypeId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DATA_SOURCE_TYPE")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_DATA_SOURCE_TYPE")) {
                         return true;
                     }
                     break;
@@ -617,12 +652,12 @@ class AuthenticationService {
                     }
                     break;
                 case "/dataSource/addDataSource":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DATA_SOURCE")) {
+                    if (bfunction.includes("ROLE_BF_ADD_DATA_SOURCE")) {
                         return true;
                     }
                     break;
                 case "/dataSource/editDataSource/:dataSourceId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_DATA_SOURCE")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_DATA_SOURCE")) {
                         return true;
                     }
                     break;
@@ -633,12 +668,12 @@ class AuthenticationService {
                     }
                     break;
                 case "/fundingSource/addFundingSource":
-                    if (bfunction.includes("ROLE_BF_MANAGE_FUNDING_SOURCE")) {
+                    if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
                         return true;
                     }
                     break;
                 case "/fundingSource/editFundingSource/:fundingSourceId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_FUNDING_SOURCE")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
                         return true;
                     }
                     break;
@@ -649,29 +684,29 @@ class AuthenticationService {
                     }
                     break;
                 case "/procurementAgent/addProcurementAgent":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_AGENT")) {
+                    if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_AGENT")) {
                         return true;
                     }
                     break;
                 case "/procurementAgent/editProcurementAgent/:procurementAgentId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_AGENT")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_AGENT")) {
                         return true;
                     }
                     break;
                 case "/procurementAgent/listProcurementAgent":
                 case "/procurementAgent/listProcurementAgent/:message":
                 case "/procurementAgent/listProcurementAgent/:color/:message":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT")) {
+                    if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
                         return true;
                     }
                     break;
                 case "/budget/addBudget":
-                    if (bfunction.includes("ROLE_BF_MANAGE_BUDGET")) {
+                    if (bfunction.includes("ROLE_BF_ADD_BUDGET")) {
                         return true;
                     }
                     break;
                 case "/budget/editBudget/:budgetId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_BUDGET")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_BUDGET")) {
                         return true;
                     }
                     break;
@@ -682,18 +717,18 @@ class AuthenticationService {
                     }
                     break;
                 case "/supplier/addSupplier":
-                    if (bfunction.includes("ROLE_BF_MANAGE_SUPPLIER")) {
+                    if (bfunction.includes("ROLE_BF_ADD_SUPPLIER")) {
                         return true;
                     }
                     break;
                 case "/supplier/editSupplier/:supplierId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_SUPPLIER")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_SUPPLIER")) {
                         return true;
                     }
                     break;
                 case "/supplier/listSupplier":
                 case "/supplier/listSupplier/:color/:message":
-                    if (bfunction.includes("ROLE_BF_SUPPLIER")) {
+                    if (bfunction.includes("ROLE_BF_LIST_SUPPLIER")) {
                         return true;
                     }
                     break;
@@ -704,34 +739,34 @@ class AuthenticationService {
                     }
                     break;
                 case "/healthArea/addHealthArea":
-                    if (bfunction.includes("ROLE_BF_MANAGE_HEALTH_AREA")) {
+                    if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
                         return true;
                     }
                     break;
                 case "/healthArea/editHealthArea/:healthAreaId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_HEALTH_AREA")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
                         return true;
                     }
                     break;
                 case "/healthArea/listHealthArea":
                 case "/healthArea/listHealthArea/:color/:message":
-                    if (bfunction.includes("ROLE_BF_HEALTH_AREA")) {
+                    if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
                         return true;
                     }
                     break;
                 case "/organisation/addOrganisation":
-                    if (bfunction.includes("ROLE_BF_MANAGE_ORGANIZATION")) {
+                    if (bfunction.includes("ROLE_BF_ADD_ORGANIZATION")) {
                         return true;
                     }
                     break;
                 case "/organisation/editOrganisation/:organisationId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_ORGANIZATION")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_ORGANIZATION")) {
                         return true;
                     }
                     break;
                 case "/organisation/listOrganisation":
                 case "/organisation/listOrganisation/:color/:message":
-                    if (bfunction.includes("ROLE_BF_ORGANIZATION")) {
+                    if (bfunction.includes("ROLE_BF_LIST_ORGANIZATION")) {
                         return true;
                     }
                     break;
@@ -753,76 +788,80 @@ class AuthenticationService {
                     }
                     break;
                 case "/tracerCategory/addTracerCategory":
-                    if (bfunction.includes("ROLE_BF_MANAGE_TRACER_CATEGORY")) {
+                    if (bfunction.includes("ROLE_BF_ADD_TRACER_CATEGORY")) {
                         return true;
                     }
                     break;
                 case "/tracerCategory/editTracerCategory/:tracerCategoryId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_TRACER_CATEGORY")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_TRACER_CATEGORY")) {
                         return true;
                     }
                     break;
                 case "/tracerCategory/listTracerCategory":
                 case "/tracerCategory/listTracerCategory/:message":
                 case "/tracerCategory/listTracerCategory/:color/:message":
-                    if (bfunction.includes("ROLE_BF_TRACER_CATEGORY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_TRACER_CATEGORY")) {
                         return true;
                     }
                     break;
                 case "/productCategory/productCategoryTree/:color/:message":
                 case "/productCategory/productCategoryTree":
-                    if (bfunction.includes("ROLE_BF_PRODUCT_CATEGORY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_PRODUCT_CATEGORY")) {
                         return true;
                     }
                     break;
                 case "/forecastingUnit/addForecastingUnit":
-                    if (bfunction.includes("ROLE_BF_MANAGE_FORECASTING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_ADD_FORECASTING_UNIT")) {
                         return true;
                     }
                     break;
                 case "/forecastingUnit/editForecastingUnit/:forecastingUnitId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_FORECASTING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_FORECASTING_UNIT")) {
                         return true;
                     }
                     break;
                 case "/forecastingUnit/listForecastingUnit":
                 case "/forecastingUnit/listForecastingUnit/:message":
                 case "/forecastingUnit/listForecastingUnit/:color/:message":
-                    console.log("result---" + bfunction.includes("ROLE_BF_MANAGE_FORECASTING_UNIT"));
+                    console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
                     if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
                         return true;
                     }
                     break;
                 case "/planningUnit/addPlanningUnit":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PLANNING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_ADD_PLANNING_UNIT")) {
                         return true;
                     }
                     break;
                 case "/planningUnit/editPlanningUnit/:planningUnitId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PLANNING_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_PLANNING_UNIT")) {
                         return true;
                     }
                     break;
                 case "/planningUnit/listPlanningUnit":
                 case "/planningUnit/listPlanningUnit/:message":
                 case "/planningUnit/listPlanningUnit/:color/:message":
-                case "/planningUnitCapacity/planningUnitCapacity/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT")) {
                         return true;
                     }
                     break;
+                case "/planningUnitCapacity/planningUnitCapacity/:planningUnitId":
+                    if (bfunction.includes("ROLE_BF_MAP_PLANNING_UNIT_CAPACITY")) {
+                        return true;
+                    }
+                    break;
                 case "/planningUnitCapacity/listPlanningUnitCapacity":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PLANNING_UNIT_CAPACITY")) {
+                    if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_CAPACITY")) {
                         return true;
                     }
                     break;
                 case "/procurementUnit/addProcurementUnit":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_UNIT")) {
                         return true;
                     }
                     break;
                 case "/procurementUnit/editProcurementUnit/:procurementUnitId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_UNIT")) {
+                    if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_UNIT")) {
                         return true;
                     }
                     break;
@@ -844,18 +883,22 @@ class AuthenticationService {
                     }
                     break;
                 case "/realmCountry/realmCountry/:realmId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_REALM_COUNTRY")) {
+                    if (bfunction.includes("ROLE_BF_MAP_REALM_COUNTRY")) {
                         return true;
                     }
                     break;
                 case "/consumptionDetails":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
+                    if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 2---------------")
                         return true;
                     }
                     break;
                 case "/inventory/addInventory":
                 case "/inventory/addInventory/:programId/:versionId/:planningUnitId":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
+                    if (bfunction.includes("ROLE_BF_INVENTORY_DATA")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 3---------------")
                         return true;
                     }
                     break;
@@ -872,7 +915,9 @@ class AuthenticationService {
                 case "/shipment/shipmentDetails":
                 case "/shipment/shipmentDetails/:message":
                 case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_DATA")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 4---------------")
                         return true;
                     }
                     break;
@@ -882,31 +927,37 @@ class AuthenticationService {
                     }
                     break;
                 case "/procurementAgent/addProcurementAgentProcurementUnit/:procurementAgentId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_AGENT")) {
+                    if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_UNIT")) {
                         return true;
                     }
                     break;
                 case "/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_PROCUREMENT_AGENT")) {
+                    if (bfunction.includes("ROLE_BF_MAP_PLANNING_UNIT")) {
                         return true;
                     }
                     break;
                 // case "/programProduct/addProgramProduct/:programId":
                 case "/programProduct/addProgramProduct":
-                    if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
+                    if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
                         return true;
                     }
                     break;
                 case "/realmCountry/realmCountryRegion/:realmCountryId":
-                    if (bfunction.includes("ROLE_BF_MANAGE_REGION")) {
+                    if (bfunction.includes("ROLE_BF_MAP_REGION")) {
                         return true;
                     }
                     break;
                 case "/supplyPlan":
                 case "/supplyPlanFormulas":
-                case "/report/whatIf":
                 case "/supplyPlan/:programId/:versionId/:planningUnitId":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
+                        localStorage.setItem("isOfflinePage", 1);
+                        console.log("offline 5---------------")
+                        return true;
+                    }
+                    break;
+                case "/report/whatIf":
+                    if (bfunction.includes("ROLE_BF_SCENARIO_PLANNING")) {
                         return true;
                     }
                     break;
@@ -946,7 +997,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/stockStatus":
-                    if (bfunction.includes("ROLE_BF_STOCK_STATUS_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
                         return true;
                     }
                     break;
@@ -984,7 +1035,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/procurementAgentExport":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_COST_DETAILS_REPORT")) {
                         return true;
                     }
                     break;
@@ -994,22 +1045,22 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/shipmentGlobalDemandView":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_OVERVIEW_REPORT")) {
                         return true;
                     }
                     break;
-                case "/report/aggregateShipmentByProduct":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
-                        return true;
-                    }
-                    break;
+                // case "/report/aggregateShipmentByProduct":
+                //     if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                //         return true;
+                //     }
+                //     break;
                 case "/report/shipmentGlobalView":
                     if (bfunction.includes("ROLE_BF_GLOBAL_DEMAND_REPORT")) {
                         return true;
                     }
                     break;
                 case "/report/warehouseCapacity":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_WAREHOUSE_CAPACITY_REPORT")) {
                         return true;
                     }
                     break;
@@ -1019,7 +1070,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/stockAdjustment":
-                    if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_STOCK_ADJUSTMENT_REPORT")) {
                         return true;
                     }
                     break;
@@ -1054,12 +1105,12 @@ class AuthenticationService {
                     }
                     break;
                 case "/program/importProgram":
-                    if (bfunction.includes("ROLE_BF_IMPORT_EXPORT_PROGARM")) {
+                    if (bfunction.includes("ROLE_BF_IMPORT_PROGARM")) {
                         return true;
                     }
                     break;
                 case "/program/exportProgram":
-                    if (bfunction.includes("ROLE_BF_IMPORT_EXPORT_PROGARM")) {
+                    if (bfunction.includes("ROLE_BF_EXPORT_PROGARM")) {
                         return true;
                     }
                     break;
@@ -1074,7 +1125,7 @@ class AuthenticationService {
                     }
                     break;
                 case "/report/budgets":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_BUDGET_REPORT")) {
                         return true;
                     }
                     break;
@@ -1087,12 +1138,12 @@ class AuthenticationService {
                     break;
                 case "/report/shipmentSummery":
                 case "/report/shipmentSummery/:message":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_SHIPMENT_DETAILS_REPORT")) {
                         return true;
                     }
                     break;
                 case "/report/expiredInventory":
-                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_REPORT")) {
+                    if (bfunction.includes("ROLE_BF_EXPIRIES_REPORT")) {
                         return true;
                     }
                     break;
@@ -1102,12 +1153,12 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/ProgramDashboard":
-                case "/RealmDashboard":
-                    if (bfunction.includes("ROLE_BF_PROGRAM_DASHBOARD")) {
-                        return true;
-                    }
-                    break;
+                // case "/ProgramDashboard":
+                // case "/RealmDashboard":
+                //     if (bfunction.includes("ROLE_BF_PROGRAM_DASHBOARD")) {
+                //         return true;
+                //     }
+                //     break;
                 case "/translations/labelTranslations":
                     if (bfunction.includes("ROLE_BF_LABEL_TRANSLATIONS")) {
                         return true;
@@ -1146,6 +1197,7 @@ class AuthenticationService {
                     break;
                 case "/report/problemList/:programId/:calculate/:color/:message":
                 case "/report/problemList/:color/:message":
+                case "/report/problemList/1/:programId/:calculate":
                     if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                         return true;
                     }
@@ -1157,6 +1209,11 @@ class AuthenticationService {
                     break;
                 case "/quantimed/quantimedImport":
                     if (bfunction.includes("ROLE_BF_QUANTIMED_IMPORT")) {
+                        return true;
+                    }
+                    break;
+                case "/userManual/uploadUserManual":
+                    if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
                         return true;
                     }
                     break;
@@ -1198,7 +1255,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (this.checkTypeOfSession()) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                         // if (this.checkLastActionTaken()) {
                         //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -1232,18 +1289,25 @@ class AuthenticationService {
                 //     }
                 // }
             } else {
-                return "/logout/static.message.sessionChange";
+                localStorage.setItem("sessionChanged", 1)
+                return "/login/static.message.sessionChange";
             }
         } else {
-            return "/accessDenied";
+            console.log("offline to online ");
+            if (localStorage.getItem("sessionChanged") == 1) {
+                return "/login/static.message.sessionChange";
+            } else {
+                return "/accessDenied";
+            }
         }
     }
     clearUserDetails() {
+        console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType","sesBudPro","sesBudFs","sesBudStatus"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus","sesProblemType","sesProblemCategory","sesReviewed"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType","sesBudPro","sesBudFs","sesBudStatus"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1255,6 +1319,11 @@ class AuthenticationService {
             return "en";
         }
     }
+
+    setLanguageChangeFlag() {
+        localStorage.setItem('lastLoggedInUsersLanguageChanged', false);
+    }
+
     setRecordCount(count) {
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
@@ -1268,6 +1337,14 @@ class AuthenticationService {
         localStorage.setItem('sesProblemType', "-1");
         localStorage.setItem('sesProblemCategory', "-1");
         localStorage.setItem('sesReviewed', "-1");
+        localStorage.setItem('sesProgramIdReport', "");
+        localStorage.setItem('sesVersionIdReport', "");
+        localStorage.setItem('sesBudPro', "");
+        localStorage.setItem('sesBudFs', "");
+        localStorage.setItem('sesBudStatus', "");
+        var currentDate = moment(Date.now()).utcOffset('-0500')
+        var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
+        localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
     }
 
     getIconAndStaticLabel(val) {

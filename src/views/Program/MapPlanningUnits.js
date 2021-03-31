@@ -6,6 +6,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from '../../Constants.js';
@@ -16,7 +17,8 @@ export default class MapPlanningUnits extends Component {
             planningUnitList: [],
             mapPlanningUnitEl: '',
             loading: true,
-            productCategoryList: []
+            productCategoryList: [],
+            lang: localStorage.getItem('lang')
         }
         this.changed = this.changed.bind(this);
         this.myFunction = this.myFunction.bind(this);
@@ -24,6 +26,7 @@ export default class MapPlanningUnits extends Component {
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.addRow = this.addRow.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
 
     }
 
@@ -32,7 +35,7 @@ export default class MapPlanningUnits extends Component {
         var data = [];
         data[0] = "-1";
         data[1] = "";
-        data[2] = ""; 
+        data[2] = "";
         data[3] = "";
         data[4] = MONTHS_IN_FUTURE_FOR_AMC;
         data[5] = MONTHS_IN_PAST_FOR_AMC;
@@ -44,7 +47,7 @@ export default class MapPlanningUnits extends Component {
         );
         // this.el.insertRow();
         console.log("insert row called");
-        var json = this.el.getJson(null,false)
+        var json = this.el.getJson(null, false)
     }
 
     checkValidation() {
@@ -52,7 +55,7 @@ export default class MapPlanningUnits extends Component {
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
         var valid = true;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
 
             var col = ("A").concat(parseInt(y) + 1);
@@ -257,7 +260,7 @@ export default class MapPlanningUnits extends Component {
             instance.jexcel.setValue(columnName, '');
         }
         if (x == 1) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -436,7 +439,7 @@ export default class MapPlanningUnits extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null,false)[r])[c - 1];
+        var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         // AuthenticationService.setupAxiosInterceptors();
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
@@ -517,13 +520,32 @@ export default class MapPlanningUnits extends Component {
                         productCategoryList.push(productCategoryJson);
 
                     }
-                    this.setState({ productCategoryList: response.data });
+
+                    productCategoryList.sort((a, b) => {
+                        var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({ productCategoryList: listArray });
 
                     PlanningUnitService.getActivePlanningUnitList()
                         .then(response => {
                             if (response.status == 200) {
+                                var listArray = response.data;
+                                listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 this.setState({
-                                    planningUnitList: response.data
+                                    planningUnitList: listArray
                                 });
                                 for (var k = 0; k < (response.data).length; k++) {
                                     var planningUnitJson = {
@@ -532,13 +554,18 @@ export default class MapPlanningUnits extends Component {
                                     }
                                     list.push(planningUnitJson);
                                 }
+                                list.sort((a, b) => {
+                                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
 
                                 var productDataArr = []
                                 // if (productDataArr.length == 0) {
                                 data = [];
                                 data[0] = "-1";
                                 data[1] = "";
-                                data[2] = ""; 
+                                data[2] = "";
                                 data[3] = "";
                                 data[4] = MONTHS_IN_FUTURE_FOR_AMC;
                                 data[5] = MONTHS_IN_PAST_FOR_AMC;
@@ -638,14 +665,14 @@ export default class MapPlanningUnits extends Component {
                                     tableOverflow: true,
                                     wordWrap: true,
                                     parseFormulas: true,
-                                    filters:true,
+                                    filters: true,
                                     // paginationOptions: [10, 25, 50, 100],
                                     // position: 'top',
                                     allowInsertColumn: false,
                                     allowManualInsertColumn: false,
                                     allowDeleteRow: true,
                                     onchange: this.changed,
-                                    oneditionend: this.onedit,
+                                    // oneditionend: this.onedit,
                                     copyCompatibility: true,
                                     allowManualInsertRow: false,
                                     text: {
@@ -654,6 +681,7 @@ export default class MapPlanningUnits extends Component {
                                         entries: '',
                                     },
                                     onload: this.loaded,
+                                    oneditionend: this.oneditionend,
                                     license: JEXCEL_PRO_KEY,
                                     contextMenu: function (obj, x, y, e) {
                                         var items = [];
@@ -913,6 +941,29 @@ export default class MapPlanningUnits extends Component {
 
     }
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[2]));
+            elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
+        } else if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
+        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        }
+
+    }
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
@@ -930,7 +981,7 @@ export default class MapPlanningUnits extends Component {
     }
 
     myFunction() {
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         var planningUnitArray = []
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));

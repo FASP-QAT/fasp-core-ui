@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 
 import i18n from '../../i18n';
@@ -21,9 +21,13 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+<<<<<<< HEAD
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js';
 import MasterSyncService from '../../api/MasterSyncService.js';
+=======
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+>>>>>>> dev
 
 
 
@@ -42,6 +46,7 @@ export default class ManualTagging extends Component {
             message: '',
             outputList: [],
             loading: true,
+            loading1: false,
             programs: [],
             planningUnits: [],
             outputListAfterSearch: [],
@@ -82,8 +87,9 @@ export default class ManualTagging extends Component {
         var conversionFactor = document.getElementById("conversionFactor").value;
         var programId = document.getElementById("programId").value;
         console.log("my conversionFactor--------", conversionFactor);
-        this.setState({ loading: true })
+        this.setState({ loading1: true })
         ManualTaggingService.linkShipmentWithARTMIS(this.state.orderNo, this.state.primeLineNo, this.state.shipmentId, conversionFactor, programId)
+<<<<<<< HEAD
             .then(response1 => {
 
                 var db1;
@@ -114,6 +120,27 @@ export default class ManualTagging extends Component {
                                 var lastSyncDate = lastSyncDateRequest.result[i];
                                 console.log("last sync date", lastSyncDate)
                             }
+=======
+            .then(response => {
+                console.log("response m tagging---", response)
+                this.setState({
+                    message: i18n.t('static.shipment.linkingsuccess'),
+                    color: 'green',
+                    haslinked: true,
+                    loading: false,
+                    loading1: false,
+                    alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
+                },
+                    () => {
+                        if (response.data != -1) {
+                            console.log(this.state.message, "success 1")
+                            this.hideSecondComponent();
+                            document.getElementById('div2').style.display = 'block';
+                            this.toggleLarge();
+                            this.filterData();
+                        } else {
+                            this.setState({ loading1: false })
+>>>>>>> dev
                         }
                         if (lastSyncDate == undefined) {
                             lastSyncDate = "2020-01-01 00:00:00";
@@ -207,7 +234,9 @@ export default class ManualTagging extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false
+                            color: 'red',
+                            loading: false,
+                            loading1: false
                         });
                     } else {
                         switch (error.response1 ? error.response1.status : "") {
@@ -222,20 +251,36 @@ export default class ManualTagging extends Component {
                             case 404:
                             case 406:
                                 this.setState({
+<<<<<<< HEAD
                                     message: error.response1.data.messageCode,
                                     loading: false
+=======
+                                    message: error.response.data.messageCode,
+                                    loading: false,
+                                    loading1: false,
+                                    color: 'red',
+>>>>>>> dev
                                 });
                                 break;
                             case 412:
                                 this.setState({
+<<<<<<< HEAD
                                     message: error.response1.data.messageCode,
                                     loading: false
+=======
+                                    message: error.response.data.messageCode,
+                                    loading: false,
+                                    loading1: false,
+                                    color: 'red',
+>>>>>>> dev
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
+                                    loading: false,
+                                    loading1: false,
+                                    color: 'red',
                                 });
                                 break;
                         }
@@ -604,7 +649,7 @@ export default class ManualTagging extends Component {
         }
     }
     addNewCountry() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/country/addCountry`)
         } else {
             alert("You must be Online.")
@@ -612,7 +657,7 @@ export default class ManualTagging extends Component {
 
     }
     editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_COUNTRY')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
             console.log(country);
             this.props.history.push({
                 pathname: `/country/editCountry/${country.countryId}`,
@@ -624,6 +669,12 @@ export default class ManualTagging extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
 
                     if (response.data.length == 1) {
                         this.setState({
@@ -635,7 +686,7 @@ export default class ManualTagging extends Component {
                         })
                     } else {
                         this.setState({
-                            programs: response.data,
+                            programs: listArray,
                             loading: false
                         })
                     }
@@ -857,8 +908,14 @@ export default class ManualTagging extends Component {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data
+                            planningUnits: listArray
                         })
                     }
                     else {
@@ -955,8 +1012,12 @@ export default class ManualTagging extends Component {
 
     formatDate(cell, row) {
         if (cell != null && cell != "") {
-            var modifiedDate = moment(cell).format(`${DATE_FORMAT_CAP}`);
-            return modifiedDate;
+            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            console.log("date-----", date);
+            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
+            console.log("dateMonthAsWord-----", dateMonthAsWord);
+            return dateMonthAsWord;
         } else {
             return "";
         }
@@ -1355,77 +1416,78 @@ export default class ManualTagging extends Component {
                         {/* Consumption modal */}
                         <Modal isOpen={this.state.manualTag}
                             className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <div>
-                                    <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>
-                                    <ToolkitProvider
-                                        keyField="optList"
-                                        data={this.state.outputListAfterSearch}
-                                        columns={columns}
-                                        search={{ searchFormatted: true }}
-                                        hover
-                                        filter={filterFactory()}
-                                    >
-                                        {
-                                            props => (
-                                                <div className="TableCust FortablewidthMannualtaggingtable2 ">
-                                                    {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                            <div style={{ display: this.state.loading1 ? "none" : "block" }}>
+                                <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                                    <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div>
+                                        <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>
+                                        <ToolkitProvider
+                                            keyField="optList"
+                                            data={this.state.outputListAfterSearch}
+                                            columns={columns}
+                                            search={{ searchFormatted: true }}
+                                            hover
+                                            filter={filterFactory()}
+                                        >
+                                            {
+                                                props => (
+                                                    <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                        // pagination={paginationFactory(options)}
-                                                        rowEvents={{
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
-                                                </div>
-                                            )
-                                        }
-                                    </ToolkitProvider>
-                                </div><br />
-                                <div>
-                                    <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
-                                    <Col md="12 pl-0">
-                                        <div className="d-md-flex">
-                                            <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
-                                                <div className="controls ">
-                                                    <Autocomplete
-                                                        id="combo-box-demo1"
-                                                        // value={this.state.selectedPlanningUnit}
-                                                        defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
-                                                        options={this.state.tracercategoryPlanningUnit}
-                                                        getOptionLabel={(option) => option.label}
-                                                        style={{ width: 300 }}
-                                                        onChange={(event, value) => {
-                                                            // this.getOrderDetails()
-                                                            console.log("demo2 value---", value);
-                                                            if (value != null) {
-                                                                this.setState({
-                                                                    erpPlanningUnitId: value.value,
-                                                                    planningUnitIdUpdated: value.value,
-                                                                    planningUnitName: value.label
-                                                                }, () => { this.getOrderDetails() });
-                                                            } else {
-                                                                this.setState({
-                                                                    erpPlanningUnitId: '',
-                                                                    planningUnitIdUpdated: '',
-                                                                    planningUnitName: ''
-                                                                }, () => { this.getOrderDetails() });
-                                                            }
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </ToolkitProvider>
+                                    </div><br />
+                                    <div>
+                                        <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
+                                        <Col md="12 pl-0">
+                                            <div className="d-md-flex">
+                                                <FormGroup className="col-md-4">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
+                                                    <div className="controls ">
+                                                        <Autocomplete
+                                                            id="combo-box-demo1"
+                                                            // value={this.state.selectedPlanningUnit}
+                                                            defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
+                                                            options={this.state.tracercategoryPlanningUnit}
+                                                            getOptionLabel={(option) => option.label}
+                                                            style={{ width: 300 }}
+                                                            onChange={(event, value) => {
+                                                                // this.getOrderDetails()
+                                                                console.log("demo2 value---", value);
+                                                                if (value != null) {
+                                                                    this.setState({
+                                                                        erpPlanningUnitId: value.value,
+                                                                        planningUnitIdUpdated: value.value,
+                                                                        planningUnitName: value.label
+                                                                    }, () => { this.getOrderDetails() });
+                                                                } else {
+                                                                    this.setState({
+                                                                        erpPlanningUnitId: '',
+                                                                        planningUnitIdUpdated: '',
+                                                                        planningUnitName: ''
+                                                                    }, () => { this.getOrderDetails() });
+                                                                }
 
-                                                        }} // prints the selected value
-                                                        renderInput={(params) => <TextField
-                                                            {...params}
-                                                            // InputProps={{ style: { fontSize: 12.24992 } }}
-                                                            variant="outlined"
-                                                            onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
-                                                    />
-                                                    {/* <InputGroup>
+                                                            }} // prints the selected value
+                                                            renderInput={(params) => <TextField
+                                                                {...params}
+                                                                // InputProps={{ style: { fontSize: 12.24992 } }}
+                                                                variant="outlined"
+                                                                onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
+                                                        />
+                                                        {/* <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="erpPlanningUnitId"
@@ -1439,163 +1501,175 @@ export default class ManualTagging extends Component {
 
                                                         </Input>
                                                     </InputGroup> */}
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.searchBy')}</Label>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-4">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.searchBy')}</Label>
+                                                    <div className="controls ">
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="select"
+                                                                name="searchId"
+                                                                id="searchId"
+                                                                bsSize="sm"
+                                                                autocomplete="off"
+                                                            // onChange={this.filterData}
+                                                            >
+                                                                <option value="1">{i18n.t('static.manualTagging.RONO')}</option>
+                                                                <option value="2">{i18n.t('static.report.orderNo')}</option>
+
+                                                            </Input>
+                                                        </InputGroup>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 pl-0">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
+                                                    <div className="controls "
+                                                    >
+                                                        <Autocomplete
+                                                            id="combo-box-demo"
+                                                            options={this.state.autocompleteData}
+                                                            getOptionLabel={(option) => option.label}
+                                                            style={{ width: 300 }}
+                                                            onChange={(event, value) => {
+                                                                console.log("ro combo box---", value)
+                                                                if (value != null) {
+                                                                    this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+                                                                } else {
+                                                                    this.setState({ searchedValue: '' }, () => { this.getOrderDetails() });
+                                                                }
+
+                                                            }} // prints the selected value
+                                                            renderInput={(params) => <TextField {...params} variant="outlined"
+                                                                onChange={(e) => this.searchErpOrderData(e.target.value)} />}
+                                                        />
+
+                                                    </div>
+                                                </FormGroup>
+
+                                            </div>
+                                        </Col>
+                                        <ToolkitProvider
+                                            keyField="erpOrderId"
+                                            data={this.state.artmisList}
+                                            columns={columns1}
+                                            search={{ searchFormatted: true }}
+                                            hover
+                                            filter={filterFactory()}
+                                        >
+                                            {
+                                                props => (
+                                                    <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
+
+                                                        <BootstrapTable
+                                                            // keyField='erpOrderId'
+                                                            ref={n => this.node = n}
+                                                            selectRow={selectRow}
+                                                            hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+
+                                                            rowEvents={{
+
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </ToolkitProvider>
+                                    </div><br />
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            <FormGroup className="col-md-3 pl-0">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpShipmentQty')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
-                                                            type="select"
-                                                            name="searchId"
-                                                            id="searchId"
+                                                            type="text"
+                                                            name="erpShipmentQty"
+                                                            id="erpShipmentQty"
                                                             bsSize="sm"
                                                             autocomplete="off"
-                                                        // onChange={this.filterData}
+                                                            readOnly={true}
                                                         >
-                                                            <option value="1">{i18n.t('static.manualTagging.RONO')}</option>
-                                                            <option value="2">{i18n.t('static.report.orderNo')}</option>
-
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3 pl-0">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
-                                                <div className="controls "
-                                                >
-                                                    <Autocomplete
-                                                        id="combo-box-demo"
-                                                        options={this.state.autocompleteData}
-                                                        getOptionLabel={(option) => option.label}
-                                                        style={{ width: 300 }}
-                                                        onChange={(event, value) => {
-                                                            console.log("ro combo box---", value)
-                                                            if (value != null) {
-                                                                this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
-                                                            } else {
-                                                                this.setState({ searchedValue: '' }, () => { this.getOrderDetails() });
-                                                            }
+                                            <div className="col-md-1">
 
-                                                        }} // prints the selected value
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
-                                                            onChange={(e) => this.searchErpOrderData(e.target.value)} />}
-                                                    />
-
+                                                <div className="calculationSignformanualtaing" style={{ paddingTop: '28px', paddingLeft: '23px' }}>
+                                                    <h3>*</h3>
+                                                </div>
+                                            </div>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.conversionFactor')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            // value={this.state.changedConversionFactor}
+                                                            type="text"
+                                                            pattern="/^\d+(\.\d{1,4})?$/"
+                                                            // min={0.1}
+                                                            name="conversionFactor"
+                                                            id="conversionFactor"
+                                                            bsSize="sm"
+                                                            // maxLength="14"
+                                                            // step={.0001}
+                                                            autocomplete="off"
+                                                            onChange={this.getConvertedQATShipmentQty}
+                                                        >
+                                                        </Input>
+                                                    </InputGroup>
                                                 </div>
                                             </FormGroup>
-
+                                            <div className="col-md-1">
+                                                <div className="calculationSignformanualtaing" style={{ paddingTop: '28px', paddingLeft: '23px' }}>
+                                                    <h3>=</h3>
+                                                </div>
+                                            </div>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.convertedQATShipmentQty')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="text"
+                                                            name="convertedQATShipmentQty"
+                                                            id="convertedQATShipmentQty"
+                                                            bsSize="sm"
+                                                            autocomplete="off"
+                                                            readOnly={true}
+                                                        >
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
                                         </div>
                                     </Col>
-                                    <ToolkitProvider
-                                        keyField="erpOrderId"
-                                        data={this.state.artmisList}
-                                        columns={columns1}
-                                        search={{ searchFormatted: true }}
-                                        hover
-                                        filter={filterFactory()}
-                                    >
-                                        {
-                                            props => (
-                                                <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
 
-                                                    <BootstrapTable
-                                                        // keyField='erpOrderId'
-                                                        ref={n => this.node = n}
-                                                        selectRow={selectRow}
-                                                        hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                    <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5>
+                                    <h5><div style={{ color: 'red' }} >
+                                        {i18n.t(this.state.result)}</div></h5>
+                                    <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
+                                </ModalBody>
+                                <ModalFooter>
 
-                                                        rowEvents={{
+                                    {this.state.displayButton && this.state.conversionFactorEntered &&
+                                        <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
+                                    }
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </div>
+                            <div style={{ display: this.state.loading1 ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
-                                                </div>
-                                            )
-                                        }
-                                    </ToolkitProvider>
-                                </div><br />
-                                <Col md="12 pl-0">
-                                    <div className="d-md-flex">
-                                        <FormGroup className="col-md-3 pl-0">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpShipmentQty')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="text"
-                                                        name="erpShipmentQty"
-                                                        id="erpShipmentQty"
-                                                        bsSize="sm"
-                                                        autocomplete="off"
-                                                        readOnly={true}
-                                                    >
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <div className="col-md-1">
+                                        <div class="spinner-border blue ml-4" role="status">
 
-                                            <div className="calculationSignformanualtaing" style={{ paddingTop: '28px', paddingLeft: '23px' }}>
-                                                <h3>*</h3>
-                                            </div>
                                         </div>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.conversionFactor')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        // value={this.state.changedConversionFactor}
-                                                        type="text"
-                                                        pattern="/^\d+(\.\d{1,4})?$/"
-                                                        // min={0.1}
-                                                        name="conversionFactor"
-                                                        id="conversionFactor"
-                                                        bsSize="sm"
-                                                        // maxLength="14"
-                                                        // step={.0001}
-                                                        autocomplete="off"
-                                                        onChange={this.getConvertedQATShipmentQty}
-                                                    >
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <div className="col-md-1">
-                                            <div className="calculationSignformanualtaing" style={{ paddingTop: '28px', paddingLeft: '23px' }}>
-                                                <h3>=</h3>
-                                            </div>
-                                        </div>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.convertedQATShipmentQty')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="text"
-                                                        name="convertedQATShipmentQty"
-                                                        id="convertedQATShipmentQty"
-                                                        bsSize="sm"
-                                                        autocomplete="off"
-                                                        readOnly={true}
-                                                    >
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
                                     </div>
-                                </Col>
-
-                                <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5>
-                                <h5><div style={{ color: 'red' }} >
-                                    {i18n.t(this.state.result)}</div></h5>
-                                <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
-                            </ModalBody>
-                            <ModalFooter>
-
-                                {this.state.displayButton && this.state.conversionFactorEntered &&
-                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
-                                }
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
+                                </div>
+                            </div>
                         </Modal>
                         {/* Consumption modal */}
                     </CardBody>

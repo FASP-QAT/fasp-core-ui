@@ -27,9 +27,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.role.roletext')),
         // .matches(LABEL_REGEX, i18n.t('static.message.rolenamevalidtext')),
         businessFunctions: Yup.string()
-            .required(i18n.t('static.role.businessfunctiontext'))
-        // canCreateRoles: Yup.string()
-        //     .required(i18n.t('static.role.cancreateroletext'))
+            .required(i18n.t('static.role.businessfunctiontext')),
+        canCreateRoles: Yup.string()
+            .required(i18n.t('static.role.cancreateroletext'))
 
         // businessFunctions: Yup.array()
         //     .min(1, i18n.t('static.role.businessfunctiontext'))
@@ -163,8 +163,8 @@ class EditRoleComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             roleName: true,
-            businessFunctions: true
-            // canCreateRoles: true
+            businessFunctions: true,
+            canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -196,8 +196,14 @@ class EditRoleComponent extends Component {
                     for (var i = 0; i < response.data.length; i++) {
                         businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    var listArray = businessFunctionList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        businessFunctionList, loading: false
+                        businessFunctionList: listArray, loading: false
                     })
                 } else {
                     this.setState({
@@ -255,8 +261,14 @@ class EditRoleComponent extends Component {
                     for (var i = 0; i < response.data.length; i++) {
                         canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    var listArray = canCreateRoleList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        canCreateRoleList,
+                        canCreateRoleList: listArray,
                         loading: false
                     })
                 } else {
@@ -510,11 +522,11 @@ class EditRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} <span className="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                // { 'is-valid': !errors.canCreateRoles },
-                                                                // { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
+                                                                { 'is-valid': !errors.canCreateRoles },
+                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
                                                             )}
                                                             // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             //     { 'is-valid': !errors.canCreateRoles },
@@ -530,12 +542,12 @@ class EditRoleComponent extends Component {
                                                             name="canCreateRoles"
                                                             id="canCreateRoles"
                                                             multi
-                                                            // required
+                                                            required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.role.canCreateRoles}
                                                         />
-                                                        {/* <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback> */}
+                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

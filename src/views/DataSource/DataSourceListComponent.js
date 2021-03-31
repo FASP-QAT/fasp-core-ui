@@ -523,6 +523,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.datasource.datasource');
@@ -762,8 +763,14 @@ export default class DataSourceListComponent extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: listArray, loading: false
                     })
                 }
 
@@ -822,8 +829,14 @@ export default class DataSourceListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data, loading: false
+                        realms: listArray, loading: false
                     })
                 } else {
                     this.setState({ message: response.data.messageCode, loading: false })
@@ -872,8 +885,14 @@ export default class DataSourceListComponent extends Component {
 
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             console.log(response.data)
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                dataSourceTypes: response.data, loading: false
+                dataSourceTypes: listArray, loading: false
 
             })
         })
@@ -974,7 +993,7 @@ export default class DataSourceListComponent extends Component {
     }
 
     editDataSource(dataSource) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
             this.props.history.push({
                 pathname: `/dataSource/editDataSource/${dataSource.dataSourceId}`,
                 // state: { dataSource: dataSource }
@@ -986,7 +1005,7 @@ export default class DataSourceListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
                 this.props.history.push({
                     pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }
@@ -996,7 +1015,7 @@ export default class DataSourceListComponent extends Component {
     }.bind(this);
     addNewDataSource() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/dataSource/addDataSource`)
         } else {
             alert(i18n.t('static.common.online'))
@@ -1057,7 +1076,7 @@ export default class DataSourceListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_DATA_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

@@ -402,6 +402,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ProductService from '../../api/ProductService';
 import moment from 'moment';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -502,29 +503,47 @@ export default class PlanningUnitListComponent extends Component {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
                     console.log("product category list---", JSON.stringify(response.data))
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        productCategories: response.data,
-                        productCategoryListAll: response.data
+                        productCategories: listArray,
+                        productCategoryListAll: listArray
                     })
                     TracerCategoryService.getTracerCategoryByRealmId(realmId)
                         .then(response => {
                             if (response.status == 200) {
+                                var listArray = response.data;
+                                listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 this.setState({
-                                    tracerCategories: response.data,
-                                    tracerCategoryListAll: response.data
+                                    tracerCategories: listArray,
+                                    tracerCategoryListAll: listArray
                                     // loading: false
                                 })
                                 ForecastingUnitService.getForcastingUnitByRealmId(realmId)
                                     .then(response => {
                                         if (response.status == 200) {
-                                            var forecastingUnits = response.data;
+                                            // var forecastingUnits = response.data;
+                                            var listArray = response.data;
+                                            listArray.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
+                                            });
                                             PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
                                                 console.log(response.data)
                                                 this.setState({
                                                     planningUnitList: response.data,
                                                     selSource: response.data,
-                                                    forecastingUnits: forecastingUnits,
-                                                    forecastingUnitListAll: forecastingUnits,
+                                                    forecastingUnits: listArray,
+                                                    forecastingUnitListAll: listArray,
                                                 }, () => {
                                                     this.buildJExcel();
                                                 });
@@ -711,7 +730,7 @@ export default class PlanningUnitListComponent extends Component {
 
     PlanningUnitCapacity(event, row) {
         event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT_CAPACITY')) {
             // console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
@@ -734,7 +753,7 @@ export default class PlanningUnitListComponent extends Component {
             data[1] = getLabelText(planningUnitList[j].label, this.state.lang)
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang)
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
-            data[4] = planningUnitList[j].multiplier;
+            data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[5] = planningUnitList[j].lastModifiedBy.username;
             data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = planningUnitList[j].active;
@@ -837,7 +856,7 @@ export default class PlanningUnitListComponent extends Component {
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
                                 // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
                                     })
@@ -867,7 +886,7 @@ export default class PlanningUnitListComponent extends Component {
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                     this.props.history.push({
                         pathname: `/planningUnit/editPlanningUnit/${this.el.getValueFromCoords(0, x)}`,
                     });
@@ -889,8 +908,14 @@ export default class PlanningUnitListComponent extends Component {
             RealmService.getRealmListAll()
                 .then(response => {
                     if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            realms: response.data,
+                            realms: listArray,
                             loading: false
                         })
                     } else {
@@ -949,7 +974,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     editPlanningUnit(planningUnit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
             console.log('**' + JSON.stringify(planningUnit))
             this.props.history.push({
                 pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
@@ -960,7 +985,7 @@ export default class PlanningUnitListComponent extends Component {
 
     addNewPlanningUnit() {
 
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/planningUnit/addPlanningUnit`)
         } else {
             alert(i18n.t('static.common.online'))
@@ -1105,7 +1130,7 @@ export default class PlanningUnitListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 

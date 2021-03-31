@@ -614,17 +614,17 @@ class EditSupplyPlanStatus extends Component {
                 } else if (supplyPlanType == 'shippedShipments') {
                     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'plannedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'deliveredErpShipments') {
                     shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'shippedErpShipments') {
                     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'orderedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                 } else if (supplyPlanType == 'plannedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                 } else {
                     shipmentList = []
                 }
@@ -989,10 +989,12 @@ class EditSupplyPlanStatus extends Component {
                         }
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
+                        var lastIsActualClosingBalance = 0;
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
+                            var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
-                                openingBalanceArray.push(jsonList[0].openingBalance);
+                                openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
                                 consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
                                 shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
                                 manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
@@ -1016,13 +1018,17 @@ class EditSupplyPlanStatus extends Component {
                                 var paColor2 = "";
                                 var paColor3 = "";
                                 var paColor4 = "";
+                                var paColor1Array = [];
+                                var paColor2Array = [];
+                                var paColor3Array = [];
+                                var paColor4Array = [];
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor1 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
@@ -1032,11 +1038,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor1 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor1 = "#efefef"
                                                 }
                                             }
@@ -1047,11 +1053,14 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent1 = true;
                                             }
                                             sd1.push(shipmentDetail);
+                                            if (paColor1Array.indexOf(paColor1) === -1) {
+                                                paColor1Array.push(paColor1);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor2 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
@@ -1061,11 +1070,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor2 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor2 = "#efefef"
                                                 }
                                             }
@@ -1076,11 +1085,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent2 = true;
                                             }
                                             sd2.push(shipmentDetail);
-                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+
+                                            if (paColor2Array.indexOf(paColor2) === -1) {
+                                                paColor2Array.push(paColor2);
+                                            }
+                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor3 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
@@ -1090,11 +1104,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor3 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor3 = "#efefef"
                                                 }
                                             }
@@ -1105,11 +1119,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent3 = true;
                                             }
                                             sd3.push(shipmentDetail);
-                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
+                                            if (paColor3Array.indexOf(paColor3) === -1) {
+                                                paColor3Array.push(paColor3);
+                                            }
+                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor4 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
@@ -1119,11 +1138,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor4 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor4 = "#efefef"
                                                 }
                                             }
@@ -1134,13 +1153,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent4 = true;
                                             }
                                             sd4.push(shipmentDetail);
+                                            if (paColor4Array.indexOf(paColor4) === -1) {
+                                                paColor4Array.push(paColor4);
+                                            }
                                         }
                                     }
                                 }
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor1;
-                                    if (sd1.length > 1) {
+                                    if (paColor1Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -1150,7 +1172,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor2;
-                                    if (sd2.length > 1) {
+                                    if (paColor2Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -1158,22 +1180,22 @@ class EditSupplyPlanStatus extends Component {
                                     shippedShipmentsTotalData.push("")
                                 }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor3;
-                                    if (sd3.length > 1) {
+                                    if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: jsonList[0].approvedShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                    orderedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].approvedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor4;
-                                    if (sd4.length > 1) {
+                                    if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedShipmentsTotalData) + parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                    plannedShipmentsTotalData.push({ qty: parseInt(jsonList[0].onholdShipmentsTotalData) + parseInt(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                 } else {
                                     plannedShipmentsTotalData.push("")
                                 }
@@ -1194,17 +1216,21 @@ class EditSupplyPlanStatus extends Component {
                                 var isLocalProcurementAgent2 = 0;
                                 var isLocalProcurementAgent3 = 0;
                                 var isLocalProcurementAgent4 = 0;
-                                var paColor1="";
-                                var paColor2="";
-                                var paColor3="";
-                                var paColor4="";
+                                var paColor1 = "";
+                                var paColor2 = "";
+                                var paColor3 = "";
+                                var paColor4 = "";
+                                var paColor1Array = [];
+                                    var paColor2Array = [];
+                                    var paColor3Array = [];
+                                    var paColor4Array = [];
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor1 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
@@ -1214,11 +1240,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor1 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor1 = "#efefef"
                                                 }
                                             }
@@ -1229,11 +1255,14 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent1 = true;
                                             }
                                             sd1.push(shipmentDetail);
+                                            if (paColor1Array.indexOf(paColor1) === -1) {
+                                                paColor1Array.push(paColor1);
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor2 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
@@ -1243,11 +1272,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor2 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor2 = "#efefef"
                                                 }
                                             }
@@ -1258,11 +1287,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent2 = true;
                                             }
                                             sd2.push(shipmentDetail);
-                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+
+                                            if (paColor2Array.indexOf(paColor2) === -1) {
+                                                paColor2Array.push(paColor2);
+                                            }
+                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor3 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
@@ -1272,11 +1306,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor3 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor3 = "#efefef"
                                                 }
                                             }
@@ -1287,11 +1321,14 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent3 = true;
                                             }
                                             sd3.push(shipmentDetail);
-                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                            if (paColor3Array.indexOf(paColor3) === -1) {
+                                                paColor3Array.push(paColor3);
+                                            }
+                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                 paColor4 = procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
@@ -1301,11 +1338,11 @@ class EditSupplyPlanStatus extends Component {
                                                 if (shipmentDetails[i].procurementAgent.id != "") {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor4 = "#efefef"
                                                 } else {
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + shipmentDetails[i].shipmentQty + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
                                                     paColor4 = "#efefef"
                                                 }
                                             }
@@ -1316,13 +1353,16 @@ class EditSupplyPlanStatus extends Component {
                                                 isLocalProcurementAgent4 = true;
                                             }
                                             sd4.push(shipmentDetail);
+                                            if (paColor4Array.indexOf(paColor4) === -1) {
+                                                paColor4Array.push(paColor4);
+                                            }
                                         }
                                     }
                                 }
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor1;
-                                    if (sd1.length > 1) {
+                                    if (paColor1Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
@@ -1332,7 +1372,7 @@ class EditSupplyPlanStatus extends Component {
 
                                 if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor2;
-                                    if (sd2.length > 1) {
+                                    if (paColor2Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
                                     shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
@@ -1340,22 +1380,22 @@ class EditSupplyPlanStatus extends Component {
                                     shippedErpShipmentsTotalData.push("")
                                 }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS)).length > 0) {
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor3;
-                                    if (sd3.length > 1) {
+                                    if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedErpShipmentsTotalData.push({ qty: jsonList[0].approvedErpShipmentsTotalData, month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                    orderedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].approvedErpShipmentsTotalData) + parseInt(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
                                 } else {
                                     orderedErpShipmentsTotalData.push("")
                                 }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
                                     var colour = paColor4;
-                                    if (sd4.length > 1) {
+                                    if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].submittedErpShipmentsTotalData) + parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                    plannedErpShipmentsTotalData.push({ qty: parseInt(jsonList[0].onholdErpShipmentsTotalData) + parseInt(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
                                 } else {
                                     plannedErpShipmentsTotalData.push("")
                                 }
@@ -1363,15 +1403,17 @@ class EditSupplyPlanStatus extends Component {
 
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
-                                monthsOfStockArray.push(parseFloat(jsonList[0].mos).toFixed(1));
+                                monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
                                 amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
+                                closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance })
                                 closingBalanceArray.push(jsonList[0].closingBalance)
 
 
                                 lastClosingBalance = jsonList[0].closingBalance
+                                lastIsActualClosingBalance = jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0;
 
                                 // suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
                                 // consumptionArrayForRegion = consumptionArrayForRegion.concat(jsonList[0].consumptionArrayForRegion);
@@ -1382,8 +1424,8 @@ class EditSupplyPlanStatus extends Component {
                                 var stockInHand = jsonList[0].closingBalance;
                                 var amc = Math.round(parseFloat(jsonList[0].amc));
                                 if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
-                                    var suggestedOrd = parseInt((amc * parseInt(maxStockMoSQty)) - jsonList[0].closingBalance);
-                                    if (suggestedOrd == 0) {
+                                    var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                    if (suggestedOrd <= 0) {
                                         var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
                                             parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
                                             parseFloat(programJson.arrivedToDeliveredLeadTime);
@@ -1439,13 +1481,13 @@ class EditSupplyPlanStatus extends Component {
                                     for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                         if (noOfActualEntries > 0) {
                                             if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                             }
                                             actualFlagForRegion = true;
                                         } else {
-                                            consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                            consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty)*parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                            consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                            consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                             actualFlagForRegion = false;
                                         }
                                     }
@@ -1497,20 +1539,20 @@ class EditSupplyPlanStatus extends Component {
                                     lastActualConsumptionDate.push({ lastActualConsumptionDate: conmax, region: regionListFiltered[r].id });
                                 }
                                 var json = {
-                                    month: m[n].month,
+                                    month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                     consumption: jsonList[0].consumptionQty,
                                     stock: jsonList[0].closingBalance,
                                     planned: parseInt(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + parseInt(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
                                     delivered: parseInt(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + parseInt(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
                                     shipped: parseInt(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + parseInt(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
                                     ordered: parseInt(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + parseInt(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
-                                    mos: parseFloat(jsonList[0].mos).toFixed(2),
+                                    mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(2) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
                                     maxMos: maxStockMoSQty
                                 }
                                 jsonArrForGraph.push(json);
                             } else {
-                                openingBalanceArray.push(lastClosingBalance);
+                                openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: lastClosingBalance });
                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                 shipmentsTotalData.push(0);
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
@@ -1528,10 +1570,10 @@ class EditSupplyPlanStatus extends Component {
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push("")
                                 amcTotalData.push("");
-                                minStockMoS.push(0);
-                                maxStockMoS.push(0)
+                                minStockMoS.push(minStockMoSQty);
+                                maxStockMoS.push(maxStockMoSQty)
                                 unmetDemand.push("");
-                                closingBalanceArray.push(lastClosingBalance);
+                                closingBalanceArray.push({ isActual: 0, balance: lastClosingBalance });
                                 for (var i = 0; i < this.state.regionListFiltered.length; i++) {
                                     consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
@@ -1541,7 +1583,7 @@ class EditSupplyPlanStatus extends Component {
                                 lastActualConsumptionDate.push("");
 
                                 var json = {
-                                    month: m[n].month,
+                                    month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                     consumption: null,
                                     stock: lastClosingBalance,
                                     planned: 0,
@@ -1549,8 +1591,8 @@ class EditSupplyPlanStatus extends Component {
                                     shipped: 0,
                                     ordered: 0,
                                     mos: "",
-                                    minMos: "",
-                                    maxMos: ""
+                                    minMos: minStockMoSQty,
+                                    maxMos: maxStockMoSQty
                                 }
                                 jsonArrForGraph.push(json);
                             }
@@ -2116,7 +2158,7 @@ class EditSupplyPlanStatus extends Component {
                         data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                     },
                     {
-                        label: i18n.t('static.supplyPlan.ordered'),
+                        label: i18n.t('static.supplyPlan.submitted'),
                         stack: 1,
                         yAxisID: 'A',
                         backgroundColor: '#205493',
@@ -2332,6 +2374,8 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
                                             <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
                                             <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                            <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
+                                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
 
                                         </ul>
                                     </FormGroup>
@@ -2386,7 +2430,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
-                                                                    <td align="right"><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b></td>
+                                                                    <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                                 ))
                                                             }
                                                         </tr>
@@ -2485,7 +2529,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                         <tr className="manualShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
-                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedShipmentsTotalData.map(item1 => {
                                                                     if (item1.toString() != "") {
@@ -2565,7 +2609,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
                                                         <tr className="erpShipments">
                                                             <td className="BorderNoneSupplyPlan"></td>
-                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.ordered')}</td>
+                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
                                                                     if (item1.toString() != "") {
@@ -2628,7 +2672,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right" bgcolor={item1 == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1 == 0 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} />}</td>)
+                                                                    return (<td align="right" bgcolor={item1.balance == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
@@ -2637,7 +2681,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" style={{ color: item1 == 0 ? "red" : "" }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                                    <td align="right" style={{ color: item1 == 0 ? "red" : "" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>
@@ -2686,11 +2730,11 @@ class EditSupplyPlanStatus extends Component {
                                                     <div className="" >
 
                                                         <div className="graphwidth">
-                                                        <div className="col-md-12">
-                                                            <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas1" data={bar} options={chartOptions} />
+                                                            <div className="col-md-12">
+                                                                <div className="chart-wrapper chart-graph-report">
+                                                                    <Bar id="cool-canvas1" data={bar} options={chartOptions} />
+                                                                </div>
                                                             </div>
-                                                        </div>
                                                         </div>
                                                         <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                     </div>}
@@ -3162,12 +3206,12 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
                     width: 80,
-                    readOnly:!this.state.editable
+                    readOnly: !this.state.editable
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.reviewNotes'),
-                    type: 'text',
-                    width: 120
+                    type: !this.state.editable ? 'hidden' : 'text',
+                    width: 120,
                 },
 
                 {
@@ -3265,7 +3309,7 @@ class EditSupplyPlanStatus extends Component {
                         title: i18n.t('static.problemContext.viewTrans'),
                         onclick: function () {
                             var myObj = obj.getRowData(y);
-                            console.log("my obj===>",myObj);
+                            console.log("my obj===>", myObj);
                             this.toggleTransView(myObj[23]);
                         }.bind(this)
                     });
@@ -3722,7 +3766,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></td>
+                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -3859,7 +3903,7 @@ class EditSupplyPlanStatus extends Component {
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty>0?item.expiredQty:item.openingBalance} /></td>
+                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                                     </tr>
                                                 )
                                                 )
@@ -4076,7 +4120,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                             <Input
                                                                 type="textarea"
-                                                                maxLength={600}
+                                                                maxLength={65535}
                                                                 name="versionNotes"
                                                                 id="versionNotes"
                                                                 value={this.state.program.currentVersion.notes}

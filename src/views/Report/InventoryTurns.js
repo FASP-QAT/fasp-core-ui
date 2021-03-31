@@ -29,6 +29,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 export const PSM_PROCUREMENT_AGENT_ID = 1
 export const CANCELLED_SHIPMENT_STATUS = 8
 
@@ -50,7 +51,9 @@ export default class InventoryTurns extends Component {
                 regionIds: [],
                 versionId: 0,
                 dt: new Date(),
-                includePlanningShipments: true
+                includePlanningShipments: true,
+                programId: '',
+                versionId: ''
             },
             programs: [],
             planningUnitList: [],
@@ -58,7 +61,7 @@ export default class InventoryTurns extends Component {
             versions: [],
             message: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             loading: true
 
@@ -67,6 +70,8 @@ export default class InventoryTurns extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
 
     }
     makeText = m => {
@@ -81,7 +86,7 @@ export default class InventoryTurns extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -208,13 +213,31 @@ export default class InventoryTurns extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        let costOfInventoryInput = this.state.CostOfInventoryInput;
+                        costOfInventoryInput.programId = localStorage.getItem("sesProgramIdReport");
+                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        this.filterVersion();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -225,15 +248,17 @@ export default class InventoryTurns extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         let costOfInventoryInput = this.state.CostOfInventoryInput;
         costOfInventoryInput.versionId = 0
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         costOfInventoryInput,
                         versions: []
@@ -306,12 +331,53 @@ export default class InventoryTurns extends Component {
 
                 }
 
-                console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                console.log(verList);
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
+
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    // this.setState({
+                    //     versions: versionList,
+                    //     versionId: localStorage.getItem("sesVersionIdReport")
+                    // }, () => {
+                    //     let costOfInventoryInput = this.state.CostOfInventoryInput;
+                    //     costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                    //     this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                    // })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar.length != 0) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            let costOfInventoryInput = this.state.CostOfInventoryInput;
+                            costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
+                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            let costOfInventoryInput = this.state.CostOfInventoryInput;
+                            costOfInventoryInput.versionId = versionList[0].versionId;
+                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+                        })
+                    }
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        let costOfInventoryInput = this.state.CostOfInventoryInput;
+                        costOfInventoryInput.versionId = versionList[0].versionId;
+                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
                     })
-                })
+                }
+
 
             }.bind(this);
 
@@ -517,6 +583,32 @@ export default class InventoryTurns extends Component {
         this.getPrograms()
     }
 
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value,
+            versionId: ''
+        }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
+            let costOfInventoryInput = this.state.CostOfInventoryInput;
+            costOfInventoryInput.programId = this.state.programId;
+            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+            this.filterVersion();
+        })
+
+    }
+
+    setVersionId(event) {
+        this.setState({
+            versionId: event.target.value
+        }, () => {
+            let costOfInventoryInput = this.state.CostOfInventoryInput;
+            costOfInventoryInput.versionId = this.state.versionId;
+            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
+        })
+
+    }
+
+
     getMonthArray = (currentDate) => {
         var month = [];
         var curDate = currentDate.subtract(0, 'months');
@@ -633,6 +725,7 @@ export default class InventoryTurns extends Component {
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
         if (programId != 0 && versionId != 0) {
+            localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
                 var startDate = moment(new Date(this.state.singleValue2.year - 1, this.state.singleValue2.month, 1));
                 var endDate = moment(this.state.CostOfInventoryInput.dt);
@@ -683,7 +776,7 @@ export default class InventoryTurns extends Component {
                             myResult = planningunitRequest.result;
 
                             for (var i = 0, j = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
                                     proList[j++] = myResult[i]
                                 }
                             }
@@ -792,6 +885,13 @@ export default class InventoryTurns extends Component {
                     });
                 }).catch(
                     error => {
+                        this.setState({
+                            costOfInventory: [],
+                            loading: false
+                        }, () => {
+                            this.el = jexcel(document.getElementById("tableDiv"), '');
+                            this.el.destroy();
+                        });
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -1019,7 +1119,9 @@ export default class InventoryTurns extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
+                                                            // onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
+                                                            onChange={(e) => { this.setProgramId(e) }}
+                                                            value={this.state.programId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -1037,7 +1139,9 @@ export default class InventoryTurns extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            // onChange={(e) => { this.dataChange(e) }}
+                                                            onChange={(e) => { this.setVersionId(e) }}
+                                                            value={this.state.versionId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}

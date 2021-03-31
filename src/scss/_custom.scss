@@ -661,11 +661,34 @@ label.arrow_label:after {
   color: red !important;
 }
 
+.jexcel > tbody > tr > td.readonly.shipmentEntryActive {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
 .jexcel > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
 .jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryEmergency {
+  color: red !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryActive {
+  color: #808080 !important;
+  background-color: #808080 !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryDoNotInclude {
+  background-color: #D3D3D3 !important;
+}
+
+.jexcel > tbody > tr > td.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
 }
@@ -3900,4 +3923,13 @@ color: #000000!important;
 
 .selection-cell-header{
   text-align: center;
+}
+
+.jtabs .jtabs-content > div.jtabs-selected {
+  display: grid!important;
+  overflow-x: hidden!important;  
+}
+
+.jexcel_content::-webkit-scrollbar-thumb {
+  background: #c1c1c1!important;
 }

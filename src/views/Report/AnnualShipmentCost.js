@@ -30,6 +30,7 @@ import {
 import ReportService from '../../api/ReportService';
 
 import MultiSelect from 'react-multi-select-component';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -64,10 +65,13 @@ class AnnualShipmentCost extends Component {
             fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
             outPutList: [],
             message: '',
+            programId: '',
+            versionId: '',
+            loading: false
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -81,6 +85,8 @@ class AnnualShipmentCost extends Component {
         this.getShipmentStatusList = this.getShipmentStatusList.bind(this);
         this.filterVersion = this.filterVersion.bind(this);
         //this.pickRange = React.createRef()
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
 
     }
     roundN = num => {
@@ -188,6 +194,7 @@ class AnnualShipmentCost extends Component {
                                     var outPutList = [];
                                     var shipmentList = [];
                                     shipmentList = programJson.shipmentList;
+                                    shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
                                         var planningUnitId = p.value
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
@@ -284,6 +291,7 @@ class AnnualShipmentCost extends Component {
                         }.bind(this)
                     }.bind(this)
                 } else {
+                    this.setState({ loading: true })
                     // alert("in else online version");
                     console.log("json---", json);
                     // AuthenticationService.setupAxiosInterceptors();
@@ -313,15 +321,16 @@ class AnnualShipmentCost extends Component {
                             }
                             console.log("json final---", json);
                             this.setState({
-                                outPutList: outPutList, message: ''
+                                outPutList: outPutList, message: '', loading: false
                             })
                         }).catch(
                             error => {
                                 this.setState({
-                                    outPutList: []
+                                    outPutList: [],
+                                    loading: false
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({ message: error.message, loading: false });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -329,10 +338,10 @@ class AnnualShipmentCost extends Component {
                                         case 404:
                                         case 406:
                                         case 412:
-                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }), loading: false });
                                             break;
                                         default:
-                                            this.setState({ message: 'static.unkownError' });
+                                            this.setState({ message: 'static.unkownError', loading: false });
                                             break;
                                     }
                                 }
@@ -361,7 +370,7 @@ class AnnualShipmentCost extends Component {
     }
 
     getPrograms() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -443,13 +452,28 @@ class AnnualShipmentCost extends Component {
                     }
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -845,13 +869,15 @@ class AnnualShipmentCost extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: [],
 
@@ -926,11 +952,37 @@ class AnnualShipmentCost extends Component {
                 }
 
                 console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
+
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
                     })
-                })
+                }
 
             }.bind(this);
 
@@ -950,6 +1002,7 @@ class AnnualShipmentCost extends Component {
             if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [] });
             } else {
+                localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
                     const lan = 'en';
                     var db1;
@@ -972,7 +1025,7 @@ class AnnualShipmentCost extends Component {
                             var proList = []
                             console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -1070,10 +1123,16 @@ class AnnualShipmentCost extends Component {
 
     getFundingSourceList() {
         const { fundingSources } = this.state
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         fundingSources: response.data
                     })
@@ -1135,13 +1194,19 @@ class AnnualShipmentCost extends Component {
     }
     getProcurementAgentList() {
         const { procurementAgents } = this.state
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
 
             ProcurementAgentService.getProcurementAgentListAll()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        procurementAgents: response.data
+                        procurementAgents: listArray
                     })
                 }).catch(
                     error => {
@@ -1198,12 +1263,18 @@ class AnnualShipmentCost extends Component {
     }
     getShipmentStatusList() {
         const { shipmentStatuses } = this.state
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        shipmentStatuses: response.data
+                        shipmentStatuses: listArray
                     })
                 }).catch(
                     error => {
@@ -1314,6 +1385,45 @@ class AnnualShipmentCost extends Component {
         // this.getProductCategories()
     }
 
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value,
+            versionId: ''
+        }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
+            this.filterVersion();
+        })
+
+    }
+
+    setVersionId(event) {
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.outPutList.length != 0) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
+
+    }
+
     render() {
         const { versions } = this.state;
         let versionList = versions.length > 0
@@ -1406,7 +1516,7 @@ class AnnualShipmentCost extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card>
+                <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
@@ -1470,7 +1580,9 @@ class AnnualShipmentCost extends Component {
                                                             id="programId"
                                                             bsSize="sm"
                                                             // onChange={this.getProductCategories}
-                                                            onChange={this.filterVersion}
+                                                            // onChange={this.filterVersion}
+                                                            onChange={(e) => { this.setProgramId(e); }}
+                                                            value={this.state.programId}
 
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
@@ -1509,7 +1621,8 @@ class AnnualShipmentCost extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                            onChange={(e) => { this.setVersionId(e); }}
+                                                            value={this.state.versionId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -1638,6 +1751,17 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </CardBody>
                 </Card>
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

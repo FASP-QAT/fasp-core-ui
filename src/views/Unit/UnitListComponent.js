@@ -358,6 +358,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -413,7 +414,7 @@ export default class UnitListComponent extends Component {
     }
 
     editUnit(unit) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_UNIT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_UNIT')) {
             this.props.history.push({
                 pathname: `/unit/editUnit/${unit.unitId}`,
                 // state: { unit }
@@ -426,7 +427,7 @@ export default class UnitListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_CURRENCY')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_UNIT')) {
                 this.props.history.push({
                     pathname: `/unit/editUnit/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }
@@ -436,7 +437,7 @@ export default class UnitListComponent extends Component {
     }.bind(this);
 
     addUnit() {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             this.props.history.push(`/unit/addUnit`)
         } else {
             alert(i18n.t('static.common.online'))
@@ -579,8 +580,14 @@ export default class UnitListComponent extends Component {
         this.hideFirstComponent();
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    dimensions: response.data
+                    dimensions: listArray
                 })
             } else {
                 this.setState({
@@ -780,7 +787,7 @@ export default class UnitListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>

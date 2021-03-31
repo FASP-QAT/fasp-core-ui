@@ -39,6 +39,8 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import AuthenticationService from '../Common/AuthenticationService';
 import i18n from '../../i18n'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { polling } from '../../Constants';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -213,7 +215,7 @@ class RealmDashboard extends Component {
   }
 
   componentDidMount() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       DashboardService.realmLevelDashboard(this.state.realmId)
         .then(response => {
           console.log("dashboard response===", response);
@@ -313,6 +315,7 @@ class RealmDashboard extends Component {
 
   render() {
     const { activeIndex } = this.state;
+    const checkOnline = localStorage.getItem('sessionType');
     const slides = this.state.users.map((item) => {
 
       return (
@@ -338,7 +341,7 @@ class RealmDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <Online>
+        {checkOnline === 'Online' && 
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
@@ -581,7 +584,7 @@ class RealmDashboard extends Component {
 
 
           </Row>
-        </Online>
+        }
 
         {/* <Row>
             <Col md="12">

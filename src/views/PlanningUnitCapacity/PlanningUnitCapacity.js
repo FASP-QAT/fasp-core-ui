@@ -753,6 +753,7 @@ class PlanningUnitCapacity extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     hideSecondComponent() {
@@ -1008,9 +1009,10 @@ class PlanningUnitCapacity extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed,
-            oneditionend: this.onedit,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             onpaste: this.onPaste,
+            oneditionend: this.oneditionend,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
@@ -1180,11 +1182,22 @@ class PlanningUnitCapacity extends Component {
         })
     }
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            console.log("RESP---------", parseFloat(rowData[4]));
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        }
+        this.el.setValueFromCoords(7, y, 1, true);
+    }
+
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
@@ -1219,8 +1232,14 @@ class PlanningUnitCapacity extends Component {
                             .then(response => {
                                 if (response.status == 200) {
                                     console.log(response.data)
+                                    var listArray = response.data;
+                                    listArray.sort((a, b) => {
+                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                        return itemLabelA > itemLabelB ? 1 : -1;
+                                    });
                                     this.setState({
-                                        suppliers: response.data
+                                        suppliers: listArray
                                     },
                                         () => {
                                             this.buildJExcel();

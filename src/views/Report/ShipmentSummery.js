@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -56,6 +56,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import MultiSelect from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -224,14 +225,18 @@ class ShipmentSummery extends Component {
             message: '',
             viewById: 1,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programId: '',
+            versionId: ''
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
 
     }
 
@@ -305,7 +310,7 @@ class ShipmentSummery extends Component {
 
         re = this.state.shipmentDetailsList
 
-console.log('shipment detail length',re.length)
+        console.log('shipment detail length', re.length)
         for (var item = 0; item < re.length; item++) {
             //console.log(item,'===>',re[item])
             B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
@@ -475,7 +480,7 @@ console.log('shipment detail length',re.length)
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -603,13 +608,28 @@ console.log('shipment detail length',re.length)
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }),
-                })
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
+                    })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                    })
+                }
+
 
             }.bind(this);
 
@@ -618,13 +638,15 @@ console.log('shipment detail length',re.length)
     }
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             // console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: [],
                         planningUnits: [],
@@ -700,11 +722,37 @@ console.log('shipment detail length',re.length)
                 }
 
                 // console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
-                    })
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
                 })
+
+                versionList.reverse();
+
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
+                    })
+                }
 
             }.bind(this);
 
@@ -720,11 +768,18 @@ console.log('shipment detail length',re.length)
         let versionId = document.getElementById("versionId").value;
         this.setState({
             planningUnits: [],
-            planningUnitValues: []
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
             if (versionId == 0) {
-                this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+                this.setState({
+                    message: i18n.t('static.program.validversion'), data: [],
+                    shipmentDetailsList: [],
+                    shipmentDetailsFundingSourceList: [],
+                    shipmentDetailsMonthList: []
+                });
             } else {
+                localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
                     const lan = 'en';
                     var db1;
@@ -747,7 +802,7 @@ console.log('shipment detail length',re.length)
                             var proList = []
                             // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -868,6 +923,43 @@ console.log('shipment detail length',re.length)
         this.getPrograms();
     }
 
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value,
+            versionId: ''
+        }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
+            this.filterVersion();
+        })
+    }
+
+    setVersionId(event) {
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if ((this.state.shipmentDetailsList.length != 0 && this.state.shipmentDetailsFundingSourceList.length != 0 && this.state.shipmentDetailsMonthList.length != 0)) {
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
+    }
+
     fetchData = () => {
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
@@ -885,6 +977,7 @@ console.log('shipment detail length',re.length)
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
+                this.setState({ loading: true })
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value));
                 console.log("planninuit ids====>", planningUnitIds);
                 var db1;
@@ -915,19 +1008,18 @@ console.log('shipment detail length',re.length)
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        this.setState({ loading: true })
                         // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
                         console.log("shipmentList------>", shipmentList);
-                        const activeFilter = shipmentList.filter(c => c.active == true);
+                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true") && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                         // const activeFilter = shipmentList;
                         console.log(startDate, endDate)
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
-                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate === '') ? (c.expectedDeliveryDate >=  moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <=  moment(endDate).format('YYYY-MM-DD')) : (c.receivedDate >=  moment(startDate).format('YYYY-MM-DD') && c.receivedDate <=  moment(endDate).format('YYYY-MM-DD')))
-console.log('dateFilter',dateFilter)
+                        let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate === '') ? (c.expectedDeliveryDate >= moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <= moment(endDate).format('YYYY-MM-DD')) : (c.receivedDate >= moment(startDate).format('YYYY-MM-DD') && c.receivedDate <= moment(endDate).format('YYYY-MM-DD')))
+                        console.log('dateFilter', dateFilter)
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -937,7 +1029,7 @@ console.log('dateFilter',dateFilter)
                                 }
                             }
                         }
-console.log('planningUnitFilter',planningUnitFilter)
+                        console.log('planningUnitFilter', planningUnitFilter)
                         var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('planningUnit');
                         var planningunitRequest = planningunitOs.getAll();
@@ -1004,7 +1096,7 @@ console.log('planningUnitFilter',planningUnitFilter)
                                 return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                             })
                             var shipmentDetailsFundingSourceList = []
-                            const fundingSourceIds = [...new Set(data.map(q => q.fundingSource.id))];
+                            const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
                             console.log('fundingSourceIds', fundingSourceIds)
                             fundingSourceIds.map(ele => {
                                 var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
@@ -1196,13 +1288,13 @@ console.log('planningUnitFilter',planningUnitFilter)
 
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [] });
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
 
         } else if (this.state.planningUnitValues.length == 0) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
         }
     }
 
@@ -1232,6 +1324,33 @@ console.log('planningUnitFilter',planningUnitFilter)
         return getLabelText(cell, this.state.lang);
     }
 
+    dateFormatterLanguage = value => {
+        if (moment(value).format('MM') === '01') {
+            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '02') {
+            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '03') {
+            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '04') {
+            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '05') {
+            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '06') {
+            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '07') {
+            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '08') {
+            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '09') {
+            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '10') {
+            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '11') {
+            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+        } else {
+            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+        }
+    }
 
     render() {
         const { programs } = this.state
@@ -1437,7 +1556,8 @@ console.log('planningUnitFilter',planningUnitFilter)
         */
         const bar = {
 
-            labels: this.state.shipmentDetailsMonthList.map((item, index) => (this.dateFormatter(item.dt))),
+            // labels: this.state.shipmentDetailsMonthList.map((item, index) => (this.dateFormatter(item.dt))),
+            labels: this.state.shipmentDetailsMonthList.map((item, index) => (this.dateFormatterLanguage(item.dt))),
             datasets: [{
                 label: i18n.t('static.supplyPlan.delivered'),
                 stack: 1,
@@ -1602,7 +1722,10 @@ console.log('planningUnitFilter',planningUnitFilter)
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            onChange={this.filterVersion}
+                                                            // onChange={this.filterVersion}
+                                                            // onChange={(e) => { this.filterVersion(); }}
+                                                            onChange={(e) => { this.setProgramId(e); }}
+                                                            value={this.state.programId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programs.length > 0
@@ -1628,7 +1751,9 @@ console.log('planningUnitFilter',planningUnitFilter)
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                            // onChange={(e) => { this.getPlanningUnit(); }}
+                                                            onChange={(e) => { this.setVersionId(e); }}
+                                                            value={this.state.versionId}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}

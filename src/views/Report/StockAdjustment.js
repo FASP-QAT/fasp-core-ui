@@ -32,6 +32,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -58,15 +59,19 @@ class StockAdjustmentComponent extends Component {
             data: [],
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            loading: true
+            loading: true,
+            programId: '',
+            versionId: ''
         }
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
     }
 
     makeText = m => {
@@ -75,7 +80,7 @@ class StockAdjustmentComponent extends Component {
     }
 
     getPrograms = () => {
-        if (navigator.onLine) {
+        if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
@@ -202,13 +207,28 @@ class StockAdjustmentComponent extends Component {
 
                 }
                 var lang = this.state.lang;
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.filterVersion();
                     })
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    })
+                }
+
 
             }.bind(this);
 
@@ -219,13 +239,15 @@ class StockAdjustmentComponent extends Component {
 
 
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
+        // let programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
         if (programId != 0) {
 
+            localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
             // console.log(program)
             if (program.length == 1) {
-                if (navigator.onLine) {
+                if (isSiteOnline()) {
                     this.setState({
                         versions: []
                     }, () => {
@@ -295,11 +317,43 @@ class StockAdjustmentComponent extends Component {
                 }
 
                 // console.log(verList)
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
-                    })
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
                 })
+                versionList.reverse();
+                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+                    // this.setState({
+                    //     versions: versionList,
+                    //     versionId: localStorage.getItem("sesVersionIdReport")
+                    // }, () => {
+                    //     this.getPlanningUnit();
+                    // })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar.length != 0) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.getPlanningUnit();
+                        })
+                    }
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.getPlanningUnit();
+                    })
+                }
+
 
             }.bind(this);
 
@@ -324,6 +378,7 @@ class StockAdjustmentComponent extends Component {
                     this.el.destroy();
                 });
             } else {
+                localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
                     const lan = 'en';
                     var db1;
@@ -346,7 +401,7 @@ class StockAdjustmentComponent extends Component {
                             var proList = []
                             // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active==true) {
+                                if (myResult[i].program.id == programId && myResult[i].active == true) {
 
                                     proList[i] = myResult[i]
                                 }
@@ -372,8 +427,14 @@ class StockAdjustmentComponent extends Component {
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data, message: ''
+                            planningUnits: listArray, message: ''
                         }, () => {
                             this.fetchData();
                         })
@@ -793,7 +854,7 @@ class StockAdjustmentComponent extends Component {
                         console.log(startDate, endDate)
                         var data = []
                         planningUnitIds.map(planningUnitId => {
-                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty!=null)));
+                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
                             console.log(inventoryList)
 
                             inventoryList.map(ele => {
@@ -944,6 +1005,49 @@ class StockAdjustmentComponent extends Component {
         this.getPrograms()
 
     }
+
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value,
+            versionId: ''
+        }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
+            this.filterVersion();
+        })
+
+    }
+
+    setVersionId(event) {
+        // this.setState({
+        //     versionId: event.target.value
+        // }, () => {
+        //     if (this.state.data.length != 0) {
+        //         console.log("************1");
+        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        //         this.fetchData();
+        //     } else {
+        //         console.log("************3", this.state.data);
+        //         console.log("************2");
+        //         this.getPlanningUnit();
+        //     }
+        // })
+        if (this.state.versionId != '' || this.state.versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.fetchData();
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnit();
+            })
+        }
+
+    }
+
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -1146,7 +1250,9 @@ class StockAdjustmentComponent extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
-                                                onChange={this.filterVersion}
+                                                // onChange={this.filterVersion}
+                                                onChange={(e) => { this.setProgramId(e); }}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programs.length > 0
@@ -1172,7 +1278,9 @@ class StockAdjustmentComponent extends Component {
                                                 name="versionId"
                                                 id="versionId"
                                                 bsSize="sm"
-                                                onChange={(e) => { this.getPlanningUnit(); }}
+                                                // onChange={(e) => { this.getPlanningUnit(); }}
+                                                onChange={(e) => { this.setVersionId(e); }}
+                                                value={this.state.versionId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {versionList}

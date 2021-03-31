@@ -61,7 +61,7 @@ import MultiSelect from "react-multi-select-component";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -154,7 +154,7 @@ class ForecastMetrics extends Component {
       message: '',
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 2 },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
       maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
       loading: true,
       programLst: []
@@ -754,13 +754,20 @@ class ForecastMetrics extends Component {
   }
 
   getCountrys() {
-    if (navigator.onLine) {
+    if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
       RealmCountryService.getRealmCountryForProgram(realmId)
         .then(response => {
+          var listArray = response.data.map(ele => ele.realmCountry);
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            countrys: response.data.map(ele => ele.realmCountry), loading: false
+            // countrys: response.data.map(ele => ele.realmCountry), loading: false
+            countrys: listArray, loading: false
           })
         }).catch(
           error => {
@@ -859,6 +866,12 @@ class ForecastMetrics extends Component {
               proList[i] = CountryJson
             }
           }
+
+          proList.sort((a, b) => {
+            var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
             countrys: proList
           })
@@ -881,8 +894,14 @@ class ForecastMetrics extends Component {
       if (programValues.length > 0) {
         PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
           .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-              planningUnits: response.data,
+              planningUnits: listArray,
             })
           }).catch(
             error => {
@@ -935,8 +954,14 @@ class ForecastMetrics extends Component {
     ProgramService.getProgramList()
       .then(response => {
         console.log(JSON.stringify(response.data))
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          programs: response.data, loading: false
+          programs: listArray, loading: false
         })
       }).catch(
         error => {
@@ -1012,8 +1037,14 @@ class ForecastMetrics extends Component {
     ProductService.getProductCategoryList(realmId)
       .then(response => {
         console.log(response.data)
+        var listArray = response.data;
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
         this.setState({
-          productCategories: response.data
+          productCategories: listArray
         })
       }).catch(
         error => {

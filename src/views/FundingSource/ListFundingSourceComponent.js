@@ -526,7 +526,7 @@ class FundingSourceListComponent extends Component {
         jExcelLoadedFunction(instance);
     }
     editFundingSource(fundingSource) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FUNDING_SOURCE')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
             this.props.history.push({
                 pathname: `/fundingSource/editFundingSource/${fundingSource.fundingSourceId}`,
                 // state: { fundingSource }
@@ -537,7 +537,7 @@ class FundingSourceListComponent extends Component {
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FUNDING_SOURCE')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
                 this.props.history.push({
                     pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
                     // state: { currency: currency }
@@ -558,8 +558,14 @@ class FundingSourceListComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        realms: response.data
+                        realms: listArray
                     })
                 } else {
                     this.setState({
@@ -705,7 +711,7 @@ class FundingSourceListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
