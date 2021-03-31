@@ -604,6 +604,22 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/integration/AddIntegration":
+                    if (bfunction.includes("ROLE_BF_ADD_INTEGRATION")) {
+                        return true;
+                    }
+                    break;
+                case "/integration/editIntegration/:integrationId":
+                    if (bfunction.includes("ROLE_BF_EDIT_INTEGRATION")) {
+                        return true;
+                    }
+                    break;
+                case "/integration/listIntegration":
+                case "/integration/listIntegration/:color/:message":
+                    if (bfunction.includes("ROLE_BF_LIST_INTEGRATION")) {
+                        return true;
+                    }
+                    break;
                 case "/realm/addrealm":
                     if (bfunction.includes("ROLE_BF_CREATE_REALM")) {
                         return true;
@@ -882,6 +898,11 @@ class AuthenticationService {
                     break;
                 case "/realmCountry/realmCountry/:realmId":
                     if (bfunction.includes("ROLE_BF_MAP_REALM_COUNTRY")) {
+                        return true;
+                    }
+                    break;
+                case "/program/addIntegration/:programId":
+                    if (bfunction.includes("ROLE_BF_ADD_INTEGRATION_PROGRAM")) {
                         return true;
                     }
                     break;
