@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -104,6 +104,7 @@ class StockStatus extends Component {
     var dt = new Date();
     dt.setMonth(dt.getMonth() - 10);
     this.state = {
+      PlanningUnitDataForExport: [],
       loading: true,
       dropdownOpen: false,
       radioSelected: 2,
@@ -290,7 +291,7 @@ class StockStatus extends Component {
     a.click()
   }
 
-  exportPDF = (columns) => {
+  exportPDF = () => {
     const addFooters = doc => {
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
@@ -324,6 +325,10 @@ class StockStatus extends Component {
         if (i == 1) {
           doc.setFontSize(8)
           doc.setFont('helvetica', 'normal')
+          var splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+          doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
+          splittext = doc.splitTextToSize(i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
+          doc.text(doc.internal.pageSize.width / 8, 60, splittext)
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -362,7 +367,7 @@ class StockStatus extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 50;
     var aspectwidth1 = (width - h1);
-
+    doc.setTextColor("#002f6c");
     doc.addImage(canvasImg, 'png', 50, 220, 750, 260, 'CANVAS');
 
     const header = [[i18n.t('static.common.month'),
@@ -2552,8 +2557,8 @@ class StockStatus extends Component {
               <a className="card-header-action">
                 {/* <span style={{cursor: 'pointer'}} onClick={() => { this.refs.formulaeChild.toggleStockStatus() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                 {this.state.stockStatusList.length > 0 && <div className="card-header-actions">
-                  <img style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-                  <img style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                <img style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportData(1)} />
+                  <img style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportData(2)} />
                 </div>}
               </a>
             </div>
