@@ -216,9 +216,9 @@ class StockStatus extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    csvRow.push('')
-    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minMos + '"'))   
+    csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].maxMos + '"'))   
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -231,11 +231,13 @@ class StockStatus extends Component {
     i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
     (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
+    i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
     i18n.t('static.report.amc').replaceAll(' ', '%20'),
     i18n.t('static.report.mos').replaceAll(' ', '%20'),
-    i18n.t('static.report.minmonth').replaceAll(' ', '%20'),
-    i18n.t('static.report.maxmonth').replaceAll(' ', '%20')])];
+    i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
+    // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
+  ])];
 
     var A = headers
     this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty==null?'':ele.forecastedConsumptionQty, ele.actualConsumptionQty==null?'':ele.actualConsumptionQty, ele.shipmentQty==null?'':ele.shipmentQty,
@@ -244,7 +246,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
+      , ele.adjustment == null ? '' : ele.adjustment,ele.expiredStock, ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand])));
 
     
     for (var i = 0; i < A.length; i++) {
@@ -257,7 +259,9 @@ class StockStatus extends Component {
       (item) => {
         csvRow.push("")
         csvRow.push("")
-        csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label,this.state.lang)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(item.planningUnit.label,this.state.lang)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))   
+        csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))   
         csvRow.push("")
         A= [headers]
         console.log(' item.data', item.data)
@@ -267,7 +271,7 @@ class StockStatus extends Component {
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , ele.adjustment == null ? '' : ele.adjustment, ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), this.roundN(ele.minMos), this.roundN(ele.maxMos)])));
+          , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock,ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), ele.unmetDemand])));
 
        console.log('A===>',A)
         for (var i = 0; i < A.length; i++) {
@@ -339,6 +343,12 @@ class StockStatus extends Component {
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
+          doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.stockStatusList[0].minMos, doc.internal.pageSize.width / 8, 170, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.stockStatusList[0].maxMos, doc.internal.pageSize.width / 8, 190, {
+            align: 'left'
+          })
 
         }
 
@@ -369,11 +379,13 @@ class StockStatus extends Component {
     i18n.t('static.shipment.qty'),
     (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName'))),
     i18n.t('static.report.adjustmentQty'),
+    i18n.t('static.supplyplan.exipredStock'),
     i18n.t('static.supplyPlan.endingBalance'),
     i18n.t('static.report.amc'),
     i18n.t('static.report.mos'),
-    i18n.t('static.report.minmonth'),
-    i18n.t('static.report.maxmonth')]];
+    i18n.t('static.supplyPlan.unmetDemandStr'),
+    // i18n.t('static.report.maxmonth')
+  ]];
 
     let data =
       this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
@@ -381,7 +393,7 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
+        , this.formatter(ele.adjustment),this.formatter(ele.expiredStock) ,this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), this.formatter(ele.unmetDemand)]);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -404,26 +416,32 @@ class StockStatus extends Component {
         doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
           align: 'left'
         })
+        doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 110, {
+          align: 'left'
+        })
+        doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 130, {
+          align: 'left'
+        })
 
         var canv = document.getElementById("cool-canvas" + count)
         console.log('canv', canv)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
         //console.log('canvasImg1',canvasImg1)    
-        doc.addImage(canvasImg1, 'png', 50, 120, 750, 290, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, 150, 750, 290, "a" + count, 'CANVAS')
         count++
 
-
+        var height = doc.internal.pageSize.height;
         let otherdata =
           item.data.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
           ele.shipmentInfo.map(item1 => {
             return (
               item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code)
           }).join(' \n')
-            , this.formatter(ele.adjustment), this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), this.formatter(this.roundN(ele.minMos)), this.formatter(this.roundN(ele.maxMos))]);
+            , this.formatter(ele.adjustment),this.formatter(ele.expiredStock) ,this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), this.formatter(ele.unmetDemand)]);
 
         let content = {
           margin: { top: 80, bottom: 50 },
-          startY: 430,
+          startY: height,
           head: header,
           body: otherdata,
           styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
@@ -624,7 +642,9 @@ class StockStatus extends Component {
                       mos: list[0].mos,
                       amc: list[0].amc,
                       minMos: minStockMoS,
-                      maxMos: maxStockMoS
+                      maxMos: maxStockMoS,
+                      expiredStock:list[0].expiredStock,
+                      unmetDemand:list[0].unmetDemand
                     }
                   } else {
                     var json = {
@@ -639,7 +659,9 @@ class StockStatus extends Component {
                       mos: '',
                       amc: '',
                       minMos: minStockMoS,
-                      maxMos: maxStockMoS
+                      maxMos: maxStockMoS,
+                      expiredStock:0,
+                      unmetDemand:0
                     }
                   }
                   data.push(json)
@@ -1090,10 +1112,134 @@ class StockStatus extends Component {
                       ],
 
                     };
+                    var chartOptions={
+                      title: {
+                        display: true,
+                        text: entityname1 + " - " + getLabelText(pu.planningUnit.label,this.state.lang)
+                      },
+                      scales: {
+                        yAxes: [{
+                          id: 'A',
+                          position: 'left',
+                          scaleLabel: {
+                            labelString: i18n.t('static.shipment.qty'),
+                            display: true,
+                            fontSize: "12",
+                            fontColor: 'black'
+                          },
+                          ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            callback: function (value) {
+                              var cell1 = value
+                              cell1 += '';
+                              var x = cell1.split('.');
+                              var x1 = x[0];
+                              var x2 = x.length > 1 ? '.' + x[1] : '';
+                              var rgx = /(\d+)(\d{3})/;
+                              while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                              }
+                              return x1 + x2;
+                
+                            }
+                
+                          }, gridLines: {
+                            color: 'rgba(171,171,171,1)',
+                            lineWidth: 0
+                          }
+                
+                        }, {
+                          id: 'B',
+                          position: 'right',
+                          scaleLabel: {
+                            labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                            fontColor: 'black',
+                            display: true,
+                
+                          },
+                          ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            callback: function (value) {
+                              var cell1 = value
+                              cell1 += '';
+                              var x = cell1.split('.');
+                              var x1 = x[0];
+                              var x2 = x.length > 1 ? '.' + x[1] : '';
+                              var rgx = /(\d+)(\d{3})/;
+                              while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                              }
+                              return x1 + x2;
+                
+                            }
+                
+                          },
+                          gridLines: {
+                            color: 'rgba(171,171,171,1)',
+                            lineWidth: 0
+                          }
+                        }],
+                        xAxes: [{
+                
+                          scaleLabel: {
+                            display: true,
+                            labelString: i18n.t('static.common.month'),
+                            fontColor: 'black',
+                            fontStyle: "normal",
+                            fontSize: "12"
+                          },
+                          ticks: {
+                            fontColor: 'black',
+                            fontStyle: "normal",
+                            fontSize: "12"
+                          },
+                          gridLines: {
+                            color: 'rgba(171,171,171,1)',
+                            lineWidth: 0
+                          }
+                        }]
+                      },
+                
+                      tooltips: {
+                        enabled: false,
+                        custom: CustomTooltips,
+                        callbacks: {
+                          label: function (tooltipItem, data) {
+                
+                            let label = data.labels[tooltipItem.index];
+                            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                          }
+                        }
+                      },
+                      maintainAspectRatio: false,
+                      legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                          usePointStyle: true,
+                          fontColor: 'black'
+                        }
+                      }
+                    }
+
                     var planningUnitexport = {
                       planningUnit: pu.planningUnit,
                       data: data,
-                      bar: bar
+                      bar: bar,
+                      chartOptions:chartOptions
                     }
                     if (pu.planningUnit.id != document.getElementById("planningUnitId").value) {
                       PlanningUnitDataForExport.push(planningUnitexport)
@@ -1166,7 +1312,7 @@ class StockStatus extends Component {
         }
         ReportService.getStockStatusData(inputjson)
           .then(response => {
-            console.log('response=>',response.data )
+            console.log('response+++=>',response.data )
             response.data.map(plannningUnitItem=>{
               var bar = {
               
@@ -1336,13 +1482,137 @@ class StockStatus extends Component {
                     ],
               
                   };
+
+                  var chartOptions={
+                    title: {
+                      display: true,
+                      text: entityname1 + " - " + getLabelText(plannningUnitItem[0].planningUnit.label,this.state.lang)
+                    },
+                    scales: {
+                      yAxes: [{
+                        id: 'A',
+                        position: 'left',
+                        scaleLabel: {
+                          labelString: i18n.t('static.shipment.qty'),
+                          display: true,
+                          fontSize: "12",
+                          fontColor: 'black'
+                        },
+                        ticks: {
+                          beginAtZero: true,
+                          fontColor: 'black',
+                          callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+              
+                          }
+              
+                        }, gridLines: {
+                          color: 'rgba(171,171,171,1)',
+                          lineWidth: 0
+                        }
+              
+                      }, {
+                        id: 'B',
+                        position: 'right',
+                        scaleLabel: {
+                          labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                          fontColor: 'black',
+                          display: true,
+              
+                        },
+                        ticks: {
+                          beginAtZero: true,
+                          fontColor: 'black',
+                          callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+              
+                          }
+              
+                        },
+                        gridLines: {
+                          color: 'rgba(171,171,171,1)',
+                          lineWidth: 0
+                        }
+                      }],
+                      xAxes: [{
+              
+                        scaleLabel: {
+                          display: true,
+                          labelString: i18n.t('static.common.month'),
+                          fontColor: 'black',
+                          fontStyle: "normal",
+                          fontSize: "12"
+                        },
+                        ticks: {
+                          fontColor: 'black',
+                          fontStyle: "normal",
+                          fontSize: "12"
+                        },
+                        gridLines: {
+                          color: 'rgba(171,171,171,1)',
+                          lineWidth: 0
+                        }
+                      }]
+                    },
+              
+                    tooltips: {
+                      enabled: false,
+                      custom: CustomTooltips,
+                      callbacks: {
+                        label: function (tooltipItem, data) {
+              
+                          let label = data.labels[tooltipItem.index];
+                          let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              
+                          var cell1 = value
+                          cell1 += '';
+                          var x = cell1.split('.');
+                          var x1 = x[0];
+                          var x2 = x.length > 1 ? '.' + x[1] : '';
+                          var rgx = /(\d+)(\d{3})/;
+                          while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                          }
+                          return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        }
+                      }
+                    },
+                    maintainAspectRatio: false,
+                    legend: {
+                      display: true,
+                      position: 'bottom',
+                      labels: {
+                        usePointStyle: true,
+                        fontColor: 'black'
+                      }
+                    }
+                  }
                   var data= plannningUnitItem;
                   var planningUnit=   plannningUnitItem[0].planningUnit 
                   console.log('planningUnit',planningUnit)
                   var planningUnitexport = {
                     planningUnit: planningUnit,
                     data: data,
-                    bar: bar
+                    bar: bar,
+                    chartOptions:chartOptions
                   }
                   PlanningUnitDataForExport.push(planningUnitexport)
                 })
@@ -1365,6 +1635,7 @@ class StockStatus extends Component {
               }, 2000)})}
           ).catch(
             error => {
+              console.log("Error+++",error)
               this.setState({
                 stockStatusList: [], loading: false
               })
@@ -2354,7 +2625,8 @@ class StockStatus extends Component {
                           <div id="bars_div">
                             {this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value).map((ele, index) => {
                               console.log(index)
-                              return (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={options} /></div>)
+                              return (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>)
+
                             })}
                           </div>
                         </div>
@@ -2370,7 +2642,14 @@ class StockStatus extends Component {
                   </div>
 
 
-
+                  {this.state.show && this.state.stockStatusList.length > 0 &&
+                  <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                  <ul className="legendcommitversion list-group">
+                      <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.stockStatusList[0].minMos}</span></li>
+                      <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li>
+                  </ul>
+              </FormGroup>
+                  }
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                     <thead>
@@ -2381,11 +2660,12 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
                         <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.mos')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.minmonth')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
+                        {/* <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.maxmonth')}</th> */}
                       </tr>
                     </thead>
                     <tbody>
@@ -2422,6 +2702,9 @@ class StockStatus extends Component {
                               {this.formatter(this.state.stockStatusList[idx].adjustment)}
                             </td>
                             <td>
+                              {this.formatter(this.state.stockStatusList[idx].expiredStock)}
+                            </td>
+                            <td>
                               {this.formatter(this.state.stockStatusList[idx].closingBalance)}
                             </td>
                             <td>
@@ -2431,11 +2714,11 @@ class StockStatus extends Component {
                               {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
                             </td>
                             <td>
-                              {this.roundN(this.state.stockStatusList[idx].minMos)}
+                            {this.formatter(this.state.stockStatusList[idx].unmetDemand)}
                             </td>
-                            <td>
+                            {/* <td>
                               {this.roundN(this.state.stockStatusList[idx].maxMos)}
-                            </td>
+                            </td> */}
 
                           </tr>)
 
