@@ -199,11 +199,11 @@ export default class StockStatusMatrix extends React.Component {
     //console.log('In filter data---' + this.state.rangeValue.from.year)
     let startDate = this.state.startYear + '-01-01';
     let endDate = this.state.endYear + '-12-' + new Date(this.state.endYear, 12, 0).getDate();
-    // let programId = document.getElementById("programId").value;
-    let programId = this.state.programId;
+    let programId = document.getElementById("programId").value;
+    // let programId = this.state.programId;
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    // let versionId = document.getElementById("versionId").value;
-    let versionId = this.state.versionId;
+    let versionId = document.getElementById("versionId").value;
+    // let versionId = this.state.versionId;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
     if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
 
