@@ -1563,7 +1563,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                 {/* <CreateCanvas ref="child" chartOptions={chartOptions}/> */}
                                             </div>
-                                            <div id="bars_div">
+                                            <div id="bars_div"  style={{display:"none"}}>
                                             {this.state.planningUnitData.filter(c=>c.planningUnit.id!=this.state.planningUnitId).map((ele,index)=> {
                                                return( <div  className="chart-wrapper chart-graph-report"><Bar  id={"cool-canvas"+index} data={ele.bar} options={ele.chartOptions}  /></div>)})}
                             </div>
