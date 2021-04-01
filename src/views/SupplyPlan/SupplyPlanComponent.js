@@ -832,7 +832,7 @@ export default class SupplyPlanComponent extends React.Component {
             // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...ele.data.maxStockMoS]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...ele.data.unmetDemand]
 
-let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
           //  var createCanvas =React.renderComponent( <CreateCanvas/>, document.getElementById('createCanvas') );
                
             
@@ -4072,79 +4072,6 @@ let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, ite
         }
     }
     getDataforExport = (report) => {
-        var chartOptions = {
-            title: {
-                display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? entityname + " - " + this.state.planningUnit.label : entityname
-            },
-            scales: {
-                yAxes: [{
-                    id: 'A',
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
-                    },
-                    stacked: false,
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: 'black',
-                        callback: function (value) {
-                            return value.toLocaleString();
-                        }
-                    },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    },
-                    position: 'left',
-                },
-                {
-                    id: 'B',
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black'
-                    },
-                    stacked: false,
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: 'black'
-                    },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    },
-                    position: 'right',
-                }
-                ],
-                xAxes: [{
-                    ticks: {
-                        fontColor: 'black'
-                    },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    }
-                }]
-            },
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItems, data) {
-                        return (tooltipItems.yLabel.toLocaleString());
-                    }
-                },
-                enabled: false,
-                custom: CustomTooltips
-            },
-            maintainAspectRatio: false
-            ,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: 'black'
-                }
-            }
-        }
 
         document.getElementById("bars_div").style.display='block';
         this.setState({ loading: true }, () => {
@@ -5020,7 +4947,79 @@ let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, ite
                                                 data: jsonArrForGraph.map((item, index) => (item.maxMos))
                                             }
                                         ]}
-                                        chartOptions.title.text=entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label,this.state.lang)
+                                        var chartOptions = {
+                                            title: {
+                                                display: true,
+                                                text: entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label,this.state.lang)
+                                            },
+                                            scales: {
+                                                yAxes: [{
+                                                    id: 'A',
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: i18n.t('static.shipment.qty'),
+                                                        fontColor: 'black'
+                                                    },
+                                                    stacked: false,
+                                                    ticks: {
+                                                        beginAtZero: true,
+                                                        fontColor: 'black',
+                                                        callback: function (value) {
+                                                            return value.toLocaleString();
+                                                        }
+                                                    },
+                                                    gridLines: {
+                                                        drawBorder: true, lineWidth: 0
+                                                    },
+                                                    position: 'left',
+                                                },
+                                                {
+                                                    id: 'B',
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                                                        fontColor: 'black'
+                                                    },
+                                                    stacked: false,
+                                                    ticks: {
+                                                        beginAtZero: true,
+                                                        fontColor: 'black'
+                                                    },
+                                                    gridLines: {
+                                                        drawBorder: true, lineWidth: 0
+                                                    },
+                                                    position: 'right',
+                                                }
+                                                ],
+                                                xAxes: [{
+                                                    ticks: {
+                                                        fontColor: 'black'
+                                                    },
+                                                    gridLines: {
+                                                        drawBorder: true, lineWidth: 0
+                                                    }
+                                                }]
+                                            },
+                                            tooltips: {
+                                                callbacks: {
+                                                    label: function (tooltipItems, data) {
+                                                        return (tooltipItems.yLabel.toLocaleString());
+                                                    }
+                                                },
+                                                enabled: false,
+                                                custom: CustomTooltips
+                                            },
+                                            maintainAspectRatio: false
+                                            ,
+                                            legend: {
+                                                display: true,
+                                                position: 'bottom',
+                                                labels: {
+                                                    usePointStyle: true,
+                                                    fontColor: 'black'
+                                                }
+                                            }
+                                        }
                                     var planningUnitDataforExport = {
                                         planningUnit: programPlanningUnit.planningUnit,
                                         info: planningUnitInfo,
