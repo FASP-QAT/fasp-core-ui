@@ -263,7 +263,21 @@ class StockStatus extends Component {
         csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))   
         csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))   
         csvRow.push("")
-        A= [headers]
+        const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
+    i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
+    i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
+    i18n.t('static.report.actual').replaceAll(' ', '%20'),
+    i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')),
+    i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
+    i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
+    i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
+    i18n.t('static.report.amc').replaceAll(' ', '%20'),
+    i18n.t('static.report.mos').replaceAll(' ', '%20'),
+    i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
+    // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
+  ])];
+        A= headers
         console.log(' item.data', item.data)
         item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty==null?'':ele.forecastedConsumptionQty, ele.actualConsumptionQty==null?'':ele.actualConsumptionQty, ele.shipmentQty==null?'':ele.shipmentQty,
         (ele.shipmentInfo.map(item1 => {
@@ -917,7 +931,9 @@ class StockStatus extends Component {
                       mos: list[0].mos,
                       amc: list[0].amc,
                       minMos: minStockMoS,
-                      maxMos: maxStockMoS
+                      maxMos: maxStockMoS,
+                      expiredStock:list[0].expiredStock,
+                      unmetDemand:list[0].unmetDemand
                     }
                   } else {
                     var json = {
@@ -932,7 +948,9 @@ class StockStatus extends Component {
                       mos: '',
                       amc: '',
                       minMos: minStockMoS,
-                      maxMos: maxStockMoS
+                      maxMos: maxStockMoS,
+                      expiredStock:0,
+                      unmetDemand:0
                     }
                   }
                   data.push(json)
