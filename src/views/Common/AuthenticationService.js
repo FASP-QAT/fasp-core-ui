@@ -906,6 +906,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/procurementAgentPlanningUnit/addCountrySpecificPrice/:procurementAgentId/:planningUnitId/:procurementAgentPlanningUnitId":
+                    if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
+                        return true;
+                    }
+                    break;
                 case "/consumptionDetails":
                     if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
                         localStorage.setItem("isOfflinePage", 1);
