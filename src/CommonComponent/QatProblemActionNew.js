@@ -254,7 +254,7 @@ export default class QatProblemActionNew extends Component {
                                                 if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD")) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
-                                                         || moment(c.createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD")
+                                                        || moment(c.createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD")
                                                     );
                                                 }
 
@@ -958,6 +958,19 @@ export default class QatProblemActionNew extends Component {
                                                                     var monthWithMosAboveThenMaxWithing7to18months = [];
                                                                     var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('YYYY-MM'));
 
+                                                                    var toleranceAndCutoffValues = typeProblemList[prob].data3;
+                                                                    var toleranceAndCutoffArray = [];
+                                                                    if (toleranceAndCutoffValues != null && toleranceAndCutoffValues != "") {
+                                                                        var toleranceAndCutoffSplit = toleranceAndCutoffValues.split(',');
+                                                                        for (var t = 0; t < toleranceAndCutoffSplit.length; t++) {
+                                                                            toleranceAndCutoffArray.push(parseInt(toleranceAndCutoffSplit[t]));
+                                                                        }
+                                                                    }
+
+                                                                    var toleranceNoOfMonthsBelowMin = toleranceAndCutoffArray[0];//2
+                                                                    var toleranceCutoffMinMoS = toleranceAndCutoffArray[1];//5
+                                                                    var toleranceNoOfMonthsOverMax = toleranceAndCutoffArray[2];//2
+
                                                                     for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                         var m = moment(curDate).add(mosCounter, 'months');
                                                                         var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
@@ -974,11 +987,30 @@ export default class QatProblemActionNew extends Component {
                                                                             minForMonths = minStockMoSQty;
                                                                             // closingBalance = supplyPlanJson[0].closingBalance;
                                                                             // amcCalcualted = supplyPlanJson[0].amc;
-                                                                            if (mos < minForMonths && mos != 0) {
-                                                                                monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
-                                                                            } else if (mos > maxForMonths && mos != 0) {
+
+                                                                            // *****new  logic of buffer for monts with mos less then min 1-6 months
+                                                                            if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                if (mos < minForMonths && mos != 0) {
+                                                                                    monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                }
+
+                                                                            } else {
+                                                                                if (mos < (minForMonths - parseInt(toleranceNoOfMonthsBelowMin)) && mos != 0) {
+                                                                                    monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                }
+                                                                            }
+
+                                                                            if (mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0) {
                                                                                 monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
                                                                             }
+                                                                            // *****new  logic of buffer for monts with mos less then min 1-6 months
+
+
+                                                                            // if (mos < minForMonths && mos != 0) {
+                                                                            //     monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                            // } else if (mos > maxForMonths && mos != 0) {
+                                                                            //     monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                            // }
                                                                         }
                                                                     }
                                                                     for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
@@ -997,11 +1029,30 @@ export default class QatProblemActionNew extends Component {
                                                                             minForMonths7to18 = minStockMoSQty;
                                                                             // closingBalance = supplyPlanJson[0].closingBalance;
                                                                             // amcCalcualted = supplyPlanJson[0].amc;
-                                                                            if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
-                                                                                monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
-                                                                            } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+
+                                                                            // *****new  logic of buffer for monts with mos less then min 7-18 months
+                                                                            if (minForMonths7to18 <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                                    monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                }
+
+                                                                            } else {
+                                                                                if (mos7to18 < (minForMonths7to18 - parseInt(toleranceNoOfMonthsBelowMin)) && mos7to18 != 0) {
+                                                                                    monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                }
+                                                                            }
+
+                                                                            if (mos7to18 > (maxForMonths7to18 + parseInt(toleranceNoOfMonthsOverMax)) && mos7to18 != 0) {
                                                                                 monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
                                                                             }
+                                                                            // *****new  logic of buffer for monts with mos less then min 7-18 months
+
+
+                                                                            // if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                            //     monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                            // } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+                                                                            //     monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                            // }
                                                                         }
                                                                     }
 
