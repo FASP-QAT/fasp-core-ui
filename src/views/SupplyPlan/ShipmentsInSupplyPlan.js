@@ -88,7 +88,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 // }
                 // if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                 if (procurementAgentPlanningUnit.length > 0) {
-                    pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                    var programPriceList = procurementAgentPlanningUnit[0].programPrice;
+                    if (programPriceList.length > 0) {
+                        programPriceList = programPriceList.filter(c => c.program.id == this.state.actualProgramId);
+                        if (programPriceList.length > 0) {
+                            pricePerUnit = Number(programPriceList[0].price);
+                        } else {
+                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        }
+                    } else {
+                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                    }
                 } else {
                     pricePerUnit = this.props.items.catalogPrice
                 }
@@ -150,6 +160,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
         var programJson = this.props.items.programJson;
+        this.setState({
+            actualProgramId: programJson.programId
+        })
         var db1;
         var shipmentStatusList = [];
         var procurementAgentList = [];
@@ -1796,7 +1809,17 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var pricePerUnit = elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                     if (procurementAgentPlanningUnit.length > 0) {
-                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        var programPriceList = procurementAgentPlanningUnit[0].programPrice;
+                        if (programPriceList.length > 0) {
+                            programPriceList = programPriceList.filter(c => c.program.id == this.state.actualProgramId);
+                            if (programPriceList.length > 0) {
+                                pricePerUnit = Number(programPriceList[0].price);
+                            } else {
+                                pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                            }
+                        } else {
+                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        }
                     } else {
                         pricePerUnit = this.props.items.catalogPrice
                     }
