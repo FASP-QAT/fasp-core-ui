@@ -837,9 +837,10 @@ class ProgramIntegration extends Component {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
-        tr.children[1].classList.add('AsteriskTheadtrTd');
+        // tr.children[].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
     }
 
     blur = function (instance) {
