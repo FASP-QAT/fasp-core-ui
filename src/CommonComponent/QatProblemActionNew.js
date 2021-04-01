@@ -965,7 +965,7 @@ export default class QatProblemActionNew extends Component {
                                                                             // closingBalance = supplyPlanJson[0].closingBalance;
                                                                             // amcCalcualted = supplyPlanJson[0].amc;
 
-                                                                            // *****new  logic of buffer for monts with mos less then min
+                                                                            // *****new  logic of buffer for monts with mos less then min 1-6 months
                                                                             if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
                                                                                 if (mos < minForMonths && mos != 0) {
                                                                                     monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
@@ -977,10 +977,10 @@ export default class QatProblemActionNew extends Component {
                                                                                 }
                                                                             }
 
-                                                                            if(mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0){
+                                                                            if (mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0) {
                                                                                 monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
                                                                             }
-                                                                            // *****new  logic of buffer for monts with mos less then min
+                                                                            // *****new  logic of buffer for monts with mos less then min 1-6 months
 
 
                                                                             // if (mos < minForMonths && mos != 0) {
@@ -1006,11 +1006,30 @@ export default class QatProblemActionNew extends Component {
                                                                             minForMonths7to18 = minStockMoSQty;
                                                                             // closingBalance = supplyPlanJson[0].closingBalance;
                                                                             // amcCalcualted = supplyPlanJson[0].amc;
-                                                                            if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
-                                                                                monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
-                                                                            } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+
+                                                                            // *****new  logic of buffer for monts with mos less then min 7-18 months
+                                                                            if (minForMonths7to18 <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                                    monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                }
+
+                                                                            } else {
+                                                                                if (mos7to18 < (minForMonths7to18 - parseInt(toleranceNoOfMonthsBelowMin)) && mos7to18 != 0) {
+                                                                                    monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                }
+                                                                            }
+
+                                                                            if (mos7to18 > (maxForMonths7to18 + parseInt(toleranceNoOfMonthsOverMax)) && mos7to18 != 0) {
                                                                                 monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
                                                                             }
+                                                                            // *****new  logic of buffer for monts with mos less then min 7-18 months
+
+
+                                                                            // if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                            //     monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                            // } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+                                                                            //     monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                            // }
                                                                         }
                                                                     }
 
