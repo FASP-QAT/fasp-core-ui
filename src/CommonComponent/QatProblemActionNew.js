@@ -603,7 +603,9 @@ export default class QatProblemActionNew extends Component {
                                                                             shipmentDetailsJson["procurementAgentCode"] = filteredShipmentList[s].procurementAgent.code;
                                                                             shipmentDetailsJson["orderNo"] = filteredShipmentList[s].orderNo;
                                                                             shipmentDetailsJson["shipmentQuantity"] = filteredShipmentList[s].shipmentQty;
-                                                                            shipmentDetailsJson["shipmentDate"] = submittedDate;
+                                                                            // shipmentDetailsJson["shipmentDate"] = submittedDate;
+                                                                            shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
+                                                                            shipmentDetailsJson["submittedDate"] = submittedDate;
                                                                             // shipmentDetailsJson.push(itemShipment);
                                                                             console.log("shipmentDetailsJson+++", shipmentDetailsJson)
 
