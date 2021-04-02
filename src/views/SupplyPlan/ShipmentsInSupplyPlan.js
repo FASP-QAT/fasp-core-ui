@@ -51,6 +51,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.oneditionend = this.oneditionend.bind(this);
     }
 
+    formatter = value => {
+        if (value != null && value != '' && !isNaN(Number(value))) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (value != null && isNaN(Number(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -72,6 +91,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(30, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(32, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(33, data[i].y, 0, true);
                 }
                 z = data[i].y;
             }
@@ -455,6 +475,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = shipmentList[i].active;//AE
                                             data[31] = 0;//AF
                                             data[32] = shipmentList[i].currency.conversionRateToUsd;//Conversionratetousdenterhere//AG
+                                            data[33]=0;
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -492,6 +513,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = true;
                                             data[31] = 0;
                                             data[32] = 1;
+                                            data[33] =0
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
@@ -608,8 +630,27 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         });
                                                     }
 
-                                                    // Add shipment batch info
+
                                                     var rowData = obj.getRowData(y);
+                                                    if (rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && data[33]==0) {
+                                                        items.push({
+                                                            title: i18n.t("static.shipmentDataEntry.showSuggestedShipmentQty"),
+                                                            onclick: function () {
+                                                                var expectedDeliveryDate = rowData[4];
+                                                                var suggestedQty = this.props.items.suggestedShipmentsTotalData.filter(c => moment(c.month).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"))[0].suggestedOrderQty;
+                                                                var shipmentQty = obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                                                                var newSuggestedShipmentQty = Number(suggestedQty) + Number(shipmentQty);
+                                                                var cf = window.confirm(i18n.t("static.supplyPlanFormula.suggestedOrderQty")+" = "+this.formatter(newSuggestedShipmentQty)+`\r\n`+i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm'));
+                                                                if (cf == true) {
+                                                                    obj.setValueFromCoords(10, y, newSuggestedShipmentQty, true);
+                                                                    obj.setValueFromCoords(33, y, 1, true);
+                                                                } else {
+
+                                                                }
+                                                            }.bind(this)
+                                                        })
+                                                    }
+                                                    // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                     if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
@@ -1218,6 +1259,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[30] = true;
         data[31] = 0;
         data[32] = 1;
+        data[33] =0;
         obj.insertRow(data);
         obj.setValueFromCoords(1, json.length, 0, true);
         obj.setValueFromCoords(10, json.length, 0, true);
