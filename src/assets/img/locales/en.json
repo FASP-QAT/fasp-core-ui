@@ -804,6 +804,7 @@
     "static.technicalArea.technicalAreaCodeText": "Enter technical area code",
     "static.planningUnit.multiplier": "Enter Conversion Factor (How many Forecasting Units are in 1 Planning Unit?)",
     "static.procurementUnit.heightUnit": "Height Unit",
+    "static.integration.versionStatus": "Version Status",
     "static.procurementUnit.unitsPerPalletEuro1": "Units per Pallet Euro1",
     "static.procurementUnit.unitsPerPalletEuro2": "Units per Pallet Euro2",
     "static.report.inventoryReports": "Inventory Reports",

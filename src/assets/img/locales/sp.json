@@ -804,6 +804,7 @@
     "static.technicalArea.technicalAreaCodeText": "Ingresar el código del área técnica",
     "static.planningUnit.multiplier": "Ingresar el factor de conversión [Producto (estimación) x Factor de coversión = Producto]",
     "static.procurementUnit.heightUnit": "Unidad de medida de altura",
+    "static.integration.versionStatus": "Estado de la versión",
     "static.procurementUnit.unitsPerPalletEuro1": "No. de unidades por palet Euro1",
     "static.procurementUnit.unitsPerPalletEuro2": "No. de unidades por palet Euro2",
     "static.report.inventoryReports": "Informes de Inventario",

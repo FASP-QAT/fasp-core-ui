@@ -804,6 +804,7 @@
     "static.technicalArea.technicalAreaCodeText": "Insira o código de área técnico",
     "static.planningUnit.multiplier": "Insira o multiplicador (unidade de previsão * multiplicador = unidade de planejamento)",
     "static.procurementUnit.heightUnit": "Unidade de Altura",
+    "static.integration.versionStatus": "Status da versão",
     "static.procurementUnit.unitsPerPalletEuro1": "Unidades por palete Euro1",
     "static.procurementUnit.unitsPerPalletEuro2": "Unidades por palete Euro2",
     "static.report.inventoryReports": "Relatórios de estoque",
