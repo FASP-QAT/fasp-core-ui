@@ -1403,7 +1403,7 @@ class EditSupplyPlanStatus extends Component {
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
                                 closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance })
-                                closingBalanceArray.push(jsonList[0].closingBalance)
+                                // closingBalanceArray.push(jsonList[0].closingBalance)
 
 
                                 lastClosingBalance = jsonList[0].closingBalance
@@ -1670,11 +1670,16 @@ class EditSupplyPlanStatus extends Component {
         ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
-                planningUnits: response.data, message: ''
+                planningUnits: (response.data).sort(function (a, b) {
+                        a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                        b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }.bind(this)), message: ''
             })
         })
             .catch(
                 error => {
+                    console.log("Error+++",error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2114,6 +2119,7 @@ class EditSupplyPlanStatus extends Component {
         }
 
         const { planningUnits } = this.state;
+
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return (
