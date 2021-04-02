@@ -35,6 +35,7 @@ import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import MultiSelect from 'react-multi-select-component';
+import ProblemListDashboard from '../Report/ProblemListDashboard';
 const entityname = i18n.t('static.report.problem');
 
 export default class ConsumptionDetails extends React.Component {
@@ -61,7 +62,8 @@ export default class ConsumptionDetails extends React.Component {
             problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             programId: '',
             showUpdateButton: false,
-            problemDetail: {}
+            problemDetail: {},
+            showProblemDashboard: 0
         }
 
 
@@ -1100,7 +1102,8 @@ export default class ConsumptionDetails extends React.Component {
             data: [],
             message: '',
             loading: true,
-            showUpdateButton: false
+            showUpdateButton: false,
+            showProblemDashboard: 0
         },
             () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1148,6 +1151,10 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
 
                     var problemReportList = (programJson.problemReportList);
+                    this.setState({
+                        problemReportListUnFiltered: problemReportList,
+                        showProblemDashboard: 1
+                    })
                     var problemReportFilterList = problemReportList;
                     console.log("problemList===========>", problemReportList);
                     var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1700,9 +1707,11 @@ export default class ConsumptionDetails extends React.Component {
                                 <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
                         </FormGroup>
-                        <div className="qat-problemListSearch">
+                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
+                            {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
+
                             {/* <div className="ProgramListSearch"> */}
-                            <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv">
                             </div>
                             {/* </div> */}
                         </div>
