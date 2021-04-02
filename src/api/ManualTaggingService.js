@@ -3,12 +3,12 @@ import { API_URL } from '../Constants.js';
 
 class ManualTaggingSerice {
 
-    getShipmentListForManualTagging(programId, planningUnitId) {
-        return axios.get(`${API_URL}/api/manualTagging/${programId}/${planningUnitId}`, {
+    getShipmentListForManualTagging(json) {
+        return axios.post(`${API_URL}/api/manualTagging/`, json, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, searchId, programId, erpPlanningUnitId) {
-        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${searchId}/${programId}/${erpPlanningUnitId}`, {
+    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo,programId, erpPlanningUnitId) {
+        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}`, {
         });
     }
     linkShipmentWithARTMIS(orderNo, primeLineNo, shipmentId, conversionFactor, programId) {
@@ -24,8 +24,8 @@ class ManualTaggingSerice {
         });
     }
 
-    searchErpOrderData(term, searchId, programId, erpPlanningUnitId) {
-        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${searchId}/${programId}/${erpPlanningUnitId}`, {
+    searchErpOrderData(term, programId, erpPlanningUnitId) {
+        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}`, {
         });
     }
 
