@@ -2815,7 +2815,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("N", y, elInstance);
 
-                        if (map.get("13") != "" && map.get("13") != undefined && map.get("13") != "undefined" && map.get("14") != "") {
+                        if (map.get("13") != "" && map.get("13") != undefined && map.get("13") != "undefined" && map.get("14") != "" && map.get("3") != CANCELLED_SHIPMENT_STATUS && map.get("30").toString() != "false") {
 
                             var budget = this.state.budgetListAll.filter(c => c.id == map.get("13"))[0]
                             var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
