@@ -246,7 +246,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment,ele.expiredStock, ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand])));
+      , ele.adjustment == null ? '' : ele.adjustment,ele.expiredStock!=0?ele.expiredStock:'', ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand!=0?ele.unmetDemand:''])));
 
     
     for (var i = 0; i < A.length; i++) {
@@ -285,7 +285,7 @@ class StockStatus extends Component {
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock,ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), ele.unmetDemand])));
+          , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock!=0?ele.expiredStock:'',ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), ele.unmetDemand!=0?ele.unmetDemand:''])));
 
        console.log('A===>',A)
         for (var i = 0; i < A.length; i++) {
@@ -407,7 +407,7 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment),this.formatter(ele.expiredStock) ,this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), this.formatter(ele.unmetDemand)]);
+        , this.formatter(ele.adjustment),ele.expiredStock!=0?this.formatter(ele.expiredStock):'' ,this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand!=0?this.formatter(ele.unmetDemand):'']);
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -451,7 +451,7 @@ class StockStatus extends Component {
             return (
               item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code)
           }).join(' \n')
-            , this.formatter(ele.adjustment),this.formatter(ele.expiredStock) ,this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), this.formatter(ele.unmetDemand)]);
+            , this.formatter(ele.adjustment),ele.expiredStock!=0?this.formatter(ele.expiredStock):'' ,this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), ele.unmetDemand!=0?this.formatter(ele.unmetDemand):'']);
 
         let content = {
           margin: { top: 80, bottom: 50 },
@@ -2720,7 +2720,7 @@ class StockStatus extends Component {
                               {this.formatter(this.state.stockStatusList[idx].adjustment)}
                             </td>
                             <td>
-                              {this.formatter(this.state.stockStatusList[idx].expiredStock)}
+                              {this.state.stockStatusList[idx].expiredStock!=0?this.formatter(this.state.stockStatusList[idx].expiredStock):''}
                             </td>
                             <td>
                               {this.formatter(this.state.stockStatusList[idx].closingBalance)}
@@ -2732,7 +2732,7 @@ class StockStatus extends Component {
                               {this.state.stockStatusList[idx].mos != null ? this.roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na")}
                             </td>
                             <td>
-                            {this.formatter(this.state.stockStatusList[idx].unmetDemand)}
+                            {this.state.stockStatusList[idx].unmetDemand!=0?this.formatter(this.state.stockStatusList[idx].unmetDemand):''}
                             </td>
                             {/* <td>
                               {this.roundN(this.state.stockStatusList[idx].maxMos)}
