@@ -11,7 +11,7 @@ export default class ProblemListDashboardComponent extends React.Component {
             problemListUnFilttered: [],
             problemCategoryList: [],
             problemStatusList: [],
-            problemDashboardList:[]
+            problemDashboardList: []
         }
     }
 
@@ -19,6 +19,11 @@ export default class ProblemListDashboardComponent extends React.Component {
         var problemListUnFilttered = this.props.problemListUnFilttered;
         var problemCategoryList = this.props.problemCategoryList;
         var problemStatusList = this.props.problemStatusList.filter(c => c.id != PROBLEM_STATUS_IN_COMPLIANCE);
+        var problemStatusListSorted = [];
+        problemStatusListSorted.push(problemStatusList[0]);
+        problemStatusListSorted.push(problemStatusList[2]);
+        problemStatusListSorted.push(problemStatusList[1]);
+        problemStatusList = problemStatusListSorted;
         var problemDashboardList = [];
         for (var ps = 0; ps < problemStatusList.length; ps++) {
             for (var pc = 0; pc < problemCategoryList.length; pc++) {
@@ -90,7 +95,7 @@ export default class ProblemListDashboardComponent extends React.Component {
                                 return (<td><b>{this.state.problemDashboardList.filter(f => f.problemCategory.id == pc.id && f.problemStatus == -1)[0].count}</b></td>)
                             })
                             }
-                            <td><b>{this.state.problemDashboardList.length>0?this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count:0}</b></td>
+                            <td><b>{this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0}</b></td>
                         </tr>
                     </tbody>
                 </Table>
