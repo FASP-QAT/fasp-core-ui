@@ -67,6 +67,7 @@ const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListR
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
+const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProcurementAgentPlanningUnit/AddCountrySpecificPrice'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
 const Logout = React.lazy(() => import('../../views/Pages/Login/LogoutComponent'));
 const AddRole = React.lazy(() => import('../../views/Role/AddRoleComponent'));
@@ -400,6 +401,7 @@ const routes = [
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'static.breadcrum.add', entityname: 'static.dashboard.realmcountry', component: AddRealmCountry },
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
+  { path: '/procurementAgentPlanningUnit/addCountrySpecificPrice/:procurementAgentId/:planningUnitId/:procurementAgentPlanningUnitId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
 
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -1004,10 +1006,12 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM')) 
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION'))
-                        ? false : true) },
+                        attributes: {
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT'))
+                            ? false : true)
+                        },
                         children: [
                           {
                             name: i18n.t('static.dashboard.country'),
@@ -1096,12 +1100,14 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) 
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))
-                        ? false : true) },
+                        attributes: {
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))
+                            ? false : true)
+                        },
                         children: [
                           {
                             name: i18n.t('static.dashboard.realmcountry'),
@@ -1158,8 +1164,10 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.Productmenu'),
                             icon: 'fa fa-cubes',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) ? false : true) },
+                            attributes: {
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY'))
+                                || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) ? false : true)
+                            },
                             children: [
                               {
                                 name: i18n.t('static.dashboad.planningunitcountry'),
@@ -1231,9 +1239,11 @@ class DefaultLayout extends Component {
                         // url: '/program',
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_PROGRAM_MASTERS') ? false : true) },
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM')) 
-                        || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')) 
-                        || (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true) },
+                        attributes: {
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW')) ? false : true)
+                        },
                         children: [
                           {
                             name: i18n.t('static.dashboard.setupprogram'),
@@ -1475,8 +1485,10 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true) },
+                        attributes: {
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
+                        },
                         children: [
                           {
                             name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
@@ -1762,12 +1774,14 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT')) 
-                        || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')) 
-                        || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_REGION')) ? false : true) },
+                        attributes: {
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_REGION')) ? false : true)
+                        },
                         children: [
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
@@ -2370,10 +2384,12 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_REPORT') ? false : true) },
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
-                        || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) ? false : true) },
+                        attributes: {
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) ? false : true)
+                        },
                         children: [
                           {
                             name: i18n.t('static.dashboard.qatProblemList'),
