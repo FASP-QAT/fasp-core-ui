@@ -421,6 +421,103 @@ class StockStatus extends Component {
     };
     doc.autoTable(content);
 
+    doc.setFontSize(8)
+        doc.setFont('helvetica', 'bold')
+        var y = doc.lastAutoTable.finalY + 20
+        if (y + 100 > height) {
+            doc.addPage();
+            y = 80
+        }
+        doc.text(i18n.t('static.program.notes'), doc.internal.pageSize.width / 9, y, {
+            align: 'left'
+        })
+        doc.setFont('helvetica', 'normal')
+        var cnt = 0
+        this.state.inList.map(ele => {
+
+            if (ele.notes != null && ele.notes != '') {
+                cnt = cnt + 1
+                if (cnt == 1) {
+                    y = y + 20
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.inventory.inventory'), doc.internal.pageSize.width / 8, y, {
+                        align: 'left'
+                    })
+                }
+                doc.setFontSize(8)
+                y = y + 20
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                    align: 'left'
+                })
+                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    align: 'left'
+                })
+            }
+        })
+
+        cnt = 0
+
+        this.state.coList.map(ele => {
+            if (ele.notes != null && ele.notes != '') {
+                cnt = cnt + 1
+                if (cnt == 1) {
+                    y = y + 20
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.supplyPlan.consumption'), doc.internal.pageSize.width / 8, y, {
+                        align: 'left'
+                    })
+                }
+                doc.setFontSize(8)
+                y = y + 20
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                    align: 'left'
+                })
+                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    align: 'left'
+                })
+            }
+        })
+
+        cnt = 0
+
+        this.state.shList.map(ele => {
+            if (ele.notes != null && ele.notes != '') {
+                cnt = cnt + 1
+                if (cnt == 1) {
+                    y = y + 20
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+                        align: 'left'
+                    })
+                }
+                doc.setFontSize(8)
+                y = y + 20
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                    align: 'left'
+                })
+                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    align: 'left'
+                })
+
+            }
+        }
+        )
+
     var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
     var count = 0;
     list.map(
@@ -464,6 +561,103 @@ class StockStatus extends Component {
           }
         };
         doc.autoTable(content);
+
+        doc.setFontSize(8)
+            doc.setFont('helvetica', 'bold')
+            var y = doc.lastAutoTable.finalY + 20
+            if (y + 100 > height) {
+                doc.addPage();
+                y = 80
+            }
+            doc.text(i18n.t('static.program.notes'), doc.internal.pageSize.width / 9, y, {
+                align: 'left'
+            })
+            doc.setFont('helvetica', 'normal')
+            var cnt = 0
+            item.inList.map(ele => {
+
+                if (ele.notes != null && ele.notes != '') {
+                    cnt = cnt + 1
+                    if (cnt == 1) {
+                        y = y + 20
+                        doc.setFontSize(8)
+                        doc.text(i18n.t('static.inventory.inventory'), doc.internal.pageSize.width / 8, y, {
+                            align: 'left'
+                        })
+                    }
+                    doc.setFontSize(8)
+                    y = y + 20
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                        align: 'left'
+                    })
+                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                        align: 'left'
+                    })
+                }
+            })
+
+            cnt = 0
+
+            item.coList.map(ele => {
+                if (ele.notes != null && ele.notes != '') {
+                    cnt = cnt + 1
+                    if (cnt == 1) {
+                        y = y + 20
+                        doc.setFontSize(8)
+                        doc.text(i18n.t('static.supplyPlan.consumption'), doc.internal.pageSize.width / 8, y, {
+                            align: 'left'
+                        })
+                    }
+                    doc.setFontSize(8)
+                    y = y + 20
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                        align: 'left'
+                    })
+                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                        align: 'left'
+                    })
+                }
+            })
+
+            cnt = 0
+
+            item.shList.map(ele => {
+                if (ele.notes != null && ele.notes != '') {
+                    cnt = cnt + 1
+                    if (cnt == 1) {
+                        y = y + 20
+                        doc.setFontSize(8)
+                        doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+                            align: 'left'
+                        })
+                    }
+                    doc.setFontSize(8)
+                    y = y + 20
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                        align: 'left'
+                    })
+                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                        align: 'left'
+                    })
+
+                }
+            }
+            )
       /*  var y = doc.lastAutoTable.finalY + 20
         var cnt=0
         item.data.map(ele =>{ ele.shipmentInfo.map(ele1 => {
@@ -610,9 +804,21 @@ class StockStatus extends Component {
                 maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
               }
 
-
-              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && c.accountFlag == true);
+              let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+    console.log("EndDate+++",endDate)
+              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag=="true"));
+              console.log("ShipmentList+++",shipmentList);
               var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
+              var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));              
+              var coList= consumptionList.filter(c=> (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
+              var shList=shipmentList.filter(c=>(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
+              console.log("ShList+++",shList);
+              this.setState({
+                inList:inList,
+                coList:coList,
+                shList:shList
+              })
               var monthstartfrom = this.state.rangeValue.from.month
               for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                 var monthlydata = [];
@@ -730,11 +936,24 @@ class StockStatus extends Component {
         }
         ReportService.getStockStatusData(inputjson)
           .then(response => {
-            console.log(JSON.stringify(response.data));
+            console.log("Response",JSON.stringify(response.data));
+            var inventoryList=[];
+            var consumptionList=[];
+            var shipmentList=[];
+            response.data.map(c=>{
+              c.inventoryInfo.map(i=>inventoryList.push(i))
+              c.consumptionInfo.map(ci=>consumptionList.push(ci))
+              c.shipmentInfo.map(si=>shipmentList.push(si))
+            }
+            );
+            console.log("ConsumptionList+++",consumptionList);
             this.setState({
               stockStatusList: response.data,
               message: '', loading: false,
-              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
+                inList:inventoryList,
+                coList:consumptionList,
+                shList:shipmentList
             })
           }).catch(
             error => {
@@ -885,9 +1104,13 @@ class StockStatus extends Component {
 
 
 
-
-              var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == pu.planningUnit.id && c.shipmentStatus.id != 8 && c.accountFlag == true);
-              var consumptionList = (programJson.consumptionList).filter(c => c.active == true && c.planningUnit.id == pu.planningUnit.id);
+              let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+              let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag=="true"));
+              var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id);
+              var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));              
+              var coList= consumptionList.filter(c=> (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
+              var shList=shipmentList.filter(c=>(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
               for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                 var monthlydata = [];
 
@@ -1257,7 +1480,10 @@ class StockStatus extends Component {
                       planningUnit: pu.planningUnit,
                       data: data,
                       bar: bar,
-                      chartOptions:chartOptions
+                      chartOptions:chartOptions,
+                      inList:inList,
+                      coList:coList,
+                      shList:shList
                     }
                     if (pu.planningUnit.id != document.getElementById("planningUnitId").value) {
                       PlanningUnitDataForExport.push(planningUnitexport)
@@ -1626,11 +1852,21 @@ class StockStatus extends Component {
                   var data= plannningUnitItem;
                   var planningUnit=   plannningUnitItem[0].planningUnit 
                   console.log('planningUnit',planningUnit)
+                  var conList=[];
+                  var invList=[];
+                  var shipList=[];
+                  plannningUnitItem.map(c=>c.consumptionInfo.map(ci=>conList.push(ci)));
+                  plannningUnitItem.map(c=>c.inventoryInfo.map(ii=>invList.push(ii)));
+                  plannningUnitItem.map(c=>c.shipmentInfo.map(si=>shipList.push(si)));
+                  console.log("Consum:List+++",conList);
                   var planningUnitexport = {
                     planningUnit: planningUnit,
                     data: data,
                     bar: bar,
-                    chartOptions:chartOptions
+                    chartOptions:chartOptions,
+                    inList:invList,
+                    coList:conList,
+                    shList:shipList
                   }
                   PlanningUnitDataForExport.push(planningUnitexport)
                 })

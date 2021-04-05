@@ -2417,9 +2417,9 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
-                var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
-                var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
+                var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
                 var realmTransaction = db1.transaction(['realm'], 'readwrite');
                 var realmOs = realmTransaction.objectStore('realm');
                 var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
@@ -4144,9 +4144,9 @@ export default class SupplyPlanComponent extends React.Component {
                         var paColors = []
                         var lastActualConsumptionDate = [];
 
-                        var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
-                        var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
-                        var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
+                        var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                        var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                        var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
                         var realmTransaction = db1.transaction(['realm'], 'readwrite');
                         var realmOs = realmTransaction.objectStore('realm');
                         var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
