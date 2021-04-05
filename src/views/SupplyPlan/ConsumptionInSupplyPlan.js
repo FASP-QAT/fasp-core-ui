@@ -40,11 +40,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     onPaste(instance, data) {
+        console.log("+++in paste");
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true)
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
+                console.log("+++in data[i and z not equal", data[i].y, "Z------------>", z);
+                (instance.jexcel).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
+                var index = (instance.jexcel).getValue(`M${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(11, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, -1, true);
@@ -60,7 +62,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`D${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`D${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     var rowData = (instance.jexcel).getRowData(0);
                     (instance.jexcel).setValueFromCoords(3, data[i].y, 0, true);
@@ -351,7 +353,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                                     }
                                     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
-                                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                    console.log("Check role",AuthenticationService.getLoggedInUserRoleIdArr());
+                                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
                                         for (var c = 0; c < colArr.length; c++) {
                                             var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                                             cell.classList.add('readonly');
@@ -361,25 +364,40 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                                         //     cell.classList.remove('readonly');
                                         // }
+                                        if (rowData[2] == 2) {
+                                            var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                            cell.classList.add('readonly');
+                                        } else {
+                                            var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                            cell.classList.remove('readonly');
+                                        }
+
+                                        if (rowData[15] > 0) {
+                                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                            cell.classList.add('readonly');
+                                        } else {
+                                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                            cell.classList.remove('readonly');
+                                        }
                                     }
                                     lastY = y;
+                                } else {
+                                    if (rowData[2] == 2) {
+                                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                        cell.classList.add('readonly');
+                                    } else {
+                                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                                        cell.classList.remove('readonly');
+                                    }
+
+                                    if (rowData[15] > 0) {
+                                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                        cell.classList.add('readonly');
+                                    } else {
+                                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                                        cell.classList.remove('readonly');
+                                    }
                                 }
-                                if(rowData[15]>0){
-                                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                    cell.classList.add('readonly');
-                                }else{
-                                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                    cell.classList.remove('readonly');
-                                }
-                                // Commented the CR
-                                // if (rowData[2] == 2) {
-                                //     var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                //     cell.classList.add('readonly');
-                                // } else {
-                                //     var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                //     cell.classList.remove('readonly');
-                                // }
-                                // Commented the CR
                             }
                         }.bind(this),
                         onsearch: function (el) {
@@ -440,7 +458,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             var consumptionBatchEditable = consumptionEditable;
                                             var lastEditableDate = "";
                                             lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[12] != -1) {
+                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[12] != -1 && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
                                                 consumptionBatchEditable = false;
                                             }
                                             if (document.getElementById("showConsumptionBatchInfoButtonsDiv") != null) {
@@ -783,11 +801,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
 
         if (x == 9) {
-            if (rowData[9].length > 600) {
-                inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-            } else {
-                positiveValidation("J", y, elInstance);
-            }
+            // if (rowData[9].length > 600) {
+            //     inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+            // } else {
+            //     positiveValidation("J", y, elInstance);
+            // }
         }
         if (x == 2) {
             var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
@@ -810,11 +828,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     positiveValidation("C", y, elInstance);
                 }
             }
-            // Commented the CR
-            // if (rowData[2] == 2) {
-            //     elInstance.setValueFromCoords(8, y, "", true);
-            // }
-            // Commented the CR
+            if (rowData[2] == 2) {
+                elInstance.setValueFromCoords(8, y, "", true);
+            }
         }
         // this.showOnlyErrors();
     }
@@ -1142,7 +1158,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     } else {
                         lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                     }
-                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
 
                     } else {
 
@@ -1220,12 +1236,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             }
                         }
 
-                        if (rowData[9].length > 600) {
-                            inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                            valid = false;
-                        } else {
-                            positiveValidation("J", y, elInstance);
-                        }
+                        // if (rowData[9].length > 600) {
+                        //     inValid("J", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                        //     valid = false;
+                        // } else {
+                        //     positiveValidation("J", y, elInstance);
+                        // }
 
                         validation = checkValidtion("text", "C", y, rowData[2], elInstance);
                         console.log("A--------------------> Validation 2", validation);
@@ -1309,7 +1325,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var minDateForcastedConsumption = "";
                     var actualConsumptionModified = 0;
                     var forecastedConsumptionModified = 0;
-                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var curUser = AuthenticationService.getLoggedInUserId();
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));

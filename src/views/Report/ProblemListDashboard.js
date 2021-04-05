@@ -20,9 +20,9 @@ export default class ProblemListDashboardComponent extends React.Component {
         var problemCategoryList = this.props.problemCategoryList;
         var problemStatusList = this.props.problemStatusList.filter(c => c.id != PROBLEM_STATUS_IN_COMPLIANCE);
         var problemStatusListSorted = [];
+        problemStatusListSorted.push(problemStatusList[1]);
         problemStatusListSorted.push(problemStatusList[0]);
         problemStatusListSorted.push(problemStatusList[2]);
-        problemStatusListSorted.push(problemStatusList[1]);
         problemStatusList = problemStatusListSorted;
         var problemDashboardList = [];
         for (var ps = 0; ps < problemStatusList.length; ps++) {
@@ -82,20 +82,22 @@ export default class ProblemListDashboardComponent extends React.Component {
                                 <tr>
                                     <td><b>{c.name}</b></td>
                                     {this.state.problemCategoryList.map(pc => {
-                                        return (<td>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory.id == pc.id)[0].count}</td>)
+                                        var count = this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory.id == pc.id)[0].count;
+                                        return (<td style={{ backgroundColor: count == 0 ? '#d9d9d9' : "" }}>{count}</td>)
                                     })
                                     }
-                                    <td><b>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count}</b></td>
+                                    <td style={{ backgroundColor: (this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count) == 0 ? '#d9d9d9' : "" }}><b>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count}</b></td>
                                 </tr>
                             ))
                         }
                         <tr>
                             <td><b>{i18n.t("static.supplyPlan.total")}</b></td>
                             {this.state.problemCategoryList.map(pc => {
-                                return (<td><b>{this.state.problemDashboardList.filter(f => f.problemCategory.id == pc.id && f.problemStatus == -1)[0].count}</b></td>)
+                                var count = this.state.problemDashboardList.filter(f => f.problemCategory.id == pc.id && f.problemStatus == -1)[0].count;
+                                return (<td style={{ backgroundColor: count == 0 ? '#d9d9d9' : "" }}><b>{count}</b></td>)
                             })
                             }
-                            <td><b>{this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0}</b></td>
+                            <td style={{ backgroundColor: (this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0) == 0 ? '#d9d9d9' : "" }}><b>{this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0}</b></td>
                         </tr>
                     </tbody>
                 </Table>

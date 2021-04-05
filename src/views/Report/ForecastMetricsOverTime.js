@@ -574,22 +574,38 @@ class ForcastMatrixOverTime extends Component {
 
         }
 
-        console.log(verList)
+        console.log(verList);
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
 
         if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            }),
-            versionId: localStorage.getItem("sesVersionIdReport")
-          }, () => {
-            this.getPlanningUnit();
-          })
+
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+          if (versionVar != '' && versionVar != undefined) {
+            this.setState({
+              versions: versionList,
+              versionId: localStorage.getItem("sesVersionIdReport")
+            }, () => {
+              this.getPlanningUnit();
+            })
+          } else {
+            this.setState({
+              versions: versionList,
+              versionId: versionList[0].versionId
+            }, () => {
+              this.getPlanningUnit();
+            })
+          }
+
+
         } else {
           this.setState({
-            versions: verList.filter(function (x, i, a) {
-              return a.indexOf(x) === i;
-            })
+            versions: versionList,
+            versionId: versionList[0].versionId
+          }, () => {
+            this.getPlanningUnit();
           })
         }
 
@@ -749,8 +765,10 @@ class ForcastMatrixOverTime extends Component {
 
   setProgramId(event) {
     this.setState({
-      programId: event.target.value
+      programId: event.target.value,
+      versionId: ''
     }, () => {
+      localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
   }
@@ -759,7 +777,12 @@ class ForcastMatrixOverTime extends Component {
     this.setState({
       versionId: event.target.value
     }, () => {
-      this.getPlanningUnit();
+      if (this.state.matricsList.length != 0) {
+        localStorage.setItem("sesVersionIdReport", this.state.versionId);
+        this.fetchData();
+      } else {
+        this.getPlanningUnit();
+      }
     })
   }
 
@@ -1042,6 +1065,34 @@ class ForcastMatrixOverTime extends Component {
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
+  dateFormatterLanguage = value => {
+    if (moment(value).format('MM') === '01') {
+      return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '02') {
+      return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '03') {
+      return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '04') {
+      return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '05') {
+      return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '06') {
+      return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '07') {
+      return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '08') {
+      return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '09') {
+      return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '10') {
+      return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+    } else if (moment(value).format('MM') === '11') {
+      return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+    } else {
+      return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+    }
+  }
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
@@ -1183,7 +1234,8 @@ class ForcastMatrixOverTime extends Component {
 
     const bar = {
 
-      labels: this.state.matricsList.map((item, index) => (this.dateFormatter(item.month))),
+      // labels: this.state.matricsList.map((item, index) => (this.dateFormatter(item.month))),
+      labels: this.state.matricsList.map((item, index) => (this.dateFormatterLanguage(item.month))),
       datasets: [
         {
           type: "line",

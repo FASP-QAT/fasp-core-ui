@@ -331,7 +331,7 @@ export default class EditRealmTicketComponent extends Component {
                                                 onBlur={handleBlur}
                                                 maxLength={600}
                                                 value={this.state.realm.notes}
-                                                maxLength={600}
+                                                // maxLength={600}
                                             // required 
                                             />
                                             <FormFeedback className="red">{errors.notes}</FormFeedback>

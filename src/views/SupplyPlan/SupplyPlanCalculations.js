@@ -9,7 +9,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
     if (page == 'masterDataSync' && !rebuild) {
         // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-            problemListChild.qatProblemActions(programId, "loading",true);
+            problemListChild.qatProblemActions(programId, "loading", true);
         } else {
             props.fetchData(1);
         }
@@ -333,19 +333,23 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                 }
 
                                             } else {
-                                                myArray[index].shipment = Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                                myArray[index].shipment = Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
                                                 if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + batchListForShipments[b].shipmentQty;
+                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number(batchListForShipments[b].shipmentQty);
                                                 }
                                             }
                                             var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
                                             if (index != -1) {
-                                                shipmentBatchQtyTotal += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                                shipmentBatchQtyTotal += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
                                                 if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + batchListForShipments[b].shipmentQty;
+                                                    shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
                                                 }
                                             }
                                         }
+                                    }
+                                    console.log("Trans Date+++",startDate)
+                                    for(var b=0;b<myArray.length;b++){
+                                        console.log("MyArray[b]+++",myArray[b])
                                     }
 
                                     // Inventory part
@@ -903,6 +907,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var mos = "";
                                     if (closingBalance != 0 && amc != 0) {
                                         mos = Number(closingBalance / amc).toFixed(4);
+                                    } else if (amc == 0) {
+                                        mos = null;
                                     } else {
                                         mos = 0;
                                     }
@@ -951,7 +957,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         nationalAdjustmentWps: nationalAdjustmentWps,
                                         expectedStock: expectedStock,
                                         expectedStockWps: expectedStockWps,
-                                        regionCountForStock: regionsReportingActualInventory
+                                        regionCountForStock: regionsReportingActualInventory,
+                                        regionCount:totalNoOfRegions
                                     }
                                     supplyPlanData.push(json);
                                 }
@@ -1053,7 +1060,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == 'masterDataSync') {
                                     // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
                                     if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-                                        problemListChild.qatProblemActions(programId, "loading",true);
+                                        problemListChild.qatProblemActions(programId, "loading", true);
                                     } else {
                                         props.fetchData(1)
                                     }

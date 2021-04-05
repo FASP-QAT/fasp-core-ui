@@ -46,20 +46,20 @@ export default class QatProblemActionNew extends Component {
     }
 
     qatProblemActions(programId, key, buildFullQPL) {
-        console.log("program id in QPL***", programId);
-        console.log("new logic start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+        // console.log("program id in QPL***", programId);
+        // console.log("new logic start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         // console.log("programId.toString()+++", programId.toString());
         var problemActionList = [];
         var db1;
         var storeOS;
-        console.log("bfor get database+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+        // console.log("bfor get database+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         getDatabase();
-        console.log("opening db start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+        // console.log("opening db start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
-            console.log("opening db end+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+            // console.log("opening db end+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
             var realmId = AuthenticationService.getRealmId();
-            console.log("afetr taking realmId+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+            // console.log("afetr taking realmId+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
             var programList = [];
             var programRequestList = [];
             var versionIDs = [];
@@ -68,7 +68,7 @@ export default class QatProblemActionNew extends Component {
             var transaction = db1.transaction([objectStoreFromProps], 'readwrite');
             var program = transaction.objectStore(objectStoreFromProps);
             var getRequest = program.get(programId.toString());
-            console.log("bfor getRequest+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+            // console.log("bfor getRequest+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
             getRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
@@ -84,23 +84,23 @@ export default class QatProblemActionNew extends Component {
                 var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
                 var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
                 programQPLDetailsGetRequest.onsuccess = function (event) {
-                    console.log("start time bfr user decryption+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                    // console.log("start time bfr user decryption+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                     let username = decryptedUser.username;
-                    console.log("end time after user decryption+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-                    console.log("program decryption start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                    // console.log("end time after user decryption+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                    // console.log("program decryption start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                     var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     // console.log("programJson+++", programJson);
-                    console.log("program decryption end+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                    // console.log("program decryption end+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                     programList.push(programJson);
                     programRequestList.push(getRequest.result);
                     versionIDs.push(getRequest.result.version);
-                    console.log("start time bfor taking list of programPlanningUnit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                    // console.log("start time bfor taking list of programPlanningUnit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                     var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                     var planningunitRequest = planningunitOs.getAll();
@@ -114,7 +114,7 @@ export default class QatProblemActionNew extends Component {
                         }
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
-                        console.log("end  time after taking list of programPlanningUnit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                        // console.log("end  time after taking list of programPlanningUnit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                         var programPlanningUnitList = planningunitRequest.result;
 
                         var problemTransaction = db1.transaction(['problem'], 'readwrite');
@@ -132,7 +132,7 @@ export default class QatProblemActionNew extends Component {
                         problemRequest.onsuccess = function (e) {
                             var planningUnitResult = [];
                             planningUnitResult = planningunitRequest.result;
-                            console.log("start time bfor taking list of planning unit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                            // console.log("start time bfor taking list of planning unit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                             var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
                             var puOs = puTransaction.objectStore('planningUnit');
                             var puRequest = puOs.getAll();
@@ -146,7 +146,7 @@ export default class QatProblemActionNew extends Component {
                                 }
                             }.bind(this);
                             puRequest.onsuccess = function (e) {
-                                console.log("end time after taking list of planning unit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                // console.log("end time after taking list of planning unit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                 var planningUnitListAll = puRequest.result;
                                 if (programList.length == 0) {
                                     if (this.props.updateState != undefined) {
@@ -184,7 +184,7 @@ export default class QatProblemActionNew extends Component {
                                         var maxForMonths = 0;
                                         var realm = realmRequest.result;
 
-                                        console.log("time taken for setup+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                        // console.log("time taken for setup+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                         for (var pp = 0; pp < programList.length; pp++) {
                                             try {
                                                 // var shipmentList = programList[pp].shipmentList;
@@ -197,13 +197,52 @@ export default class QatProblemActionNew extends Component {
                                                 problemActionList = programList[pp].problemReportList;
                                                 problemActionIndex = programList[pp].problemReportList.length;
                                                 actionList = programList[pp].actionList;
-                                                console.log("actionList+++", actionList);
+                                                // console.log("actionList+++", actionList);
+
+                                                // ******* update logic for active inactive planning units===========================================================
+                                                planningUnitListAll.filter(
+                                                    c => c.active == false)
+                                                    .map(m => {
+                                                        actionPlanningUnitIds.push(parseInt(m.planningUnitId));
+                                                    });
+                                                programPlanningUnitList.filter(
+                                                    c => c.active == false).map(m => {
+                                                        actionPlanningUnitIds.push(parseInt(m.planningUnit.id));
+                                                    });
+                                                programList[pp].problemReportList.filter(
+                                                    c => c.planningUnitActive == false).map(m => {
+                                                        actionPlanningUnitIds.push(parseInt(m.planningUnit.id));
+                                                    });
+                                                // ******* ===========================================================
                                                 actionList.map(actionObj => {
                                                     actionPlanningUnitIds.push(parseInt(actionObj.planningUnitId));
                                                 });
 
-                                                console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
+                                                // console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
+
+                                                //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
+                                                var regionIdArray = [];
                                                 var regionList = programList[pp].regionList;
+                                                regionList.map(rm => {
+                                                    regionIdArray.push(parseInt(rm.regionId));
+                                                });
+                                                console.log("regionIdArray+++", regionIdArray);
+                                                var problemReportIdForRegion = [];
+                                                problemActionList.filter(c =>
+                                                    !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
+                                                    map(m => {
+                                                        problemReportIdForRegion.push(parseInt(m.problemReportId));
+                                                    });
+                                                console.log("problem reportId to mark region acive false+++", problemReportIdForRegion);
+                                                for (var pal = 0; pal < problemActionList.length; pal++) {
+                                                    if (problemReportIdForRegion.includes(parseInt(problemActionList[pal].problemReportId))) {
+                                                        problemActionList[pal].regionActive = false;
+                                                    } else {
+                                                        problemActionList[pal].regionActive = true;
+                                                    }
+                                                }
+                                                //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
+
                                                 problemList = problemRequest.result.filter(c =>
                                                     c.realm.id == programList[pp].realmCountry.realm.realmId
                                                     && c.active.toString() == "true");
@@ -211,21 +250,28 @@ export default class QatProblemActionNew extends Component {
                                                     c.program.id == programList[pp].programId
                                                 );
 
-                                                console.log("qplLastModifiedDate+++", moment(qplLastModifiedDate).format("YYYY-MM"));
+                                                // console.log("qplLastModifiedDate+++", moment(qplLastModifiedDate).format("YYYY-MM"));
                                                 if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD")) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
+                                                         || moment(c.createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD")
                                                     );
                                                 }
 
-                                                console.log("new filtered panning unit list+++", planningUnitList);
+                                                // console.log("new filtered panning unit list+++", planningUnitList);
                                                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                                                 var curMonth = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM'));
                                                 for (var p = 0; p < planningUnitList.length; p++) {
-                                                    console.log("in for+++");
+                                                    // console.log("in for+++");
                                                     var checkPlanningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
                                                     var checkProgramPlanningUnitObj = planningUnitList[p];
                                                     if (checkPlanningUnitObj.active == true && checkProgramPlanningUnitObj.active == true) {
+
+                                                        for (var pal = 0; pal < problemActionList.length; pal++) {
+                                                            if (problemActionList[pal].planningUnit.id == planningUnitList[p].planningUnit.id && problemActionList[pal].planningUnitActive == false) {
+                                                                problemActionList[pal].planningUnitActive = true;
+                                                            }
+                                                        }
 
                                                         var shipmentListForMonths = programList[pp].shipmentList.filter(c =>
                                                             c.planningUnit.id == planningUnitList[p].planningUnit.id
@@ -260,9 +306,9 @@ export default class QatProblemActionNew extends Component {
                                                         filteredActionListForType.map(actionForTypeObj => {
                                                             actionTypeIds.push(parseInt(actionForTypeObj.type));
                                                         });
-                                                        console.log("actionTypeIds+++", actionTypeIds);
+                                                        // console.log("actionTypeIds+++", actionTypeIds);
                                                         var typeProblemList = problemList;
-                                                        if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM")) {
+                                                        if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && !(moment(planningUnitList[p].createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD"))) {
                                                             typeProblemList = problemList.filter(
                                                                 c =>
                                                                     (actionTypeIds.includes(FORECASTED_CONSUMPTION_MODIFIED) && c.problem.forecastedConsumptionTrigger) ||
@@ -273,14 +319,15 @@ export default class QatProblemActionNew extends Component {
                                                                     (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                             );
                                                         }
-                                                        console.log("typeProblemList+++", typeProblemList);
+                                                        // console.log("typeProblemList+++", typeProblemList);
                                                         for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                             // for (var prob = 0; prob < problemList.length; prob++) {
-                                                            console.log("in problemlist for+++");
+                                                            // console.log("in problemlist for+++");
                                                             switch (typeProblemList[prob].problem.problemId) {
                                                                 case 1:
                                                                     // CASE 1 START (missing recent actual consumption in last three month including current month.)
                                                                     for (var r = 0; r < regionList.length; r++) {
+
                                                                         var consumptionList = programList[pp].consumptionList;
                                                                         var numberOfMonths = parseInt(typeProblemList[prob].data1);
                                                                         var numberOfMonthsData2 = parseInt(typeProblemList[prob].data2);
@@ -898,7 +945,7 @@ export default class QatProblemActionNew extends Component {
                                                                         var minForMonths = "";
                                                                         // var closingBalance = "";
                                                                         // var amcCalcualted = "";
-                                                                        if (supplyPlanJson.length > 0) {
+                                                                        if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
                                                                             mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
                                                                             maxForMonths = maxStockMoSQty;
                                                                             minForMonths = minStockMoSQty;
@@ -1013,7 +1060,8 @@ export default class QatProblemActionNew extends Component {
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                         var mos = "";
                                                                         if (supplyPlanJson.length > 0) {
-                                                                            mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                            // mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                            mos = Number(supplyPlanJson[0].closingBalance);
                                                                             if (mos == 0) {
                                                                                 stockoutsWithing6months.push(moment(m).format('MMM-YY'));
                                                                             }
@@ -1026,7 +1074,8 @@ export default class QatProblemActionNew extends Component {
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                         var mos7to18 = "";
                                                                         if (supplyPlanJson7to18.length > 0) {
-                                                                            mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                            // mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                            mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
                                                                             if (mos7to18 == 0) {
                                                                                 stockoutsWithing7to18months.push(moment(m7to18).format('MMM-YY'));
                                                                             }
@@ -1045,7 +1094,7 @@ export default class QatProblemActionNew extends Component {
                                                                     cause["shipmentListWithin7to18Months"] = filteredShipmentListWithin7to18Months.length;
                                                                     cause["range1to6months"] = moment(curDate).add(1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('MMM-YY');
                                                                     cause["range7to18months"] = moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('MMM-YY') + " to " + moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('MMM-YY');
-                                                                    console.log("cause+++", cause);
+                                                                    // console.log("cause+++", cause);
 
                                                                     var index = problemActionList.findIndex(
                                                                         c =>
@@ -1097,7 +1146,7 @@ export default class QatProblemActionNew extends Component {
                                                                         }
                                                                         // console.log("pastSixMonthsArray>>>", pastSixMonthsArray);
                                                                         var monthWithNoActualConsumption = pastSixMonthsArray.filter(function (obj) { return monthsWithActualConsumption.indexOf(obj) == -1; });
-                                                                        console.log("monthWithNoActualConsumption>>>", monthWithNoActualConsumption);
+                                                                        // console.log("monthWithNoActualConsumption>>>", monthWithNoActualConsumption);
                                                                         var actualCauseMonths = [];
                                                                         // jan21 and dec20
                                                                         //start aug2020 stop is feb21
@@ -1120,7 +1169,7 @@ export default class QatProblemActionNew extends Component {
                                                                             }
 
                                                                         }
-                                                                        console.log("actual cause months***", actualCauseMonths);
+                                                                        // console.log("actual cause months***", actualCauseMonths);
                                                                         var index = problemActionList.findIndex(
                                                                             c =>
                                                                                 c.region.id == regionList[r].regionId
@@ -1166,24 +1215,24 @@ export default class QatProblemActionNew extends Component {
 
                                                     }
                                                 }
-                                                console.log("time taken by complete logic to execute+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-                                                console.log("start time to set planning unit list the program data boject+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                                // console.log("time taken by complete logic to execute+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                                // console.log("start time to set planning unit list the program data boject+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                 var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                 var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                                 //previously we use to use this bcz we use to calculate for all program now we do it for one program at a time so we can remove filter from below line.
-                                                console.log("time taken to get object store+++", problemOs);
-                                                console.log("problemActionList***", problemActionList);
+                                                // console.log("time taken to get object store+++", problemOs);
+                                                // console.log("problemActionList***", problemActionList);
                                                 var paList = problemActionList.filter(c => c.program.id == programList[pp].programId)
                                                 programList[pp].problemReportList = paList;
-                                                console.log("paList***", paList);
+                                                // console.log("paList***", paList);
 
                                                 // after the logic for QPL is run accordign to the type and planning unit list we are clearing the action list and update the date on which QPL is calcukated
                                                 programList[pp].actionList = [];
                                                 programList[pp].qplLastModifiedDate = curDate;
 
-                                                var openCount = (paList.filter(c => c.problemStatus.id == 1)).length;
-                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3)).length;
-                                                console.log("openCount***", openCount, "addressedCount***", addressedCount);
+                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                                // console.log("openCount***", openCount, "addressedCount***", addressedCount);
                                                 var programQPLDetailsJson = {
                                                     id: programRequestList[pp].id,
                                                     openCount: openCount,
@@ -1194,15 +1243,15 @@ export default class QatProblemActionNew extends Component {
                                                     programId: programList[pp].programId,
                                                     programModified: programQPLDetailsGetRequest.result.programModified
                                                 }
-                                                console.log("open+++", openCount, "addressed+++", addressedCount);
-                                                console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
+                                                // console.log("open+++", openCount, "addressed+++", addressedCount);
+                                                // console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
                                                 // programRequestList[pp].openCount=openCount;
                                                 // programRequestList[pp].addressedCount=addressedCount;
-                                                console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                                // console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                 programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
-                                                console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                                // console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                             } catch (err) {
-                                                console.log("In error@@@")
+                                                // console.log("In error@@@")
                                                 if (this.props.fetchData != undefined) {
                                                     this.props.fetchData();
                                                 }
@@ -1221,7 +1270,7 @@ export default class QatProblemActionNew extends Component {
                                             putRequest.onsuccess = function (event) {
                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                console.log("programQPLDetailsJson***", programQPLDetailsJson);
+                                                // console.log("programQPLDetailsJson***", programQPLDetailsJson);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                 programQPLDetailsRequest.onsuccess = function (event) {
                                                     if (this.props.updateState != undefined) {
@@ -1233,8 +1282,8 @@ export default class QatProblemActionNew extends Component {
 
                                                 }.bind(this);
                                             }.bind(this);
-                                            console.log("problemList for each program***", problemActionList);
-                                            console.log("new logic ends+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                            console.log("problemList for program***", problemActionList);
+                                            // console.log("new logic ends+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                         }
                                     }.bind(this);
                                 }.bind(this);

@@ -553,6 +553,29 @@ class Budgets extends Component {
                                 console.log("B** json ---", json);
                             }
                             console.log("B** data ---", data);
+
+                            data.sort(function (a, b) {
+                                var keyA = new Date(a.startDate),
+                                    keyB = new Date(b.startDate);
+                                // Compare the 2 dates
+                                if (keyA < keyB) return -1;
+                                if (keyA > keyB) return 1;
+                                return 0;
+                            });
+                            data.sort(function (a, b) {
+                                var keyA1 = new Date(a.startDate),
+                                    keyA11 = new Date(a.stopDate),
+                                    keyB1 = new Date(b.startDate),
+                                    keyB11 = new Date(b.stopDate);
+                                // Compare the 2 dates
+                                if (keyA1.getTime() === keyB1.getTime()) {
+                                    if (keyA11 < keyB11) return -1;
+                                    if (keyA11 > keyB11) return 1;
+                                }
+                                return 0;
+                            });
+
+                            console.log("data---->", data);
                             this.setState({
                                 selBudget: data,
                                 message: '',
@@ -907,20 +930,35 @@ class Budgets extends Component {
                 }
 
                 console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
+
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        }),
-                        versionId: localStorage.getItem("sesVersionIdReport")
-                    }, () => {
-                        this.filterData();
-                    })
+
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+                    if (versionVar != '' && versionVar != undefined) {
+                        this.setState({
+                            versions: versionList,
+                            versionId: localStorage.getItem("sesVersionIdReport")
+                        }, () => {
+                            this.filterData();
+                        })
+                    } else {
+                        this.setState({
+                            versions: versionList,
+                            versionId: versionList[0].versionId
+                        }, () => {
+                            this.filterData();
+                        })
+                    }
                 } else {
                     this.setState({
-                        versions: verList.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })
+                        versions: versionList,
+                        versionId: versionList[0].versionId
+                    }, () => {
+                        this.filterData();
                     })
                 }
 
@@ -942,8 +980,10 @@ class Budgets extends Component {
 
     setProgramId(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            versionId: ''
         }, () => {
+            localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
             this.filterData()
         })

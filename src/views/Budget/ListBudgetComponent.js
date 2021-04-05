@@ -507,7 +507,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -527,6 +527,10 @@ class ListBudgetComponent extends Component {
       fundingSourceList: [],
       loading: true,
       programs: [],
+      programId: localStorage.getItem("sesBudPro") != "" ? localStorage.getItem("sesBudPro") : 0,
+      fundingSourceId: localStorage.getItem("sesBudFs") != "" ? localStorage.getItem("sesBudFs") : 0,
+      statusId: localStorage.getItem("sesBudStatus") != "" ? localStorage.getItem("sesBudStatus") : "true",
+
     }
 
     this.editBudget = this.editBudget.bind(this);
@@ -539,6 +543,36 @@ class ListBudgetComponent extends Component {
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
     this.hideSecondComponent = this.hideSecondComponent.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
+    this.programChanged = this.programChanged.bind(this);
+    this.fundingSourceChanged = this.fundingSourceChanged.bind(this);
+    this.statusChanged = this.statusChanged.bind(this);
+  }
+
+  programChanged(event) {
+    localStorage.setItem("sesBudPro", event.target.value);
+    this.setState({
+      programId: event.target.value
+    }, () => {
+      this.filterData();
+    })
+  }
+
+  fundingSourceChanged(event) {
+    localStorage.setItem("sesBudFs", event.target.value);
+    this.setState({
+      fundingSourceId: event.target.value
+    }, () => {
+      this.filterData();
+    })
+  }
+
+  statusChanged(event) {
+    localStorage.setItem("sesBudStatus", event.target.value);
+    this.setState({
+      statusId: event.target.value
+    }, () => {
+      this.filterData();
+    })
   }
 
   hideFirstComponent() {
@@ -560,9 +594,9 @@ class ListBudgetComponent extends Component {
 
 
   filterData() {
-    let fundingSourceId = document.getElementById("fundingSourceId").value;
-    let programId = document.getElementById("programId").value;
-    var selStatus = document.getElementById("active").value;
+    let fundingSourceId = this.state.fundingSourceId;
+    let programId = this.state.programId;
+    var selStatus = this.state.statusId;
     let tempSelStatus = (selStatus == "true" ? true : false)
 
     if (fundingSourceId != 0 && programId != 0 && selStatus != "") {
@@ -665,7 +699,7 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
       var budgetId = budget.budgetId
       this.props.history.push({
         pathname: `/budget/editBudget/${budgetId}`,
@@ -704,10 +738,10 @@ class ListBudgetComponent extends Component {
       data[6] = budgetList[j].budgetAmt;
       data[7] = (budgetList[j].usedUsdAmt).toFixed(2);
       data[8] = (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2);
-      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`${DATE_FORMAT_CAP}`) : null);
-      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`${DATE_FORMAT_CAP}`) : null);
+      data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
+      data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
       data[11] = budgetList[j].lastModifiedBy.username;
-      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`${DATE_FORMAT_CAP}`) : null)
+      data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null)
       // data[9] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
       // data[10] = budgetList[j].budgetAmt;
       // data[11] = budgetList[j].usedUsdAmt;
@@ -789,12 +823,14 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.startdate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
           title: i18n.t('static.common.stopdate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
@@ -804,7 +840,8 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.common.lastModifiedDate'),
-          type: 'text',
+          options: { format: JEXCEL_DATE_FORMAT_SM },
+          type: 'calendar'
           // readOnly: true
         },
         {
@@ -899,7 +936,7 @@ class ListBudgetComponent extends Component {
     } else {
       // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
       if (this.state.selBudget.length != 0) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
           this.props.history.push({
             pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
           });
@@ -1339,7 +1376,7 @@ class ListBudgetComponent extends Component {
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
@@ -1356,7 +1393,8 @@ class ListBudgetComponent extends Component {
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.programId}
+                        onChange={(e) => this.programChanged(e)}
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {programList}
@@ -1374,7 +1412,8 @@ class ListBudgetComponent extends Component {
                         name="fundingSourceId"
                         id="fundingSourceId"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.fundingSourceId}
+                        onChange={(e) => this.fundingSourceChanged(e)}
                       >
                         <option value="0">{i18n.t('static.common.all')}</option>
                         {fundingSources}
@@ -1391,7 +1430,8 @@ class ListBudgetComponent extends Component {
                         name="active"
                         id="active"
                         bsSize="sm"
-                        onChange={this.filterData}
+                        value={this.state.statusId}
+                        onChange={(e) => this.statusChanged(e)}
                       >
                         <option value="">{i18n.t('static.common.all')}</option>
                         <option value="true" selected>{i18n.t('static.common.active')}</option>

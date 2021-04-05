@@ -819,7 +819,7 @@ export default class ProgramList extends Component {
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CREATE_A_PROGRAM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SET_UP_PROGRAM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>

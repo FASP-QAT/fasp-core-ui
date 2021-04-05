@@ -160,7 +160,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
-                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage"];
+                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -168,6 +168,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                                         // localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
+                                                        localStorage.setItem('sessionType', "Online");
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('lang', decoded.user.language.languageCode);

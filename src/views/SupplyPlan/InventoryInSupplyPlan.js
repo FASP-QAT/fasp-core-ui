@@ -43,11 +43,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`O${parseInt(data[i].y) + 1}`, true)
                 var adjustmentType = this.props.items.inventoryType;
                 (instance.jexcel).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
                 (instance.jexcel).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
                 (instance.jexcel).setValueFromCoords(4, data[i].y, adjustmentType, true);
+                var index = (instance.jexcel).getValue(`O${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(12, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, "", true);
@@ -82,7 +82,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true)
+                var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     var rowData = (instance.jexcel).getRowData(0);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, rowData[2], true);
@@ -365,7 +365,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 var rowData = elInstance.getRowData(y);
                                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-                                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")  && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
                                     for (var c = 0; c < colArr.length; c++) {
                                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                                         cell.classList.add('readonly');
@@ -449,7 +449,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                             var inventoryBatchEditable = inventoryEditable;
                                             var lastEditableDate = "";
                                             lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1) {
+                                            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1  && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
                                                 inventoryBatchEditable = false;
                                             }
                                             if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
@@ -904,25 +904,25 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
 
-        if (x == 10) {
-            if (rowData[4] == 2) {
-                var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
-                if (valid == true) {
-                    if (rowData[10].length > 600) {
-                        inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                    } else {
-                        positiveValidation("K", y, elInstance);
-                    }
-                }
-            } else {
-                if (rowData[10].length > 600) {
-                    inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                } else {
-                    positiveValidation("K", y, elInstance);
-                }
-            }
+        // if (x == 10) {
+        //     if (rowData[4] == 2) {
+        //         var valid = checkValidtion("text", "K", y, rowData[10], elInstance);
+        //         if (valid == true) {
+        //             if (rowData[10].length > 600) {
+        //                 inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+        //             } else {
+        //                 positiveValidation("K", y, elInstance);
+        //             }
+        //         }
+        //     } else {
+        //         if (rowData[10].length > 600) {
+        //             inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+        //         } else {
+        //             positiveValidation("K", y, elInstance);
+        //         }
+        //     }
+        // }
 
-        }
         // this.showOnlyErrors();
     }
 
@@ -1337,7 +1337,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 // adjustmentsQty += (map.get("7") * map.get("4"))
                 var rowData = elInstance.getRowData(y);
                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
+                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")  && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
                 } else {
                     // var colArr = ['D'];
                     // for (var c = 0; c < colArr.length; c++) {
@@ -1478,20 +1478,20 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             valid = false;
                             elInstance.setValueFromCoords(16, y, 1, true);
                         } else {
-                            if (rowData[10].length > 600) {
-                                inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                                valid = false;
-                            } else {
-                                positiveValidation("K", y, elInstance);
-                            }
+                            // if (rowData[10].length > 600) {
+                            //     inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                            //     valid = false;
+                            // } else {
+                            //     positiveValidation("K", y, elInstance);
+                            // }
                         }
                     } else {
-                        if (rowData[10].length > 600) {
-                            inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
-                            valid = false;
-                        } else {
-                            positiveValidation("K", y, elInstance);
-                        }
+                        // if (rowData[10].length > 600) {
+                        //     inValid("K", y, i18n.t('static.dataentry.notesMaxLength'), elInstance);
+                        //     valid = false;
+                        // } else {
+                        //     positiveValidation("K", y, elInstance);
+                        // }
                     }
 
 
@@ -1562,7 +1562,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         actionList = []
                     }
                     var minDate = "";
-                    var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var curUser = AuthenticationService.getLoggedInUserId();
                     var username = AuthenticationService.getLoggedInUsername();
                     for (var i = 0; i < json.length; i++) {

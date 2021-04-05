@@ -77,7 +77,9 @@ let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
-{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 }];
+{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
+{ text: i18n.t('static.supplyPlanFormula.na'), color: "#cfcdc9", value: 4 }
+];
 
 // const legendcolor = [{ text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
 // { text: i18n.t('static.report.stockout'), color: "#ed5626", value: 0 },
@@ -333,7 +335,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
     for (var item = 0; item < re.length; item++) {
       re[item].programData.map(p =>
-        A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), this.roundN(p.mos), p.minMos, p.maxMos])])
+        A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(p.program.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20'), this.round(p.amc), this.round(p.finalClosingBalance), p.mos != null ? this.roundN(p.mos) : i18n.t("static.supplyPlanFormula.na"), p.minMos, p.maxMos])])
       )
     }
     for (var i = 0; i < A.length; i++) {
@@ -366,7 +368,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   cellstyleWithData = (item) => {
     console.log(item)
-    if (this.roundN(item.mos) == 0) {
+    if (item.mos != null && this.roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color }
     } else if (this.roundN(item.mos) != 0 && this.roundN(item.mos) != null && this.roundN(item.mos) < item.minMos) {
       return { backgroundColor: legendcolor[1].color }
@@ -374,6 +376,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       return { backgroundColor: legendcolor[2].color }
     } else if (this.roundN(item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color }
+    } else if (item.mos == null) {
+      return { backgroundColor: legendcolor[4].color }
     }
   }
 
@@ -453,7 +457,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
     const headers = [[i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.program.programMaster'), i18n.t('static.supplyPlan.amc'), i18n.t('static.supplyPlan.endingBalance'), i18n.t('static.supplyPlan.monthsOfStock'), i18n.t('static.supplyPlan.minStock'), i18n.t('static.supplyPlan.maxStock')]]
     var data = [];
-    this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), this.formatter(this.roundN(p.mos)), p.minMos, p.maxMos])));
+    this.state.data.map(elt => elt.programData.map(p => data.push([elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), getLabelText(p.program.label, this.state.lang), this.formatter(this.round(p.amc)), this.formatter(this.round(p.finalClosingBalance)), p.mos != null ? this.formatter(this.roundN(p.mos)) : i18n.t("static.supplyPlanFormula.na"), p.minMos, p.maxMos])));
     var height = doc.internal.pageSize.height;
     var startY = 150 + (this.state.countryValues.length * 2) + this.state.tracerCategoryLabels.length * 3
     let content = {
@@ -830,6 +834,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           } else if (stockStatusId == 2) {
             if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
               console.log('in 3')
+              filterProgramData.push(ele)
+            }
+          } else if (stockStatusId == 4) {
+            if (ele.mos == null) {
               filterProgramData.push(ele)
             }
           }
@@ -1361,7 +1369,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                     this.state.programLst.map(ele1 => {
                                       return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
                                         item => {
-                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos)}</td>)
+                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{item.programData.filter(c => c.program.code == ele1)[0].mos != null ? this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos) : i18n.t("static.supplyPlanFormula.na")}</td>)
                                         }
 
                                       )
