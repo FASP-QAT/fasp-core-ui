@@ -159,7 +159,7 @@ class SupplyPlanFormulas extends Component {
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance")+" / "+i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance") + " / " + i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={endingbalance} /><br></br>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
@@ -173,10 +173,10 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlan.projectedInventory") + " = 1,653 + (-100) + 5,176 - 7,087 - 642"}<br></br>
                     {i18n.t("static.supplyPlan.projectedInventory") + " = -1000"}<br></br>
                     {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 0"}<br></br>
-                    {i18n.t("static.supplyPlan.unmetDemandStr") + " = 0 - "+i18n.t("static.supplyPlan.projectedInventory")}<br></br>
+                    {i18n.t("static.supplyPlan.unmetDemandStr") + " = 0 - " + i18n.t("static.supplyPlan.projectedInventory")}<br></br>
                     {i18n.t("static.supplyPlan.unmetDemandStr") + " = 0 - (-1,000)"}<br></br>
                     {i18n.t("static.supplyPlan.unmetDemandStr") + " = 1,000)"}</p>
-                    <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 9,999"}<br></br>
                     {i18n.t("static.supplyPlan.adjustments") + " = -100"}<br></br>
                     {i18n.t("static.dashboard.shipments") + " = 5,176"}<br></br>
@@ -187,7 +187,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlan.projectedInventory") + " = 9,999 + (-100) + 5,176 - 7,087 - 642"}<br></br>
                     {i18n.t("static.supplyPlan.projectedInventory") + " = 7,346"}<br></br>
                     {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 7,346"}<br></br>
-                    {i18n.t("static.supplyPlan.unmetDemandStr")+" = "+i18n.t('static.supplyPlanFormula.na')}</p>
+                    {i18n.t("static.supplyPlan.unmetDemandStr") + " = " + i18n.t('static.supplyPlanFormula.na')}</p>
                   {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                 </ListGroupItemText>
               </ListGroupItem>
@@ -202,10 +202,10 @@ class SupplyPlanFormulas extends Component {
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.expiredStockEx")}<br></br>
                     {i18n.t("static.supplyPlanFormula.expiredStockEx3")}</p>
-                    <p>
+                  <p>
                     <span className="formulastext-p">{i18n.t("static.program.notes") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.expiredStockNote")}
-                    </p>
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
@@ -307,9 +307,15 @@ class SupplyPlanFormulas extends Component {
 
                   <img className="formula-img-mr img-fluid" src={suggestorder} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx3")}</p>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx4")}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestShipmentEx5")}<br></br><br></br>
+                    {i18n.t("static.supplyPlanFormula.whenToSuggestEx3")}
+
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
 
@@ -321,7 +327,6 @@ class SupplyPlanFormulas extends Component {
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}<br></br>
                     <br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
@@ -625,7 +630,7 @@ class SupplyPlanFormulas extends Component {
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance")+" / "+i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance") + " / " + i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={endingbalance} /><br></br>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
@@ -639,10 +644,10 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlan.projectedInventory") + " = 1,653 + (-100) + 5,176 - 7,087 - 642"}<br></br>
                     {i18n.t("static.supplyPlan.projectedInventory") + " = -1000"}<br></br>
                     {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 0"}<br></br>
-                    {i18n.t("static.supplyPlan.unmetDemandStr") + " = 0 - "+i18n.t("static.supplyPlan.projectedInventory")}<br></br>
+                    {i18n.t("static.supplyPlan.unmetDemandStr") + " = 0 - " + i18n.t("static.supplyPlan.projectedInventory")}<br></br>
                     {i18n.t("static.supplyPlan.unmetDemandStr") + " = 0 - (-1,000)"}<br></br>
                     {i18n.t("static.supplyPlan.unmetDemandStr") + " = 1,000)"}</p>
-                    <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 9,999"}<br></br>
                     {i18n.t("static.supplyPlan.adjustments") + " = -100"}<br></br>
                     {i18n.t("static.dashboard.shipments") + " = 5,176"}<br></br>
@@ -653,7 +658,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlan.projectedInventory") + " = 9,999 + (-100) + 5,176 - 7,087 - 642"}<br></br>
                     {i18n.t("static.supplyPlan.projectedInventory") + " = 7,346"}<br></br>
                     {i18n.t("static.supplyPlanFormula.endingBalanceFormula") + " = 7,346"}<br></br>
-                    {i18n.t("static.supplyPlan.unmetDemandStr")+" = "+i18n.t('static.supplyPlanFormula.na')}</p>
+                    {i18n.t("static.supplyPlan.unmetDemandStr") + " = " + i18n.t('static.supplyPlanFormula.na')}</p>
                   {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                 </ListGroupItemText>
               </ListGroupItem>
