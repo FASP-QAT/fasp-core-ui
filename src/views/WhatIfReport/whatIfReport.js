@@ -3594,6 +3594,7 @@ export default class WhatIfReportComponent extends React.Component {
                     shelfLife: shelfLife,
                     shipmentList: shipmentList,
                     showShipments: 1,
+                    isSuggested:1
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -5083,7 +5084,8 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     showShipments: 1,
                     shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    isSuggested:0
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
