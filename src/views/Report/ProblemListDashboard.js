@@ -64,7 +64,7 @@ export default class ProblemListDashboardComponent extends React.Component {
     render() {
         return (
             <div>
-                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options} style={{width:"auto"}}>
                     <thead>
                         <tr>
                             <td></td>
