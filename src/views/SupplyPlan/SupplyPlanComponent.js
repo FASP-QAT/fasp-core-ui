@@ -715,7 +715,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
             }
@@ -743,7 +743,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
             }
@@ -771,7 +771,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
 
@@ -899,7 +899,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
@@ -927,7 +927,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
@@ -955,7 +955,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
 
