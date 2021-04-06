@@ -892,7 +892,7 @@ export default class EditLanguageComponent extends Component {
                                                             <FormGroup className="col-md-6 ">
                                                                 <Label for="problemDescription">{i18n.t('static.report.problemDescription')}</Label>
                                                                 <Input
-                                                                    // type="hidden"
+                                                                    type="textarea"
                                                                     name="problemDescription"
                                                                     id="problemDescription"
                                                                     bsSize="sm"
