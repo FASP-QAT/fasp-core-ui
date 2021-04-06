@@ -191,7 +191,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
       loading: true,
       programLstFiltered: []
 
