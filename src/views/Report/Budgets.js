@@ -65,7 +65,9 @@ const chartoptions =
         xAxes: [{
             scaleLabel: {
                 display: true,
-                labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
+                // labelString: i18n.t('static.supplyPlan.amountInUSD') + '' + i18n.t('static.report.inmillions'),
+                labelString: i18n.t('static.supplyPlan.amountInUSD'),
+                // + '' + i18n.t('static.report.inmillions'),
                 fontColor: 'black',
                 fontStyle: "normal",
                 fontSize: "12"
@@ -73,16 +75,20 @@ const chartoptions =
             ticks: {
                 fontColor: 'black',
                 callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    // var cell1 = value
+                    // cell1 += '';
+                    // var x = cell1.split('.');
+                    // var x1 = x[0];
+                    // var x2 = x.length > 1 ? '.' + x[1] : '';
+                    // var rgx = /(\d+)(\d{3})/;
+                    // while (rgx.test(x1)) {
+                    //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    // }
+                    // return x1 + x2;
+                    if (value != null) {
+                        return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     }
-                    return x1 + x2;
+
 
                 }
             }
@@ -90,6 +96,8 @@ const chartoptions =
     },
 
     tooltips: {
+        mode: 'index',
+        intersect: false,
         enabled: false,
         custom: CustomTooltips,
         callbacks: {
@@ -98,18 +106,23 @@ const chartoptions =
                 let label = data.labels[tooltipItem.index];
                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
-                var cell1 = value
-                cell1 += '';
-                var x = cell1.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                // var cell1 = value
+                // cell1 += '';
+                // var x = cell1.split('.');
+                // var x1 = x[0];
+                // var x2 = x.length > 1 ? '.' + x[1] : '';
+                // var rgx = /(\d+)(\d{3})/;
+                // while (rgx.test(x1)) {
+                //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                // }
+                // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
             }
         }
+    },
+    hover: {
+        mode: 'index',
+        intersect: false
     },
     maintainAspectRatio: false,
     legend: {
@@ -299,19 +312,7 @@ class Budgets extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-    formatter = value => {
 
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
@@ -334,7 +335,8 @@ class Budgets extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        // this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.roundN(ele.budgetAmt), this.roundN(ele.plannedBudgetAmt), this.roundN(ele.orderedBudgetAmt), this.roundN((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -421,7 +423,8 @@ class Budgets extends Component {
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        // const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatter(this.roundN(ele.budgetAmt)), this.formatter(this.roundN(ele.plannedBudgetAmt)), this.formatter(this.roundN(ele.orderedBudgetAmt)), this.formatter(this.roundN(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -541,11 +544,13 @@ class Budgets extends Component {
                                     program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
                                     fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
                                     currency: budgetList[l].currency,
-                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    // orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
+                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
                                     startDate: budgetList[l].startDate,
                                     stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt / 1000000
+                                    budgetAmt: budgetList[l].budgetAmt
 
                                 }
 
@@ -596,7 +601,7 @@ class Budgets extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
-                        console.log(JSON.stringify(response.data));
+                        console.log("BudgetData--------", response.data);
                         this.setState({
                             selBudget: response.data, message: '', loading: false
                         })
@@ -1042,6 +1047,30 @@ class Budgets extends Component {
         // return currencyCode + "    " + x1 + x2;
         return x1 + x2
     }
+
+    formatter = value => {
+        if (value != null) {
+            var cell1 = parseFloat(value).toFixed(2)
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else {
+            return ''
+        }
+    }
+
+    formatterValue = value => {
+        if (value != null) {
+            return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+        }
+    }
+
     handleChangeProgram = (programIds) => {
 
         this.setState({
@@ -1087,10 +1116,13 @@ class Budgets extends Component {
         let data3 = []
         for (var i = 0; i < budgets.length; i++) {
             console.log(this.state.selBudget.filter(c => c.budget.id = budgets[i].id))
-            data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
-            data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
+            // data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
+            // data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
+            // data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
 
-            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
+            data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.orderedBudgetAmt)))
+            data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.plannedBudgetAmt)))
+            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
         }
 
         const bar = {
@@ -1210,43 +1242,59 @@ class Budgets extends Component {
             },
             {
                 dataField: 'budgetAmt',
-                text: i18n.t('static.budget.budgetamount') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.budget.budgetamount'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN
+                // formatter: this.roundN
+                // formatter: this.formatter
+                formatter: this.formatterValue,
             },
             {
                 dataField: 'plannedBudgetAmt',
-                text: i18n.t('static.report.plannedBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.plannedBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN,
+                // formatter: this.roundN,
+                // formatter: this.formatter,
+                formatter: this.formatterValue,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.plannedbudgetStatus')
             }
             ,
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.orderedBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.orderedBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
-                formatter: this.roundN,
+                // formatter: this.roundN,
+                // formatter: this.formatter,
+                formatter: this.formatterValue,
                 headerTitle: (cell, row, rowIndex, colIndex) => i18n.t('static.report.OrderedbudgetStatus')
             },
             {
                 dataField: 'orderedBudgetAmt',
-                text: i18n.t('static.report.remainingBudgetAmt') + i18n.t('static.report.inmillions'),
+                text: i18n.t('static.report.remainingBudgetAmt'),
+                // + i18n.t('static.report.inmillions'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '100px' },
+                // formatter: (cell, row) => {
+                //     return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                // }
+                // formatter: (cell, row) => {
+                //     return (row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt)).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                // }
                 formatter: (cell, row) => {
-                    return this.roundN(row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt), row)
+                    return Math.floor((row.budgetAmt - (row.plannedBudgetAmt + row.orderedBudgetAmt))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                 }
             },
 
