@@ -799,6 +799,7 @@
     "static.message.user.TokenExpired": "Le mot de passe à usage unique a expiré",
     "static.dashboard.healtharea": "Secteurs techniques",
     "static.report.warehouseCapacity": "Capacité de l`entrepôt (par programme)",
+    "static.shipmentDataEntry.suggestedShipmentQtyConfirm": "Cliquez sur OK pour mettre à jour la quantité de commande avec la quantité d`expédition suggérée",
     "static.quantimed.importpercentage": "Pourcentage d`importation",
     "static.dimension.dimensionName": "Nom de la dimension",
     "static.program.programMaster": "Programme",
