@@ -735,7 +735,7 @@ class ListBudgetComponent extends Component {
       // data[6] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       // data[7] = budgetList[j].currency.currencyCode + " " + ((budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
       data[5] = budgetList[j].currency.currencyCode;
-      data[6] = budgetList[j].budgetAmt;
+      data[6] = parseFloat(budgetList[j].budgetAmt).toFixed(2);
       data[7] = (budgetList[j].usedUsdAmt).toFixed(2);
       data[8] = (budgetList[j].budgetAmt - budgetList[j].usedUsdAmt).toFixed(2);
       data[9] = (budgetList[j].startDate ? moment(budgetList[j].startDate).format(`YYYY-MM-DD HH:mm:ss`) : null);

@@ -479,7 +479,17 @@ export default class QatProblemActionNew extends Component {
                                                                     );
                                                                     if (filteredShipmentList.length > 0) {
                                                                         var shipmentIdsFromShipmnetList = [];
+
                                                                         for (var s = 0; s < filteredShipmentList.length; s++) {
+                                                                            // var shipmentDetailsJson = [];
+                                                                            var shipmentDetailsJson = {}
+                                                                            shipmentDetailsJson["procurementAgentCode"] = filteredShipmentList[s].procurementAgent.code;
+                                                                            shipmentDetailsJson["orderNo"] = filteredShipmentList[s].orderNo;
+                                                                            shipmentDetailsJson["shipmentQuantity"] = filteredShipmentList[s].shipmentQty;
+                                                                            shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
+                                                                            // shipmentDetailsJson.push(itemShipment);
+                                                                            console.log("shipmentDetailsJson+++", shipmentDetailsJson)
+
                                                                             shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
                                                                             var indexShipment = 0;
                                                                             var newAddShipment = false;
@@ -490,10 +500,11 @@ export default class QatProblemActionNew extends Component {
                                                                             );
                                                                             if (indexShipment == -1) {
                                                                                 var index = 0;
-                                                                                createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList);
+                                                                                createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
+                                                                                    problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
                                                                                     openProblem(indexShipment, username, userId, problemActionList);
                                                                                 }
                                                                             }
@@ -544,7 +555,9 @@ export default class QatProblemActionNew extends Component {
                                                                     // console.log("submited status list===>", filteredShipmentList);
                                                                     if (filteredShipmentList.length > 0) {
                                                                         var shipmentIdsFromShipmnetList = [];
+                                                                        
                                                                         for (var s = 0; s < filteredShipmentList.length; s++) {
+
                                                                             var papuResult = procurementAgentListForProblemActionreport.filter(c => c.procurementAgentId == filteredShipmentList[s].procurementAgent.id)[0];
                                                                             var submittedDate = filteredShipmentList[s].submittedDate;
                                                                             var approvedDate = filteredShipmentList[s].approvedDate;
@@ -585,6 +598,17 @@ export default class QatProblemActionNew extends Component {
                                                                                 // plannedDate = moment(submittedDate).subtract(parseInt(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                             }
                                                                             //  //console.log("submittedDate=====>", submittedDate);
+                                                                            // var shipmentDetailsJson = [];
+                                                                            var shipmentDetailsJson = {}
+                                                                            shipmentDetailsJson["procurementAgentCode"] = filteredShipmentList[s].procurementAgent.code;
+                                                                            shipmentDetailsJson["orderNo"] = filteredShipmentList[s].orderNo;
+                                                                            shipmentDetailsJson["shipmentQuantity"] = filteredShipmentList[s].shipmentQty;
+                                                                            // shipmentDetailsJson["shipmentDate"] = submittedDate;
+                                                                            shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
+                                                                            shipmentDetailsJson["submittedDate"] = submittedDate;
+                                                                            // shipmentDetailsJson.push(itemShipment);
+                                                                            console.log("shipmentDetailsJson+++", shipmentDetailsJson)
+
                                                                             if ((moment(submittedDate).add(parseInt(typeProblemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                                 shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
                                                                                 var indexShipment = 0;
@@ -597,11 +621,12 @@ export default class QatProblemActionNew extends Component {
                                                                                 );
                                                                                 if (indexShipment == -1) {
                                                                                     var index = 0;
-                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList);
+                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList,shipmentDetailsJson);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // make shipmet problem status eual to open========
                                                                                     if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
+                                                                                        problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
                                                                                         openProblem(indexShipment, username, userId, problemActionList);
                                                                                     }
                                                                                 }
@@ -609,7 +634,7 @@ export default class QatProblemActionNew extends Component {
                                                                         }
                                                                         //new for loop logic=======================================
                                                                         var problemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0)
-                                                                        // console.log("shipmentIdsFromShipmnetList",shipmentIdsFromShipmnetList);
+                                                                        // console.log("shipmentIdsFromShipmnetList",shipmentIdsFromShipmnetList);s
                                                                         for (var fsl = 0; fsl < problemActionListForShipments.length; fsl++) {
                                                                             var fslShipmentId = problemActionListForShipments[fsl].shipmentId
                                                                             // console.log("fslShipmentId===>", fslShipmentId);
