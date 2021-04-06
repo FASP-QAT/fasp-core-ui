@@ -236,6 +236,12 @@ class EditSupplyPlanStatus extends Component {
         if (x != 22 && rowData[22] != 1) {
             elInstance.setValueFromCoords(22, y, 1, true);
         }
+
+        if(x==20){
+            if(value.toString()=="false"){
+                elInstance.setValueFromCoords(21, y, "", true);
+            }
+        }
     }
     hideFirstComponent() {
 
@@ -1221,9 +1227,9 @@ class EditSupplyPlanStatus extends Component {
                                 var paColor3 = "";
                                 var paColor4 = "";
                                 var paColor1Array = [];
-                                    var paColor2Array = [];
-                                    var paColor3Array = [];
-                                    var paColor4Array = [];
+                                var paColor2Array = [];
+                                var paColor3Array = [];
+                                var paColor4Array = [];
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -1409,7 +1415,7 @@ class EditSupplyPlanStatus extends Component {
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
                                 closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance })
-                                closingBalanceArray.push(jsonList[0].closingBalance)
+                                // closingBalanceArray.push(jsonList[0].closingBalance)
 
 
                                 lastClosingBalance = jsonList[0].closingBalance
@@ -1671,11 +1677,16 @@ class EditSupplyPlanStatus extends Component {
         ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
-                planningUnits: response.data, message: ''
+                planningUnits: (response.data).sort(function (a, b) {
+                        a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                        b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }.bind(this)), message: ''
             })
         })
             .catch(
                 error => {
+                    console.log("Error+++",error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2115,6 +2126,7 @@ class EditSupplyPlanStatus extends Component {
         }
 
         const { planningUnits } = this.state;
+
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return (
@@ -2375,7 +2387,7 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
                                             <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
-                                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                                            <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
 
                                         </ul>
                                     </FormGroup>
@@ -3230,14 +3242,24 @@ class EditSupplyPlanStatus extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (this.state.editable) {
-                    var rowData = elInstance.getRowData(y)[12];
-                    if (rowData == 4) {
+                    var rowData = elInstance.getRowData(y);
+                    if (rowData[12] == 4) {
                         var cell = elInstance.getCell(("S").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                         var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                         var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
+                    }
+                    if (this.state.editable) {
+                        if (rowData[20].toString() == "true") {
+                            var cell = elInstance.getCell(("V").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                        } else {
+                            var cell = elInstance.getCell(("V").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                            // elInstance.setValueFromCoords(x, y, "", true);
+                        }
                     }
                 }
 

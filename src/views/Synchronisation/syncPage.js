@@ -39,7 +39,8 @@ export default class syncPage extends Component {
       isChanged: false,
       conflictsCount: 0,
       loading: true,
-      versionType: 1
+      versionType: 1,
+      openCount: 0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -862,8 +863,11 @@ export default class syncPage extends Component {
 
     problemInstance.orderBy(20, 0);
     problemInstance.options.editable = false;
+    var json = problemInstance.getJson()
+    var openCount = json.filter(c => c[12] == OPEN_PROBLEM_STATUS_ID).length;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
         // this.generateDataAfterResolveConflictsForQPL();
@@ -906,8 +910,11 @@ export default class syncPage extends Component {
     }
     problemInstance.orderBy(20, 0);
     problemInstance.options.editable = false;
+    var json = problemInstance.getJson()
+    var openCount = json.filter(c => c[12] == OPEN_PROBLEM_STATUS_ID).length;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
         // this.generateDataAfterResolveConflictsForQPL();
@@ -2774,7 +2781,7 @@ export default class syncPage extends Component {
                         </FormGroup>
                         <FormGroup className="tab-ml-1 mt-4">
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || this.state.versionType == 2) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount==0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                           &nbsp;
                 </FormGroup>
                       </div>
@@ -3422,6 +3429,12 @@ export default class syncPage extends Component {
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
         mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false && c.regionActive != false)
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        this.setState({
+          openCount: mergedProblemListData.filter(c =>
+            c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
+            moment(c.createdDate).format("YYYY-MM-DD") > problemListDate).length
+        })
 
         var data = [];
         var mergedProblemListJexcel = [];
