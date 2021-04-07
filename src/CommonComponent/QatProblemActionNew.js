@@ -206,7 +206,7 @@ export default class QatProblemActionNew extends Component {
                                                         actionPlanningUnitIds.push(parseInt(m.planningUnitId));
                                                     });
                                                 programPlanningUnitList.filter(
-                                                    c => c.active == false).map(m => {
+                                                    c => c.active == false && c.program.id==programList[pp].programId).map(m => {
                                                         actionPlanningUnitIds.push(parseInt(m.planningUnit.id));
                                                     });
                                                 programList[pp].problemReportList.filter(
@@ -565,7 +565,10 @@ export default class QatProblemActionNew extends Component {
                                                                             var arrivedDate = filteredShipmentList[s].arrivedDate;
                                                                             var expectedDeliveryDate = filteredShipmentList[s].expectedDeliveryDate;
                                                                             if (filteredShipmentList[s].localProcurement) {
-                                                                                var addLeadTimes = programPlanningUnitList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id)[0].localProcurementLeadTime;
+                                                                                var addLeadTimes = programPlanningUnitList.filter(c => 
+                                                                                    c.planningUnit.id == filteredShipmentList[s].planningUnit.id
+                                                                                    && c.program.id==programList[pp].programId
+                                                                                    )[0].localProcurementLeadTime;
                                                                                 var leadTimesPerStatus = addLeadTimes / 5;
                                                                                 arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                 shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
