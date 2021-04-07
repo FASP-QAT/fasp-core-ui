@@ -649,7 +649,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
                                                     var rowData = obj.getRowData(y);
-                                                    if (rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1 && this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"))+2<=TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN) {
+                                                    if (rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1 && this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM")) + 2 <= TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN) {
                                                         items.push({
                                                             title: i18n.t("static.qpl.recalculate"),
                                                             onclick: function () {
@@ -659,6 +659,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 var unmetDemand = this.props.items.unmetDemand[index];
                                                                 var originalShipmentQty = Number(rowData[33]);
                                                                 var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
+                                                                if (newEndingBalance < 0) {
+                                                                    var tempEndingBalance = Number(newEndingBalance)+Number(unmetDemand);
+                                                                    unmetDemand += (0 - Number(tempEndingBalance));
+                                                                    newEndingBalance = 0;
+                                                                }
                                                                 var amc = Number(this.props.items.amcTotalData[index]);
                                                                 var mosForMonth1 = "";
                                                                 if (newEndingBalance != 0 && amc != 0) {
