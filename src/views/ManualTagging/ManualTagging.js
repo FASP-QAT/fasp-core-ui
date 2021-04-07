@@ -63,7 +63,8 @@ export default class ManualTagging extends Component {
             active2: false,
             active3: false,
             planningUnitValues: [],
-            planningUnitIds: []
+            planningUnitIds: [],
+            roNoOrderNo: ''
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -362,15 +363,15 @@ export default class ManualTagging extends Component {
 
     getOrderDetails = () => {
 
-        console.log("combo box value-------------------------------", document.getElementById("combo-box-demo").value);
+        // console.log("combo box value-------------------------------", document.getElementById("combo-box-demo").value);
 
         var roNoOrderNo = this.state.searchedValue;
-        console.log("roNoOrderNo---", roNoOrderNo);
+        console.log("roNoOrderNo--->>>", roNoOrderNo);
         var programId = document.getElementById("programId").value;
         var erpPlanningUnitId = this.state.planningUnitIdUpdated;
         console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
         if (roNoOrderNo != "" && erpPlanningUnitId != null && erpPlanningUnitId != "") {
-            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId)
+            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
                     console.log("artmis response===", response.data);
                     // document.getElementById("erpShipmentQty").value = '';
@@ -975,8 +976,7 @@ export default class ManualTagging extends Component {
                 data[8] = this.addCommas(manualTaggingList[j].shipmentQty);
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
                 data[10] = this.addCommas(manualTaggingList[j].shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
-                
-                data[10] = manualTaggingList[j].notes
+                data[11] = manualTaggingList[j].notes
             }
             manualTaggingArray[count] = data;
             count++;
@@ -993,7 +993,7 @@ export default class ManualTagging extends Component {
                 colWidths: [20, 40, 25, 20, 20, 40, 40, 25, 25],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
-                    
+
                     {
                         title: i18n.t('static.commit.qatshipmentId'),
                         type: 'text',
@@ -1094,7 +1094,7 @@ export default class ManualTagging extends Component {
             var options = {
                 data: data,
                 columnDrag: true,
-                colWidths: [20,20, 40, 45, 45, 45, 30, 30, 35, 25,35,35],
+                colWidths: [20, 20, 40, 45, 45, 45, 30, 30, 35, 25, 35, 35],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
@@ -1223,12 +1223,33 @@ export default class ManualTagging extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             var outputListAfterSearch = [];
-            let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
-            outputListAfterSearch.push(row);
+            let row;
+            if (this.state.active1) {
+                row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
+                outputListAfterSearch.push(row);
+            } else if (this.state.active2) {
+                console.log("my out put list---", this.state.outputList)
+                console.log("my coordinates---", this.el.getValueFromCoords(1, x))
+                row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(1, x)))[0];
+                console.log()
+                outputListAfterSearch.push(row);
+                console.log("my output---", document.getElementById("combo-box-demo1"));
+                let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
+                this.setState({
+                    roNoOrderNo: json,
+                    searchedValue: outputListAfterSearch[0].roNo,
+                    planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                }, () => {
+
+                    this.getOrderDetails();
+                });
+                // document.getElementById("combo-box-demo1").value = outputListAfterSearch[0].roNo;
+            }
+            // outputListAfterSearch.push(row);
 
             this.setState({
                 planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                shipmentId: this.el.getValueFromCoords(0, x),
+                shipmentId: this.el.getValueFromCoords(1, x),
                 outputListAfterSearch,
                 procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
                 planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
@@ -1889,6 +1910,7 @@ export default class ManualTagging extends Component {
                                                     >
                                                         <Autocomplete
                                                             id="combo-box-demo"
+                                                            value={this.state.roNoOrderNo}
                                                             options={this.state.autocompleteData}
                                                             getOptionLabel={(option) => option.label}
                                                             style={{ width: 300 }}

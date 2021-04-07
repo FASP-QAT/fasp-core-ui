@@ -7,8 +7,8 @@ class ManualTaggingSerice {
         return axios.post(`${API_URL}/api/manualTagging/`, json, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo,programId, erpPlanningUnitId) {
-        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}`, {
+    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo,programId, erpPlanningUnitId,linkingType) {
+        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
     }
     linkShipmentWithARTMIS(json) {
