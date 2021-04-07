@@ -671,8 +671,8 @@ export default class SupplyPlanComponent extends React.Component {
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
-                        myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
+                        myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
