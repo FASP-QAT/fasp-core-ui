@@ -222,6 +222,7 @@ export default class QunatimedImportStepFive extends Component {
                                             actionList = []
                                         }
                                         var qunatimedData = this.state.finalImportData;
+                                        var finalImportQATData = this.state.finalImportData;
                                         var finalPuList = []
                                         for (var i = 0; i < finalImportQATData.length; i++) {
                                             var index = finalPuList.findIndex(c => c == finalImportQATData[i].product.programPlanningUnitId)
