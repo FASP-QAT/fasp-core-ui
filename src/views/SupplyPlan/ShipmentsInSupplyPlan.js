@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -51,6 +51,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.oneditionend = this.oneditionend.bind(this);
     }
 
+    formatter = value => {
+        if (value != null && value != '' && !isNaN(Number(value))) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (value != null && isNaN(Number(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -75,6 +94,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(30, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(32, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(33, data[i].y, 0, true);
                 }
                 z = data[i].y;
             }
@@ -471,6 +491,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = shipmentList[i].active;//AE
                                             data[31] = 0;//AF
                                             data[32] = shipmentList[i].currency.conversionRateToUsd;//Conversionratetousdenterhere//AG
+                                            data[33] = shipmentList[i].shipmentQty;
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -508,6 +529,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = true;
                                             data[31] = 0;
                                             data[32] = 1;
+                                            data[33] = 0
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
@@ -545,6 +567,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: "Suggested order Qty" },
                                                 { type: 'hidden', title: "Is changed" },
                                                 { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
+                                                { type: 'hidden' },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' }
                                             ],
@@ -624,8 +647,75 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         });
                                                     }
 
-                                                    // Add shipment batch info
+
                                                     var rowData = obj.getRowData(y);
+                                                    if (rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1 && this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"))+2<=TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN) {
+                                                        items.push({
+                                                            title: i18n.t("static.qpl.recalculate"),
+                                                            onclick: function () {
+                                                                var expectedDeliveryDate = rowData[4];
+                                                                var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                                var endingBalance = Number(this.props.items.closingBalanceArray[index].balance);
+                                                                var unmetDemand = this.props.items.unmetDemand[index];
+                                                                var originalShipmentQty = Number(rowData[33]);
+                                                                var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
+                                                                var amc = Number(this.props.items.amcTotalData[index]);
+                                                                var mosForMonth1 = "";
+                                                                if (newEndingBalance != 0 && amc != 0) {
+                                                                    mosForMonth1 = Number(newEndingBalance / amc).toFixed(1);
+                                                                } else if (amc == 0) {
+                                                                    mosForMonth1 = null;
+                                                                } else {
+                                                                    mosForMonth1 = 0;
+                                                                }
+
+                                                                var mosForMonth2 = this.props.items.monthsOfStockArray[index + 1];
+                                                                var mosForMonth3 = this.props.items.monthsOfStockArray[index + 2];
+                                                                var minStockMoSQty = this.props.items.minStockMoSQty;
+                                                                var maxStockMoSQty = this.props.items.maxStockMoSQty;
+                                                                var suggestShipment = false;
+                                                                var useMax = false;
+                                                                if (Number(amc) == 0) {
+                                                                    suggestShipment = false;
+                                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                                                    suggestShipment = false;
+                                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                    suggestShipment = true;
+                                                                    useMax = true;
+                                                                } else if (Number(mosForMonth1) == 0) {
+                                                                    suggestShipment = true;
+                                                                    if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                        useMax = true;
+                                                                    } else {
+                                                                        useMax = false;
+                                                                    }
+                                                                }
+                                                                var newSuggestedShipmentQty = 0;
+                                                                if (suggestShipment) {
+                                                                    var suggestedOrd = 0;
+                                                                    if (useMax) {
+                                                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                    } else {
+                                                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                    }
+                                                                    if (suggestedOrd <= 0) {
+                                                                        newSuggestedShipmentQty = 0;
+                                                                    } else {
+                                                                        newSuggestedShipmentQty = suggestedOrd;
+                                                                    }
+                                                                } else {
+                                                                    newSuggestedShipmentQty = 0;
+                                                                }
+                                                                var cf = window.confirm(i18n.t("static.supplyPlanFormula.suggestedOrderQty") + " = " + this.formatter(newSuggestedShipmentQty) + `\r\n` + i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm'));
+                                                                if (cf == true) {
+                                                                    obj.setValueFromCoords(10, y, newSuggestedShipmentQty, true);
+                                                                } else {
+
+                                                                }
+                                                            }.bind(this)
+                                                        })
+                                                    }
+                                                    // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                     if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
@@ -1234,6 +1324,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[30] = true;
         data[31] = 0;
         data[32] = 1;
+        data[33] = 0;
         obj.insertRow(data);
         obj.setValueFromCoords(1, json.length, 0, true);
         obj.setValueFromCoords(10, json.length, 0, true);

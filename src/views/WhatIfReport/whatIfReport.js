@@ -493,7 +493,7 @@ export default class WhatIfReportComponent extends React.Component {
                         rows: [],
                         scenarioId: '',
                         percentage: '',
-                        
+
                     })
                 }.bind(this)
             }.bind(this)
@@ -2242,7 +2242,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
-        console.log("MonthCount+++",monthCount)
+        console.log("MonthCount+++", monthCount)
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -2273,7 +2273,8 @@ export default class WhatIfReportComponent extends React.Component {
             localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
-        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
+        var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
+        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;
         var consumptionTotalData = [];
         var shipmentsTotalData = [];
@@ -2844,6 +2845,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var sstd = {}
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
+                                    // var stockInHand = jsonList[0].closingBalance;
                                     var amc = Math.round(Number(jsonList[0].amc));
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
@@ -2851,44 +2853,51 @@ export default class WhatIfReportComponent extends React.Component {
                                     var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
                                     var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
                                     var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
-                                    if (compare && Number(mosForMonth1) <= Number(minStockMoSQty) && Number(mosForMonth2) <= Number(minStockMoSQty) && Number(mosForMonth3) <= Number(minStockMoSQty)) {
-                                        var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
-                                        if (suggestedOrd <= 0) {
-                                            var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                                parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                                parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                            var isEmergencyOrder = 0;
-                                            if (expectedDeliveryDate >= currentMonth) {
-                                                isEmergencyOrder = 0;
+
+                                    var suggestShipment = false;
+                                    var useMax = false;
+                                    if (compare) {
+                                        if (Number(amc) == 0) {
+                                            suggestShipment = false;
+                                        } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                            suggestShipment = false;
+                                        } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                            suggestShipment = true;
+                                            useMax = true;
+                                        } else if (Number(mosForMonth1) == 0) {
+                                            suggestShipment = true;
+                                            if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                useMax = true;
                                             } else {
-                                                isEmergencyOrder = 1;
+                                                useMax = false;
                                             }
+                                        }
+                                    } else {
+                                        suggestShipment = false;
+                                    }
+                                    var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                        parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                        parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                    var isEmergencyOrder = 0;
+                                    if (expectedDeliveryDate >= currentMonth) {
+                                        isEmergencyOrder = 0;
+                                    } else {
+                                        isEmergencyOrder = 1;
+                                    }
+                                    if (suggestShipment) {
+                                        var suggestedOrd = 0;
+                                        if (useMax) {
+                                            suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                        } else {
+                                            suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                        }
+                                        if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
                                         } else {
-                                            var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                                parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                                parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                            var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                            var isEmergencyOrder = 0;
-                                            if (expectedDeliveryDate >= currentMonth) {
-                                                isEmergencyOrder = 0;
-                                            } else {
-                                                isEmergencyOrder = 1;
-                                            }
                                             sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
                                         }
                                     } else {
-                                        var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                            parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                            parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                        var isEmergencyOrder = 0;
-                                        if (expectedDeliveryDate >= currentMonth) {
-                                            isEmergencyOrder = 0;
-                                        } else {
-                                            isEmergencyOrder = 1;
-                                        }
                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
                                     }
                                     suggestedShipmentsTotalData.push(sstd);
@@ -3524,7 +3533,8 @@ export default class WhatIfReportComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var planningUnitId = document.getElementById("planningUnitId").value;
-                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
+                var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
                 var shelfLife = programPlanningUnit.shelfLife;
                 if (month != "" && quantity != 0) {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
@@ -3581,6 +3591,7 @@ export default class WhatIfReportComponent extends React.Component {
                     shelfLife: shelfLife,
                     shipmentList: shipmentList,
                     showShipments: 1,
+                    isSuggested:1
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -4299,7 +4310,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" style={{ color: item1 == 0 ? "red" : "" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#ed5626" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
                                         </tr>
@@ -4910,8 +4921,13 @@ export default class WhatIfReportComponent extends React.Component {
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.stockOut')} </span></li>
                                     <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
                                     <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                    <li><span className="legendcolor" style={{ backgroundColor: "#ed5626" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                    <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                                    <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                                    <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                                    <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
                                     <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
-                                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                                    <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
                                 </ul>
                             </FormGroup>
                             <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
@@ -5068,7 +5084,8 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     showShipments: 1,
                     shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    isSuggested:0
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)

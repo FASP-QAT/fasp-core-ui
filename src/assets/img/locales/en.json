@@ -799,6 +799,7 @@
     "static.message.user.TokenExpired": "One-time password has expired",
     "static.dashboard.healtharea": "Technical areas",
     "static.report.warehouseCapacity": "Warehouse Capacity (by Program)",
+    "static.shipmentDataEntry.suggestedShipmentQtyConfirm": "Click on ok to update the order qty with suggested shipment qty",
     "static.quantimed.importpercentage": "Import Percentage",
     "static.dimension.dimensionName": "Dimension name",
     "static.program.programMaster": "Program",
