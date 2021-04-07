@@ -801,6 +801,7 @@
     "static.message.user.TokenExpired": "Contraseña provisional caducada",
     "static.dashboard.healtharea": "Áreas técnicas",
     "static.report.warehouseCapacity": "Capacidad de almacén (por programa)",
+    "static.shipmentDataEntry.suggestedShipmentQtyConfirm": "Haga clic en Aceptar para actualizar la cantidad del pedido con la cantidad de envío sugerida",
     "static.quantimed.importpercentage": "Porcentaje de importación",
     "static.dimension.dimensionName": "Nombre de la dimensión",
     "static.program.programMaster": "Programa",

@@ -801,6 +801,7 @@
     "static.message.user.TokenExpired": "A senha de uso único expirou",
     "static.dashboard.healtharea": "Áreas Técnicas",
     "static.report.warehouseCapacity": "Capacidade do armazém (por programa)",
+    "static.shipmentDataEntry.suggestedShipmentQtyConfirm": "Clique em ok para atualizar a quantidade do pedido com a quantidade de envio sugerida",
     "static.quantimed.importpercentage": "Porcentagem de Importação",
     "static.dimension.dimensionName": "Nome da Dimensão",
     "static.program.programMaster": "Programa",
