@@ -24,8 +24,8 @@ class ManualTaggingSerice {
         });
     }
 
-    searchErpOrderData(term, programId, erpPlanningUnitId) {
-        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}`, {
+    searchErpOrderData(term, programId, erpPlanningUnitId,linkingType) {
+        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
     }
 

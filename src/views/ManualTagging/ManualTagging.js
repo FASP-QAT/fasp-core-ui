@@ -32,6 +32,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            parentShipmentId: '',
             planningUnitIdUpdated: '',
             erpPlanningUnitId: '',
             conversionFactorEntered: false,
@@ -239,8 +240,10 @@ export default class ManualTagging extends Component {
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("7 map---" + map1.get("10"))
-                if (this.state.active1 && parseInt(map1.get("10")) === 1 && map1.get("0")) {
+                console.log("7 map order no--- ", map1.get("11"));
+                if (parseInt(map1.get("10")) === 1) {
                     let json = {
+                        parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
                         programId: programId,
                         shipmentId: this.state.shipmentId,
                         conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
@@ -363,7 +366,7 @@ export default class ManualTagging extends Component {
 
     getOrderDetails = () => {
 
-        // console.log("combo box value-------------------------------", document.getElementById("combo-box-demo").value);
+        console.log("combo box value-------------------------------", this.state.searchedValue);
 
         var roNoOrderNo = this.state.searchedValue;
         console.log("roNoOrderNo--->>>", roNoOrderNo);
@@ -644,7 +647,7 @@ export default class ManualTagging extends Component {
             console.log("programId ---", programId);
             console.log("erpPlanningUnitId ---", erpPlanningUnitId);
 
-            ManualTaggingService.searchErpOrderData(term.toUpperCase(), programId, erpPlanningUnitId)
+            ManualTaggingService.searchErpOrderData(term.toUpperCase(), programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
                     console.log("searchErpOrderData response===", response);
 
@@ -1227,15 +1230,22 @@ export default class ManualTagging extends Component {
             if (this.state.active1) {
                 row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
                 outputListAfterSearch.push(row);
+                let json = { id: '', label: '' };
+                this.setState({
+                    roNoOrderNo: json,
+                    searchedValue: '',
+                    planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                });
             } else if (this.state.active2) {
                 console.log("my out put list---", this.state.outputList)
                 console.log("my coordinates---", this.el.getValueFromCoords(1, x))
                 row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(1, x)))[0];
                 console.log()
                 outputListAfterSearch.push(row);
-                console.log("my output---", document.getElementById("combo-box-demo1"));
+                // console.log("my output---", document.getElementById("combo-box-demo1"));
                 let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
                 this.setState({
+                    parentShipmentId: outputListAfterSearch[0].parentShipmentId,
                     roNoOrderNo: json,
                     searchedValue: outputListAfterSearch[0].roNo,
                     planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
@@ -1243,13 +1253,12 @@ export default class ManualTagging extends Component {
 
                     this.getOrderDetails();
                 });
-                // document.getElementById("combo-box-demo1").value = outputListAfterSearch[0].roNo;
             }
             // outputListAfterSearch.push(row);
 
             this.setState({
                 planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                shipmentId: this.el.getValueFromCoords(1, x),
+                shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : this.el.getValueFromCoords(1, x)),
                 outputListAfterSearch,
                 procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
                 planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
@@ -1738,7 +1747,7 @@ export default class ManualTagging extends Component {
                                         <Label
                                             className="form-check-label"
                                             check htmlFor="inline-radio2">
-                                            {i18n.t('static.mt.notLinkedERP')}
+                                            {i18n.t('static.mt.linked')}
                                         </Label>
                                     </FormGroup>
                                     <FormGroup check inline>
@@ -1754,7 +1763,7 @@ export default class ManualTagging extends Component {
                                         <Label
                                             className="form-check-label"
                                             check htmlFor="inline-radio2">
-                                            {i18n.t('static.mt.linked')}
+                                            {i18n.t('static.mt.notLinkedERP')}
                                         </Label>
                                     </FormGroup>
                                 </FormGroup>
@@ -1910,16 +1919,26 @@ export default class ManualTagging extends Component {
                                                     >
                                                         <Autocomplete
                                                             id="combo-box-demo"
-                                                            value={this.state.roNoOrderNo}
+                                                            // value={this.state.roNoOrderNo}
+                                                            defaultValue={this.state.roNoOrderNo}
                                                             options={this.state.autocompleteData}
                                                             getOptionLabel={(option) => option.label}
                                                             style={{ width: 300 }}
                                                             onChange={(event, value) => {
                                                                 console.log("ro combo box---", value)
                                                                 if (value != null) {
-                                                                    this.setState({ searchedValue: value.label }, () => { this.getOrderDetails() });
+                                                                    console.log("Inside if");
+                                                                    this.setState({
+                                                                        searchedValue: value.label
+                                                                        ,
+                                                                        roNoOrderNo: value.label
+                                                                    }, () => { this.getOrderDetails() });
                                                                 } else {
-                                                                    this.setState({ searchedValue: '' }, () => { this.getOrderDetails() });
+                                                                    console.log("Inside else");
+                                                                    this.setState({
+                                                                        searchedValue: ''
+                                                                        // , roNoOrderNo: '' 
+                                                                    }, () => { this.getOrderDetails() });
                                                                 }
 
                                                             }} // prints the selected value
