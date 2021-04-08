@@ -65,6 +65,7 @@ class AddprogramPlanningUnit extends Component {
         // this.disableRow = this.disableRow.bind(this);
         // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
@@ -117,7 +118,15 @@ class AddprogramPlanningUnit extends Component {
         }, 8000);
     }
 
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
     componentDidMount() {
+        this.hideFirstComponent();
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
@@ -599,6 +608,31 @@ class AddprogramPlanningUnit extends Component {
                                                                         //         });
                                                                         //     }
                                                                         // }
+                                                                    }
+
+                                                                    //wr
+                                                                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                                        let cordsValue = `${this.el.getValueFromCoords(9, y)}`;
+                                                                        // console.log("CHECK--------->", cordsValue);
+                                                                        // if (cordsValue.length != 0) {
+                                                                        //     console.log("CHECK--------->not empty", cordsValue);
+                                                                        // } else {
+                                                                        //     console.log("CHECK--------->empty", cordsValue);
+                                                                        // }
+                                                                        if (obj.options.allowInsertRow == true) {
+                                                                            if (cordsValue.length != 0) {
+                                                                                items.push({
+                                                                                    title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
+                                                                                    onclick: function () {
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        this.props.history.push({
+                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(9, y)}/${programId}`,
+                                                                                        });
+
+                                                                                    }.bind(this)
+                                                                                });
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
 

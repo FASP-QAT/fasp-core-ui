@@ -67,7 +67,7 @@ const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListR
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
-const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProcurementAgentPlanningUnit/AddCountrySpecificPrice'));
+const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProgramProduct/AddCountrySpecificPrice'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
 const Logout = React.lazy(() => import('../../views/Pages/Login/LogoutComponent'));
 const AddRole = React.lazy(() => import('../../views/Role/AddRoleComponent'));
@@ -320,7 +320,8 @@ const routes = [
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   // { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
-  { path: '/programProduct/addProgramProduct', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct', exact: true, name: 'static.Update.PlanningUnits', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
@@ -402,7 +403,7 @@ const routes = [
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'static.breadcrum.add', entityname: 'static.dashboard.realmcountry', component: AddRealmCountry },
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
-  { path: '/procurementAgentPlanningUnit/addCountrySpecificPrice/:procurementAgentId/:planningUnitId/:procurementAgentPlanningUnitId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
 
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
