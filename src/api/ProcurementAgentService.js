@@ -22,7 +22,7 @@ class ProcurementAgentService {
     }
 
     getCountrySpecificPricesList(json) {
-        return axios.get(`${API_URL}/api/procurementAgent/planningUnit/${json}/program/`, {}
+        return axios.get(`${API_URL}/api/program/planningUnit/procurementAgent/${json}`, {}
         );
     }
 
@@ -34,7 +34,7 @@ class ProcurementAgentService {
 
     savePlanningUnitProgramPriceForProcurementAgent(json) {
         console.log("json papu---", json);
-        return axios.put(`${API_URL}/api/procurementAgent/planningingUnit/program/`, json, {}
+        return axios.put(`${API_URL}/api/program/planningingUnit/procurementAgent/`, json, {}
         );
     }
 

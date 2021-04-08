@@ -32,6 +32,7 @@ class CountrySpecificPrices extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             programs: [],
+            procurementAgents: [],
             procurementAgent: {
                 id: '',
                 label: {
@@ -44,7 +45,7 @@ class CountrySpecificPrices extends Component {
                     label_en: ''
                 }
             },
-            procurementAgentPlanningUnit: '',
+            programPlanningUnit: '',
             rows: [],
             isNew: true,
             updateRowStatus: 0,
@@ -67,68 +68,69 @@ class CountrySpecificPrices extends Component {
     }
 
     filterProgram = function (instance, cell, c, r, source) {
-        return this.state.programArr.filter(c => c.active.toString() == "true");
+        return this.state.procurementAgentArr.filter(c => c.active.toString() == "true");
     }.bind(this);
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProcurementAgentService.getCountrySpecificPricesList(this.props.match.params.procurementAgentPlanningUnitId).then(response => {
+        ProcurementAgentService.getCountrySpecificPricesList(this.props.match.params.programPlanningUnitId).then(response => {
             if (response.status == 200) {
                 console.log("getProcurementAgentPlaningUnitList---", response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
                 }
-                ProcurementAgentService.getProcurementAgentPlaningUnitList(this.props.match.params.procurementAgentId).then(response => {
+                ProgramService.getProgramPlaningUnitListByProgramId(this.props.match.params.programId).then(response => {
                     if (response.status == 200) {
                         console.log(response.data);
-                        let procurementAgentPlanningUnit = response.data.filter(c => c.procurementAgentPlanningUnitId == this.props.match.params.procurementAgentPlanningUnitId)[0];
-                        console.log("Success-------->", procurementAgentPlanningUnit);
+                        let programPlanningUnit = response.data.filter(c => c.programPlanningUnitId == this.props.match.params.programPlanningUnitId)[0];
+                        console.log("Success-------->", programPlanningUnit);
                         this.setState({
-                            procurementAgentPlanningUnit: procurementAgentPlanningUnit,
+                            programPlanningUnit: programPlanningUnit,
                             //  rows:response.data
                         })
 
-                        ProgramService.getProgramList().then(response => {
+                        ProcurementAgentService.getProcurementAgentListAll().then(response => {
                             if (response.status == 200) {
                                 console.log(response.data);
-
+                                console.log("Success-------->1", response.data);
                                 this.setState({
-                                    programs: response.data,
+                                    procurementAgents: response.data,
                                     //  rows:response.data
                                 })
 
-                                const { programs } = this.state;
+                                const { procurementAgents } = this.state;
 
-                                let programArr = [];
+                                let procurementAgentArr = [];
 
-                                if (programs.length > 0) {
-                                    for (var i = 0; i < programs.length; i++) {
+                                if (procurementAgents.length > 0) {
+                                    for (var i = 0; i < procurementAgents.length; i++) {
                                         var paJson = {
-                                            name: getLabelText(programs[i].label, this.state.lang),
-                                            id: parseInt(programs[i].programId),
-                                            active: programs[i].active,
-                                            programCode: programs[i].programCode
+                                            name: getLabelText(procurementAgents[i].label, this.state.lang),
+                                            id: parseInt(procurementAgents[i].procurementAgentId),
+                                            active: procurementAgents[i].active,
+                                            code: procurementAgents[i].procurementAgentCode,
                                         }
-                                        programArr[i] = paJson
+                                        procurementAgentArr[i] = paJson
                                     }
                                 }
-
-                                programArr.sort(function (a, b) {
-                                    var programCodeA = a.programCode.toUpperCase(); // ignore upper and lowercase
-                                    var programCodeB = b.programCode.toUpperCase(); // ignore upper and lowercase
-                                    if (programCodeA < programCodeB) {
+                                console.log("Success-------->2", response.data);
+                                procurementAgentArr.sort(function (a, b) {
+                                    var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase
+                                    if (itemLabelA < itemLabelB) {
                                         return -1;
                                     }
-                                    if (programCodeA > programCodeB) {
+                                    if (itemLabelA > itemLabelB) {
                                         return 1;
                                     }
 
                                     // names must be equal
                                     return 0;
                                 });
+                                console.log("Success-------->3", response.data);
                                 this.setState({
-                                    programArr: programArr,
+                                    procurementAgentArr: procurementAgentArr,
                                 })
                                 // Jexcel starts
                                 var papuList = this.state.rows;
@@ -140,27 +142,27 @@ class CountrySpecificPrices extends Component {
                                     for (var j = 0; j < papuList.length; j++) {
 
                                         data = [];
-                                        data[0] = this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en;
-                                        data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
-                                        data[2] = parseInt(papuList[j].program.id);
+                                        data[0] = this.state.programPlanningUnit.program.label.label_en;
+                                        data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;
+                                        data[2] = parseInt(papuList[j].procurementAgent.id);
                                         data[3] = papuList[j].price;
                                         data[4] = papuList[j].active;
-                                        data[5] = papuList[j].procurementAgentPlanningUnitId;
-                                        data[6] = papuList[j].procurementAgentPlanningUnitProgramId;
+                                        data[5] = papuList[j].programPlanningUnitId;
+                                        data[6] = papuList[j].programPlanningUnitProcurementAgentId;
                                         data[7] = 0;
-                                        
+
                                         papuDataArr[count] = data;
                                         count++;
                                     }
                                 }
                                 if (papuDataArr.length == 0) {
                                     data = [];
-                                    data[0] = this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en;
-                                    data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
+                                    data[0] = this.state.programPlanningUnit.program.label.label_en;
+                                    data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;
                                     data[2] = "";
                                     data[3] = "";
                                     data[4] = true;
-                                    data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+                                    data[5] = this.props.match.params.programPlanningUnitId;
                                     data[6] = 0;
                                     data[7] = 1;
                                     papuDataArr[0] = data;
@@ -176,7 +178,7 @@ class CountrySpecificPrices extends Component {
                                     columns: [
 
                                         {
-                                            title: i18n.t('static.report.procurementAgentName'),
+                                            title: i18n.t('static.program.programMaster'),
                                             type: 'text',
                                             readOnly: true
                                         },
@@ -187,9 +189,9 @@ class CountrySpecificPrices extends Component {
                                         },
 
                                         {
-                                            title: i18n.t('static.program.programMaster'),
+                                            title: i18n.t('static.report.procurementAgentName'),
                                             type: 'autocomplete',
-                                            source: programArr,
+                                            source: procurementAgentArr,
                                             filter: this.filterProgram
 
                                         },
@@ -206,11 +208,11 @@ class CountrySpecificPrices extends Component {
                                             type: 'checkbox'
                                         },
                                         {
-                                            title: 'procurementAgentPlanningUnitId',
+                                            title: 'programPlanningUnitId',
                                             type: 'hidden'
                                         },
                                         {
-                                            title: 'procurementAgentPlanningUnitProgramId',
+                                            title: 'programPlanningUnitProcurementAgentId',
                                             type: 'hidden'
                                         },
                                         {
@@ -316,15 +318,15 @@ class CountrySpecificPrices extends Component {
                                                     title: i18n.t('static.common.insertNewRowBefore'),
                                                     onclick: function () {
                                                         var data = [];
-                                                        data[0] = this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en;
-                                                        data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
+                                                        data[0] = this.state.programPlanningUnit.program.label.label_en;
+                                                        data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;
                                                         data[2] = "";
                                                         data[3] = "";
                                                         data[4] = true;
-                                                        data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+                                                        data[5] = this.props.match.params.programPlanningUnitId;
                                                         data[6] = 0;
                                                         data[7] = 1;
-                                                        
+
                                                         obj.insertRow(data, parseInt(y), 1);
                                                     }.bind(this)
                                                 });
@@ -335,15 +337,15 @@ class CountrySpecificPrices extends Component {
                                                     title: i18n.t('static.common.insertNewRowAfter'),
                                                     onclick: function () {
                                                         var data = [];
-                                                        data[0] = this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en;
-                                                        data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
+                                                        data[0] = this.state.programPlanningUnit.program.label.label_en;
+                                                        data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;
                                                         data[2] = "";
                                                         data[3] = "";
                                                         data[4] = true;
-                                                        data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+                                                        data[5] = this.props.match.params.programPlanningUnitId;
                                                         data[6] = 0;
                                                         data[7] = 1;
-                                                        
+
                                                         obj.insertRow(data, parseInt(y));
                                                     }.bind(this)
                                                 });
@@ -578,15 +580,15 @@ class CountrySpecificPrices extends Component {
     addRow = function () {
         var json = this.el.getJson(null, false);
         var data = [];
-        data[0] = this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en;
-        data[1] = this.state.procurementAgentPlanningUnit.planningUnit.label.label_en;
+        data[0] = this.state.programPlanningUnit.program.label.label_en;
+        data[1] = this.state.programPlanningUnit.planningUnit.label.label_en;
         data[2] = "";
         data[3] = "";
         data[4] = true;
-        data[5] = this.props.match.params.procurementAgentPlanningUnitId;
+        data[5] = this.props.match.params.programPlanningUnitId;
         data[6] = 0;
         data[7] = 1;
-        
+
 
         this.el.insertRow(
             data, 0, 1
@@ -598,8 +600,8 @@ class CountrySpecificPrices extends Component {
             if (z != data[i].y) {
                 var index = (instance.jexcel).getValue(`F${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.procurementAgentPlanningUnit.procurementAgent.label.label_en, true);
-                    (instance.jexcel).setValueFromCoords(1, data[i].y, this.state.procurementAgentPlanningUnit.planningUnit.label.label_en, true);
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.programPlanningUnit.program.label.label_en, true);
+                    (instance.jexcel).setValueFromCoords(1, data[i].y, this.state.programPlanningUnit.planningUnit.label.label_en, true);
                     (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
                     z = data[i].y;
@@ -619,18 +621,18 @@ class CountrySpecificPrices extends Component {
                 console.log("7 map---" + map1.get("7"))
                 if (parseInt(map1.get("7")) === 1) {
                     let json = {
-                        procurementAgent: {
-                            id: this.props.match.params.procurementAgentId
+                        program: {
+                            id: this.props.match.params.programId
                         },
                         planningUnit: {
                             id: this.props.match.params.planningUnitId
                         },
-                        program: {
+                        procurementAgent: {
                             id: parseInt(map1.get("2"))
                         },
                         price: this.el.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        procurementAgentPlanningUnitId: parseInt(map1.get("5")),
-                        procurementAgentPlanningUnitProgramId: parseInt(map1.get("6")),
+                        programPlanningUnitId: parseInt(map1.get("5")),
+                        programPlanningUnitProcurementAgentId: parseInt(map1.get("6")),
                         active: map1.get("4"),
                     }
                     changedpapuList.push(json);
@@ -642,7 +644,7 @@ class CountrySpecificPrices extends Component {
                     console.log(response.data);
                     if (response.status == "200") {
                         console.log(response);
-                        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/programProduct/addProgramProduct/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
                             message: response.data.messageCode
@@ -717,7 +719,7 @@ class CountrySpecificPrices extends Component {
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
 
-        //Program
+        //ProcurementAgent
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -753,8 +755,8 @@ class CountrySpecificPrices extends Component {
             }
         }
 
-         //Active
-         if (x != 7) {
+        //Active
+        if (x != 7) {
             this.el.setValueFromCoords(7, y, 1, true);
         }
 
@@ -776,7 +778,7 @@ class CountrySpecificPrices extends Component {
             var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
 
-                //Country
+                //ProcurementAgent
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
                 console.log("value-----", value);
@@ -857,7 +859,9 @@ class CountrySpecificPrices extends Component {
         )
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        // this.props.history.push(`/programProduct/addProgramProduct/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

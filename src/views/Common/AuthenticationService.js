@@ -854,7 +854,7 @@ class AuthenticationService {
                         return true;
                     }
                     break;
-                case "/procurementAgentPlanningUnit/addCountrySpecificPrice/:procurementAgentId/:planningUnitId/:procurementAgentPlanningUnitId":
+                case "/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId":
                     if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
                         return true;
                     }
@@ -904,6 +904,7 @@ class AuthenticationService {
                     break;
                 // case "/programProduct/addProgramProduct/:programId":
                 case "/programProduct/addProgramProduct":
+                case "/programProduct/addProgramProduct/:color/:message":
                     if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
                         return true;
                     }
