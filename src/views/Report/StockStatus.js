@@ -458,6 +458,7 @@ class StockStatus extends Component {
       head: header,
       body: data,
       styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+      headStyles:{fillColor: "#e5edf5",textColor:"#000",fontStyle:"normal"},
       columnStyles: {
         5: { cellWidth: 156.89 },
       }
@@ -488,10 +489,6 @@ class StockStatus extends Component {
                     doc.text(i18n.t("static.supplyPlan.consumptionMsg"), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    y = y + 20
-                    doc.text(i18n.t('static.supplyPlan.notesDetailsCon'), doc.internal.pageSize.width / 7, y, {
-                      align: 'left'
-                  })
                 }
                 doc.setFontSize(8)
                 y = y + 20
@@ -500,9 +497,16 @@ class StockStatus extends Component {
                     y = 150;
 
                 }
-                doc.text((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+"")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 7, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+"")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width/8, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                  if (y > doc.internal.pageSize.height - 100) {
+                      doc.addPage();
+                      y = 150;
+                  } else {
+                      y = y + 5
+                  }
+              }
             }
         })
 
@@ -518,10 +522,6 @@ class StockStatus extends Component {
                     doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    y = y + 20
-                    doc.text(i18n.t('static.supplyPlan.notesDetailsShip'), doc.internal.pageSize.width / 7, y, {
-                      align: 'left'
-                  })
 
                 }
                 doc.setFontSize(8)
@@ -531,9 +531,16 @@ class StockStatus extends Component {
                     y = 150;
 
                 }
-                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY')+" ("+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 7, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY')+" ("+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width/8, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                  if (y > doc.internal.pageSize.height - 100) {
+                      doc.addPage();
+                      y = 150;
+                  } else {
+                      y = y + 5
+                  }
+              }
             }
         }
         )
@@ -549,10 +556,6 @@ class StockStatus extends Component {
                     doc.text(i18n.t("static.supplyPlan.inventoryMsg"), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    y = y + 20
-                    doc.text(i18n.t('static.supplyPlan.notesDetailsCon'), doc.internal.pageSize.width / 7, y, {
-                      align: 'left'
-                  })
                 }
                 doc.setFontSize(8)
                 y = y + 20
@@ -561,9 +564,16 @@ class StockStatus extends Component {
                     y = 150;
 
                 }
-                doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 7, y, {
-                  align: 'left'
-              })
+              var splitTitle = doc.splitTextToSize((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width/8, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                  if (y > doc.internal.pageSize.height - 100) {
+                      doc.addPage();
+                      y = 150;
+                  } else {
+                      y = y + 5
+                  }
+              }
             }
         })
         var lastPage=doc.internal.getCurrentPageInfo().pageNumber;
@@ -608,6 +618,7 @@ class StockStatus extends Component {
           head: header,
           body: otherdata,
           styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+          headStyles:{fillColor: "#e5edf5",textColor:"#000",fontStyle:"normal"},
           columnStyles: {
             5: { cellWidth: 156.89 },
           }
@@ -640,10 +651,6 @@ class StockStatus extends Component {
                         doc.text(i18n.t("static.supplyPlan.consumptionMsg"), doc.internal.pageSize.width / 8, y, {
                             align: 'left'
                         })
-                        y = y + 20
-                        doc.text(i18n.t('static.supplyPlan.notesDetailsCon'), doc.internal.pageSize.width / 7, y, {
-                          align: 'left'
-                      })
                     }
                     doc.setFontSize(8)
                     y = y + 20
@@ -652,9 +659,16 @@ class StockStatus extends Component {
                         y = 150;
 
                     }
-                    doc.text((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+"")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 7, y, {
-                      align: 'left'
-                  })
+                  var splitTitle = doc.splitTextToSize((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+"")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width/8, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                  if (y > doc.internal.pageSize.height - 100) {
+                      doc.addPage();
+                      y = 150;
+                  } else {
+                      y = y + 5
+                  }
+              }
                 }
             })
 
@@ -670,10 +684,6 @@ class StockStatus extends Component {
                         doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
                             align: 'left'
                         })
-                        y = y + 20
-                        doc.text(i18n.t('static.supplyPlan.notesDetailsShip'), doc.internal.pageSize.width / 7, y, {
-                          align: 'left'
-                        })
                         
                     }
                     doc.setFontSize(8)
@@ -683,9 +693,16 @@ class StockStatus extends Component {
                         y = 150;
 
                     }
-                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY')+" ("+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 7, y, {
-                        align: 'left'
-                    })
+                    var splitTitle = doc.splitTextToSize(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY')+" ("+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width/8, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                  if (y > doc.internal.pageSize.height - 100) {
+                      doc.addPage();
+                      y = 150;
+                  } else {
+                      y = y + 5
+                  }
+              }
                 }
             }
             )
@@ -701,10 +718,6 @@ class StockStatus extends Component {
                         doc.text(i18n.t("static.supplyPlan.inventoryMsg"), doc.internal.pageSize.width / 8, y, {
                             align: 'left'
                         })
-                        y = y + 20
-                        doc.text(i18n.t('static.supplyPlan.notesDetailsCon'), doc.internal.pageSize.width / 7, y, {
-                          align: 'left'
-                      })
                     }
                     doc.setFontSize(8)
                     y = y + 20
@@ -713,9 +726,16 @@ class StockStatus extends Component {
                         y = 150;
 
                     }
-                    doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 7, y, {
-                      align: 'left'
-                  })
+                  var splitTitle = doc.splitTextToSize((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*")+" ("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width/8, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                  if (y > doc.internal.pageSize.height - 100) {
+                      doc.addPage();
+                      y = 150;
+                  } else {
+                      y = y + 5
+                  }
+              }
                 }
             })
             var ppu=this.state.planningUnits.filter(c=>c.planningUnit.id==item.planningUnit.id)[0];
