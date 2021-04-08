@@ -316,7 +316,7 @@ class ShipmentSummery extends Component {
             B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
             re[item].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20') : '',
             re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
-            re[item].localProcurement == true ? i18n.t('static.supplyPlan.localprocurement').replaceAll(' ', '%20') : '',
+            re[item].localProcurement == true ? i18n.t('static.report.localprocurement').replaceAll(' ', '%20') : '',
             re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
             Number(re[item].productCost).toFixed(2),
