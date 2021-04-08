@@ -52,7 +52,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     formatter = value => {
-        if (value != null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value !== '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -674,8 +674,42 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     mosForMonth1 = 0;
                                                                 }
 
-                                                                var mosForMonth2 = this.props.items.monthsOfStockArray[index + 1];
-                                                                var mosForMonth3 = this.props.items.monthsOfStockArray[index + 2];
+                                                                var endingBalance1 = Number(this.props.items.closingBalanceArray[index+1].balance);
+                                                                var unmetDemand1 = this.props.items.unmetDemand[index+1];
+                                                                var newEndingBalance1 = Number(endingBalance1) - Number(originalShipmentQty);
+                                                                if (newEndingBalance1 < 0) {
+                                                                    var tempEndingBalance1 = Number(newEndingBalance1)+Number(unmetDemand1);
+                                                                    unmetDemand1 += (0 - Number(tempEndingBalance1));
+                                                                    newEndingBalance1 = 0;
+                                                                }
+                                                                var amc1 = Number(this.props.items.amcTotalData[index+1]);
+                                                                var mosForMonth2 = "";
+                                                                if (newEndingBalance1 != 0 && amc1 != 0) {
+                                                                    mosForMonth2 = Number(newEndingBalance1 / amc1).toFixed(1);
+                                                                } else if (amc1 == 0) {
+                                                                    mosForMonth2 = null;
+                                                                } else {
+                                                                    mosForMonth2 = 0;
+                                                                }
+
+                                                                var endingBalance2 = Number(this.props.items.closingBalanceArray[index+2].balance);
+                                                                var unmetDemand2 = this.props.items.unmetDemand[index+2];
+                                                                var newEndingBalance2 = Number(endingBalance2) - Number(originalShipmentQty);
+                                                                if (newEndingBalance2 < 0) {
+                                                                    var tempEndingBalance2 = Number(newEndingBalance2)+Number(unmetDemand2);
+                                                                    unmetDemand2 += (0 - Number(tempEndingBalance2));
+                                                                    newEndingBalance2 = 0;
+                                                                }
+                                                                var amc2 = Number(this.props.items.amcTotalData[index+2]);
+                                                                var mosForMonth3 = "";
+                                                                if (newEndingBalance2 != 0 && amc2 != 0) {
+                                                                    mosForMonth3 = Number(newEndingBalance2 / amc2).toFixed(1);
+                                                                } else if (amc2 == 0) {
+                                                                    mosForMonth3 = null;
+                                                                } else {
+                                                                    mosForMonth3 = 0;
+                                                                }
+
                                                                 var minStockMoSQty = this.props.items.minStockMoSQty;
                                                                 var maxStockMoSQty = this.props.items.maxStockMoSQty;
                                                                 var suggestShipment = false;
