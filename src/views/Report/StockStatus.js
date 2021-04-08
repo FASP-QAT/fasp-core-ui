@@ -427,7 +427,7 @@ class StockStatus extends Component {
     var aspectwidth1 = (width - h1);
     console.log("Document+++",doc.internal)
     doc.setTextColor("#002f6c");
-    doc.addImage(canvasImg, 'png', 50, 150, 750, 300, 'CANVAS');
+    doc.addImage(canvasImg, 'png', 50, 150, aspectwidth1, 400, 'CANVAS');
 
     const header = [[i18n.t('static.common.month'),
     i18n.t('static.supplyPlan.openingBalance'),
@@ -600,7 +600,7 @@ class StockStatus extends Component {
         console.log('canv', canv)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
         //console.log('canvasImg1',canvasImg1)    
-        doc.addImage(canvasImg1, 'png', 50, 150, 750, 300, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, 150, aspectwidth1, 400, "a" + count, 'CANVAS')
         count++
 
         var height = doc.internal.pageSize.height;
