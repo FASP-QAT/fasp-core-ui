@@ -603,7 +603,8 @@ export default class SupplyPlanComponent extends React.Component {
                         var programJson1 = JSON.parse(programData);
                         var programJson = {
                             name: programJson1.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            id: myResult[i].id,
+                            programId:myResult[i].programId
                         }
                         proList.push(programJson)
                     }
