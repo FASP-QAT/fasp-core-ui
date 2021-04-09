@@ -351,16 +351,28 @@ class StockStatus extends Component {
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         doc.setFontSize(8)
         doc.setFont('helvetica', 'normal')
-        var splittext = doc.splitTextToSize(i18n.t('static.supplyPlan.runDate')+" " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width / 6);
-        doc.text(doc.internal.pageSize.width * 3 / 4, 20, splittext)
-        var splittext = doc.splitTextToSize(i18n.t('static.supplyPlan.runTime')+" " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 6);
-        doc.text(doc.internal.pageSize.width * 3 / 4, 30, splittext)
-        splittext = doc.splitTextToSize(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 6);
-        doc.text(doc.internal.pageSize.width *3 / 4, 40, splittext)
-        splittext = doc.splitTextToSize(this.state.programs.filter(c=>c.programId==document.getElementById("programId").value)[0].programCode+" "+i18n.t("static.supplyPlan.v")+ document.getElementById("versionId").selectedOptions[0].text , doc.internal.pageSize.width / 6);
-        doc.text(doc.internal.pageSize.width *3 / 4, 50, splittext)
-        splittext = doc.splitTextToSize(document.getElementById("programId").selectedOptions[0].text , doc.internal.pageSize.width / 6);
-        doc.text(doc.internal.pageSize.width *3 / 4, 60, splittext)
+
+        doc.text(i18n.t('static.supplyPlan.runDate')+" " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width-40, 20, {
+          align: 'right'
+        })
+        doc.text(i18n.t('static.supplyPlan.runTime')+" " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width-40, 30, {
+          align: 'right'
+        })
+        doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width-40, 40, {
+          align: 'right'
+        })
+        if((document.getElementById("versionId").selectedOptions[0].text).includes('Local')){
+        doc.text((this.state.programs.filter(c=>c.programId==document.getElementById("programId").value)[0].programCode+" "+i18n.t("static.supplyPlan.v")+ (document.getElementById("versionId").selectedOptions[0].text)), doc.internal.pageSize.width-35, 50, {
+          align: 'right'
+        })
+      }else{
+        doc.text((this.state.programs.filter(c=>c.programId==document.getElementById("programId").value)[0].programCode+" "+i18n.t("static.supplyPlan.v")+ (document.getElementById("versionId").selectedOptions[0].text)), doc.internal.pageSize.width-40, 50, {
+          align: 'right'
+        })
+      }
+        doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width-40, 60, {
+          align: 'right'
+        })
 
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
@@ -417,13 +429,13 @@ class StockStatus extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
     doc.setFontSize(8);
-    var canvas = document.getElementById("cool-canvas");
+    var canvas = document.getElementById("cool-canvas-without-header");
     //creates image
 
     var canvasImg = canvas.toDataURL("image/png", 1.0);
     var width = doc.internal.pageSize.width;
     var height = doc.internal.pageSize.height;
-    var h1 = 50;
+    var h1 = 100;
     var aspectwidth1 = (width - h1);
     console.log("Document+++",doc.internal)
     doc.setTextColor("#002f6c");
@@ -1444,8 +1456,8 @@ console.log("PageArray+++",pageArray);
                     };
                     var chartOptions={
                       title: {
-                        display: true,
-                        text: entityname1 + " - " + getLabelText(pu.planningUnit.label,this.state.lang)
+                        display: false,
+                        text: ""
                       },
                       scales: {
                         yAxes: [{
@@ -1818,8 +1830,8 @@ console.log("PageArray+++",pageArray);
 
                   var chartOptions={
                     title: {
-                      display: true,
-                      text: entityname1 + " - " + getLabelText(plannningUnitItem[0].planningUnit.label,this.state.lang)
+                      display: false,
+                      text: ""
                     },
                     scales: {
                       yAxes: [{
@@ -2664,7 +2676,128 @@ console.log("PageArray+++",pageArray);
       }
     }
 
+    const optionsWithoutHeader = {
+      title: {
+        display: false,
+        text: ""
+      },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          position: 'left',
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
 
+            }
+
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+
+        }, {
+          id: 'B',
+          position: 'right',
+          scaleLabel: {
+            labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+            fontColor: 'black',
+            display: true,
+
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+
+            }
+
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }],
+        xAxes: [{
+
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.common.month'),
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          ticks: {
+            fontColor: 'black',
+            fontStyle: "normal",
+            fontSize: "12"
+          },
+          gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        }]
+      },
+
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black'
+        }
+      }
+    }
     const bar = {
 
       labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
@@ -2966,6 +3099,7 @@ console.log("PageArray+++",pageArray);
 
                           </div>
                           <div id="bars_div" style={{display:"none"}}>
+                          <div className="chart-wrapper chart-graph-report"><Bar id="cool-canvas-without-header" data={bar} options={optionsWithoutHeader} /></div>
                             {this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value).map((ele, index) => {
                               console.log(index)
                               return (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>)
