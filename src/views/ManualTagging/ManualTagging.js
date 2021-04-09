@@ -2179,35 +2179,61 @@ export default class ManualTagging extends Component {
                                 <ModalBody>
                                     <div>
                                         <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>
-                                        {!this.state.active3 && 
-                                        <ToolkitProvider
-                                            keyField="optList"
-                                            data={this.state.outputListAfterSearch}
-                                            columns={columns}
-                                            search={{ searchFormatted: true }}
-                                            hover
-                                            filter={filterFactory()}
-                                        >
-                                            {
-                                                props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable2 ">
-                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        {!this.state.active3 &&
+                                            <ToolkitProvider
+                                                keyField="optList"
+                                                data={this.state.outputListAfterSearch}
+                                                columns={columns}
+                                                search={{ searchFormatted: true }}
+                                                hover
+                                                filter={filterFactory()}
+                                            >
+                                                {
+                                                    props => (
+                                                        <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                            // pagination={paginationFactory(options)}
-                                                            rowEvents={{
-                                                            }}
-                                                            {...props.baseProps}
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </ToolkitProvider>}
-                                        {/* {this.state.active3 &&
+                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                // pagination={paginationFactory(options)}
+                                                                rowEvents={{
+                                                                }}
+                                                                {...props.baseProps}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            </ToolkitProvider>}
+                                        {this.state.active3 &&
+                                            <ToolkitProvider
+                                                keyField="erpOrderId"
+                                                data={this.state.artmisList}
+                                                columns={columns}
+                                                search={{ searchFormatted: true }}
+                                                hover
+                                                filter={filterFactory()}
+                                            >
+                                                {
+                                                    props => (
+                                                        <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
 
-                                        } */}
+                                                            <BootstrapTable
+                                                                // keyField='erpOrderId'
+                                                                ref={n => this.node = n}
+                                                                selectRow={selectRow}
+                                                                hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+
+                                                                rowEvents={{
+
+                                                                }}
+                                                                {...props.baseProps}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            </ToolkitProvider>
+                                        }
                                     </div><br />
                                     <div>
                                         <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>

@@ -569,9 +569,32 @@ export default class ProgramList extends Component {
       position: 'top',
       filters: true,
       license: JEXCEL_PRO_KEY,
+      // contextMenu: function (obj, x, y, e) {
+      //   return [];
+      // }.bind(this),
       contextMenu: function (obj, x, y, e) {
-        return [];
-      }.bind(this),
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
+          var items = [];
+          if (y != null) {
+            if (obj.options.allowInsertRow == true) {
+              items.push({
+                title: i18n.t('static.integration.addProgramIntegration'),
+                onclick: function () {
+                  // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                  this.props.history.push({
+                    pathname: `/program/addIntegration/${this.el.getValueFromCoords(0, y)}`,
+                  })
+
+                }.bind(this)
+              });
+            }
+          }
+          return items;
+        } else {
+          return [];
+        }
+
+      }.bind(this)
       // contextMenu: function (obj, x, y, e) {
       //   var items = [];
       //   if (y != null) {
