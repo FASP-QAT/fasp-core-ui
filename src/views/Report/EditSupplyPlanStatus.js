@@ -3067,7 +3067,7 @@ class EditSupplyPlanStatus extends Component {
             data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[7] = moment(problemList[j].createdDate).format('MMM-YY')
+            data[7] = problemList[j].problemCategory.id
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             data[10] = problemList[j].problemStatus.id
@@ -3149,10 +3149,11 @@ class EditSupplyPlanStatus extends Component {
                     width: 0
                 },
                 {
-                    title: i18n.t('static.report.createdDate'),
-                    type: 'hidden',
-                    readOnly: true,
-                    width: 0
+                    title: i18n.t("static.problemActionReport.problemCategory"),
+                    type: 'dropdown',
+                    width: 80,
+                    source:this.state.problemCategoryList,
+                    readOnly:true
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
