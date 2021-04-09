@@ -12,8 +12,10 @@ import moment from 'moment';
 
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
+import ProductService from '../../api/ProductService';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
+import RealmCountryService from '../../api/RealmCountryService';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -32,6 +34,8 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            productCategories: [],
+            countryList: [],
             parentShipmentId: '',
             planningUnitIdUpdated: '',
             erpPlanningUnitId: '',
@@ -70,6 +74,7 @@ export default class ManualTagging extends Component {
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.formatPlanningUnitLabel = this.formatPlanningUnitLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -84,9 +89,61 @@ export default class ManualTagging extends Component {
         this.changed = this.changed.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
-        // this.oneditionend = this.oneditionend.bind(this);
+        this.getProductCategories = this.getProductCategories.bind(this);
     }
 
+    getProductCategories() {
+        // AuthenticationService.setupAxiosInterceptors();
+        let realmId = AuthenticationService.getRealmId();
+        ProductService.getProductCategoryList(realmId)
+            .then(response => {
+                console.log("product category list---", JSON.stringify(response.data))
+                // response.data.splice(0, 1);
+                this.setState({
+                    productCategories: response.data.splice(1)
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -215,10 +272,71 @@ export default class ManualTagging extends Component {
                 active3: false
             });
         } else {
+
             this.setState({
                 active3: true,
                 active1: false,
                 active2: false
+            }, () => {
+                this.buildJExcel();
+                let realmId = AuthenticationService.getRealmId();
+                RealmCountryService.getRealmCountryrealmIdById(realmId)
+                    .then(response => {
+                        console.log("RealmCountryService---->", response.data)
+                        if (response.status == 200) {
+                            var listArray = response.data;
+                            listArray.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            this.setState({
+                                countryList: listArray
+                            })
+                        } else {
+                            this.setState({ message: response.data.messageCode })
+                        }
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+                this.getProductCategories();
             });
         }
     }
@@ -370,7 +488,7 @@ export default class ManualTagging extends Component {
 
         var roNoOrderNo = this.state.searchedValue;
         console.log("roNoOrderNo--->>>", roNoOrderNo);
-        var programId = document.getElementById("programId").value;
+        var programId = (this.state.active3 ? 0 : document.getElementById("programId").value);
         var erpPlanningUnitId = this.state.planningUnitIdUpdated;
         console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
         if (roNoOrderNo != "" && erpPlanningUnitId != null && erpPlanningUnitId != "") {
@@ -472,7 +590,82 @@ export default class ManualTagging extends Component {
 
     }
 
+    filterErpData(productCategoryIds) {
+        console.log("planningUnitIds---", productCategoryIds);
+        document.getElementById('div2').style.display = 'block';
+        var countryId = document.getElementById("countryId").value;
+        // let productCategoryIds = this.state.productCategoryIds;
+        this.setState({
+            productCategoryValues: productCategoryIds.map(ele => ele),
+            productCategoryLabels: productCategoryIds.map(ele => ele.label)
+        }, () => {
+            if (countryId != -1 && productCategoryIds != null && productCategoryIds != "") {
+                this.setState({
+                    loading: true,
+                    productCategoryIds
+                })
+
+                var json = {
+                    countryId: parseInt(document.getElementById("countryId").value),
+                    productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
+                    linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
+                }
+
+                ManualTaggingService.getShipmentListForManualTagging(json)
+                    .then(response => {
+                        console.log("manual tagging response===", response);
+                        this.setState({
+                            outputList: response.data
+                        }, () => {
+                            this.buildJExcel();
+                        });
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }
+
+        })
+    }
+
     filterData = (planningUnitIds) => {
+
         console.log("planningUnitIds---", planningUnitIds);
         document.getElementById('div2').style.display = 'block';
         var programId = document.getElementById("programId").value;
@@ -554,27 +747,28 @@ export default class ManualTagging extends Component {
                             }
                         }
                     );
-            } else if (programId == -1) {
-                console.log("2-programId------>", programId);
-                this.setState({
-                    outputList: [],
-                    message: i18n.t('static.program.validselectprogramtext'),
-                    color: 'red'
-                }, () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                });
-            } else if (planningUnitIds != null && planningUnitIds != "") {
-                console.log("3-programId------>", programId);
-                this.setState({
-                    outputList: [],
-                    message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                    color: 'red'
-                }, () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                });
             }
+            // else if (programId == -1) {
+            //     console.log("2-programId------>", programId);
+            //     this.setState({
+            //         outputList: [],
+            //         message: i18n.t('static.program.validselectprogramtext'),
+            //         color: 'red'
+            //     }, () => {
+            //         this.el = jexcel(document.getElementById("tableDiv"), '');
+            //         this.el.destroy();
+            //     });
+            // } else if (planningUnitIds != null && planningUnitIds != "") {
+            //     console.log("3-programId------>", programId);
+            //     this.setState({
+            //         outputList: [],
+            //         message: i18n.t('static.procurementUnit.validPlanningUnitText'),
+            //         color: 'red'
+            //     }, () => {
+            //         this.el = jexcel(document.getElementById("tableDiv"), '');
+            //         this.el.destroy();
+            //     });
+            // }
         })
 
 
@@ -813,21 +1007,35 @@ export default class ManualTagging extends Component {
             // data[5] = manualTaggingList[j].procurementAgent.code;
             // data[6] = manualTaggingList[j].orderNo
             // data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
-
-            data[0] = erpDataList[j].active;
-            data[1] = erpDataList[j].erpOrderId;
-            data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-            data[3] = getLabelText(erpDataList[j].planningUnitLabel);
-            data[4] = this.formatDate(erpDataList[j].currentEstimatedDeliveryDate);
-            data[5] = erpDataList[j].status;
-            data[6] = this.addCommas(erpDataList[j].quantity);
-            data[7] = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : 1);
-            data[8] = this.addCommas(erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1));
-            data[9] = erpDataList[j].notes;
-            data[10] = 0;
-            data[11] = erpDataList[j].orderNo;
-            data[12] = erpDataList[j].primeLineNo;
-
+            if (this.state.active3) {
+                data[0] = 0;
+                data[1] = erpDataList[j].erpOrderId;
+                data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
+                data[4] = this.formatDate(erpDataList[j].expectedDeliveryDate);
+                data[5] = erpDataList[j].erpStatus;
+                data[6] = this.addCommas(erpDataList[j].shipmentQty);
+                data[7] = 1;
+                data[8] = this.addCommas(erpDataList[j].shipmentQty * 1);
+                data[9] = '';
+                data[10] = 0;
+                data[11] = erpDataList[j].orderNo;
+                data[12] = erpDataList[j].primeLineNo;
+            } else {
+                data[0] = erpDataList[j].active;
+                data[1] = erpDataList[j].erpOrderId;
+                data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                data[3] = getLabelText(erpDataList[j].planningUnitLabel);
+                data[4] = this.formatDate(erpDataList[j].currentEstimatedDeliveryDate);
+                data[5] = erpDataList[j].status;
+                data[6] = this.addCommas(erpDataList[j].quantity);
+                data[7] = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : 1);
+                data[8] = this.addCommas(erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1));
+                data[9] = erpDataList[j].notes;
+                data[10] = 0;
+                data[11] = erpDataList[j].orderNo;
+                data[12] = erpDataList[j].primeLineNo;
+            }
             erpDataArray[count] = data;
             count++;
         }
@@ -980,6 +1188,15 @@ export default class ManualTagging extends Component {
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
                 data[10] = this.addCommas(manualTaggingList[j].shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
                 data[11] = manualTaggingList[j].notes
+            }
+            else {
+                data[0] = manualTaggingList[j].erpOrderId;
+                data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+                data[2] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
+                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+                data[4] = manualTaggingList[j].erpStatus
+                data[5] = this.addCommas(manualTaggingList[j].shipmentQty);
+
             }
             manualTaggingArray[count] = data;
             count++;
@@ -1209,6 +1426,67 @@ export default class ManualTagging extends Component {
                 }.bind(this)
             };
         }
+        else if (this.state.active3) {
+            var options = {
+                data: data,
+                columnDrag: true,
+                colWidths: [20, 20, 40, 45, 45, 45],
+                colHeaderClasses: ["Reqasterisk"],
+                columns: [
+
+                    {
+                        title: "erpOrderId",
+                        type: 'hidden',
+                    },
+                    {
+                        title: i18n.t('static.manualTagging.procOrderNo'),
+                        type: 'text',
+                    },
+                    {
+                        title: i18n.t('static.manualTagging.erpPlanningUnit'),
+                        type: 'text',
+                    },
+                    {
+                        title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
+                        type: 'text',
+                    },
+                    {
+                        title: i18n.t('static.manualTagging.erpStatus'),
+                        type: 'text',
+                    },
+
+                    {
+                        title: i18n.t('static.supplyPlan.shipmentQty'),
+                        type: 'text',
+                    },
+                ],
+                editable: false,
+                text: {
+                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                    show: '',
+                    entries: '',
+                },
+                onload: this.loaded,
+                pagination: localStorage.getItem("sesRecordCount"),
+                search: true,
+                columnSorting: true,
+                tableOverflow: true,
+                wordWrap: true,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: false,
+                onselection: this.selected,
+
+
+                oneditionend: this.onedit,
+                copyCompatibility: true,
+                allowExport: false,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: 'top',
+                filters: true,
+                license: JEXCEL_PRO_KEY,
+            };
+        }
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
@@ -1253,15 +1531,31 @@ export default class ManualTagging extends Component {
 
                     this.getOrderDetails();
                 });
+            } else {
+                console.log("my out put list---", this.state.outputList)
+                console.log("my coordinates---", this.el.getValueFromCoords(0, x))
+                row = this.state.outputList.filter(c => (c.erpOrderId == this.el.getValueFromCoords(0, x)))[0];
+                console.log()
+                outputListAfterSearch.push(row);
+                let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
+                this.setState({
+                    // parentShipmentId: outputListAfterSearch[0].parentShipmentId,
+                    roNoOrderNo: json,
+                    searchedValue: outputListAfterSearch[0].roNo,
+                    planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
+                }, () => {
+
+                    this.getOrderDetails();
+                });
             }
             // outputListAfterSearch.push(row);
 
             this.setState({
-                planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : this.el.getValueFromCoords(1, x)),
+                planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
                 outputListAfterSearch,
-                procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
-                planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
+                procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
+                planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "()" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
             })
             console.log("Going to call toggle large 3");
             this.toggleLarge();
@@ -1346,13 +1640,21 @@ export default class ManualTagging extends Component {
     }
 
     formatLabel(cell, row) {
-        return getLabelText(cell, this.state.lang);
+        if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang);
+        } else {
+            return "";
+        }
     }
 
     formatPlanningUnitLabel(cell, row) {
         console.log("cell------", cell);
         console.log("row------", row);
-        return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
+        if (cell != null && cell != "") {
+            return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
+        } else {
+            return "";
+        }
     }
 
     toggleLarge() {
@@ -1434,20 +1736,16 @@ export default class ManualTagging extends Component {
             )
         }, this);
 
+        const { productCategories } = this.state;
+        let productCategoryMultList = productCategories.length > 0 && productCategories.map((item, i) => {
+            return ({ label: getLabelText(item.payload.label, this.state.lang), value: item.payload.productCategoryId })
+        }, this);
+
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
-
-        // const { tracercategoryPlanningUnit } = this.state;
-        // let tracerCategoryPlanningUnitList = tracercategoryPlanningUnit.length > 0 && tracercategoryPlanningUnit.map((item, i) => {
-        //     return (
-        //         <option key={i} value={item.planningUnit.id}>
-        //             {getLabelText(item.planningUnit.label, this.state.lang) + '(' + item.skuCode + ')'}
-        //         </option>
-        //     )
-        // }, this);
 
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -1705,6 +2003,16 @@ export default class ManualTagging extends Component {
                 text: 'All', value: this.state.outputList.length
             }]
         }
+
+        const { countryList } = this.state;
+        let countries = countryList.length > 0
+            && countryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmCountryId}>
+                        {getLabelText(item.country.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1770,9 +2078,47 @@ export default class ManualTagging extends Component {
                             </Row>
                         </div>
                         {/* </Col> */}
-                        {(this.state.active1 || this.state.active2) &&
-                            <div className="col-md-12 pl-0">
-                                <Row>
+
+
+                        <div className="col-md-12 pl-0">
+                            <Row>
+                                {this.state.active3 &&
+                                    <>
+                                        <FormGroup className="col-md-3 ">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="countryId"
+                                                        id="countryId"
+                                                        bsSize="sm"
+                                                    // onChange={this.filterData}
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.all')}</option>
+                                                        {countries}
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.productcategory')}</Label>
+                                            <div className="controls ">
+                                                {/* <InMultiputGroup> */}
+                                                <MultiSelect
+                                                    // type="select"
+                                                    name="productCategoryId"
+                                                    id="productCategoryId"
+                                                    bsSize="sm"
+                                                    value={this.state.productCategoryValues}
+                                                    onChange={(e) => { this.filterErpData(e) }}
+                                                    options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
+                                                />
+
+                                            </div>
+                                        </FormGroup>
+                                    </>}
+                                {(this.state.active1 || this.state.active2) &&
                                     <FormGroup className="col-md-3 ">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                         <div className="controls ">
@@ -1791,7 +2137,8 @@ export default class ManualTagging extends Component {
                                                 </Input>
                                             </InputGroup>
                                         </div>
-                                    </FormGroup>
+                                    </FormGroup>}
+                                {(this.state.active1 || this.state.active2 || this.state.active3) &&
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                         <div className="controls ">
@@ -1812,15 +2159,15 @@ export default class ManualTagging extends Component {
 
                                             {/* </InputMultiGroup> */}
                                         </div>
-                                    </FormGroup>
-                                </Row>
-                                <div className="ReportSearchMarginTop">
-                                    <div id="tableDiv" className="jexcelremoveReadonlybackground">
-                                    </div>
+                                    </FormGroup>}
+                            </Row>
+                            <div className="ReportSearchMarginTop">
+                                <div id="tableDiv" className="jexcelremoveReadonlybackground">
                                 </div>
-
                             </div>
-                        }
+
+                        </div>
+
 
                         {/* Consumption modal */}
                         <Modal isOpen={this.state.manualTag}
