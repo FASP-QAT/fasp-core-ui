@@ -429,7 +429,13 @@ class StockStatus extends Component {
     doc.setTextColor("#002f6c");
     doc.addImage(canvasImg, 'png', 50, 150, aspectwidth1, 400, 'CANVAS');
 
-    const header = [[i18n.t('static.common.month'),
+    const header = [[{content:i18n.t('static.common.month'),rowSpan:2},
+      {content:i18n.t("static.report.stock"),colSpan:1},
+      {content:i18n.t("static.supplyPlan.consumption"),colSpan:2},
+      {content:i18n.t("static.shipment.shipment"),colSpan:2},
+      {content:i18n.t("static.report.stock"),colSpan:6}
+    ],
+    [
     i18n.t('static.supplyPlan.openingBalance'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual'),
