@@ -2179,6 +2179,7 @@ export default class ManualTagging extends Component {
                                 <ModalBody>
                                     <div>
                                         <p><h5><b>{i18n.t('static.manualTagging.qatShipmentTitle')}</b></h5></p>
+                                        {!this.state.active3 && 
                                         <ToolkitProvider
                                             keyField="optList"
                                             data={this.state.outputListAfterSearch}
@@ -2203,7 +2204,10 @@ export default class ManualTagging extends Component {
                                                     </div>
                                                 )
                                             }
-                                        </ToolkitProvider>
+                                        </ToolkitProvider>}
+                                        {/* {this.state.active3 &&
+
+                                        } */}
                                     </div><br />
                                     <div>
                                         <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
