@@ -214,7 +214,7 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
         csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
-        csvRow.push("\"" + i18n.t("static.report.reorderFrequencyInMonths").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
+        csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
 
         csvRow.push('')
@@ -372,7 +372,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.reorderFrequencyInMonths') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
+                    doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
@@ -1499,7 +1499,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     plannedErpShipmentsTotalData.push("");
                                     inventoryTotalData.push("");
                                     totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
-                                    monthsOfStockArray.push("")
+                                    monthsOfStockArray.push(null)
                                     amcTotalData.push("");
                                     minStockMoS.push(minStockMoSQty);
                                     maxStockMoS.push(maxStockMoSQty)
