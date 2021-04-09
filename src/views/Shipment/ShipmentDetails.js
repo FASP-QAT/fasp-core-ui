@@ -432,6 +432,7 @@ export default class ShipmentDetails extends React.Component {
                             shipmentListUnFiltered: shipmentListUnFiltered,
                             shipmentList: shipmentList,
                             showShipments: 1,
+                            programPlanningUnitForPrice:programPlanningUnit
                         })
                         this.refs.shipmentChild.showShipmentData();
                     }.bind(this)

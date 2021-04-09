@@ -2991,7 +2991,8 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     showShipments: 1,
                     shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    programJson:programJson
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
