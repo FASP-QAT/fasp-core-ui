@@ -3634,6 +3634,7 @@ export default class SupplyPlanComponent extends React.Component {
                     catalogPrice: catalogPrice,
                     shipmentList: shipmentList,
                     showShipments: 1,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -3844,6 +3845,8 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+                var planningUnitId = document.getElementById("planningUnitId").value;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var shipmentListUnFiltered = programJson.shipmentList;
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
@@ -3904,7 +3907,11 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     showShipments: 1,
                     shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    programJson:programJson,
+                    shelfLife: programPlanningUnit.shelfLife,
+                    catalogPrice: programPlanningUnit.catalogPrice,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)

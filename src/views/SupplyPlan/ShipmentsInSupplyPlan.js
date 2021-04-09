@@ -84,20 +84,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 //     elInstance.setValueFromCoords(8, y, "", true);
                 // }
                 // if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
-                if (procurementAgentPlanningUnit.length > 0) {
-                    var programPriceList = procurementAgentPlanningUnit[0].programPrice;
-                    if (programPriceList.length > 0) {
-                        programPriceList = programPriceList.filter(c => c.program.id == this.state.actualProgramId);
-                        if (programPriceList.length > 0) {
-                            pricePerUnit = Number(programPriceList[0].price);
-                        } else {
-                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
-                        }
-                    } else {
-                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
-                    }
+                var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+                if (programPriceList.length > 0) {
+                    pricePerUnit = Number(programPriceList[0].price);
                 } else {
-                    pricePerUnit = this.props.items.catalogPrice
+                    if (procurementAgentPlanningUnit.length > 0) {
+                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                    } else {
+                        pricePerUnit = this.props.items.catalogPrice
+                    }
                 }
                 if (rowData[14] != "") {
                     var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
@@ -1804,20 +1799,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 // }
                 var pricePerUnit = elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
-                    if (procurementAgentPlanningUnit.length > 0) {
-                        var programPriceList = procurementAgentPlanningUnit[0].programPrice;
-                        if (programPriceList.length > 0) {
-                            programPriceList = programPriceList.filter(c => c.program.id == this.state.actualProgramId);
-                            if (programPriceList.length > 0) {
-                                pricePerUnit = Number(programPriceList[0].price);
-                            } else {
-                                pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
-                            }
-                        } else {
-                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
-                        }
+                    var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+                    if (programPriceList.length > 0) {
+                        pricePerUnit = Number(programPriceList[0].price);
                     } else {
-                        pricePerUnit = this.props.items.catalogPrice
+                        if (procurementAgentPlanningUnit.length > 0) {
+                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        } else {
+                            pricePerUnit = this.props.items.catalogPrice
+                        }
                     }
                     if (rowData[14] != "") {
                         var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);

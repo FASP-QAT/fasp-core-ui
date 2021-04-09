@@ -3525,7 +3525,6 @@ export default class WhatIfReportComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 var planningUnitId = document.getElementById("planningUnitId").value;
                 var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
-                var shelfLife = programPlanningUnit.shelfLife;
                 if (month != "" && quantity != 0) {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
                 } else {
@@ -3578,9 +3577,11 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: programJson.shipmentList,
                     programJson: programJson,
-                    shelfLife: shelfLife,
                     shipmentList: shipmentList,
                     showShipments: 1,
+                    shelfLife: programPlanningUnit.shelfLife,
+                    catalogPrice: programPlanningUnit.catalogPrice,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -5005,6 +5006,8 @@ export default class WhatIfReportComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+                var planningUnitId = document.getElementById("planningUnitId").value;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var shipmentListUnFiltered = programJson.shipmentList;
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
@@ -5065,7 +5068,11 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     showShipments: 1,
                     shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    programJson:programJson,
+                    shelfLife: programPlanningUnit.shelfLife,
+                    catalogPrice: programPlanningUnit.catalogPrice,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
