@@ -32,6 +32,13 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import AuthenticationService from '../Common/AuthenticationService';
 import MultiSelect from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
+import DataSourceService from '../../api/DataSourceService';
+import RealmCountryService from '../../api/RealmCountryService';
+import FundingSourceService from '../../api/FundingSourceService';
+import ShipmentStatusService from '../../api/ShipmentStatusService';
+import CurrencyService from '../../api/CurrencyService';
+import BudgetService from '../../api/BudgetService';
+import ProcurementAgentService from '../../api/ProcurementAgentService';
 
 const entityname = i18n.t('static.program.program');
 
@@ -237,8 +244,8 @@ class EditSupplyPlanStatus extends Component {
             elInstance.setValueFromCoords(22, y, 1, true);
         }
 
-        if(x==20){
-            if(value.toString()=="false"){
+        if (x == 20) {
+            if (value.toString() == "false") {
                 elInstance.setValueFromCoords(21, y, "", true);
             }
         }
@@ -455,47 +462,79 @@ class EditSupplyPlanStatus extends Component {
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = this.state.program;
                 var batchInfoList = programJson.batchInfoList;
+                DataSourceService.getAllDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    response.data.map(c => {
+                        dataSourceList.push({
+                            name: getLabelText(c.label, this.state.lang),
+                            id: c.dataSourceId,
+                            dataSourceTypeId: c.dataSourceType.id,
+                            active: c.active,
+                            label: c.label
+                        })
+                    })
+                    this.setState({
+                        dataSourceList: dataSourceList
+                    })
+
+                    RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
+                        var rcpuList = [];
+                        response1.data.map(c => {
+                            rcpuList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.realmCountryPlanningUnitId,
+                                multiplier: c.multiplier,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            realmCountryPlanningUnitList: rcpuList
+                        })
+                        console.log("++++Rcpu:List", rcpuList)
 
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                console.log("Shipment list=============>", shipmentList);
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                            if (batchDetailsToPush.length > 0) {
-                                batchList.push(batchDetailsToPush[0]);
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                        console.log("Shipment list=============>", shipmentList);
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (batchDetailsToPush.length > 0) {
+                                        batchList.push(batchDetailsToPush[0]);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                console.log("Btach List============>", batchList);
-                var consumptionListUnFiltered = (programJson.consumptionList);
-                var consumptionList = consumptionListUnFiltered.filter(con =>
-                    con.planningUnit.id == planningUnitId
-                    && con.region.id == region
-                    && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
-                this.setState({
-                    programJsonAfterConsumptionClicked: programJson,
-                    consumptionListUnFiltered: consumptionListUnFiltered,
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    consumptionList: consumptionList,
-                    showConsumption: 1,
-                    consumptionMonth: month,
-                    consumptionStartDate: startDate,
-                    consumptionRegion: region
-                })
-                this.refs.consumptionChild.showConsumptionData();
+                        console.log("Btach List============>", batchList);
+                        var consumptionListUnFiltered = (programJson.consumptionList);
+                        var consumptionList = consumptionListUnFiltered.filter(con =>
+                            con.planningUnit.id == planningUnitId
+                            && con.region.id == region
+                            && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)));
+                        this.setState({
+                            programJsonAfterConsumptionClicked: programJson,
+                            consumptionListUnFiltered: consumptionListUnFiltered,
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            consumptionList: consumptionList,
+                            showConsumption: 1,
+                            consumptionMonth: month,
+                            consumptionStartDate: startDate,
+                            consumptionRegion: region
+                        })
+                        this.refs.consumptionChild.showConsumptionData();
+                    }).catch(error => { console.log("Error+++", error) });
+                }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
 
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
-        this.setState({ inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
+        this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             elInstance.destroy();
@@ -532,44 +571,77 @@ class EditSupplyPlanStatus extends Component {
                 var programJson = this.state.program;
                 var batchInfoList = programJson.batchInfoList;
 
-                var batchList = [];
-                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                DataSourceService.getAllDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    response.data.map(c => {
+                        dataSourceList.push({
+                            name: getLabelText(c.label, this.state.lang),
+                            id: c.dataSourceId,
+                            dataSourceTypeId: c.dataSourceType.id,
+                            active: c.active,
+                            label: c.label
+                        })
+                    })
+                    this.setState({
+                        dataSourceList: dataSourceList
+                    })
 
-                for (var sl = 0; sl < shipmentList.length; sl++) {
-                    var bdl = shipmentList[sl].batchInfoList;
-                    for (var bd = 0; bd < bdl.length; bd++) {
-                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                        if (index == -1) {
-                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                            if (batchDetailsToPush.length > 0) {
-                                batchList.push(batchDetailsToPush[0]);
+                    RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
+                        var rcpuList = [];
+                        response1.data.map(c => {
+                            rcpuList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.realmCountryPlanningUnitId,
+                                multiplier: c.multiplier,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            realmCountryPlanningUnitList: rcpuList
+                        })
+                        console.log("++++Rcpu:List", rcpuList)
+
+                        var batchList = [];
+                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+
+                        for (var sl = 0; sl < shipmentList.length; sl++) {
+                            var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (batchDetailsToPush.length > 0) {
+                                        batchList.push(batchDetailsToPush[0]);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                var inventoryListUnFiltered = (programJson.inventoryList);
-                var inventoryList = (programJson.inventoryList).filter(c =>
-                    c.planningUnit.id == planningUnitId &&
-                    c.region != null && c.region.id != 0 &&
-                    c.region.id == region &&
-                    moment(c.inventoryDate).format("MMM YY") == month);
-                if (inventoryType == 1) {
-                    inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
-                } else {
-                    inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
-                }
-                this.setState({
-                    batchInfoList: batchList,
-                    programJson: programJson,
-                    inventoryListUnFiltered: inventoryListUnFiltered,
-                    inventoryList: inventoryList,
-                    showInventory: 1,
-                    inventoryType: inventoryType,
-                    inventoryMonth: month,
-                    inventoryEndDate: endDate,
-                    inventoryRegion: region
-                })
-                this.refs.inventoryChild.showInventoryData();
+                        var inventoryListUnFiltered = (programJson.inventoryList);
+                        var inventoryList = (programJson.inventoryList).filter(c =>
+                            c.planningUnit.id == planningUnitId &&
+                            c.region != null && c.region.id != 0 &&
+                            c.region.id == region &&
+                            moment(c.inventoryDate).format("MMM YY") == month);
+                        if (inventoryType == 1) {
+                            inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
+                        } else {
+                            inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                        }
+                        this.setState({
+                            batchInfoList: batchList,
+                            programJson: programJson,
+                            inventoryListUnFiltered: inventoryListUnFiltered,
+                            inventoryList: inventoryList,
+                            showInventory: 1,
+                            inventoryType: inventoryType,
+                            inventoryMonth: month,
+                            inventoryEndDate: endDate,
+                            inventoryRegion: region
+                        })
+                        this.refs.inventoryChild.showInventoryData();
+                    }).catch(error => { console.log("Error+++", error) });
+                }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
@@ -579,7 +651,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     shipmentsDetailsClicked = (supplyPlanType, startDate, endDate) => {
-        // this.setState({ loading: true })
+        this.setState({ loading: true })
         var programId = document.getElementById("programId").value;
         var db1;
         getDatabase();
@@ -614,33 +686,131 @@ class EditSupplyPlanStatus extends Component {
                     shipmentListUnFiltered: shipmentListUnFiltered
                 })
                 var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-                // var tableEditableBasedOnSupplyPlan = true;
-                if (supplyPlanType == 'deliveredShipments') {
-                    shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'shippedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'orderedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'plannedShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'deliveredErpShipments') {
-                    shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'shippedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'orderedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                } else if (supplyPlanType == 'plannedErpShipments') {
-                    shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                } else {
-                    shipmentList = []
-                }
-                this.setState({
-                    showShipments: 1,
-                    shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered,
-                    programJson: programJson
-                })
-                this.refs.shipmentChild.showShipmentData();
+
+                DataSourceService.getAllDataSourceList().then(response => {
+                    var dataSourceList = [];
+                    response.data.map(c => {
+                        dataSourceList.push({
+                            name: getLabelText(c.label, this.state.lang),
+                            id: c.dataSourceId,
+                            dataSourceTypeId: c.dataSourceType.id,
+                            active: c.active,
+                            label: c.label
+                        })
+                    })
+                    this.setState({
+                        dataSourceList: dataSourceList
+                    })
+
+                    ShipmentStatusService.getShipmentStatusListActive().then(response1 => {
+                        var shipmentStatusList = [];
+                        response1.data.map(c => {
+                            shipmentStatusList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.shipmentStatusId,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            shipmentStatusList: shipmentStatusList
+                        })
+
+                        ProcurementAgentService.getProcurementAgentListAll().then(response2 => {
+                            var paList = [];
+                            response2.data.map(c => {
+                                paList.push({
+                                    name: c.procurementAgentCode,
+                                    id: c.procurementAgentId,
+                                    active: c.active,
+                                    label: c.label
+                                })
+                            })
+                            this.setState({
+                                procurementAgentList: paList
+                            })
+
+                            FundingSourceService.getFundingSourceListAll().then(response3 => {
+                                var fsList = [];
+                                response3.data.map(c => {
+                                    fsList.push({
+                                        name: c.fundingSourceCode,
+                                        id: c.fundingSourceId,
+                                        active: c.active,
+                                        label: c.label
+                                    })
+                                })
+                                this.setState({
+                                    fundingSourceList: fsList
+                                })
+
+                                BudgetService.getBudgetList().then(response4 => {
+                                    var bList = [];
+                                    response4.data.map(c => {
+                                        bList.push({
+                                            name: c.budgetCode,
+                                            id: c.budgetId,
+                                            fundingSource: c.fundingSource,
+                                            currency: c.currency,
+                                            budgetAmt: c.budgetAmt,
+                                            active: c.active,
+                                            programId: c.program.id,
+                                            label: c.label,
+                                            startDate: c.startDate,
+                                            stopDate: c.stopDate
+                                        })
+                                    })
+                                    this.setState({
+                                        budgetList: bList
+                                    })
+
+                                    CurrencyService.getCurrencyList().then(response5 => {
+                                        var cList = [];
+                                        response5.data.map(c => {
+                                            cList.push({
+                                                name: getLabelText(c.label, this.state.lang),
+                                                id: c.currencyId,
+                                                active: c.active,
+                                                label: c.label
+                                            })
+                                        })
+                                        this.setState({
+                                            currencyList: cList
+                                        })
+
+                                        // var tableEditableBasedOnSupplyPlan = true;
+                                        if (supplyPlanType == 'deliveredShipments') {
+                                            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'shippedShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'orderedShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'plannedShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'deliveredErpShipments') {
+                                            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'shippedErpShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'orderedErpShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                        } else if (supplyPlanType == 'plannedErpShipments') {
+                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                        } else {
+                                            shipmentList = []
+                                        }
+                                        this.setState({
+                                            showShipments: 1,
+                                            shipmentList: shipmentList,
+                                            shipmentListUnFiltered: shipmentListUnFiltered,
+                                            programJson: programJson
+                                        })
+                                        this.refs.shipmentChild.showShipmentData();
+                                    }).catch(error => { console.log("Error+++", error) });
+                                }).catch(error => { console.log("Error+++", error) });
+                            }).catch(error => { console.log("Error+++", error) });
+                        }).catch(error => { console.log("Error+++", error) });
+                    }).catch(error => { console.log("Error+++", error) });
+                }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
@@ -1678,15 +1848,15 @@ class EditSupplyPlanStatus extends Component {
             console.log('**' + JSON.stringify(response.data))
             this.setState({
                 planningUnits: (response.data).sort(function (a, b) {
-                        a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
-                        b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }.bind(this)), message: ''
+                    a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                    b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                }.bind(this)), message: ''
             })
         })
             .catch(
                 error => {
-                    console.log("Error+++",error)
+                    console.log("Error+++", error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -3619,7 +3789,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tfoot>
                                     </Table>
-                                    {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlanCompare" />}
+                                    {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlanCompare" useLocalData={0} />}
                                     <div className="table-responsive mt-3">
                                         <div id="consumptionTable" />
                                     </div>
@@ -3796,7 +3966,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} />}
+                                    {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}
                                     <div className="table-responsive mt-3">
                                         <div id="adjustmentsTable" className="table-responsive " />
                                     </div>
@@ -3847,7 +4017,7 @@ class EditSupplyPlanStatus extends Component {
                             </ModalHeader>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <ModalBody>
-                                    {this.state.showShipments && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanCompare" />}
+                                    {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlanCompare" useLocalData={0} />}
                                     <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                     <div className="table-responsive">
                                         <div id="shipmentsDetailsTable" />

@@ -330,6 +330,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             currencyList.push(currencyJson);
                                         }
+                                        if (this.props.useLocalData == 0) {
+                                            dataSourceList = this.props.items.dataSourceList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            currencyList = this.props.items.currencyList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            fundingSourceList = this.props.items.fundingSourceList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            budgetList = this.props.items.budgetList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            shipmentStatusList = this.props.items.shipmentStatusList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            procurementAgentList = this.props.items.procurementAgentList;
+                                        }
                                         this.setState({
                                             currencyListAll: currencyResult,
                                             currencyList: currencyList,
