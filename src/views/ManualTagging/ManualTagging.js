@@ -34,6 +34,8 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            finalShipmentId:'',
+            selectedShipment: [],
             productCategories: [],
             countryList: [],
             parentShipmentId: '',
@@ -69,7 +71,8 @@ export default class ManualTagging extends Component {
             active3: false,
             planningUnitValues: [],
             planningUnitIds: [],
-            roNoOrderNo: ''
+            roNoOrderNo: '',
+            notLinkedShipments: []
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -90,8 +93,75 @@ export default class ManualTagging extends Component {
         this.onPaste = this.onPaste.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
+        this.getNotLinkedShipments = this.getNotLinkedShipments.bind(this);
+        this.displayShipmentData = this.displayShipmentData.bind(this);
     }
 
+    displayShipmentData() {
+        let selectedShipmentId = parseInt(document.getElementById("notLinkedShipmentId").value);
+        let selectedPlanningUnitId = parseInt(document.getElementById("planningUnitId1").value);
+        let selectedShipment;
+        console.log("selectedShipmentId---", selectedShipmentId);
+        if (selectedShipmentId != null && selectedShipmentId != 0) {
+            selectedShipment = this.state.notLinkedShipments.filter(c => (c.shipmentId == selectedShipmentId));
+        } else {
+            selectedShipment = this.state.notLinkedShipments.filter(c => (c.planningUnit.id == selectedPlanningUnitId));
+        }
+        this.setState({
+            selectedShipment
+        })
+    }
+    getNotLinkedShipments() {
+
+        let programId1 = parseInt(document.getElementById("programId1").value);
+        let planningUnitId = this.state.planningUnitIdUpdated;
+        ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
+            .then(response => {
+                console.log("notLinkedShipments response===", response.data);
+                this.setState({
+                    notLinkedShipments: response.data
+                });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
     getProductCategories() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
@@ -347,7 +417,7 @@ export default class ManualTagging extends Component {
     }
     link() {
 
-        var programId = document.getElementById("programId").value;
+        var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
 
         this.setState({ loading1: true })
         var validation = this.checkValidation();
@@ -363,7 +433,7 @@ export default class ManualTagging extends Component {
                     let json = {
                         parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
                         programId: programId,
-                        shipmentId: this.state.shipmentId,
+                        shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
                         conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         notes: (map1.get("9") === '' ? null : map1.get("9")),
                         active: map1.get("0"),
@@ -1546,6 +1616,7 @@ export default class ManualTagging extends Component {
                 }, () => {
 
                     this.getOrderDetails();
+                    // this.getNotLinkedShipments();
                 });
             }
             // outputListAfterSearch.push(row);
@@ -1569,7 +1640,7 @@ export default class ManualTagging extends Component {
     }
 
     getPlanningUnitList() {
-        var programId = document.getElementById("programId").value;
+        var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
         if (programId != -1) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
@@ -1709,12 +1780,9 @@ export default class ManualTagging extends Component {
                 //     return "center" }
             },
             onSelect: (row, isSelect, rowIndex, e) => {
-                document.getElementById("erpShipmentQty").value = row.quantity;
-                this.getConvertedQATShipmentQty();
+                console.log("my row---",row);
                 this.setState({
-                    orderNo: row.orderNo,
-                    primeLineNo: row.primeLineNo,
-                    displayButton: true
+                    finalShipmentId: row.shipmentId
                 });
             }
         };
@@ -1732,6 +1800,15 @@ export default class ManualTagging extends Component {
             return (
                 <option key={i} value={item.planningUnit.id}>
                     {getLabelText(item.planningUnit.label, this.state.lang)}
+                </option>
+            )
+        }, this);
+
+        const { notLinkedShipments } = this.state;
+        let shipmentIdList = notLinkedShipments.length > 0 && notLinkedShipments.map((item, i) => {
+            return (
+                <option key={i} value={item.shipmentId}>
+                    {item.shipmentId}
                 </option>
             )
         }, this);
@@ -2206,33 +2283,94 @@ export default class ManualTagging extends Component {
                                                 }
                                             </ToolkitProvider>}
                                         {this.state.active3 &&
-                                            <ToolkitProvider
-                                                keyField="erpOrderId"
-                                                data={this.state.artmisList}
-                                                columns={columns}
-                                                search={{ searchFormatted: true }}
-                                                hover
-                                                filter={filterFactory()}
-                                            >
-                                                {
-                                                    props => (
-                                                        <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
+                                            <>
+                                                <div className="col-md-12">
+                                                    <Row>
+                                                        <FormGroup className="col-md-3 ">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
+                                                            <div className="controls ">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="programId1"
+                                                                        id="programId1"
+                                                                        bsSize="sm"
+                                                                        // value={this.state.programId}
+                                                                        // onChange={this.getPlanningUnitList}
+                                                                        onChange={(e) => { this.getNotLinkedShipments(e); this.getPlanningUnitList(e) }}
+                                                                    >
+                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                        {programList}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-3 pl-0">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
+                                                            <div className="controls ">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="notLinkedShipmentId"
+                                                                        id="notLinkedShipmentId"
+                                                                        bsSize="sm"
+                                                                        onChange={this.displayShipmentData}
+                                                                    >
+                                                                        <option value="0">{i18n.t('static.common.all')}</option>
+                                                                        {shipmentIdList}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-3 ">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+                                                            <div className="controls ">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="planningUnitId1"
+                                                                        id="planningUnitId1"
+                                                                        bsSize="sm"
+                                                                        // value={this.state.programId}
+                                                                        onChange={this.displayShipmentData}
+                                                                    // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
+                                                                    >
+                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                        {planningUnitList}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Row>
+                                                </div>
+                                                <ToolkitProvider
+                                                    keyField="shipmentId"
+                                                    data={this.state.selectedShipment}
+                                                    columns={columns}
+                                                    search={{ searchFormatted: true }}
+                                                    hover
+                                                    filter={filterFactory()}
+                                                >
+                                                    {
+                                                        props => (
+                                                            <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
 
-                                                            <BootstrapTable
-                                                                // keyField='erpOrderId'
-                                                                ref={n => this.node = n}
-                                                                selectRow={selectRow}
-                                                                hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                <BootstrapTable
+                                                                    // keyField='erpOrderId'
+                                                                    ref={n => this.node = n}
+                                                                    selectRow={selectRow}
+                                                                    hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
 
-                                                                rowEvents={{
+                                                                    rowEvents={{
 
-                                                                }}
-                                                                {...props.baseProps}
-                                                            />
-                                                        </div>
-                                                    )
-                                                }
-                                            </ToolkitProvider>
+                                                                    }}
+                                                                    {...props.baseProps}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    }
+                                                </ToolkitProvider>
+                                            </>
                                         }
                                     </div><br />
                                     <div>

@@ -7,7 +7,12 @@ class ManualTaggingSerice {
         return axios.post(`${API_URL}/api/manualTagging/`, json, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo,programId, erpPlanningUnitId,linkingType) {
+
+    getNotLinkedShipmentListForManualTagging(programId,linkingType) {
+        return axios.get(`${API_URL}/api/manualTagging/notLinkedShipments/${programId}/${linkingType}`, {
+        });
+    }
+    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType) {
         return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
     }
@@ -24,7 +29,7 @@ class ManualTaggingSerice {
         });
     }
 
-    searchErpOrderData(term, programId, erpPlanningUnitId,linkingType) {
+    searchErpOrderData(term, programId, erpPlanningUnitId, linkingType) {
         return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
     }
