@@ -9,7 +9,8 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
-
+import BudgetServcie from '../../api/BudgetService';
+import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
 import ProductService from '../../api/ProductService';
@@ -34,7 +35,10 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            finalShipmentId:'',
+            filteredBudgetList: [],
+            budgetList: [],
+            planningUnits1: [],
+            finalShipmentId: '',
             selectedShipment: [],
             productCategories: [],
             countryList: [],
@@ -72,7 +76,8 @@ export default class ManualTagging extends Component {
             planningUnitValues: [],
             planningUnitIds: [],
             roNoOrderNo: '',
-            notLinkedShipments: []
+            notLinkedShipments: [],
+            fundingSourceList: []
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -95,6 +100,7 @@ export default class ManualTagging extends Component {
         this.getProductCategories = this.getProductCategories.bind(this);
         this.getNotLinkedShipments = this.getNotLinkedShipments.bind(this);
         this.displayShipmentData = this.displayShipmentData.bind(this);
+        this.getFundingSourceList = this.getFundingSourceList.bind(this);
     }
 
     displayShipmentData() {
@@ -348,8 +354,11 @@ export default class ManualTagging extends Component {
                 active1: false,
                 active2: false
             }, () => {
-                this.buildJExcel();
+                // this.buildJExcel();
                 let realmId = AuthenticationService.getRealmId();
+                this.getProductCategories();
+                this.getBudgetList();
+                this.getFundingSourceList();
                 RealmCountryService.getRealmCountryrealmIdById(realmId)
                     .then(response => {
                         console.log("RealmCountryService---->", response.data)
@@ -406,9 +415,146 @@ export default class ManualTagging extends Component {
                             }
                         }
                     );
-                this.getProductCategories();
+
+
             });
         }
+    }
+
+    getBudgetListByFundingSourceId = (e) => {
+        let fundingSourceId = document.getElementById("fundingSourceId").value;
+        console.log("programId--->>>>>>>>>>", fundingSourceId)
+        const filteredBudgetList = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+        console.log("filteredBudgetList---", filteredBudgetList);
+        this.setState({
+            filteredBudgetList
+        });
+    }
+    getFundingSourceList() {
+        FundingSourceService.getFundingSourceListAll()
+            .then(response => {
+                console.log(response)
+                if (response.status == 200) {
+                    console.log("budget after status 200 new console --- ---->", response.data);
+                    let fundingSourceList = response.data.filter(c => c.active == true)
+                    console.log("fundingSourceList---", fundingSourceList);
+                    this.setState({
+                        fundingSourceList
+                    }, () => {
+                        // this.buildJExcel();
+                        // this.filterData();
+                    });
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    getBudgetList = () => {
+        BudgetServcie.getBudgetList()
+            .then(response => {
+                console.log(response)
+                if (response.status == 200) {
+                    console.log("budget after status 200 new console --- ---->", response.data);
+                    // let 
+                    let budgetList = response.data.filter(c => c.active == true)
+                    this.setState({
+                        budgetList
+                    }, () => {
+                        // this.buildJExcel();
+                        // this.filterData();
+                    });
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     programChange(event) {
         this.setState({
@@ -433,12 +579,15 @@ export default class ManualTagging extends Component {
                     let json = {
                         parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
                         programId: programId,
+                        fundingSourceId: (this.state.active3 ? document.getElementById("programId1").value : 0),
+                        budgetId: (this.state.active3 ? document.getElementById("budgetId").value : 0),
                         shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
                         conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         notes: (map1.get("9") === '' ? null : map1.get("9")),
                         active: map1.get("0"),
                         orderNo: map1.get("11"),
-                        primeLineNo: parseInt(map1.get("12"))
+                        primeLineNo: parseInt(map1.get("12")),
+                        planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0)
                     }
                     changedmtList.push(json);
                 }
@@ -660,78 +809,144 @@ export default class ManualTagging extends Component {
 
     }
 
-    filterErpData(productCategoryIds) {
-        console.log("planningUnitIds---", productCategoryIds);
-        document.getElementById('div2').style.display = 'block';
-        var countryId = document.getElementById("countryId").value;
-        // let productCategoryIds = this.state.productCategoryIds;
+    handlePlanningUnitChange = (planningUnitIds) => {
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+            this.filterErpData()
+        })
+    }
+
+    handleProductCategoryChange = (productCategoryIds) => {
         this.setState({
             productCategoryValues: productCategoryIds.map(ele => ele),
             productCategoryLabels: productCategoryIds.map(ele => ele.label)
         }, () => {
-            if (countryId != -1 && productCategoryIds != null && productCategoryIds != "") {
+            this.getPlanningUnitListByProductcategoryIds();
+            this.filterErpData();
+        })
+    }
+
+    getPlanningUnitListByProductcategoryIds = () => {
+        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.map(ele => (ele.value).toString()))
+            .then(response => {
+                console.log("RESP--->3", response.data);
                 this.setState({
-                    loading: true,
-                    productCategoryIds
+                    planningUnits1: response.data
                 })
-
-                var json = {
-                    countryId: parseInt(document.getElementById("countryId").value),
-                    productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
-                    linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
-                }
-
-                ManualTaggingService.getShipmentListForManualTagging(json)
-                    .then(response => {
-                        console.log("manual tagging response===", response);
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
                         this.setState({
-                            outputList: response.data
-                        }, () => {
-                            this.buildJExcel();
+                            message: 'static.unkownError',
+                            loading: false
                         });
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
                                 });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
-                            }
+                                break;
                         }
-                    );
+                    }
+                }
+            );
+    }
+
+    filterErpData() {
+        document.getElementById('div2').style.display = 'block';
+        var countryId = document.getElementById("countryId").value;
+
+        if (countryId != -1) {
+            this.setState({
+                loading: true
+            })
+            console.log("pl value---", this.state.planningUnitValues.map(ele => (ele.value).toString()));
+            var json = {
+                countryId: parseInt(document.getElementById("countryId").value),
+                productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
+                planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
+                linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
             }
 
-        })
+            ManualTaggingService.getShipmentListForManualTagging(json)
+                .then(response => {
+                    console.log("manual tagging response===", response);
+                    this.setState({
+                        outputList: response.data
+                    }, () => {
+                        this.buildJExcel();
+                    });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+
+
     }
 
     filterData = (planningUnitIds) => {
@@ -1091,6 +1306,7 @@ export default class ManualTagging extends Component {
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
                 data[12] = erpDataList[j].primeLineNo;
+                data[13] = erpDataList[j].erpPlanningUnit.id;
             } else {
                 data[0] = erpDataList[j].active;
                 data[1] = erpDataList[j].erpOrderId;
@@ -1105,6 +1321,7 @@ export default class ManualTagging extends Component {
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
                 data[12] = erpDataList[j].primeLineNo;
+                data[13]=0;
             }
             erpDataArray[count] = data;
             count++;
@@ -1179,6 +1396,10 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: 'primeLineNo',
+                    type: 'hidden'
+                },
+                {
+                    title: 'erpPlanningUnitId',
                     type: 'hidden'
                 }
             ],
@@ -1780,7 +2001,7 @@ export default class ManualTagging extends Component {
                 //     return "center" }
             },
             onSelect: (row, isSelect, rowIndex, e) => {
-                console.log("my row---",row);
+                console.log("my row---", row);
                 this.setState({
                     finalShipmentId: row.shipmentId
                 });
@@ -1803,6 +2024,25 @@ export default class ManualTagging extends Component {
                 </option>
             )
         }, this);
+        const { fundingSourceList } = this.state;
+        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
+            return (
+                <option key={i} value={item.fundingSourceId}>
+                    {item.fundingSourceCode}
+                </option>
+            )
+        }, this);
+
+
+        const { filteredBudgetList } = this.state;
+        let newBudgetList = filteredBudgetList.length > 0 && filteredBudgetList.map((item, i) => {
+            return (
+                <option key={i} value={item.budgetId}>
+                    {item.budgetCode}
+                </option>
+            )
+        }, this);
+
 
         const { notLinkedShipments } = this.state;
         let shipmentIdList = notLinkedShipments.length > 0 && notLinkedShipments.map((item, i) => {
@@ -1821,6 +2061,12 @@ export default class ManualTagging extends Component {
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
+        const { planningUnits1 } = this.state;
+        let planningUnitMultiList1 = planningUnits1.length > 0
+            && planningUnits1.map((item, i) => {
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
@@ -2188,7 +2434,7 @@ export default class ManualTagging extends Component {
                                                     id="productCategoryId"
                                                     bsSize="sm"
                                                     value={this.state.productCategoryValues}
-                                                    onChange={(e) => { this.filterErpData(e) }}
+                                                    onChange={(e) => { this.handleProductCategoryChange(e) }}
                                                     options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
                                                 />
 
@@ -2215,7 +2461,29 @@ export default class ManualTagging extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>}
-                                {(this.state.active1 || this.state.active2 || this.state.active3) &&
+                                {this.state.active3 &&
+                                    <FormGroup className="col-md-3">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+                                        <div className="controls ">
+                                            {/* <InMultiputGroup> */}
+                                            <MultiSelect
+                                                // type="select"
+                                                name="planningUnitId2"
+                                                id="planningUnitId2"
+                                                bsSize="sm"
+                                                value={this.state.planningUnitValues}
+                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
+                                            />
+                                            {/* <option value="0">{i18n.t('static.common.select')}</option> */}
+                                            {/* {planningUnitList} */}
+
+                                            {/* </MultiSelect> */}
+
+                                            {/* </InputMultiGroup> */}
+                                        </div>
+                                    </FormGroup>}
+                                {(this.state.active1 || this.state.active2) &&
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                         <div className="controls ">
@@ -2297,7 +2565,7 @@ export default class ManualTagging extends Component {
                                                                         bsSize="sm"
                                                                         // value={this.state.programId}
                                                                         // onChange={this.getPlanningUnitList}
-                                                                        onChange={(e) => { this.getNotLinkedShipments(e); this.getPlanningUnitList(e) }}
+                                                                        onChange={(e) => { this.getNotLinkedShipments(e); this.getPlanningUnitList(e); }}
                                                                     >
                                                                         <option value="-1">{i18n.t('static.common.select')}</option>
                                                                         {programList}
@@ -2337,6 +2605,44 @@ export default class ManualTagging extends Component {
                                                                     >
                                                                         <option value="-1">{i18n.t('static.common.select')}</option>
                                                                         {planningUnitList}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-3 ">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                            <div className="controls ">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="fundingSourceId"
+                                                                        id="fundingSourceId"
+                                                                        bsSize="sm"
+                                                                        // value={this.state.programId}
+                                                                        // onChange={this.getBudgetListByFundingSourceId}
+                                                                        onChange={(e) => { this.getBudgetListByFundingSourceId(e) }}
+                                                                    >
+                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                        {newFundingSourceList}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-3 ">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budget')}</Label>
+                                                            <div className="controls ">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="budgetId"
+                                                                        id="budgetId"
+                                                                        bsSize="sm"
+                                                                    // value={this.state.programId}
+                                                                    // onChange={this.getPlanningUnitList}
+                                                                    // onChange={(e) => { this.getNotLinkedShipments(e); this.getPlanningUnitList(e);this.getBudgetListByProgramId(e) }}
+                                                                    >
+                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                        {newBudgetList}
                                                                     </Input>
                                                                 </InputGroup>
                                                             </div>

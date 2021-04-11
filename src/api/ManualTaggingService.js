@@ -8,8 +8,23 @@ class ManualTaggingSerice {
         });
     }
 
-    getNotLinkedShipmentListForManualTagging(programId,linkingType) {
+    getShipmentLinkingNotification(json) {
+        return axios.post(`${API_URL}/api/shipmentLinkingNotification/`, json, {
+        });
+    }
+
+    updateNotification(json) {
+        return axios.post(`${API_URL}/api/updateNotification/`, json, {
+        });
+    }
+
+    getNotLinkedShipmentListForManualTagging(programId, linkingType) {
         return axios.get(`${API_URL}/api/manualTagging/notLinkedShipments/${programId}/${linkingType}`, {
+        });
+    }
+
+    getNotificationCount() {
+        return axios.get(`${API_URL}/api/getNotificationCount`, {
         });
     }
     getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType) {
