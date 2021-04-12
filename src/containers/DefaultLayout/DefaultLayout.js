@@ -767,6 +767,7 @@ class DefaultLayout extends Component {
   }
 
   getNotificationCount() {
+    AuthenticationService.setupAxiosInterceptors();
     ManualTaggingService.getNotificationCount()
       .then(response => {
         console.log("notification response===", response.data);
@@ -1520,7 +1521,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: {
                           hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
+                            ||  (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
                         },
                         children: [
                           {
@@ -1546,12 +1547,6 @@ class DefaultLayout extends Component {
                             url: '/shipment/manualTagging',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.delinking'),
-                            url: '/shipment/delinking',
-                            icon: 'fa fa-chain-broken',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
                           },
                           {
                             name: i18n.t('static.quantimed.quantimedImport'),

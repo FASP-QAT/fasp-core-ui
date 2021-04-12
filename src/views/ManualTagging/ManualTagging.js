@@ -101,8 +101,17 @@ export default class ManualTagging extends Component {
         this.getNotLinkedShipments = this.getNotLinkedShipments.bind(this);
         this.displayShipmentData = this.displayShipmentData.bind(this);
         this.getFundingSourceList = this.getFundingSourceList.bind(this);
-    }
+        this.cancelClicked = this.cancelClicked.bind(this);
 
+    }
+    cancelClicked() {
+        if (this.state.active1 || this.state.active2) {
+            this.filterData(this.state.planningUnitIds);
+        } else {
+            this.filterErpData();
+        }
+        this.toggleLarge();
+    }
     displayShipmentData() {
         let selectedShipmentId = parseInt(document.getElementById("notLinkedShipmentId").value);
         let selectedPlanningUnitId = parseInt(document.getElementById("planningUnitId1").value);
@@ -613,7 +622,8 @@ export default class ManualTagging extends Component {
                             document.getElementById('div2').style.display = 'block';
                             console.log("Going to call toggle large 1");
                             this.toggleLarge();
-                            this.filterData(this.state.planningUnitIds);
+
+                            (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
 
                         })
 
@@ -1321,7 +1331,7 @@ export default class ManualTagging extends Component {
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
                 data[12] = erpDataList[j].primeLineNo;
-                data[13]=0;
+                data[13] = 0;
             }
             erpDataArray[count] = data;
             count++;
@@ -1341,7 +1351,8 @@ export default class ManualTagging extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.manualTagging.linkColumn'),
+                    // title: i18n.t('static.manualTagging.linkColumn'),
+                    title: "Link?",
                     type: 'checkbox',
                 },
                 {
@@ -1568,36 +1579,36 @@ export default class ManualTagging extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function (obj, x, y, e) {
-                    var items = [];
-                    if (y != null) {
-                        if (obj.options.allowInsertRow == true) {
-                            items.push({
-                                title: i18n.t('static.dashboard.linkShipment'),
-                                onclick: function () {
-                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                    var outputListAfterSearch = [];
-                                    let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
-                                    console.log("row---------***----", row);
-                                    outputListAfterSearch.push(row);
+                // contextMenu: function (obj, x, y, e) {
+                //     var items = [];
+                //     if (y != null) {
+                //         if (obj.options.allowInsertRow == true) {
+                //             items.push({
+                //                 title: i18n.t('static.dashboard.linkShipment'),
+                //                 onclick: function () {
+                //                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                //                     var outputListAfterSearch = [];
+                //                     let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
+                //                     console.log("row---------***----", row);
+                //                     outputListAfterSearch.push(row);
 
-                                    this.setState({
-                                        planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                                        shipmentId: this.el.getValueFromCoords(0, y),
-                                        outputListAfterSearch,
-                                        procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
-                                        planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
-                                    })
-                                    console.log("Going to call toggle large 2");
-                                    this.toggleLarge();
+                //                     this.setState({
+                //                         planningUnitId: outputListAfterSearch[0].planningUnit.id,
+                //                         shipmentId: this.el.getValueFromCoords(0, y),
+                //                         outputListAfterSearch,
+                //                         procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
+                //                         planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
+                //                     })
+                //                     console.log("Going to call toggle large 2");
+                //                     this.toggleLarge();
 
-                                }.bind(this)
-                            });
-                        }
-                    }
+                //                 }.bind(this)
+                //             });
+                //         }
+                //     }
 
-                    return items;
-                }.bind(this)
+                //     return items;
+                // }.bind(this)
             };
         }
 
@@ -1685,36 +1696,36 @@ export default class ManualTagging extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                contextMenu: function (obj, x, y, e) {
-                    var items = [];
-                    if (y != null) {
-                        if (obj.options.allowInsertRow == true) {
-                            items.push({
-                                title: i18n.t('static.dashboard.linkShipment'),
-                                onclick: function () {
-                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                    var outputListAfterSearch = [];
-                                    let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
-                                    console.log("row---------***----", row);
-                                    outputListAfterSearch.push(row);
+                // contextMenu: function (obj, x, y, e) {
+                //     var items = [];
+                //     if (y != null) {
+                //         if (obj.options.allowInsertRow == true) {
+                //             items.push({
+                //                 title: i18n.t('static.dashboard.linkShipment'),
+                //                 onclick: function () {
+                //                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                //                     var outputListAfterSearch = [];
+                //                     let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
+                //                     console.log("row---------***----", row);
+                //                     outputListAfterSearch.push(row);
 
-                                    this.setState({
-                                        planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                                        shipmentId: this.el.getValueFromCoords(0, y),
-                                        outputListAfterSearch,
-                                        procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
-                                        planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
-                                    })
-                                    console.log("Going to call toggle large 2");
-                                    this.toggleLarge();
+                //                     this.setState({
+                //                         planningUnitId: outputListAfterSearch[0].planningUnit.id,
+                //                         shipmentId: this.el.getValueFromCoords(0, y),
+                //                         outputListAfterSearch,
+                //                         procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
+                //                         planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
+                //                     })
+                //                     console.log("Going to call toggle large 2");
+                //                     this.toggleLarge();
 
-                                }.bind(this)
-                            });
-                        }
-                    }
+                //                 }.bind(this)
+                //             });
+                //         }
+                //     }
 
-                    return items;
-                }.bind(this)
+                //     return items;
+                // }.bind(this)
             };
         }
         else if (this.state.active3) {
@@ -1796,8 +1807,13 @@ export default class ManualTagging extends Component {
         } else {
             var outputListAfterSearch = [];
             let row;
+            console.log("instance---", instance);
+            console.log("cell---", cell);
+            console.log("this.state.outputList---", this.state.outputList);
             if (this.state.active1) {
                 row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
+                console.log("row id----------------------->", this.el.getValueFromCoords(0, x));
+                console.log("row----------------------->", row);
                 outputListAfterSearch.push(row);
                 let json = { id: '', label: '' };
                 this.setState({
@@ -1841,7 +1857,7 @@ export default class ManualTagging extends Component {
                 });
             }
             // outputListAfterSearch.push(row);
-
+            // console.log("1------------------------------>>>>", outputListAfterSearch[0].planningUnit.id)
             this.setState({
                 planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                 shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
@@ -2788,7 +2804,7 @@ export default class ManualTagging extends Component {
 
                                     <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
 
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </div>
                             <div style={{ display: this.state.loading1 ? "block" : "none" }}>
