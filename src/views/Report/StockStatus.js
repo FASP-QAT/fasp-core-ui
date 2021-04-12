@@ -439,7 +439,7 @@ class StockStatus extends Component {
     var aspectwidth1 = (width - h1);
     console.log("Document+++",doc.internal)
     doc.setTextColor("#002f6c");
-    doc.addImage(canvasImg, 'png', 50, 150, aspectwidth1, 400, 'CANVAS');
+    doc.addImage(canvasImg, 'png', 50, 150, 750, 300, 'CANVAS');
 
     const header = [[{content:i18n.t('static.common.month'),rowSpan:2},
       {content:i18n.t("static.report.stock"),colSpan:1},
@@ -504,7 +504,7 @@ class StockStatus extends Component {
                     y = y + 20
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t("static.supplyPlan.consumptionMsg"), doc.internal.pageSize.width / 8, y, {
+                    doc.text(i18n.t("static.supplyPlan.consumptionMsg"), doc.internal.pageSize.width / 9, y, {
                         align: 'left'
                     })
                 }
@@ -537,7 +537,7 @@ class StockStatus extends Component {
                     y = y + 20
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+                    doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 9, y, {
                         align: 'left'
                     })
 
@@ -571,7 +571,7 @@ class StockStatus extends Component {
                     y = y + 20
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t("static.supplyPlan.inventoryMsg"), doc.internal.pageSize.width / 8, y, {
+                    doc.text(i18n.t("static.supplyPlan.inventoryMsg"), doc.internal.pageSize.width / 9, y, {
                         align: 'left'
                     })
                 }
@@ -618,7 +618,7 @@ class StockStatus extends Component {
         console.log('canv', canv)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
         //console.log('canvasImg1',canvasImg1)    
-        doc.addImage(canvasImg1, 'png', 50, 150, aspectwidth1, 400, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, 150, 750, 300, "a" + count, 'CANVAS')
         count++
 
         var height = doc.internal.pageSize.height;
@@ -666,7 +666,7 @@ class StockStatus extends Component {
                         y = y + 20
                         doc.setFont('helvetica', 'normal')
                         doc.setFontSize(8)
-                        doc.text(i18n.t("static.supplyPlan.consumptionMsg"), doc.internal.pageSize.width / 8, y, {
+                        doc.text(i18n.t("static.supplyPlan.consumptionMsg"), doc.internal.pageSize.width / 9, y, {
                             align: 'left'
                         })
                     }
@@ -699,7 +699,7 @@ class StockStatus extends Component {
                         y = y + 20
                         doc.setFont('helvetica', 'normal')
                         doc.setFontSize(8)
-                        doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+                        doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 9, y, {
                             align: 'left'
                         })
                         
@@ -733,7 +733,7 @@ class StockStatus extends Component {
                         y = y + 20
                         doc.setFont('helvetica', 'normal')
                         doc.setFontSize(8)
-                        doc.text(i18n.t("static.supplyPlan.inventoryMsg"), doc.internal.pageSize.width / 8, y, {
+                        doc.text(i18n.t("static.supplyPlan.inventoryMsg"), doc.internal.pageSize.width / 9, y, {
                             align: 'left'
                         })
                     }
