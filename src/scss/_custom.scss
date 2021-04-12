@@ -3933,3 +3933,10 @@ color: #000000!important;
 .jexcel_content::-webkit-scrollbar-thumb {
   background: #c1c1c1!important;
 }
+
+.checkinlinedisplay{
+  display: inline-flex !important;
+  align-items: center;
+    padding-left: 0;
+    margin-right: 0.75rem;
+}
