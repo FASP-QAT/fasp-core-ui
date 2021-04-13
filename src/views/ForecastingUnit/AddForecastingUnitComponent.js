@@ -363,6 +363,9 @@ export default class AddForecastingUnitComponent extends Component {
                 .then(response => {
                     console.log("productCategory------>", response.data.slice(1))
                     var listArray = response.data.slice(1);
+                    console.log("RESPO----->1", listArray.length);
+                    listArray = listArray.filter(c => c.payload.active.toString() == "true");
+                    console.log("RESPO----->2", listArray.length);
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
