@@ -77,7 +77,8 @@ export default class ManualTagging extends Component {
             planningUnitIds: [],
             roNoOrderNo: '',
             notLinkedShipments: [],
-            fundingSourceList: []
+            fundingSourceList: [],
+            displaySubmitButton: false
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -102,6 +103,7 @@ export default class ManualTagging extends Component {
         this.displayShipmentData = this.displayShipmentData.bind(this);
         this.getFundingSourceList = this.getFundingSourceList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.displayButton = this.displayButton.bind(this);
 
     }
     cancelClicked() {
@@ -265,6 +267,17 @@ export default class ManualTagging extends Component {
         }
         return valid;
     }
+
+    SUMCOL = function (instance, columnId) {
+        var total = 0;
+        for (var j = 0; j < instance.options.data.length; j++) {
+            if (Number(instance.records[j][columnId - 1].innerHTML)) {
+                total += Number(instance.records[j][columnId - 1].innerHTML);
+            }
+        }
+        return total;
+    }
+
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
         console.log("changed 1---")
@@ -275,7 +288,7 @@ export default class ManualTagging extends Component {
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-          
+
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -295,6 +308,9 @@ export default class ManualTagging extends Component {
 
             }
         }
+        // if (x == 0) {
+        //     console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+        // }
 
         // if (x == 9) {
 
@@ -304,7 +320,7 @@ export default class ManualTagging extends Component {
         if (x != 10) {
             this.el.setValueFromCoords(10, y, 1, true);
         }
-
+        this.displayButton();
 
 
     }.bind(this);
@@ -589,111 +605,151 @@ export default class ManualTagging extends Component {
             programId: event.target.value
         })
     }
-    link() {
 
-        var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
-
-        this.setState({ loading1: true })
+    displayButton() {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.state.instance.getJson(null, false);
             console.log("tableJson---", tableJson);
-            let changedmtList = [];
+            let count = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("7 map---" + map1.get("10"))
-                console.log("7 map order no--- ", map1.get("11"));
-                if (parseInt(map1.get("10")) === 1) {
-                    let json = {
-                        parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
-                        programId: programId,
-                        fundingSourceId: (this.state.active3 ? document.getElementById("programId1").value : 0),
-                        budgetId: (this.state.active3 ? document.getElementById("budgetId").value : 0),
-                        shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
-                        conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        notes: (map1.get("9") === '' ? null : map1.get("9")),
-                        active: map1.get("0"),
-                        orderNo: map1.get("11"),
-                        primeLineNo: parseInt(map1.get("12")),
-                        planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0)
-                    }
-                    changedmtList.push(json);
+                if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
+                    count++;
                 }
             }
-            console.log("FINAL SUBMIT changedmtList---", changedmtList);
-            ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
-                .then(response => {
-                    console.log("response m tagging---", response)
-                    this.setState({
-                        message: i18n.t('static.shipment.linkingsuccess'),
-                        color: 'green',
-                        haslinked: true,
-                        loading: false,
-                        loading1: false,
-                        alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
-                    },
-                        () => {
-                            console.log("changedmtList length---", changedmtList.length);
-                            console.log("data length---", response.data.length);
+            this.setState({
+                displaySubmitButton: (count > 0 ? true : false)
+            })
+        }
+    }
 
-                            console.log(this.state.message, "success 1")
-                            this.hideSecondComponent();
-                            document.getElementById('div2').style.display = 'block';
-                            console.log("Going to call toggle large 1");
-                            this.toggleLarge();
+    link() {
+        let valid = false;
+        var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
+        if (this.state.active3) {
+            if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
+                valid = true;
+            } else {
+                if (programId == -1) {
+                    alert("Please select program");
+                } else if (document.getElementById("fundingSourceId").value == -1) {
+                    alert("Please select funding source");
+                } else if (document.getElementById("budgetId").value == -1) {
+                    alert("Please select budget");
+                } else {
+                    var cf = window.confirm("You are about to create a new shipment.Are you sure you want to continue?");
+                    if (cf == true) {
+                        valid = true;
+                    } else { }
+                }
+            }
+        } else {
+            valid = true;
+        }
+        if (valid) {
+            this.setState({ loading1: true })
+            var validation = this.checkValidation();
+            if (validation == true) {
+                var tableJson = this.state.instance.getJson(null, false);
+                console.log("tableJson---", tableJson);
+                let changedmtList = [];
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    console.log("7 map---" + map1.get("10"))
+                    console.log("7 map order no--- ", map1.get("11"));
+                    if (parseInt(map1.get("10")) === 1) {
+                        let json = {
+                            parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
+                            programId: programId,
+                            fundingSourceId: (this.state.active3 ? document.getElementById("programId1").value : 0),
+                            budgetId: (this.state.active3 ? document.getElementById("budgetId").value : 0),
+                            shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
+                            conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            notes: (map1.get("9") === '' ? null : map1.get("9")),
+                            active: map1.get("0"),
+                            orderNo: map1.get("11"),
+                            primeLineNo: parseInt(map1.get("12")),
+                            planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0)
+                        }
+                        changedmtList.push(json);
+                    }
+                }
+                console.log("FINAL SUBMIT changedmtList---", changedmtList);
+                ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
+                    .then(response => {
+                        console.log("response m tagging---", response)
+                        this.setState({
+                            message: i18n.t('static.shipment.linkingsuccess'),
+                            color: 'green',
+                            haslinked: true,
+                            loading: false,
+                            loading1: false,
+                            alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
+                        },
+                            () => {
+                                console.log("changedmtList length---", changedmtList.length);
+                                console.log("data length---", response.data.length);
 
-                            (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+                                console.log(this.state.message, "success 1")
+                                this.hideSecondComponent();
+                                document.getElementById('div2').style.display = 'block';
+                                console.log("Going to call toggle large 1");
+                                this.toggleLarge();
 
-                        })
+                                (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
 
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                color: 'red',
-                                loading: false,
-                                loading1: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+                            })
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false,
-                                        loading1: false,
-                                        color: 'red',
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false,
-                                        loading1: false,
-                                        color: 'red',
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false,
-                                        loading1: false,
-                                        color: 'red',
-                                    });
-                                    break;
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    color: 'red',
+                                    loading: false,
+                                    loading1: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false,
+                                            loading1: false,
+                                            color: 'red',
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false,
+                                            loading1: false,
+                                            color: 'red',
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false,
+                                            loading1: false,
+                                            color: 'red',
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+            }
         }
     }
     getConvertedQATShipmentQty = () => {
@@ -1366,8 +1422,10 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 40, 50, 50, 25, 30, 30, 20, 30, 25],
+            // colWidths: [20, 40, 50, 50, 25, 30, 30, 20, 30, 25],
             colHeaderClasses: ["Reqasterisk"],
+            // minDimensions: [9],
+
             columns: [
                 {
                     // title: i18n.t('static.manualTagging.linkColumn'),
@@ -1433,13 +1491,14 @@ export default class ManualTagging extends Component {
                     type: 'hidden'
                 }
             ],
+            // footers: [['Total','1','1','1','1',0,0,0,0]],
             editable: true,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
             },
-            onload: this.loaded,
+            // onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1464,7 +1523,7 @@ export default class ManualTagging extends Component {
                 show: '',
                 entries: '',
             },
-            onload: this.loaded,
+            onload: this.loadedERP,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -1817,7 +1876,10 @@ export default class ManualTagging extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance, 0);
+    }
+    loadedERP = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
     }
 
     selected = function (instance, cell, x, y, value) {
@@ -1884,7 +1946,7 @@ export default class ManualTagging extends Component {
                 shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
                 outputListAfterSearch,
                 procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-                planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "()" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
+                planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
             })
             console.log("Going to call toggle large 3");
             this.toggleLarge();
@@ -2823,7 +2885,7 @@ export default class ManualTagging extends Component {
                                 <ModalFooter>
 
 
-                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>
+                                    {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>}
 
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
