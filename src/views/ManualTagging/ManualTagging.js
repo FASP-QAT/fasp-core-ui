@@ -275,6 +275,7 @@ export default class ManualTagging extends Component {
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+          
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -288,6 +289,8 @@ export default class ManualTagging extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
+                    var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    this.state.instance.setValueFromCoords(8, y, this.addCommas(qty * value), true);
                 }
 
             }
@@ -344,14 +347,23 @@ export default class ManualTagging extends Component {
 
     dataChange(event) {
         console.log("radio button event---", event.target)
+
         if (event.target.id == 'active1') {
             this.setState({
+                programId: -1,
+                planningUnitValues: [],
+                planningUnits: [],
+                outputList: [],
                 active1: true,
                 active2: false,
                 active3: false
             });
         } else if (event.target.id == 'active2') {
             this.setState({
+                programId: -1,
+                planningUnitValues: [],
+                planningUnits: [],
+                outputList: [],
                 active2: true,
                 active1: false,
                 active3: false
@@ -359,6 +371,11 @@ export default class ManualTagging extends Component {
         } else {
 
             this.setState({
+                outputList: [],
+                planningUnitValues: [],
+                productCategoryValues: [],
+                planningUnits1: [],
+                countryId: -1,
                 active3: true,
                 active1: false,
                 active2: false
@@ -428,6 +445,8 @@ export default class ManualTagging extends Component {
 
             });
         }
+        this.state.languageEl.destroy();
+        // this.buildJExcel();
     }
 
     getBudgetListByFundingSourceId = (e) => {
@@ -1478,6 +1497,7 @@ export default class ManualTagging extends Component {
                 data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
                 data[8] = manualTaggingList[j].notes
             } else if (this.state.active2) {
+                let shipmentQty = (manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
                 data[0] = manualTaggingList[j].parentShipmentId;
                 data[1] = manualTaggingList[j].shipmentId;
                 data[2] = manualTaggingList[j].shipmentTransId;
@@ -1486,9 +1506,9 @@ export default class ManualTagging extends Component {
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
                 data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-                data[8] = this.addCommas(manualTaggingList[j].shipmentQty);
+                data[8] = this.addCommas((manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-                data[10] = this.addCommas(manualTaggingList[j].shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+                data[10] = this.addCommas(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
                 data[11] = manualTaggingList[j].notes
             }
             else {
@@ -1844,11 +1864,12 @@ export default class ManualTagging extends Component {
                 row = this.state.outputList.filter(c => (c.erpOrderId == this.el.getValueFromCoords(0, x)))[0];
                 console.log()
                 outputListAfterSearch.push(row);
-                let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
+                let json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
+
                 this.setState({
-                    // parentShipmentId: outputListAfterSearch[0].parentShipmentId,
+                    selectedShipment: [],
                     roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo,
+                    searchedValue: outputListAfterSearch[0].orderNo,
                     planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
 
@@ -2802,7 +2823,7 @@ export default class ManualTagging extends Component {
                                 <ModalFooter>
 
 
-                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{i18n.t('static.manualTagging.link')}</Button>
+                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>
 
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>

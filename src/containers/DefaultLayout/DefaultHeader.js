@@ -94,8 +94,13 @@ class DefaultHeader extends Component {
           </UncontrolledDropdown> */}
           <NavItem className="">
             <NavLink to="#" className="nav-link">
-            <span class="badge badge-danger">{this.props.notificationCount}</span>
-            <i className="fa fa-bell  icon-anim-pulse text-primary " onClick={this.props.shipmentLinkingAlerts} title={i18n.t('static.common.viewDashBoard')}></i>
+            
+              <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
+                
+                <span className="icon-wrapper-bg"></span>
+                <span class="badge badge-danger" style={{'zIndex': '6'}}>{this.props.notificationCount}</span>
+                <i className="cui-bell icons HomeIcon icon-anim-pulse text-primary " onClick={this.props.shipmentLinkingAlerts} title={i18n.t('static.common.viewDashBoard')}></i>
+              </span>
             </NavLink>
           </NavItem>
           <DefaultHeaderDropdown mssgs />
@@ -144,7 +149,7 @@ class DefaultHeader extends Component {
             </span>
           </NavItem>
 
-          
+
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
