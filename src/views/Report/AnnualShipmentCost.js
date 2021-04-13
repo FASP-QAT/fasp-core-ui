@@ -597,7 +597,7 @@ class AnnualShipmentCost extends Component {
 
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-        var ystart = 170 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
+        var ystart = 200 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
         ystart = ystart + 10;
         doc.setFontSize(9);
         doc.setTextColor("#002f6c");
