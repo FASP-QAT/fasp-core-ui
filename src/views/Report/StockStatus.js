@@ -517,11 +517,11 @@ class StockStatus extends Component {
                     y = 150;
 
                 }
-                doc.text((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+""), doc.internal.pageSize.width / 9, y, {
+                doc.text((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+""), doc.internal.pageSize.width / 8, y, {
                   align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize("("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width/6, y, splitTitle);
+                doc.text(doc.internal.pageSize.width/5.7, y, splitTitle);
                 for (var i = 0; i < splitTitle.length; i++) {
                   if (y > doc.internal.pageSize.height - 100) {
                       doc.addPage();
@@ -559,11 +559,11 @@ class StockStatus extends Component {
                     y = 150;
 
                 }
-                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 9, y, {
+                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                   align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize("("+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width/6, y, splitTitle);
+                doc.text(doc.internal.pageSize.width/5.7, y, splitTitle);
                 for (var i = 0; i < splitTitle.length; i++) {
                   if (y > doc.internal.pageSize.height - 100) {
                       doc.addPage();
@@ -600,11 +600,11 @@ class StockStatus extends Component {
                     y = 150;
 
                 }
-                doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*"), doc.internal.pageSize.width / 9, y, {
+                doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*"), doc.internal.pageSize.width / 8, y, {
                   align: 'left'
                 })
               var splitTitle = doc.splitTextToSize("("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width/6, y, splitTitle);
+                doc.text(doc.internal.pageSize.width/5.7, y, splitTitle);
                 for (var i = 0; i < splitTitle.length; i++) {
                   if (y > doc.internal.pageSize.height - 100) {
                       doc.addPage();
@@ -703,11 +703,11 @@ class StockStatus extends Component {
                         y = 150;
 
                     }
-                    doc.text((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+""), doc.internal.pageSize.width / 9, y, {
+                    doc.text((ele.actualFlag.toString()=="true"?moment(ele.consumptionDate).format('DD-MMM-YY')+"*":moment(ele.consumptionDate).format('DD-MMM-YY')+""), doc.internal.pageSize.width / 8, y, {
                       align: 'left'
                     })
                   var splitTitle = doc.splitTextToSize("("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width/6, y, splitTitle);
+                doc.text(doc.internal.pageSize.width/5.7, y, splitTitle);
                 for (var i = 0; i < splitTitle.length; i++) {
                   if (y > doc.internal.pageSize.height - 100) {
                       doc.addPage();
@@ -745,11 +745,11 @@ class StockStatus extends Component {
                         y = 150;
 
                     }
-                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 9, y, {
+                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                       align: 'left'
                     })
                     var splitTitle = doc.splitTextToSize("("+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width/6, y, splitTitle);
+                doc.text(doc.internal.pageSize.width/5.7, y, splitTitle);
                 for (var i = 0; i < splitTitle.length; i++) {
                   if (y > doc.internal.pageSize.height - 100) {
                       doc.addPage();
@@ -786,11 +786,11 @@ class StockStatus extends Component {
                         y = 150;
 
                     }
-                    doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*"), doc.internal.pageSize.width / 9, y, {
+                    doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null?moment(ele.inventoryDate).format('DD-MMM-YY')+"":moment(ele.inventoryDate).format('DD-MMM-YY')+"*"), doc.internal.pageSize.width / 8, y, {
                       align: 'left'
                     })
                   var splitTitle = doc.splitTextToSize("("+getLabelText(ele.region.label,this.state.lang)+" | "+getLabelText(ele.dataSource.label,this.state.lang)+") "+ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width/6, y, splitTitle);
+                doc.text(doc.internal.pageSize.width/5.7, y, splitTitle);
                 for (var i = 0; i < splitTitle.length; i++) {
                   if (y > doc.internal.pageSize.height - 100) {
                       doc.addPage();
