@@ -1216,6 +1216,7 @@
     "static.dashboard.whatIf": "Planification des scénarios",
     "static.unit.dimensiontext": "Sélectionnez la dimension",
     "static.message.negativeInventoryMessage": "Veuillez vous assurer que vous n`avez pas d`inventaire négatif avant de continuer",
+    "static.message.procurementAgentAlreadExists": "L agent d approvisionnement existe déjà",
     "static.ticket.openIssues": "Tickets ouverts",
     "static.healtharea.healthareatext": "Entrez dans le secteur technique",
     "static.dashboard.procurementAgentProcurementUnit": "Unité des achats des agents d`approvisionnement",

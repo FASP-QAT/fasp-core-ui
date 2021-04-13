@@ -1216,6 +1216,7 @@
     "static.dashboard.whatIf": "Scenario Planning",
     "static.unit.dimensiontext": "Select Dimension",
     "static.message.negativeInventoryMessage": "Please ensure you do not have negative inventory in your PipeLine database before you proceed.",
+    "static.message.procurementAgentAlreadExists": "Procurement Agent already exists",
     "static.ticket.openIssues": "Open Tickets",
     "static.healtharea.healthareatext": "Enter technical area",
     "static.dashboard.procurementAgentProcurementUnit": "Procurement Agent Procurement Unit",
