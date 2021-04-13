@@ -633,103 +633,114 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
                                                     var rowData = obj.getRowData(y);
-                                                    if (rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1 && this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM")) + 2 <= TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN) {
+                                                    if(rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1){
+                                                    var expectedDeliveryDate = rowData[4];
+                                                    var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                    var expectedTotalShipmentQty=this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty!=""?(this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty):0;
+                                                    var existingShipmentQty=0;
+                                                    var shipmentsJson=(obj.getJson(null,false));
+                                                    shipmentsJson.map((item,index)=>{
+                                                        existingShipmentQty += Number(obj.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
+                                                    })
+                                                    var suggestedQty=Number(expectedTotalShipmentQty)-Number(existingShipmentQty);
+                                                    if (suggestedQty>0) {
                                                         items.push({
                                                             title: i18n.t("static.qpl.recalculate"),
                                                             onclick: function () {
-                                                                var expectedDeliveryDate = rowData[4];
-                                                                var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
-                                                                var endingBalance = Number(this.props.items.closingBalanceArray[index].balance);
-                                                                var unmetDemand = this.props.items.unmetDemand[index];
-                                                                var originalShipmentQty = Number(rowData[33]);
-                                                                var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
-                                                                if (newEndingBalance < 0) {
-                                                                    var tempEndingBalance = Number(newEndingBalance)+Number(unmetDemand);
-                                                                    unmetDemand += (0 - Number(tempEndingBalance));
-                                                                    newEndingBalance = 0;
-                                                                }
-                                                                var amc = Number(this.props.items.amcTotalData[index]);
-                                                                var mosForMonth1 = "";
-                                                                if (newEndingBalance != 0 && amc != 0) {
-                                                                    mosForMonth1 = Number(newEndingBalance / amc).toFixed(1);
-                                                                } else if (amc == 0) {
-                                                                    mosForMonth1 = null;
-                                                                } else {
-                                                                    mosForMonth1 = 0;
-                                                                }
+                                                                // var expectedDeliveryDate = rowData[4];
+                                                                // var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                                // var endingBalance = Number(this.props.items.closingBalanceArray[index].balance);
+                                                                // var unmetDemand = this.props.items.unmetDemand[index];
+                                                                var originalShipmentQty = Number(obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                                                                // var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
+                                                                // if (newEndingBalance < 0) {
+                                                                //     var tempEndingBalance = Number(newEndingBalance)+Number(unmetDemand);
+                                                                //     unmetDemand += (0 - Number(tempEndingBalance));
+                                                                //     newEndingBalance = 0;
+                                                                // }
+                                                                // var amc = Number(this.props.items.amcTotalData[index]);
+                                                                // var mosForMonth1 = "";
+                                                                // if (newEndingBalance != 0 && amc != 0) {
+                                                                //     mosForMonth1 = Number(newEndingBalance / amc).toFixed(1);
+                                                                // } else if (amc == 0) {
+                                                                //     mosForMonth1 = null;
+                                                                // } else {
+                                                                //     mosForMonth1 = 0;
+                                                                // }
 
-                                                                var endingBalance1 = Number(this.props.items.closingBalanceArray[index+1].balance);
-                                                                var unmetDemand1 = this.props.items.unmetDemand[index+1];
-                                                                var newEndingBalance1 = Number(endingBalance1) - Number(originalShipmentQty);
-                                                                if (newEndingBalance1 < 0) {
-                                                                    var tempEndingBalance1 = Number(newEndingBalance1)+Number(unmetDemand1);
-                                                                    unmetDemand1 += (0 - Number(tempEndingBalance1));
-                                                                    newEndingBalance1 = 0;
-                                                                }
-                                                                var amc1 = Number(this.props.items.amcTotalData[index+1]);
-                                                                var mosForMonth2 = "";
-                                                                if (newEndingBalance1 != 0 && amc1 != 0) {
-                                                                    mosForMonth2 = Number(newEndingBalance1 / amc1).toFixed(1);
-                                                                } else if (amc1 == 0) {
-                                                                    mosForMonth2 = null;
-                                                                } else {
-                                                                    mosForMonth2 = 0;
-                                                                }
+                                                                // var endingBalance1 = Number(this.props.items.closingBalanceArray[index+1].balance);
+                                                                // var unmetDemand1 = this.props.items.unmetDemand[index+1];
+                                                                // var newEndingBalance1 = Number(endingBalance1) - Number(originalShipmentQty);
+                                                                // if (newEndingBalance1 < 0) {
+                                                                //     var tempEndingBalance1 = Number(newEndingBalance1)+Number(unmetDemand1);
+                                                                //     unmetDemand1 += (0 - Number(tempEndingBalance1));
+                                                                //     newEndingBalance1 = 0;
+                                                                // }
+                                                                // var amc1 = Number(this.props.items.amcTotalData[index+1]);
+                                                                // var mosForMonth2 = "";
+                                                                // if (newEndingBalance1 != 0 && amc1 != 0) {
+                                                                //     mosForMonth2 = Number(newEndingBalance1 / amc1).toFixed(1);
+                                                                // } else if (amc1 == 0) {
+                                                                //     mosForMonth2 = null;
+                                                                // } else {
+                                                                //     mosForMonth2 = 0;
+                                                                // }
 
-                                                                var endingBalance2 = Number(this.props.items.closingBalanceArray[index+2].balance);
-                                                                var unmetDemand2 = this.props.items.unmetDemand[index+2];
-                                                                var newEndingBalance2 = Number(endingBalance2) - Number(originalShipmentQty);
-                                                                if (newEndingBalance2 < 0) {
-                                                                    var tempEndingBalance2 = Number(newEndingBalance2)+Number(unmetDemand2);
-                                                                    unmetDemand2 += (0 - Number(tempEndingBalance2));
-                                                                    newEndingBalance2 = 0;
-                                                                }
-                                                                var amc2 = Number(this.props.items.amcTotalData[index+2]);
-                                                                var mosForMonth3 = "";
-                                                                if (newEndingBalance2 != 0 && amc2 != 0) {
-                                                                    mosForMonth3 = Number(newEndingBalance2 / amc2).toFixed(1);
-                                                                } else if (amc2 == 0) {
-                                                                    mosForMonth3 = null;
-                                                                } else {
-                                                                    mosForMonth3 = 0;
-                                                                }
+                                                                // var endingBalance2 = Number(this.props.items.closingBalanceArray[index+2].balance);
+                                                                // var unmetDemand2 = this.props.items.unmetDemand[index+2];
+                                                                // var newEndingBalance2 = Number(endingBalance2) - Number(originalShipmentQty);
+                                                                // if (newEndingBalance2 < 0) {
+                                                                //     var tempEndingBalance2 = Number(newEndingBalance2)+Number(unmetDemand2);
+                                                                //     unmetDemand2 += (0 - Number(tempEndingBalance2));
+                                                                //     newEndingBalance2 = 0;
+                                                                // }
+                                                                // var amc2 = Number(this.props.items.amcTotalData[index+2]);
+                                                                // var mosForMonth3 = "";
+                                                                // if (newEndingBalance2 != 0 && amc2 != 0) {
+                                                                //     mosForMonth3 = Number(newEndingBalance2 / amc2).toFixed(1);
+                                                                // } else if (amc2 == 0) {
+                                                                //     mosForMonth3 = null;
+                                                                // } else {
+                                                                //     mosForMonth3 = 0;
+                                                                // }
 
-                                                                var minStockMoSQty = this.props.items.minStockMoSQty;
-                                                                var maxStockMoSQty = this.props.items.maxStockMoSQty;
-                                                                var suggestShipment = false;
-                                                                var useMax = false;
-                                                                if (Number(amc) == 0) {
-                                                                    suggestShipment = false;
-                                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
-                                                                    suggestShipment = false;
-                                                                } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
-                                                                    suggestShipment = true;
-                                                                    useMax = true;
-                                                                } else if (Number(mosForMonth1) == 0) {
-                                                                    suggestShipment = true;
-                                                                    if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
-                                                                        useMax = true;
-                                                                    } else {
-                                                                        useMax = false;
-                                                                    }
-                                                                }
-                                                                var newSuggestedShipmentQty = 0;
-                                                                if (suggestShipment) {
-                                                                    var suggestedOrd = 0;
-                                                                    if (useMax) {
-                                                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
-                                                                    } else {
-                                                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
-                                                                    }
-                                                                    if (suggestedOrd <= 0) {
-                                                                        newSuggestedShipmentQty = 0;
-                                                                    } else {
-                                                                        newSuggestedShipmentQty = suggestedOrd;
-                                                                    }
-                                                                } else {
-                                                                    newSuggestedShipmentQty = 0;
-                                                                }
-                                                                var cf = window.confirm(i18n.t("static.supplyPlanFormula.suggestedOrderQty") + " = " + this.formatter(newSuggestedShipmentQty) + `\r\n` + i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm'));
+                                                                // var minStockMoSQty = this.props.items.minStockMoSQty;
+                                                                // var maxStockMoSQty = this.props.items.maxStockMoSQty;
+                                                                // var suggestShipment = false;
+                                                                // var useMax = false;
+                                                                // if (Number(amc) == 0) {
+                                                                //     suggestShipment = false;
+                                                                // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                                                //     suggestShipment = false;
+                                                                // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                //     suggestShipment = true;
+                                                                //     useMax = true;
+                                                                // } else if (Number(mosForMonth1) == 0) {
+                                                                //     suggestShipment = true;
+                                                                //     if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                //         useMax = true;
+                                                                //     } else {
+                                                                //         useMax = false;
+                                                                //     }
+                                                                // }
+                                                                // var newSuggestedShipmentQty = 0;
+                                                                // if (suggestShipment) {
+                                                                //     var suggestedOrd = 0;
+                                                                //     if (useMax) {
+                                                                //         suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                //     } else {
+                                                                //         suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                //     }
+                                                                //     if (suggestedOrd <= 0) {
+                                                                //         newSuggestedShipmentQty = 0;
+                                                                //     } else {
+                                                                //         newSuggestedShipmentQty = suggestedOrd;
+                                                                //     }
+                                                                // } else {
+                                                                //     newSuggestedShipmentQty = 0;
+                                                                // }
+                                                                var newSuggestedShipmentQty=Number(originalShipmentQty)+Number(suggestedQty);
+                                                                var cf = window.confirm(i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm1')+" "+this.formatter(suggestedQty)+" "+i18n.t("static.shipmentDataEntry.suggestedShipmentQtyConfirm2")+" "+this.formatter(newSuggestedShipmentQty));
                                                                 if (cf == true) {
                                                                     obj.setValueFromCoords(10, y, newSuggestedShipmentQty, true);
                                                                 } else {
@@ -737,6 +748,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 }
                                                             }.bind(this)
                                                         })
+                                                    }
                                                     }
                                                     // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
