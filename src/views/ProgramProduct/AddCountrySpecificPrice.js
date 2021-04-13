@@ -676,7 +676,7 @@ class CountrySpecificPrices extends Component {
                                 case 406:
                                     this.setState({
                                         // message: error.response.data.messageCode,
-                                        message: i18n.t('static.message.alreadExists'),
+                                        message: i18n.t('static.message.procurementAgentAlreadExists'),
                                         loading: false
                                     });
                                     break;
