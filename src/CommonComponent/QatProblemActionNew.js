@@ -281,6 +281,7 @@ export default class QatProblemActionNew extends Component {
 
                                                         var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
                                                         var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+
                                                         if (DEFAULT_MIN_MONTHS_OF_STOCK > planningUnitList[p].minMonthsOfStock) {
                                                             maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
                                                         } else {
@@ -963,18 +964,20 @@ export default class QatProblemActionNew extends Component {
                                                                     var monthWithMosAboveThenMaxWithing7to18months = [];
                                                                     var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('YYYY-MM'));
 
-                                                                    var toleranceAndCutoffValues = typeProblemList[prob].data3;
-                                                                    var toleranceAndCutoffArray = [];
-                                                                    if (toleranceAndCutoffValues != null && toleranceAndCutoffValues != "") {
-                                                                        var toleranceAndCutoffSplit = toleranceAndCutoffValues.split(',');
-                                                                        for (var t = 0; t < toleranceAndCutoffSplit.length; t++) {
-                                                                            toleranceAndCutoffArray.push(parseInt(toleranceAndCutoffSplit[t]));
-                                                                        }
-                                                                    }
+                                                                    // var toleranceAndCutoffValues = typeProblemList[prob].data3;
+                                                                    // var toleranceAndCutoffArray = [];
+                                                                    // if (toleranceAndCutoffValues != null && toleranceAndCutoffValues != "") {
+                                                                    //     var toleranceAndCutoffSplit = toleranceAndCutoffValues.split(',');
+                                                                    //     for (var t = 0; t < toleranceAndCutoffSplit.length; t++) {
+                                                                    //         toleranceAndCutoffArray.push(parseInt(toleranceAndCutoffSplit[t]));
+                                                                    //     }
+                                                                    // }
 
-                                                                    var toleranceNoOfMonthsBelowMin = toleranceAndCutoffArray[0];//2
-                                                                    var toleranceCutoffMinMoS = toleranceAndCutoffArray[1];//5
-                                                                    var toleranceNoOfMonthsOverMax = toleranceAndCutoffArray[2];//2
+                                                                    var toleranceNoOfMonthsBelowMin = realm.minQplTolerance;//2
+                                                                    var toleranceCutoffMinMoS = realm.minQplToleranceCutOff;//5
+                                                                    var toleranceNoOfMonthsOverMax = realm.maxQplTolerance;//2
+
+                                                                    // console.log("toleranceNoOfMonthsBelowMin+++",toleranceNoOfMonthsBelowMin,"toleranceCutoffMinMoS+++",toleranceCutoffMinMoS,"toleranceNoOfMonthsOverMax+++",toleranceNoOfMonthsOverMax);
 
                                                                     for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                         var m = moment(curDate).add(mosCounter, 'months');
@@ -1138,9 +1141,9 @@ export default class QatProblemActionNew extends Component {
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                         var mos = "";
-                                                                        if (supplyPlanJson.length > 0) {
-                                                                            // mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
-                                                                            mos = Number(supplyPlanJson[0].closingBalance);
+                                                                        if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
+                                                                            mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                            // mos = Number(supplyPlanJson[0].closingBalance);
                                                                             if (mos == 0) {
                                                                                 stockoutsWithing6months.push(moment(m).format('MMM-YY'));
                                                                             }
@@ -1153,8 +1156,8 @@ export default class QatProblemActionNew extends Component {
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                         var mos7to18 = "";
                                                                         if (supplyPlanJson7to18.length > 0) {
-                                                                            // mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
-                                                                            mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
+                                                                            mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                            // mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
                                                                             if (mos7to18 == 0) {
                                                                                 stockoutsWithing7to18months.push(moment(m7to18).format('MMM-YY'));
                                                                             }
