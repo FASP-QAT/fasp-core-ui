@@ -315,7 +315,7 @@ const routes = [
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   // { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
   { path: '/programProduct/addProgramProduct', exact: true, name: 'static.Update.PlanningUnits', component: AddProgramProduct },
-  { path: '/programProduct/addProgramProduct/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct/:programId/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
