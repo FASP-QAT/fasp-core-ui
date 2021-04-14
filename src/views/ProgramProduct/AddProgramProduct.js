@@ -191,7 +191,8 @@ class AddprogramPlanningUnit extends Component {
         if (this.props.match.params.programId != null) {
             let programId = this.props.match.params.programId;
             this.setState({
-                programId: programId
+                programId: programId,
+                loading: true
             },
                 () => {
                     if (programId != 0 && programId != '' && programId != null) {
