@@ -531,7 +531,7 @@ class StockStatus extends Component {
                   }
               }
               if(splitTitle.length>1){
-                y = y + 5;
+                y = y + (5*(splitTitle.length-1));
               }
             }
         })
@@ -573,7 +573,7 @@ class StockStatus extends Component {
                   }
               }
               if(splitTitle.length>1){
-                y = y + 5;
+                y = y + (5*(splitTitle.length-1));
               }
             }
         }
@@ -614,7 +614,7 @@ class StockStatus extends Component {
                   }
               }
               if(splitTitle.length>1){
-                y = y + 5;
+                y = y + (5*(splitTitle.length-1));
               }
             }
         })
@@ -717,7 +717,7 @@ class StockStatus extends Component {
                   }
               }
               if(splitTitle.length>1){
-                y = y + 5                
+                y = y + (5*(splitTitle.length-1));
               }
                 }
             })
@@ -759,7 +759,7 @@ class StockStatus extends Component {
                   }
               }
               if(splitTitle.length>1){
-                y = y + 5;
+                y = y + (5*(splitTitle.length-1));
               }
                 }
             }
@@ -800,7 +800,7 @@ class StockStatus extends Component {
                   }
               }
               if(splitTitle.length>1){
-                y = y + 5;
+                y = y + (5*(splitTitle.length-1));
               }
                 }
             })
