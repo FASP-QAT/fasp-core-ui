@@ -73,6 +73,7 @@ class AddprogramPlanningUnit extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -187,13 +188,38 @@ class AddprogramPlanningUnit extends Component {
                 }
             );
         // this.buildJexcel();
+        if (this.props.match.params.programId != null) {
+            let programId = this.props.match.params.programId;
+            this.setState({
+                programId: programId
+            },
+                () => {
+                    if (programId != 0 && programId != '' && programId != null) {
+                        console.log("CONSOLE-------->1", programId);
+                        this.buildJexcel();
+                    }
+                })
+        }
+
+    }
+
+    setProgramId() {
+        var programId = document.getElementById("programId").value;
+        this.setState({
+            programId: programId,
+        },
+            () => {
+                this.buildJexcel();
+            })
     }
 
     buildJexcel() {
         var list = [];
         var productCategoryListNew = [];
         var programObj;
-        var programId = document.getElementById("programId").value;
+        // var programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
+        console.log("CONSOLE-------->2", programId);
         this.setState({
             programId: programId,
             loading: true
@@ -1592,7 +1618,8 @@ class AddprogramPlanningUnit extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
-                                                onChange={this.buildJexcel}
+                                                onChange={this.setProgramId}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programList}

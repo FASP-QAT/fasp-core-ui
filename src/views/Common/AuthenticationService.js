@@ -963,7 +963,7 @@ class AuthenticationService {
                     break;
                 // case "/programProduct/addProgramProduct/:programId":
                 case "/programProduct/addProgramProduct":
-                case "/programProduct/addProgramProduct/:color/:message":
+                case "/programProduct/addProgramProduct/:programId/:color/:message":
                     if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
                         return true;
                     }

@@ -644,7 +644,8 @@ class CountrySpecificPrices extends Component {
                     console.log(response.data);
                     if (response.status == "200") {
                         console.log(response);
-                        this.props.history.push(`/programProduct/addProgramProduct/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                        let programId = this.props.match.params.programId;
+                        this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
                             message: response.data.messageCode
