@@ -215,6 +215,8 @@ export default class ShipmentLinkingNotifications extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
+                    var qty = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    this.state.instance.setValueFromCoords(10, y, this.addCommas(qty * value), true);
                 }
 
             }
@@ -538,35 +540,43 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.mt.notificationType'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.commit.qatshipmentId'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.procOrderNo'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.erpPlanningUnit'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.qatProduct'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
                     type: 'text',
+                    readOnly: true
                 },
 
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
                     type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
@@ -576,6 +586,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                     type: 'text',
+                    readOnly: true
                 },
 
                 {
