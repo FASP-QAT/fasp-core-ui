@@ -1992,7 +1992,8 @@ export default class WhatIfReportComponent extends React.Component {
                         // var programJson1 = JSON.parse(programData);
                         var programJson = {
                             label: myResult[i].programCode + "~v" + myResult[i].version,
-                            value: myResult[i].id
+                            value: myResult[i].id,
+                            programId:myResult[i].programId
                         }
                         proList.push(programJson);
                     }
@@ -2118,8 +2119,8 @@ export default class WhatIfReportComponent extends React.Component {
                         }.bind(this);
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
-                            myResult = planningunitRequest.result;
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -2270,7 +2271,8 @@ export default class WhatIfReportComponent extends React.Component {
             localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
-        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
+        var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
+        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;
         var consumptionTotalData = [];
         var shipmentsTotalData = [];
@@ -3537,7 +3539,8 @@ export default class WhatIfReportComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var planningUnitId = document.getElementById("planningUnitId").value;
-                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
+                var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
                 var shelfLife = programPlanningUnit.shelfLife;
                 if (month != "" && quantity != 0) {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
