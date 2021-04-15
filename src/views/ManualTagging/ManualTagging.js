@@ -35,6 +35,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            totalQuantity: '',
             filteredBudgetList: [],
             budgetList: [],
             planningUnits1: [],
@@ -611,15 +612,17 @@ export default class ManualTagging extends Component {
         if (validation == true) {
             var tableJson = this.state.instance.getJson(null, false);
             console.log("tableJson---", tableJson);
-            let count = 0;
+            let count = 0, qty = '';
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
+                    qty = qty + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
             this.setState({
-                displaySubmitButton: (count > 0 ? true : false)
+                displaySubmitButton: (count > 0 ? true : false),
+                totalQuantity: this.addCommas(qty)
             })
         }
     }
@@ -670,7 +673,8 @@ export default class ManualTagging extends Component {
                             active: map1.get("0"),
                             orderNo: map1.get("11"),
                             primeLineNo: parseInt(map1.get("12")),
-                            planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0)
+                            planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
+                            quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
                         }
                         changedmtList.push(json);
                     }
@@ -1209,7 +1213,7 @@ export default class ManualTagging extends Component {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
             var programId = document.getElementById("programId").value;
             console.log("programId ---", programId);
-            console.log("erpPlanningUnitId ---", erpPlanningUnitId);
+            console.log("selected erpPlanningUnitId ---", erpPlanningUnitId);
 
             ManualTaggingService.searchErpOrderData(term.toUpperCase(), programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
@@ -1909,13 +1913,13 @@ export default class ManualTagging extends Component {
                 row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(1, x)))[0];
                 console.log()
                 outputListAfterSearch.push(row);
-                // console.log("my output---", document.getElementById("combo-box-demo1"));
+                console.log("selected planning unit id--", outputListAfterSearch[0].erpPlanningUnit.id);
                 let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
                 this.setState({
                     parentShipmentId: outputListAfterSearch[0].parentShipmentId,
                     roNoOrderNo: json,
                     searchedValue: outputListAfterSearch[0].roNo,
-                    planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                    planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
 
                     this.getOrderDetails();
@@ -1942,11 +1946,11 @@ export default class ManualTagging extends Component {
             // outputListAfterSearch.push(row);
             // console.log("1------------------------------>>>>", outputListAfterSearch[0].planningUnit.id)
             this.setState({
-                planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
+                planningUnitId: (this.state.active2 || this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                 shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
                 outputListAfterSearch,
                 procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-                planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
+                planningUnitName: (this.state.active2 || this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
             })
             console.log("Going to call toggle large 3");
             this.toggleLarge();
@@ -2056,6 +2060,7 @@ export default class ManualTagging extends Component {
             planningUnitIdUpdated: this.state.planningUnitId,
             artmisList: [],
             reason: "1",
+            totalQuantity: '',
             result: '',
             alreadyLinkedmessage: '',
             manualTag: !this.state.manualTag,
@@ -2617,7 +2622,7 @@ export default class ManualTagging extends Component {
                         <Modal isOpen={this.state.manualTag}
                             className={'modal-lg ' + this.props.className, "modalWidth"}>
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
-                                <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                                <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
@@ -2883,7 +2888,7 @@ export default class ManualTagging extends Component {
                                     <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
                                 </ModalBody>
                                 <ModalFooter>
-
+                                    {this.state.displaySubmitButton && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
 
                                     {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>}
 

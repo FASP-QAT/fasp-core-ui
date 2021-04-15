@@ -361,7 +361,7 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
-  { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.dashboard.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
+  { path: '/shipmentLinkingNotification', exact: true, name: 'Shipment Linking Notification', component: ShipmentLinkingNotifications },
 
   { path: '/RealmDashboard', name: 'static.dashboard.realmdashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'static.dashboard.programdashboard', component: ProgramDashboard },

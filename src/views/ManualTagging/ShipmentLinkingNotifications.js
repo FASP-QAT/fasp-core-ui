@@ -19,6 +19,8 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import MultiSelect from 'react-multi-select-component';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 
 
 
@@ -31,9 +33,13 @@ export default class ShipmentLinkingNotifications extends Component {
             loading: true,
             loading1: false,
             programs: [],
-            planningUnits: []
+            planningUnits: [],
+            instance: '',
+            artmisHistory: [],
+            lang: 'en',
+            displaySubmitButton: false
         }
-
+        this.displayButton = this.displayButton.bind(this);
         this.filterData = this.filterData.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -47,7 +53,32 @@ export default class ShipmentLinkingNotifications extends Component {
         this.updateDetails = this.updateDetails.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.filterData1 = this.filterData1.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
+        this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
     }
+
+    displayButton() {
+        var validation = this.checkValidation();
+        if (validation == true) {
+            var tableJson = this.el.getJson(null, false);
+            console.log("tableJson---", tableJson);
+            let count = 0;
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                if (parseInt(map1.get("12")) === 1 && map1.get("0")) {
+                    count++;
+                }
+            }
+            this.setState({
+                displaySubmitButton: (count > 0 ? true : false)
+            })
+        }
+    }
+
+    cancelClicked() {
+        this.toggleLarge();
+    }
+
     filterData1() {
         this.filterData(this.state.planningUnitIds);
     }
@@ -79,7 +110,9 @@ export default class ShipmentLinkingNotifications extends Component {
                         notificationId: parseInt(map1.get("16")),
                         notificationType: {
                             id: parseInt(map1.get("17"))
-                        }
+                        },
+                        shipmentQty : parseInt(map1.get("8")),
+                        programId : programId
                     }
                     changedmtList.push(json);
                 }
@@ -198,6 +231,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
         //conversion factor
         if (x == 9) {
+            console.log("-------------inside conversion factor change-------------------------")
             var col = ("J").concat(parseInt(y) + 1);
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
@@ -216,7 +250,8 @@ export default class ShipmentLinkingNotifications extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.state.instance.setValueFromCoords(10, y, this.addCommas(qty * value), true);
+                    console.log("qty-------" + qty);
+                    this.el.setValueFromCoords(10, y, this.addCommas(qty * value), true);
                 }
 
             }
@@ -230,7 +265,7 @@ export default class ShipmentLinkingNotifications extends Component {
         if (x != 12) {
             this.el.setValueFromCoords(12, y, 1, true);
         }
-
+        this.displayButton();
 
 
     }.bind(this);
@@ -489,6 +524,122 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
 
+    buildARTMISHistory() {
+        let artmisHistoryList = this.state.artmisHistory;
+        console.log("artmisHistoryList---->", artmisHistoryList);
+        let artmisHistoryArray = [];
+        let count = 0;
+
+        // for (var j = 0; j < artmisHistoryList.length; j++) {
+        //     data = [];
+
+        //     data[0] = artmisHistoryList[j].roNo;
+        //     data[1] = artmisHistoryList[j].roPrimeLineNo;
+        //     data[2] = artmisHistoryList[j].orderNo;
+        //     data[3] = artmisHistoryList[j].primeLineNo;
+        //     data[4] = getLabelText(artmisHistoryList[j].erpPlanningUnit.label, this.state.lang)
+        //     data[5] = this.formatDate(artmisHistoryList[j].expectedDeliveryDate);
+        //     data[6] = artmisHistoryList[j].erpStatus
+        //     data[7] = this.addCommas(artmisHistoryList[j].shipmentQty);
+        //     data[8] = this.formatDate(artmisHistoryList[j].receivedOn);
+
+        //     artmisHistoryArray[count] = data;
+        //     count++;
+        // }
+        console.log("jexcel this------", this);
+        this.el = jexcel(document.getElementById("tableDiv1"), '');
+        this.el.destroy();
+        var json = [];
+        var data = artmisHistoryArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [40, 30, 40, 45, 30, 30, 35, 25, 35],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+
+                {
+                    title: "RO No.",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "RO Prime Line No",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Order No.",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Prime Line No.",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "ERP Planning Unit",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.manualTagging.erpStatus'),
+                    type: 'text',
+                    readOnly: true
+                },
+
+                {
+                    title: i18n.t('static.supplyPlan.shipmentQty'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Received On",
+                    type: 'text',
+                    readOnly: true
+                },
+            ],
+            editable: true,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedERP,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+        };
+
+
+        var instance = jexcel(document.getElementById("tableDiv1"), options);
+        this.el = instance;
+        this.setState({
+            instance, loading: false
+        })
+    }
 
     buildJExcel() {
         let manualTaggingList = this.state.outputList;
@@ -512,9 +663,9 @@ export default class ShipmentLinkingNotifications extends Component {
             data[10] = this.addCommas(manualTaggingList[j].shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
             data[11] = manualTaggingList[j].notes
             data[12] = 0
-            data[13] = manualTaggingList[j].parentShipmentId
-            data[14] = manualTaggingList[j].orderNo
-            data[15] = manualTaggingList[j].primeLineNo
+            data[13] = manualTaggingList[j].orderNo
+            data[14] = manualTaggingList[j].primeLineNo
+            data[15] = manualTaggingList[j].parentShipmentId
             data[16] = manualTaggingList[j].notificationId
             data[17] = manualTaggingList[j].notificationType.id;
 
@@ -534,7 +685,7 @@ export default class ShipmentLinkingNotifications extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: "Addresses?",
+                    title: "Addressed?",
                     type: 'checkbox',
                 },
                 {
@@ -634,8 +785,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
+            onchange: this.changed,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -648,24 +798,65 @@ export default class ShipmentLinkingNotifications extends Component {
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            title: i18n.t('static.dashboard.linkShipment'),
+                            // title: i18n.t('static.dashboard.linkShipment'),
+                            title: "View ARTMIS History",
                             onclick: function () {
-                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                 var outputListAfterSearch = [];
-                                let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
-                                console.log("row---------***----", row);
-                                outputListAfterSearch.push(row);
+                                let orderNo = this.el.getValueFromCoords(13, y);
+                                let primeLineNo = this.el.getValueFromCoords(14, y);
+                                console.log("history order no---" + orderNo);
+                                console.log("history prime line no---" + primeLineNo);
+                                // this.buildARTMISHistory();
+                                // this.toggleLarge();
+                                ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
+                                    .then(response => {
+                                        console.log("history response===", response.data);
+                                        this.setState({
+                                            artmisHistory: response.data
+                                        }, () => {
+                                            // this.buildARTMISHistory();
+                                            this.toggleLarge();
+                                        });
+                                    }).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
 
-                                this.setState({
-                                    planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                                    shipmentId: this.el.getValueFromCoords(0, y),
-                                    outputListAfterSearch,
-                                    procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
-                                    planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
-                                })
-                                console.log("Going to call toggle large 2");
-                                this.toggleLarge();
-
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
                             }.bind(this)
                         });
                     }
@@ -682,9 +873,12 @@ export default class ShipmentLinkingNotifications extends Component {
             languageEl: languageEl, loading: false
         })
     }
-
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance, 0);
+    }
+
+    loadedERP = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
     }
 
     // selected = function (instance, cell, x, y, value) {
@@ -756,6 +950,13 @@ export default class ShipmentLinkingNotifications extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         this.getProgramList();
+    }
+
+    toggleLarge() {
+        console.log("show artmis history---")
+        this.setState({
+            manualTag: !this.state.manualTag,
+        })
     }
 
     getPlanningUnitList() {
@@ -855,11 +1056,127 @@ export default class ShipmentLinkingNotifications extends Component {
         }
         return x1 + x2;
     }
+    formatLabel(cell, row) {
+        console.log("cell---", cell);
+        console.log("row---", row);
+        if (cell != null && cell != "") {
+            return getLabelText(cell.label, 'en');
+        } else {
+            return "";
+        }
+    }
 
 
     render() {
 
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
+        const columns1 = [
 
+            {
+                dataField: 'roNo',
+                text: i18n.t('static.manualTagging.RONO'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'roPrimeLineNo',
+                text: i18n.t('static.manualTagging.ROPrimeline'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                // formatter: this.formatLabel
+            },
+            {
+                dataField: 'orderNo',
+                text: i18n.t('static.manualTagging.erpShipmentNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'primeLineNo',
+                text: i18n.t('static.manualTagging.erpShipmentLineNo'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                // formatter: this.formatLabel
+            },
+
+            {
+                dataField: 'erpPlanningUnit',
+                text: "ERP Planning Unit",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+
+            {
+                dataField: 'expectedDeliveryDate',
+                text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            },
+            {
+                dataField: 'erpStatus',
+                text: i18n.t('static.manualTagging.erpStatus'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'shipmentQty',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'receivedOn',
+                text: "Data Received On",
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            }
+
+        ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.artmisHistory.length
+            }]
+        }
 
 
         const { programs } = this.state;
@@ -887,7 +1204,62 @@ export default class ShipmentLinkingNotifications extends Component {
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-5">
+                        {/* Consumption modal */}
+                        <Modal isOpen={this.state.manualTag}
+                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
+                            <div>
+                                <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan hideCross">
+                                    <strong>ERP Order History</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div>
 
+                                        <ToolkitProvider
+                                            keyField="optList"
+                                            data={this.state.artmisHistory}
+                                            columns={columns1}
+                                            search={{ searchFormatted: true }}
+                                            hover
+                                            filter={filterFactory()}
+                                        >
+                                            {
+                                                props => (
+                                                    <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </ToolkitProvider>
+
+                                    </div><br />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </div>
+                            {/* <div style={{ display: this.state.loading1 ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> */}
+                        </Modal>
+                        {/* Consumption modal */}
                         <div className="col-md-12 pl-0">
                             <Row>
 
@@ -930,7 +1302,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3 ">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.mt.reviewed')}</Label>
+                                    <Label htmlFor="appendedInputButton">Reviewed</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -942,7 +1314,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                 onChange={this.filterData1}
                                             // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
                                             >
-                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                                <option value="-1">All</option>
                                                 <option value="1">Reviewed</option>
                                                 <option value="0">Not Reviewed</option>
                                             </Input>
@@ -953,6 +1325,8 @@ export default class ShipmentLinkingNotifications extends Component {
                             <div className="ReportSearchMarginTop">
                                 <div id="tableDiv" className="jexcelremoveReadonlybackground">
                                 </div>
+                                {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">
+                                        </div> */}
                             </div>
 
                         </div>
@@ -964,7 +1338,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 &nbsp;
-                                <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                         </FormGroup>
                     </CardFooter>
                 </Card>
