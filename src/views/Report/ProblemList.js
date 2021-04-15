@@ -149,67 +149,6 @@ export default class ConsumptionDetails extends React.Component {
                     }
                 }
 
-                var needToCalculate = this.props.match.params.calculate;
-                var programIdd = this.props.match.params.programId;
-                if (programIdd != '' && programIdd != undefined) {
-                    this.setState({
-                        programList: proList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        programId: programIdd
-                    }, () => {
-                        if (this.state.programId != '' && this.state.programId != undefined) {
-                            this.fetchData();
-                        }
-                    })
-                }
-                else if (proList.length == 1) {
-                    this.setState({
-                        programList: proList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        programId: proList[0].id
-                    }, () => {
-                        if (this.state.programId != '' && this.state.programId != undefined) {
-                            this.fetchData();
-                        }
-                    })
-                } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-                    this.setState({
-                        programList: proList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        programId: localStorage.getItem("sesProgramId")
-                    }, () => {
-                        if (this.state.programId != '' && this.state.programId != undefined) {
-                            // if (needToCalculate == "false") {
-                            //     this.fetchData();
-                            // } else {
-                            // this.getProblemListAfterCalculation();
-                            this.fetchData();
-
-                            // }
-                        }
-                    })
-
-                } else {
-                    this.setState({
-                        programList: proList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        })
-                    })
-                }
-
-
-
                 var problemStatusTransaction = db1.transaction(['problemStatus'], 'readwrite');
                 var problemStatusOs = problemStatusTransaction.objectStore('problemStatus');
                 var problemStatusRequest = problemStatusOs.getAll();
@@ -221,22 +160,22 @@ export default class ConsumptionDetails extends React.Component {
                 problemStatusRequest.onsuccess = function (e) {
                     var myResult = [];
                     myResult = problemStatusRequest.result;
-                    var proList = []
+                    var proListProblemStatus = []
                     for (var i = 0; i < myResult.length; i++) {
                         var Json = {
                             name: getLabelText(myResult[i].label, lan),
                             id: myResult[i].id
                         }
-                        proList[i] = Json
+                        proListProblemStatus[i] = Json
                     }
-                    proList.sort((a, b) => {
+                    proListProblemStatus.sort((a, b) => {
                         var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
                         problemListForUpdate: myResult,
-                        problemStatusList: proList
+                        problemStatusList: proListProblemStatus
                     })
 
 
@@ -288,6 +227,65 @@ export default class ConsumptionDetails extends React.Component {
                         //     }
                         // }
 
+                        var needToCalculate = this.props.match.params.calculate;
+                        var programIdd = this.props.match.params.programId;
+                        if (programIdd != '' && programIdd != undefined) {
+                            this.setState({
+                                programList: proList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                programId: programIdd
+                            }, () => {
+                                if (this.state.programId != '' && this.state.programId != undefined) {
+                                    this.fetchData();
+                                }
+                            })
+                        }
+                        else if (proList.length == 1) {
+                            this.setState({
+                                programList: proList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                programId: proList[0].id
+                            }, () => {
+                                if (this.state.programId != '' && this.state.programId != undefined) {
+                                    this.fetchData();
+                                }
+                            })
+                        } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+                            this.setState({
+                                programList: proList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                programId: localStorage.getItem("sesProgramId")
+                            }, () => {
+                                if (this.state.programId != '' && this.state.programId != undefined) {
+                                    // if (needToCalculate == "false") {
+                                    //     this.fetchData();
+                                    // } else {
+                                    // this.getProblemListAfterCalculation();
+                                    this.fetchData();
+
+                                    // }
+                                }
+                            })
+
+                        } else {
+                            this.setState({
+                                programList: proList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                })
+                            })
+                        }
+
                     }.bind(this)
 
                 }.bind(this);
@@ -329,7 +327,7 @@ export default class ConsumptionDetails extends React.Component {
         mylist = this.state.problemStatusList;
         // console.log(">>>",mylist);
         mylist = hasRole == true ? mylist.filter(c => c.id != 4) : mylist.filter(c => c.id != 2 && c.id != 4);
-        console.log(">>>",mylist);
+        console.log(">>>", mylist);
         return mylist;
     }.bind(this)
 
@@ -564,7 +562,8 @@ export default class ConsumptionDetails extends React.Component {
             data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[7] = moment(problemList[j].createdDate).format('MMM-YY')
+            // data[7] = moment(problemList[j].createdDate).format('MMM-YY')
+            data[7] = problemList[j].problemCategory.id
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             // data[10] = getLabelText(problemList[j].problemStatus.label, this.state.lang)
@@ -624,9 +623,16 @@ export default class ConsumptionDetails extends React.Component {
                     title: i18n.t('static.report.month'),
                     type: 'hidden',
                 },
+                // {
+                //     title: i18n.t('static.report.createdDate'),
+                //     type: 'hidden',
+                // },
                 {
-                    title: i18n.t('static.report.createdDate'),
-                    type: 'hidden',
+                    title: i18n.t("static.problemActionReport.problemCategory"),
+                    type: 'dropdown',
+                    width: 80,
+                    source: this.state.problemCategoryList,
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),
@@ -994,7 +1000,7 @@ export default class ConsumptionDetails extends React.Component {
 
     selected = function (instance, cell, x, y, value) {
         // console.log("y+++", y);
-        if (y == 5 || y == 8 || y == 9) {
+        if (y == 5 || y == 7 || y == 8 || y == 9) {
             if ((x == 0 && value != 0) || (y == 0)) {
                 // console.log("HEADER SELECTION--------------------------");
             } else {
@@ -1092,110 +1098,125 @@ export default class ConsumptionDetails extends React.Component {
     }
     fetchData() {
         // alert("hi 2");
-        this.setState({
-            data: [],
-            message: '',
-            loading: true,
-            showProblemDashboard: 0,
-            showUpdateButton: false
-        },
-            () => {
-                this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
-                localStorage.setItem("sesProblemType", document.getElementById('problemTypeId').value);
-                localStorage.setItem("sesProblemCategory", document.getElementById('problemCategoryId').value);
-                localStorage.setItem("sesReviewed", document.getElementById('reviewedStatusId').value);
-            });
-        let programId = document.getElementById('programId').value;
-        // let problemStatusId = document.getElementById('problemStatusId').value;
-        let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
-        // let problemStatusId =-1;
-        let problemTypeId = document.getElementById('problemTypeId').value;
-        let problemCategoryId = document.getElementById('problemCategoryId').value;
-        let reviewedCheck = document.getElementById('reviewedStatusId').value;
 
-        this.setState({ programId: programId });
-        if (parseInt(programId) != 0 && problemStatusIds != [] && problemTypeId != 0 && problemCategoryId != 0) {
+        var cont = false;
+        if (this.state.showUpdateButton == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            var procurementAgentList = [];
-            var fundingSourceList = [];
-            var budgetList = [];
-            openRequest.onerror = function (event) {
-                this.setState({ loading: false });
-            };
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
+            }
+        } else {
+            cont = true;
+        }
 
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
+        if (cont == true) {
+            this.setState({
+                data: [],
+                message: '',
+                loading: true,
+                showProblemDashboard: 0,
+                showUpdateButton: false
+            },
+                () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                    localStorage.setItem("sesProblemType", document.getElementById('problemTypeId').value);
+                    localStorage.setItem("sesProblemCategory", document.getElementById('problemCategoryId').value);
+                    localStorage.setItem("sesReviewed", document.getElementById('reviewedStatusId').value);
+                });
+            let programId = document.getElementById('programId').value;
+            // let problemStatusId = document.getElementById('problemStatusId').value;
+            let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
+            // let problemStatusId =-1;
+            let problemTypeId = document.getElementById('problemTypeId').value;
+            let problemCategoryId = document.getElementById('problemCategoryId').value;
+            let reviewedCheck = document.getElementById('reviewedStatusId').value;
+
+            this.setState({ programId: programId });
+            if (parseInt(programId) != 0 && problemStatusIds != [] && problemTypeId != 0 && problemCategoryId != 0) {
+
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                var procurementAgentList = [];
+                var fundingSourceList = [];
+                var budgetList = [];
+                openRequest.onerror = function (event) {
                     this.setState({ loading: false });
                 };
-                programRequest.onsuccess = function (event) {
-                    this.setState({ loading: true },
-                        () => {
-                            console.log("callback")
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var programTransaction = transaction.objectStore('programData');
+                    var programRequest = programTransaction.get(programId);
+                    programRequest.onerror = function (event) {
+                        this.setState({ loading: false });
+                    };
+                    programRequest.onsuccess = function (event) {
+                        this.setState({ loading: true },
+                            () => {
+                                console.log("callback")
+                            })
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = JSON.parse(programData);
+
+                        var problemReportList = (programJson.problemReportList);
+                        this.setState({
+                            problemReportListUnFiltered: problemReportList,
+                            showProblemDashboard: 1
                         })
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                        var problemReportFilterList = problemReportList;
+                        console.log("problemList===========>", problemReportList);
+                        var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+                        problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
 
-                    var problemReportList = (programJson.problemReportList);
-                    this.setState({
-                        problemReportListUnFiltered: problemReportList,
-                        showProblemDashboard: 1
-                    })
-                    var problemReportFilterList = problemReportList;
-                    console.log("problemList===========>", problemReportList);
-                    var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
+                        if (problemTypeId != -1) {
+                            problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
+                        }
+                        if (problemCategoryId != -1) {
+                            problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
+                        }
+                        if (reviewedCheck != -1) {
+                            problemReportFilterList = problemReportFilterList.filter(c => (c.reviewed == reviewedCheck));
+                        }
 
-                    if (problemTypeId != -1) {
-                        problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
-                    }
-                    if (problemCategoryId != -1) {
-                        problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
-                    }
-                    if (reviewedCheck != -1) {
-                        problemReportFilterList = problemReportFilterList.filter(c => (c.reviewed == reviewedCheck));
-                    }
+                        this.setState({
+                            data: problemReportFilterList,
+                            message: '',
+                            problemReportListForUpdate: problemReportList
+                        },
+                            () => {
+                                this.buildJExcel();
+                            });
 
-                    this.setState({
-                        data: problemReportFilterList,
-                        message: '',
-                        problemReportListForUpdate: problemReportList
-                    },
-                        () => {
-                            this.buildJExcel();
-                        });
-
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        }
-        else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
-                () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                });
-        }
-        else if (problemStatusIds != []) {
-            this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
-                () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                });
-        }
-        else if (problemTypeId == 0) {
-            this.setState({ message: i18n.t('static.report.selectProblemType'), data: [], loading: false },
-                () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
-                });
+            }
+            else if (programId == 0) {
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    });
+            }
+            else if (problemStatusIds != []) {
+                this.setState({ message: i18n.t('static.report.selectProblemStatus'), data: [], loading: false },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    });
+            }
+            else if (problemTypeId == 0) {
+                this.setState({ message: i18n.t('static.report.selectProblemType'), data: [], loading: false },
+                    () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        this.el.destroy();
+                    });
+            }
         }
     }
 
