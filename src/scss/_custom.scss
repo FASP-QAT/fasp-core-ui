@@ -3940,3 +3940,7 @@ color: #000000!important;
     padding-left: 0;
     margin-right: 0.75rem;
 }
+
+.hideCross .close span{
+display: none !important;
+}
