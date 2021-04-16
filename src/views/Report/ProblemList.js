@@ -831,7 +831,7 @@ export default class ConsumptionDetails extends React.Component {
         // headers.push(i18n.t('static.program.versionId').replaceAll(' ', '%20'));
         // headers.push(i18n.t('static.program.programCode').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20'));
-        // headers.push(i18n.t('static.report.createdDate').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.problemActionReport.problemCategory').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemDescription').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.suggession').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.report.problemStatus').replaceAll(' ', '%20'));
@@ -849,7 +849,7 @@ export default class ConsumptionDetails extends React.Component {
                 // (ele.program.code).replaceAll(' ', '%20'),
                 // ele.versionId,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                // moment(ele.createdDate).format('MMM-YY').replaceAll(' ', '%20'),
+                getLabelText(ele.problemCategory.label,this.state.lang).replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
@@ -945,6 +945,7 @@ export default class ConsumptionDetails extends React.Component {
         // headers.push(i18n.t('static.program.versionId'));
         headers.push(i18n.t('static.planningunit.planningunit'));
         // headers.push(i18n.t('static.report.createdDate'));
+        headers.push(i18n.t('static.problemActionReport.problemCategory'));
         headers.push(i18n.t('static.report.problemDescription'));
         headers.push(i18n.t('static.report.suggession'));
         headers.push(i18n.t('static.report.problemStatus'));
@@ -961,6 +962,7 @@ export default class ConsumptionDetails extends React.Component {
             // ele.versionId,
             getLabelText(ele.planningUnit.label, this.state.lang),
             // moment(ele.createdDate).format('MMM-YY'),
+            getLabelText(ele.problemCategory.label, this.state.lang),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
@@ -981,14 +983,15 @@ export default class ConsumptionDetails extends React.Component {
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
                 0: { cellWidth: 70 },
-                1: { cellWidth: 100 },
-                2: { cellWidth: 150 },
-                3: { cellWidth: 40 },
-                4: { cellWidth: 150 },
-                5: { cellWidth: 40 },
-                6: { cellWidth: 150 },
-                7: { cellWidth: 50 },
-                8: { cellWidth: 40 },
+                1: { cellWidth: 50 },
+                2: { cellWidth: 100 },
+                3: { cellWidth: 140 },
+                4: { cellWidth: 30 },
+                5: { cellWidth: 140 },
+                6: { cellWidth: 30 },
+                7: { cellWidth: 130 },
+                8: { cellWidth: 50 },
+                9: { cellWidth: 40 },
 
             }
         };
