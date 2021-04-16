@@ -369,6 +369,7 @@ export default class ManualTagging extends Component {
             this.setState({
                 programId: -1,
                 planningUnitValues: [],
+                planningUnitLabels:[],
                 planningUnits: [],
                 outputList: [],
                 active1: true,
@@ -379,6 +380,7 @@ export default class ManualTagging extends Component {
             this.setState({
                 programId: -1,
                 planningUnitValues: [],
+                planningUnitLabels:[],
                 planningUnits: [],
                 outputList: [],
                 active2: true,
@@ -612,11 +614,11 @@ export default class ManualTagging extends Component {
         if (validation == true) {
             var tableJson = this.state.instance.getJson(null, false);
             console.log("tableJson---", tableJson);
-            let count = 0, qty = '';
+            let count = 0, qty = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    qty = qty + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
