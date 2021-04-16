@@ -147,10 +147,11 @@ class AuthenticationService {
         return decryptedUser.realm.realmId;
     }
 
-    checkTypeOfSession() {
+    checkTypeOfSession(checkOnline) {
         let sessionType = localStorage.getItem('sessionType');
         let typeOfSession = localStorage.getItem('typeOfSession');
-        let checkSite = isSiteOnline();
+        console.log("TypeOfSession+++",typeOfSession)
+        let checkSite = checkOnline;
         if (checkSite && sessionType === 'Offline' && typeOfSession === 'Online') {
             localStorage.setItem("sessionType", 'Online')
         } else if (!checkSite && sessionType === 'Online') {
@@ -477,7 +478,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             console.log("cur user available");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (isSiteOnline() && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+            if (localStorage.getItem("sessionType") === 'Online'  && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
                 return true;
             }
@@ -1276,12 +1277,12 @@ class AuthenticationService {
         throw new Error('Bad Hex');
     }
 
-    validateRequest() {
-        console.log("inside validate request")
+    validateRequest(checkOnline) {
+        console.log("inside validate request");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (this.checkTypeOfSession()) {
-                if (isSiteOnline()) {
+            if (this.checkTypeOfSession(checkOnline)) {
+                if (checkOnline) {
                     if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                         // if (this.checkLastActionTaken()) {
                         //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
