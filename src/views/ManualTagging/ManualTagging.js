@@ -369,7 +369,7 @@ export default class ManualTagging extends Component {
             this.setState({
                 programId: -1,
                 planningUnitValues: [],
-                planningUnitLabels:[],
+                planningUnitLabels: [],
                 planningUnits: [],
                 outputList: [],
                 active1: true,
@@ -380,7 +380,7 @@ export default class ManualTagging extends Component {
             this.setState({
                 programId: -1,
                 planningUnitValues: [],
-                planningUnitLabels:[],
+                planningUnitLabels: [],
                 planningUnits: [],
                 outputList: [],
                 active2: true,
@@ -605,6 +605,9 @@ export default class ManualTagging extends Component {
     }
     programChange(event) {
         this.setState({
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
             programId: event.target.value
         })
     }
@@ -915,7 +918,10 @@ export default class ManualTagging extends Component {
     handleProductCategoryChange = (productCategoryIds) => {
         this.setState({
             productCategoryValues: productCategoryIds.map(ele => ele),
-            productCategoryLabels: productCategoryIds.map(ele => ele.label)
+            productCategoryLabels: productCategoryIds.map(ele => ele.label),
+            planningUnitValues: [],
+            planningUnitLabels: [],
+            planningUnits1: []
         }, () => {
             this.getPlanningUnitListByProductcategoryIds();
             this.filterErpData();
@@ -2589,6 +2595,8 @@ export default class ManualTagging extends Component {
                                             {/* </InputMultiGroup> */}
                                         </div>
                                     </FormGroup>}
+
+
                                 {(this.state.active1 || this.state.active2) &&
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
@@ -2602,6 +2610,7 @@ export default class ManualTagging extends Component {
                                                 value={this.state.planningUnitValues}
                                                 onChange={(e) => { this.filterData(e) }}
                                                 options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
+                                                labelledBy={i18n.t('static.common.select')}
                                             />
                                             {/* <option value="0">{i18n.t('static.common.select')}</option> */}
                                             {/* {planningUnitList} */}
@@ -2612,6 +2621,7 @@ export default class ManualTagging extends Component {
                                         </div>
                                     </FormGroup>}
                             </Row>
+
                             <div className="ReportSearchMarginTop">
                                 <div id="tableDiv" className="jexcelremoveReadonlybackground">
                                 </div>
