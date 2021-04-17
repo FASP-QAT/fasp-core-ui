@@ -92,6 +92,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
+          {checkOnline === 'Online' &&
           <NavItem className="">
             <NavLink to="#" className="nav-link">
             
@@ -102,7 +103,7 @@ class DefaultHeader extends Component {
                 <i className="cui-bell icons HomeIcon icon-anim-pulse text-primary " onClick={this.props.shipmentLinkingAlerts} title={i18n.t('static.common.viewDashBoard')}></i>
               </span>
             </NavLink>
-          </NavItem>
+          </NavItem>}
           <DefaultHeaderDropdown mssgs />
 
           {/* <NavItem className="">

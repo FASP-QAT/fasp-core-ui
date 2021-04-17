@@ -620,9 +620,17 @@ export default class ManualTagging extends Component {
             let count = 0, qty = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                if (this.state.active2 && parseInt(map1.get("10")) === 1) {
                     count++;
+                    if (map1.get("0")) {
+                        qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    }
+                }
+                else {
+                    if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
+                        qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                        count++;
+                    }
                 }
             }
             this.setState({
@@ -1577,7 +1585,7 @@ export default class ManualTagging extends Component {
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
                 data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-                data[8] = this.addCommas((manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
+                data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
                 data[10] = this.addCommas(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
                 data[11] = manualTaggingList[j].notes
@@ -2065,6 +2073,7 @@ export default class ManualTagging extends Component {
         console.log("planning unit in modal---", this.state.planningUnitId);
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
+            displaySubmitButton:false,
             planningUnitIdUpdated: this.state.planningUnitId,
             artmisList: [],
             reason: "1",
@@ -2900,7 +2909,7 @@ export default class ManualTagging extends Component {
                                     <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
                                 </ModalBody>
                                 <ModalFooter>
-                                    {this.state.displaySubmitButton && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
+                                    {/* {this.state.displaySubmitButton && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>} */}
 
                                     {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>}
 
