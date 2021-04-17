@@ -767,20 +767,22 @@ class DefaultLayout extends Component {
   }
 
   getNotificationCount() {
-    AuthenticationService.setupAxiosInterceptors();
-    ManualTaggingService.getNotificationCount()
-      .then(response => {
-        console.log("notification response===", response.data);
-        this.setState({
-          notificationCount: response.data
-        })
-      }).catch(
-        error => {
+    if (isSiteOnline()) {
+      AuthenticationService.setupAxiosInterceptors();
+      ManualTaggingService.getNotificationCount()
+        .then(response => {
+          console.log("notification response===", response.data);
           this.setState({
-            notificationCount: 0
+            notificationCount: response.data
           })
-        }
-      );
+        }).catch(
+          error => {
+            this.setState({
+              notificationCount: 0
+            })
+          }
+        );
+    }
   }
   getProgramData() {
     console.log("P***get programs called");
@@ -1521,7 +1523,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: {
                           hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
-                            ||  (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
+                            || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
                         },
                         children: [
                           {
