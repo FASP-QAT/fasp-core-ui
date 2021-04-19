@@ -30,6 +30,8 @@ export default class ShipmentLinkingNotifications extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            color:'',
+            message:'',
             loading: true,
             loading1: false,
             programs: [],
@@ -100,19 +102,19 @@ export default class ShipmentLinkingNotifications extends Component {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("7 map---" + map1.get("10"))
                 console.log("is changed-- ", map1.get("12"));
-                if (parseInt(map1.get("12")) === 1) {
+                if (parseInt(map1.get("12")) === 1 && map1.get("0")) {
                     let json = {
-                        parentShipmentId: (map1.get("13") === '' ? null : map1.get("13")),
+                        parentShipmentId: (map1.get("15") === '' ? null : map1.get("15")),
                         conversionFactor: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         notes: (map1.get("11") === '' ? null : map1.get("11")),
-                        orderNo: map1.get("14"),
-                        primeLineNo: parseInt(map1.get("15")),
+                        orderNo: map1.get("13"),
+                        primeLineNo: parseInt(map1.get("14")),
                         notificationId: parseInt(map1.get("16")),
                         notificationType: {
                             id: parseInt(map1.get("17"))
                         },
-                        shipmentQty : parseInt(map1.get("8")),
-                        programId : programId
+                        shipmentQty: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        programId: programId
                     }
                     changedmtList.push(json);
                 }
@@ -121,15 +123,16 @@ export default class ShipmentLinkingNotifications extends Component {
             ManualTaggingService.updateNotification(changedmtList)
                 .then(response => {
                     console.log("response m tagging---", response)
+                    document.getElementById('div2').style.display = 'block';
                     this.setState({
-                        message: i18n.t('static.shipment.linkingsuccess'),
+                        message : "Data updated successfully.",
                         color: 'green',
                         loading: false,
                         loading1: false
                     },
                         () => {
-
-                            this.hideSecondComponent();
+console.log("message ------------------"+this.state.message);
+                            // this.hideSecondComponent();
                             document.getElementById('div2').style.display = 'block';
                             console.log("Going to call toggle large 1");
 
@@ -335,7 +338,7 @@ export default class ShipmentLinkingNotifications extends Component {
     filterData = (planningUnitIds) => {
 
         console.log("planningUnitIds---", planningUnitIds);
-        document.getElementById('div2').style.display = 'block';
+        // document.getElementById('div2').style.display = 'block';
         var programId = document.getElementById("programId").value;
         var addressed = document.getElementById("addressed").value;
 
@@ -353,11 +356,11 @@ export default class ShipmentLinkingNotifications extends Component {
                     loading: true,
                     planningUnitIds
                 })
-                if (this.state.haslinked) {
-                    this.setState({ haslinked: false })
-                } else {
-                    this.setState({ message: '' })
-                }
+                // if (this.state.haslinked) {
+                //     this.setState({ haslinked: false })
+                // } else {
+                //     this.setState({ message: '' })
+                // }
                 var json = {
                     programId: parseInt(document.getElementById("programId").value),
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString())
@@ -657,10 +660,11 @@ export default class ShipmentLinkingNotifications extends Component {
             data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
             data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
             data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
-            data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-            data[8] = this.addCommas(manualTaggingList[j].shipmentQty);
+            // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
+            data[7] = manualTaggingList[j].erpStatus
+            data[8] = this.addCommas(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
             data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-            data[10] = this.addCommas(manualTaggingList[j].shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+            data[10] = this.addCommas((manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
             data[11] = manualTaggingList[j].notes
             data[12] = 0
             data[13] = manualTaggingList[j].orderNo
@@ -681,7 +685,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 20, 40, 45, 45, 45, 30, 30, 35, 25, 35, 35, 35, 10, 10, 10],
+            colWidths: [20, 40, 20, 50, 50, 50, 30, 30, 35, 25, 35, 35],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -689,7 +693,8 @@ export default class ShipmentLinkingNotifications extends Component {
                     type: 'checkbox',
                 },
                 {
-                    title: i18n.t('static.mt.notificationType'),
+                    // title: i18n.t('static.mt.notificationType'),
+                    title: "Notification Type",
                     type: 'text',
                     readOnly: true
                 },
@@ -1302,7 +1307,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3 ">
-                                    <Label htmlFor="appendedInputButton">Reviewed</Label>
+                                    <Label htmlFor="appendedInputButton">Addressed</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -1315,8 +1320,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                             // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
                                             >
                                                 <option value="-1">All</option>
-                                                <option value="1">Reviewed</option>
-                                                <option value="0">Not Reviewed</option>
+                                                <option value="1">Addressed</option>
+                                                <option value="0">Not Addressed</option>
                                             </Input>
                                         </InputGroup>
                                     </div>

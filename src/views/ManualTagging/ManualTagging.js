@@ -35,6 +35,9 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            programId1: '',
+            fundingSourceId: '',
+            budgetId: '',
             totalQuantity: '',
             filteredBudgetList: [],
             budgetList: [],
@@ -95,6 +98,11 @@ export default class ManualTagging extends Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.buildJExcelERP = this.buildJExcelERP.bind(this);
         this.programChange = this.programChange.bind(this);
+
+        this.programChangeModal = this.programChangeModal.bind(this);
+        this.fundingSourceModal = this.fundingSourceModal.bind(this);
+        this.budgetChange = this.budgetChange.bind(this);
+
         this.dataChange = this.dataChange.bind(this);
         this.changed = this.changed.bind(this);
         this.onPaste = this.onPaste.bind(this);
@@ -126,6 +134,7 @@ export default class ManualTagging extends Component {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.planningUnit.id == selectedPlanningUnitId));
         }
         this.setState({
+            finalShipmentId:'',
             selectedShipment
         })
     }
@@ -612,6 +621,26 @@ export default class ManualTagging extends Component {
         })
     }
 
+
+    programChangeModal(event) {
+        this.setState({
+            programId1: event.target.value
+        })
+    }
+
+    fundingSourceModal(event) {
+        this.setState({
+            fundingSourceId: event.target.value
+        })
+    }
+
+    budgetChange(event) {
+        this.setState({
+            budgetId: event.target.value
+        })
+    }
+
+
     displayButton() {
         var validation = this.checkValidation();
         if (validation == true) {
@@ -678,7 +707,7 @@ export default class ManualTagging extends Component {
                         let json = {
                             parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
                             programId: programId,
-                            fundingSourceId: (this.state.active3 ? document.getElementById("programId1").value : 0),
+                            fundingSourceId: (this.state.active3 ? document.getElementById("fundingSourceId").value : 0),
                             budgetId: (this.state.active3 ? document.getElementById("budgetId").value : 0),
                             shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
                             conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
@@ -697,7 +726,7 @@ export default class ManualTagging extends Component {
                     .then(response => {
                         console.log("response m tagging---", response)
                         this.setState({
-                            message: i18n.t('static.shipment.linkingsuccess'),
+                            message: (this.state.active2 ? "Shipment linking updated successfully" : i18n.t('static.shipment.linkingsuccess')),
                             color: 'green',
                             haslinked: true,
                             loading: false,
@@ -989,67 +1018,70 @@ export default class ManualTagging extends Component {
         document.getElementById('div2').style.display = 'block';
         var countryId = document.getElementById("countryId").value;
 
-        if (countryId != -1) {
-            this.setState({
-                loading: true
-            })
-            console.log("pl value---", this.state.planningUnitValues.map(ele => (ele.value).toString()));
-            var json = {
-                countryId: parseInt(document.getElementById("countryId").value),
-                productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
-                planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
-                linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
-            }
+        // if (countryId != -1) {
+        this.setState({
+            loading: true,
+            programId1: -1,
+            fundingSourceId: -1,
+            budgetId: -1
+        })
+        console.log("pl value---", this.state.planningUnitValues.map(ele => (ele.value).toString()));
+        var json = {
+            countryId: parseInt(document.getElementById("countryId").value),
+            productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
+            planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
+            linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
+        }
 
-            ManualTaggingService.getShipmentListForManualTagging(json)
-                .then(response => {
-                    console.log("manual tagging response===", response);
-                    this.setState({
-                        outputList: response.data
-                    }, () => {
-                        this.buildJExcel();
-                    });
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+        ManualTaggingService.getShipmentListForManualTagging(json)
+            .then(response => {
+                console.log("manual tagging response===", response);
+                this.setState({
+                    outputList: response.data
+                }, () => {
+                    this.buildJExcel();
+                });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
                         }
                     }
-                );
-        }
+                }
+            );
+        // }
 
 
     }
@@ -2073,7 +2105,7 @@ export default class ManualTagging extends Component {
         console.log("planning unit in modal---", this.state.planningUnitId);
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
-            displaySubmitButton:false,
+            displaySubmitButton: false,
             planningUnitIdUpdated: this.state.planningUnitId,
             artmisList: [],
             reason: "1",
@@ -2688,9 +2720,9 @@ export default class ManualTagging extends Component {
                                                                         name="programId1"
                                                                         id="programId1"
                                                                         bsSize="sm"
-                                                                        // value={this.state.programId}
+                                                                        value={this.state.programId1}
                                                                         // onChange={this.getPlanningUnitList}
-                                                                        onChange={(e) => { this.getNotLinkedShipments(e); this.getPlanningUnitList(e); }}
+                                                                        onChange={(e) => { this.programChangeModal(e); this.getNotLinkedShipments(e); this.getPlanningUnitList(e); }}
                                                                     >
                                                                         <option value="-1">{i18n.t('static.common.select')}</option>
                                                                         {programList}
@@ -2743,9 +2775,9 @@ export default class ManualTagging extends Component {
                                                                         name="fundingSourceId"
                                                                         id="fundingSourceId"
                                                                         bsSize="sm"
-                                                                        // value={this.state.programId}
+                                                                        value={this.state.fundingSourceId}
                                                                         // onChange={this.getBudgetListByFundingSourceId}
-                                                                        onChange={(e) => { this.getBudgetListByFundingSourceId(e) }}
+                                                                        onChange={(e) => { this.fundingSourceModal(e); this.getBudgetListByFundingSourceId(e) }}
                                                                     >
                                                                         <option value="-1">{i18n.t('static.common.select')}</option>
                                                                         {newFundingSourceList}
@@ -2762,9 +2794,9 @@ export default class ManualTagging extends Component {
                                                                         name="budgetId"
                                                                         id="budgetId"
                                                                         bsSize="sm"
-                                                                    // value={this.state.programId}
-                                                                    // onChange={this.getPlanningUnitList}
-                                                                    // onChange={(e) => { this.getNotLinkedShipments(e); this.getPlanningUnitList(e);this.getBudgetListByProgramId(e) }}
+                                                                        value={this.state.budgetId}
+                                                                        // onChange={this.getPlanningUnitList}
+                                                                        onChange={(e) => { this.budgetChange(e) }}
                                                                     >
                                                                         <option value="-1">{i18n.t('static.common.select')}</option>
                                                                         {newBudgetList}

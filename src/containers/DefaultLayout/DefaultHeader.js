@@ -100,7 +100,7 @@ class DefaultHeader extends Component {
                 
                 <span className="icon-wrapper-bg"></span>
                 <span class="badge badge-danger" style={{'zIndex': '6'}}>{this.props.notificationCount}</span>
-                <i className="cui-bell icons HomeIcon icon-anim-pulse text-primary " onClick={this.props.shipmentLinkingAlerts} title={i18n.t('static.common.viewDashBoard')}></i>
+                <i className="cui-bell icons HomeIcon icon-anim-pulse text-primary " onClick={this.props.shipmentLinkingAlerts} title={"Shipment Linking Notification"}></i>
               </span>
             </NavLink>
           </NavItem>}
