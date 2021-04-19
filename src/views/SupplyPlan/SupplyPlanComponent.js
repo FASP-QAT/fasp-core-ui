@@ -3483,8 +3483,11 @@ export default class SupplyPlanComponent extends React.Component {
                         consumptionChangedFlag: 0,
                         consumptionBatchInfoChangedFlag: 0,
                         consumptionRegion: region
+                    },()=>{
+                        if(this.refs.consumptionChild!=undefined){
+                            this.refs.consumptionChild.showConsumptionData();
+                        }
                     })
-                    this.refs.consumptionChild.showConsumptionData();
                 }.bind(this)
             }.bind(this)
         }
@@ -3581,8 +3584,11 @@ export default class SupplyPlanComponent extends React.Component {
                         inventoryRegion: region,
                         inventoryChangedFlag: 0,
                         inventoryBatchInfoChangedFlag: 0
+                    },()=>{
+                        if(this.refs.inventoryChild!=undefined){
+                            this.refs.inventoryChild.showInventoryData();
+                        }
                     })
-                    this.refs.inventoryChild.showInventoryData();
                 }.bind(this)
             }.bind(this)
         }
@@ -3688,8 +3694,11 @@ export default class SupplyPlanComponent extends React.Component {
                     showShipments: 1,
                     isSuggested: 1,
                     programPlanningUnitForPrice:programPlanningUnit
+                },()=>{
+                    if(this.refs.shipmentChild!=undefined){
+                        this.refs.shipmentChild.showShipmentData();
+                    }
                 })
-                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
@@ -3980,8 +3989,11 @@ export default class SupplyPlanComponent extends React.Component {
                     shelfLife: programPlanningUnit.shelfLife,
                     catalogPrice: programPlanningUnit.catalogPrice,
                     programPlanningUnitForPrice:programPlanningUnit
+                },()=>{
+                    if(this.refs.shipmentChild!=undefined){
+                    this.refs.shipmentChild.showShipmentData();
+                    }
                 })
-                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
