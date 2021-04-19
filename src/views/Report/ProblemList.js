@@ -36,6 +36,7 @@ import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import MultiSelect from 'react-multi-select-component';
 import ProblemListDashboard from '../Report/ProblemListDashboard';
+import { Prompt } from 'react-router-dom';
 const entityname = i18n.t('static.report.problem');
 
 export default class ConsumptionDetails extends React.Component {
@@ -60,10 +61,14 @@ export default class ConsumptionDetails extends React.Component {
             loading: false,
             problemCategoryList: [],
             problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
-            programId: '',
+            programId:localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
             showUpdateButton: false,
-            problemDetail: {}
+            problemDetail: {},
+            problemTypeId:localStorage.getItem("sesProblemType") != "" ? localStorage.getItem("sesProblemType") : -1,
+            productCategoryId:localStorage.getItem("sesProblemCategory") != "" ? localStorage.getItem("sesProblemCategory") : -1,
+            reviewedStatusId:localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1
+
         }
 
 
@@ -104,6 +109,15 @@ export default class ConsumptionDetails extends React.Component {
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.showUpdateButton == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     componentDidMount = function () {
@@ -209,9 +223,9 @@ export default class ConsumptionDetails extends React.Component {
                             problemCategoryList: procList
                         })
 
-                        document.getElementById("problemTypeId").value = localStorage.getItem("sesProblemType");
-                        document.getElementById("problemCategoryId").value = localStorage.getItem("sesProblemCategory");
-                        document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
+                        // document.getElementById("problemTypeId").value = localStorage.getItem("sesProblemType");
+                        // document.getElementById("problemCategoryId").value = localStorage.getItem("sesProblemCategory");
+                        // document.getElementById("reviewedStatusId").value = localStorage.getItem("sesReviewed");
                         // console.log("]]]]]]====>", localStorage.getItem("sesProblemCategory"));
 
                         // var programIdd = this.props.match.params.programId;
@@ -855,7 +869,7 @@ export default class ConsumptionDetails extends React.Component {
                 // (ele.program.code).replaceAll(' ', '%20'),
                 // ele.versionId,
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                getLabelText(ele.problemCategory.label,this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.problemCategory.label, this.state.lang).replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
@@ -1126,7 +1140,12 @@ export default class ConsumptionDetails extends React.Component {
                 message: '',
                 loading: true,
                 showProblemDashboard: 0,
-                showUpdateButton: false
+                showUpdateButton: false,
+                programId:document.getElementById('programId').value,
+                problemTypeId: document.getElementById('problemTypeId').value,
+                productCategoryId: document.getElementById('problemCategoryId').value,
+                reviewedStatusId: document.getElementById('reviewedStatusId').value
+
             },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1134,6 +1153,7 @@ export default class ConsumptionDetails extends React.Component {
                     localStorage.setItem("sesProblemType", document.getElementById('problemTypeId').value);
                     localStorage.setItem("sesProblemCategory", document.getElementById('problemCategoryId').value);
                     localStorage.setItem("sesReviewed", document.getElementById('reviewedStatusId').value);
+                    localStorage.setItem("sesProgramId", document.getElementById('programId').value);
                 });
             let programId = document.getElementById('programId').value;
             // let problemStatusId = document.getElementById('problemStatusId').value;
@@ -1284,19 +1304,35 @@ export default class ConsumptionDetails extends React.Component {
         return transList[listLength - 1].notes;
     }
     handleProblemStatusChange = (event) => {
-        console.log('***', event)
-        var problemStatusIds = event
-        problemStatusIds = problemStatusIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-            problemStatusValues: problemStatusIds.map(ele => ele),
-            problemStatusLabels: problemStatusIds.map(ele => ele.label)
-        }, () => {
-            console.log("problemStatusValues===>", this.state.problemStatusValues);
-            localStorage.setItem("sesProblemStatus", JSON.stringify(this.state.problemStatusValues));
-            this.fetchData()
-        })
+
+        var cont = false;
+        if (this.state.showUpdateButton == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+
+        if (cont == true) {
+            console.log('***', event)
+            var problemStatusIds = event
+            problemStatusIds = problemStatusIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemStatusValues: problemStatusIds.map(ele => ele),
+                problemStatusLabels: problemStatusIds.map(ele => ele.label),
+                showUpdateButton: false
+            }, () => {
+                console.log("problemStatusValues===>", this.state.problemStatusValues);
+                localStorage.setItem("sesProblemStatus", JSON.stringify(this.state.problemStatusValues));
+                this.fetchData()
+            })
+        }
 
     }
 
@@ -1584,6 +1620,10 @@ export default class ConsumptionDetails extends React.Component {
 
             <div className="animated">
                 {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions> */}
+                <Prompt
+                    when={this.state.showUpdateButton == true }
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
@@ -1674,7 +1714,7 @@ export default class ConsumptionDetails extends React.Component {
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
-                                                // value={this.state.hqStatusId}
+                                                value={this.state.problemTypeId}
                                                 name="problemTypeId" id="problemTypeId"
                                                 onChange={this.fetchData}
                                             >
@@ -1695,7 +1735,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 name="problemCategoryId" id="problemCategoryId"
                                                 onChange={this.fetchData}
-                                            // value={1}
+                                                value={this.state.productCategoryId}
                                             >
                                                 <option value="-1">{i18n.t("static.common.all")}</option>
                                                 {problemCategories}
@@ -1711,7 +1751,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 name="reviewedStatusId" id="reviewedStatusId"
                                                 onChange={this.fetchData}
-                                            // value={1}
+                                                value={this.state.reviewedStatusId}
                                             >
                                                 <option value="-1">{i18n.t("static.common.all")}</option>
                                                 <option value="1">{i18n.t("static.program.yes")}</option>
