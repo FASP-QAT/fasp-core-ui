@@ -93,7 +93,8 @@ export default class SupplyPlanComponent extends React.Component {
             showInventory: 0,
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
-            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+            inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            batchInfoInInventoryPopUp: []
 
         }
         this.getMonthArray = this.getMonthArray.bind(this);
@@ -914,6 +915,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             // if (supplyPlanData.length > 0) {
                             var lastClosingBalance = 0;
+                            var lastBatchDetails = [];
                             var lastIsActualClosingBalance = 0;
                             for (var n = 0; n < m.length; n++) {
                                 var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
@@ -1326,10 +1328,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
-                                    closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance })
+                                    closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance, batchInfoList: jsonList[0].batchDetails })
 
 
-                                    lastClosingBalance = jsonList[0].closingBalance
+                                    lastClosingBalance = jsonList[0].closingBalance;
+                                    lastBatchDetails = jsonList[0].batchDetails;
                                     lastIsActualClosingBalance = jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0;
 
                                     // suggestedShipmentsTotalData.push(jsonList[0].suggestedShipmentsTotalData);
@@ -1502,7 +1505,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     minStockMoS.push(minStockMoSQty);
                                     maxStockMoS.push(maxStockMoSQty)
                                     unmetDemand.push("");
-                                    closingBalanceArray.push({ isActual: 0, balance: lastClosingBalance });
+                                    closingBalanceArray.push({ isActual: 0, balance: lastClosingBalance, batchInfoList: lastBatchDetails });
                                     for (var i = 0; i < this.state.regionListFiltered.length; i++) {
                                         consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
                                         inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
@@ -1610,7 +1613,8 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentDatesError: '',
             showShipments: 0,
             showInventory: 0,
-            showConsumption: 0
+            showConsumption: 0,
+            batchInfoInInventoryPopUp: []
 
         })
         if (supplyPlanType == 'Consumption') {
@@ -1702,7 +1706,8 @@ export default class SupplyPlanComponent extends React.Component {
             noFundsBudgetError: '',
             showShipments: 0,
             showInventory: 0,
-            showConsumption: 0
+            showConsumption: 0,
+            batchInfoInInventoryPopUp: [],
 
         },
             () => {
@@ -2126,6 +2131,22 @@ export default class SupplyPlanComponent extends React.Component {
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
+                    },
+                    {
+                        label: i18n.t('static.supplyplan.exipredStock'),
+                        yAxisID: 'A',
+                        type: 'line',
+                        stack: 7,
+                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        showLine: false,
+                        pointStyle: 'triangle',
+                        pointBackgroundColor: '#ffff00',
+                        pointBorderColor: '#ffff00',
+                        pointRadius: 10
+
                     }
                 ]
 
@@ -2758,7 +2779,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             this.state.closingBalanceArray.map((item, count) => {
                                                 if (count < 7) {
                                                     return (
-                                                        <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                        <td colSpan="2"  className="hoverTd" onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                     )
                                                 }
                                             })
@@ -2766,6 +2787,33 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tbody>
                             </Table>
+                            {this.state.batchInfoInInventoryPopUp.length > 0 &&
+                                    <>
+                                        <Table  className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                            <thead>
+                                                <tr>
+                                                    <td>{i18n.t("static.supplyPlan.batchId")}</td>
+                                                    <th>{i18n.t('static.report.createdDate')}</th>
+                                                    <th>{i18n.t('static.inventory.expireDate')}</th>
+                                                    <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
+                                                    <td>{i18n.t("static.report.qty")}</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {this.state.batchInfoInInventoryPopUp.map(item => (
+                                                    <tr>
+                                                        <td>{item.batchNo}</td>
+                                                        <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
+                                                        <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                        <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
+                                                        <td>{item.qty}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table><br/>
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br/>
+                                    </>
+                                }
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                             <div className="table-responsive mt-3">
                                 <div id="adjustmentsTable" className="table-responsive " />
@@ -2849,7 +2897,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button size="md" color="danger"  id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </div>
                             <div className="pt-4"></div>
                         </ModalBody>

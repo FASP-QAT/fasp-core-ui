@@ -3933,3 +3933,7 @@ color: #000000!important;
 .jexcel_content::-webkit-scrollbar-thumb {
   background: #c1c1c1!important;
 }
+
+.hideCross .close span{
+  display: none !important;
+}
