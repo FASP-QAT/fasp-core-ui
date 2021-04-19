@@ -525,8 +525,11 @@ class EditSupplyPlanStatus extends Component {
                             consumptionMonth: month,
                             consumptionStartDate: startDate,
                             consumptionRegion: region
+                        }, () => {
+                            if (this.refs.consumptionChild != undefined) {
+                                this.refs.consumptionChild.showConsumptionData();
+                            }
                         })
-                        this.refs.consumptionChild.showConsumptionData();
                     }).catch(error => { console.log("Error+++", error) });
                 }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
@@ -638,8 +641,11 @@ class EditSupplyPlanStatus extends Component {
                             inventoryMonth: month,
                             inventoryEndDate: endDate,
                             inventoryRegion: region
+                        }, () => {
+                            if (this.refs.inventoryChild != undefined) {
+                                this.refs.inventoryChild.showInventoryData();
+                            }
                         })
-                        this.refs.inventoryChild.showInventoryData();
                     }).catch(error => { console.log("Error+++", error) });
                 }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
@@ -803,8 +809,11 @@ class EditSupplyPlanStatus extends Component {
                                             shipmentList: shipmentList,
                                             shipmentListUnFiltered: shipmentListUnFiltered,
                                             programJson: programJson
+                                        }, () => {
+                                            if (this.refs.shipmentChild != undefined) {
+                                                this.refs.shipmentChild.showShipmentData();
+                                            }
                                         })
-                                        this.refs.shipmentChild.showShipmentData();
                                     }).catch(error => { console.log("Error+++", error) });
                                 }).catch(error => { console.log("Error+++", error) });
                             }).catch(error => { console.log("Error+++", error) });
@@ -3323,8 +3332,8 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t("static.problemActionReport.problemCategory"),
                     type: 'dropdown',
                     width: 80,
-                    source:this.state.problemCategoryList,
-                    readOnly:true
+                    source: this.state.problemCategoryList,
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.problemDescription'),

@@ -601,7 +601,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var programJson = {
                             name: programJson1.programCode + "~v" + myResult[i].version,
                             id: myResult[i].id,
-                            programId:myResult[i].programId
+                            programId: myResult[i].programId
                         }
                         proList.push(programJson)
                     }
@@ -673,7 +673,7 @@ export default class SupplyPlanComponent extends React.Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         var programId = (document.getElementById("programId").value).split("_")[0];
-                        myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
+                        myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -772,8 +772,8 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var planningUnitName = this.props.items.planningUnitName;
 
-        var actualProgramId=this.state.programList.filter(c=>c.id==document.getElementById("programId").value)[0].programId;
-        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
+        var actualProgramId = this.state.programList.filter(c => c.id == document.getElementById("programId").value)[0].programId;
+        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;
         var consumptionTotalData = [];
         var shipmentsTotalData = [];
@@ -1013,7 +1013,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (paColor2Array.indexOf(paColor2) === -1) {
                                                     paColor2Array.push(paColor2);
                                                 }
-                                            } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS  || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                            } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
                                                 if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -1816,8 +1816,11 @@ export default class SupplyPlanComponent extends React.Component {
                     consumptionMonth: month,
                     consumptionStartDate: startDate,
                     consumptionRegion: region
+                }, () => {
+                    if (this.refs.consumptionChild != undefined) {
+                        this.refs.consumptionChild.showConsumptionData();
+                    }
                 })
-                this.refs.consumptionChild.showConsumptionData();
             }.bind(this)
         }.bind(this)
     }
@@ -1897,8 +1900,11 @@ export default class SupplyPlanComponent extends React.Component {
                     inventoryMonth: month,
                     inventoryEndDate: endDate,
                     inventoryRegion: region
+                }, () => {
+                    if (this.refs.inventoryChild != undefined) {
+                        this.refs.inventoryChild.showInventoryData();
+                    }
                 })
-                this.refs.inventoryChild.showInventoryData();
             }.bind(this)
         }.bind(this)
     }
@@ -2990,8 +2996,11 @@ export default class SupplyPlanComponent extends React.Component {
                     showShipments: 1,
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered
+                }, () => {
+                    if (this.refs.shipmentChild != undefined) {
+                        this.refs.shipmentChild.showShipmentData();
+                    }
                 })
-                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
