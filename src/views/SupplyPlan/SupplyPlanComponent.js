@@ -2295,11 +2295,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitIdProp = proList[0].value;
                                 }
                                 if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                    console.log("ProListProp+++",planningUnitIdProp);
-                                    console.log("ProList+++",proList);
-                                    var ppList=proList.filter(c => c.value == planningUnitIdProp);
-                                    console.log("PPList+++",ppList);
-                                    var planningUnit = { value: planningUnitIdProp, label: ppList.length>0?ppList[0].label:'' };
+                                    var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                     this.setState({
                                         planningUnit: planningUnit,
                                         planningUnitId: planningUnitIdProp
