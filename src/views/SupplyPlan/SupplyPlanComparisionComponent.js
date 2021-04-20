@@ -244,6 +244,7 @@ export default class SupplyPlanComponent extends React.Component {
         var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
         var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
@@ -268,6 +269,7 @@ export default class SupplyPlanComponent extends React.Component {
         A.push(orderedErpShipmentArr)
         A.push(plannedErpShipmentArr)
         A.push(inventoryArr)
+        A.push(expiredStockArr)
         A.push(closingBalanceArr)
         A.push(monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na")))
         A.push(amcgArr)
@@ -425,6 +427,7 @@ export default class SupplyPlanComponent extends React.Component {
         var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]        
         var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
         var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
@@ -433,7 +436,7 @@ export default class SupplyPlanComponent extends React.Component {
         // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr, consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr, closingBalanceArr, monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na')), amcgArr, unmetDemandArr];
+        const data = [openningArr, consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr, suggestedArr, manualEntryShipmentsArr, deliveredShipmentArr, shippedShipmentArr, orderedShipmentArr, plannedShipmentArr, erpShipmentsArr, deliveredErpShipmentArr, shippedErpShipmentArr, orderedErpShipmentArr, plannedErpShipmentArr, inventoryArr,expiredStockArr, closingBalanceArr, monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na')), amcgArr, unmetDemandArr];
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -3037,7 +3040,8 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     showShipments: 1,
                     shipmentList: shipmentList,
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    programJson:programJson
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)

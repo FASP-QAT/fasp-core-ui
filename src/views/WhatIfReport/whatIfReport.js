@@ -1616,6 +1616,7 @@ export default class WhatIfReportComponent extends React.Component {
         var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
         var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
@@ -1640,6 +1641,7 @@ export default class WhatIfReportComponent extends React.Component {
         A.push(orderedErpShipmentArr)
         A.push(plannedErpShipmentArr)
         A.push(inventoryArr)
+        A.push(expiredStockArr)
         A.push(closingBalanceArr)
         A.push(monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na")))
         A.push(amcgArr)
@@ -1809,6 +1811,7 @@ export default class WhatIfReportComponent extends React.Component {
         var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
         var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
@@ -1817,7 +1820,7 @@ export default class WhatIfReportComponent extends React.Component {
         // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)),expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
             margin: { top: 80, bottom: 70 },
@@ -3599,10 +3602,12 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     shipmentListUnFiltered: programJson.shipmentList,
                     programJson: programJson,
-                    shelfLife: shelfLife,
                     shipmentList: shipmentList,
                     showShipments: 1,
-                    isSuggested: 1
+                    isSuggested: 1,
+                    shelfLife: programPlanningUnit.shelfLife,
+                    catalogPrice: programPlanningUnit.catalogPrice,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -5084,6 +5089,8 @@ export default class WhatIfReportComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+                var planningUnitId = document.getElementById("planningUnitId").value;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var shipmentListUnFiltered = programJson.shipmentList;
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
@@ -5145,7 +5152,11 @@ export default class WhatIfReportComponent extends React.Component {
                     showShipments: 1,
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
-                    isSuggested: 0
+                    isSuggested: 0,
+                    programJson:programJson,
+                    shelfLife: programPlanningUnit.shelfLife,
+                    catalogPrice: programPlanningUnit.catalogPrice,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
