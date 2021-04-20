@@ -21,9 +21,20 @@ class ProcurementAgentService {
         );
     }
 
+    getCountrySpecificPricesList(json) {
+        return axios.get(`${API_URL}/api/program/planningUnit/procurementAgent/${json}`, {}
+        );
+    }
+
     addprocurementAgentPlanningUnitMapping(json) {
-        console.log("json papu---",json);
+        console.log("json papu---", json);
         return axios.put(`${API_URL}/api/procurementAgent/planningingUnit/`, json, {}
+        );
+    }
+
+    savePlanningUnitProgramPriceForProcurementAgent(json) {
+        console.log("json papu---", json);
+        return axios.put(`${API_URL}/api/program/planningingUnit/procurementAgent/`, json, {}
         );
     }
 
@@ -33,7 +44,7 @@ class ProcurementAgentService {
     }
 
     addprocurementAgentProcurementUnitMapping(json) {
-        console.log("Json",json);
+        console.log("Json", json);
         return axios.put(`${API_URL}/api/procurementAgent/procurementUnit/`, json, {}
         );
     }
@@ -43,7 +54,7 @@ class ProcurementAgentService {
         );
     }
 
-    getProcurementAgentDisplayName(json1,json2) {
+    getProcurementAgentDisplayName(json1, json2) {
         return axios.get(`${API_URL}/api/procurementAgent/getDisplayName/realmId/${json1}/name/${json2}`, {}
         );
     }
