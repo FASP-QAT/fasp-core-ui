@@ -325,7 +325,7 @@ class EditSupplyPlanStatus extends Component {
 
         })
         if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = count - 2;
+            var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
                 monthCountConsumption: monthCountConsumption,
@@ -343,7 +343,7 @@ class EditSupplyPlanStatus extends Component {
             });
             this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
         } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = count - 2;
+            var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
                 adjustments: !this.state.adjustments,
                 monthCountAdjustments: monthCountAdjustments,
