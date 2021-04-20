@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from 'react-dom'
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
@@ -36,6 +37,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Prompt } from 'react-router'
 
+
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
 
@@ -48,6 +50,7 @@ export default class SupplyPlanComponent extends React.Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
+            planningUnitData:[],
             loading: true,
             monthsArray: [],
             programList: [],
@@ -398,6 +401,7 @@ export default class SupplyPlanComponent extends React.Component {
         var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
         var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
@@ -422,6 +426,7 @@ export default class SupplyPlanComponent extends React.Component {
         A.push(orderedErpShipmentArr)
         A.push(plannedErpShipmentArr)
         A.push(inventoryArr)
+        A.push(expiredStockArr)
         A.push(closingBalanceArr)
         A.push(monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na")))
         A.push(amcgArr)
@@ -460,6 +465,7 @@ export default class SupplyPlanComponent extends React.Component {
             var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedErpShipmentsTotalData.map(item => item.qty)]
 
             var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...ele.data.inventoryTotalData]
+            var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...ele.data.expiredStockArr.map(item => item.qty)]
             var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...ele.data.closingBalanceArray.map(item => item.balance)]
             var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ...ele.data.monthsOfStockArray]
             var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...ele.data.amcTotalData]
@@ -496,6 +502,7 @@ export default class SupplyPlanComponent extends React.Component {
             A.push(orderedErpShipmentArr)
             A.push(plannedErpShipmentArr)
             A.push(inventoryArr)
+            A.push(expiredStockArr)
             A.push(closingBalanceArr)
             A.push(monthsOfStockArr.map(c => c != null ? c : i18n.t('static.supplyPlanFormula.na')))
             A.push(amcgArr)
@@ -526,6 +533,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     exportPDF = () => {
+        //console.log(this.state.bars)
         const addFooters = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
@@ -573,6 +581,11 @@ export default class SupplyPlanComponent extends React.Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
+                    var splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
+                    doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
+                    splittext = doc.splitTextToSize(i18n.t('static.user.user')+' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
+                    doc.text( doc.internal.pageSize.width / 8, 60, splittext)
+          
                     doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 10, 80, {
                         align: 'left'
                     })
@@ -645,6 +658,7 @@ export default class SupplyPlanComponent extends React.Component {
         var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
         var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
         var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
@@ -653,7 +667,7 @@ export default class SupplyPlanComponent extends React.Component {
         // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)),expiredStockArr.map(c=>this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
             margin: { top: 80, bottom: 70 },
@@ -670,7 +684,7 @@ export default class SupplyPlanComponent extends React.Component {
 
         doc.setFontSize(8)
         doc.setFont('helvetica', 'bold')
-        var y = doc.autoTableEndPosY() + 20
+        var y = doc.lastAutoTable.finalY + 20
         if (y + 100 > height) {
             doc.addPage();
             y = 80
@@ -701,7 +715,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
             }
@@ -729,7 +743,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
             }
@@ -757,7 +771,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
 
@@ -770,6 +784,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
         var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
+        var count=0;
         list.map(ele => {
             doc.addPage();
             y = 80
@@ -814,6 +829,7 @@ export default class SupplyPlanComponent extends React.Component {
             var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...ele.data.plannedErpShipmentsTotalData.map(item => item.qty)]
 
             var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...ele.data.inventoryTotalData]
+            var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...ele.data.expiredStockArr.map(item => item.qty)]
             var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...ele.data.closingBalanceArray.map(item => item.balance)]
             var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ...ele.data.monthsOfStockArray]
             var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...ele.data.amcTotalData]
@@ -822,11 +838,24 @@ export default class SupplyPlanComponent extends React.Component {
             // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...ele.data.maxStockMoS]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...ele.data.unmetDemand]
 
-            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)),expiredStockArr.map(c=>this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+          //  var createCanvas =React.renderComponent( <CreateCanvas/>, document.getElementById('createCanvas') );
+               
+            
+          
+            var canv=  document.getElementById("cool-canvas"+count)
+                 
+           var canvasImg1 = canv.toDataURL("image/png", 1.0);
+        //   console.log(canvasImg1)
+          console.log('count',count, doc.addImage(canvasImg1, 'png', 50, 160, 750, 290,"a"+count ,'CANVAS'));
+          count++
+  
 
+
+          
             let content = {
                 margin: { top: 80, bottom: 70 },
-                startY: 170,
+                startY: height,
                 head: headers,
                 body: data1,
                 styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
@@ -839,7 +868,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             doc.setFontSize(8)
             doc.setFont('helvetica', 'bold')
-            var y = doc.autoTableEndPosY() + 20
+            var y = doc.lastAutoTable.finalY + 20
             if (y + 100 > height) {
                 doc.addPage();
                 y = 80
@@ -870,7 +899,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
@@ -898,7 +927,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
@@ -926,7 +955,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
 
@@ -954,7 +983,7 @@ export default class SupplyPlanComponent extends React.Component {
 
     tabPane = () => {
 
-        const chartOptions = {
+        var chartOptions = {
             title: {
                 display: true,
                 text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? entityname + " - " + this.state.planningUnit.label : entityname
@@ -1535,7 +1564,12 @@ export default class SupplyPlanComponent extends React.Component {
                                         <div className="col-md-12">
                                             <div className="chart-wrapper chart-graph-report">
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                {/* <CreateCanvas ref="child" chartOptions={chartOptions}/> */}
                                             </div>
+                                            <div id="bars_div"  style={{display:"none"}}>
+                                            {this.state.planningUnitData.filter(c=>c.planningUnit.id!=this.state.planningUnitId).map((ele,index)=> {
+                                               return( <div  className="chart-wrapper chart-graph-report"><Bar  id={"cool-canvas"+index} data={ele.bar} options={ele.chartOptions}  /></div>)})}
+                            </div>
                                         </div>
                                     </div>
                                     <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
@@ -2384,9 +2418,9 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
-                var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
-                var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
+                var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
                 var realmTransaction = db1.transaction(['realm'], 'readwrite');
                 var realmOs = realmTransaction.objectStore('realm');
                 var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
@@ -3650,6 +3684,7 @@ export default class SupplyPlanComponent extends React.Component {
                     shipmentList: shipmentList,
                     showShipments: 1,
                     isSuggested: 1,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -3874,6 +3909,8 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+                var planningUnitId = document.getElementById("planningUnitId").value;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
                 var shipmentListUnFiltered = programJson.shipmentList;
                 this.setState({
                     shipmentListUnFiltered: shipmentListUnFiltered
@@ -3935,7 +3972,11 @@ export default class SupplyPlanComponent extends React.Component {
                     showShipments: 1,
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
-                    isSuggested: 0
+                    isSuggested: 0,
+                    programJson:programJson,
+                    shelfLife: programPlanningUnit.shelfLife,
+                    catalogPrice: programPlanningUnit.catalogPrice,
+                    programPlanningUnitForPrice:programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -4067,6 +4108,8 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
     getDataforExport = (report) => {
+
+        document.getElementById("bars_div").style.display='block';
         this.setState({ loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
@@ -4099,10 +4142,14 @@ export default class SupplyPlanComponent extends React.Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    var planningUnitData = []
+                    var planningUnitData = [];
+                    var selectedPlanningUnitdata={};
+                    var selectedplanningunit=this.state.planningUnitList.filter(c=>c.value==this.state.planningUnitId)
 
+                    var planningunitList=this.state.planningUnitList.filter(c=>c.value!=this.state.planningUnitId)
+                    planningunitList.push(selectedplanningunit[0])
                     var pcnt = 0
-                    this.state.planningUnitList.map(planningUnit => {
+                    planningunitList.map(planningUnit => {
 
                         var planningUnitId = planningUnit.value
                         var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
@@ -4136,9 +4183,9 @@ export default class SupplyPlanComponent extends React.Component {
                         var paColors = []
                         var lastActualConsumptionDate = [];
 
-                        var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
-                        var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
-                        var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
+                        var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                        var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
+                        var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
                         var realmTransaction = db1.transaction(['realm'], 'readwrite');
                         var realmOs = realmTransaction.objectStore('realm');
                         var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
@@ -4804,22 +4851,255 @@ export default class SupplyPlanComponent extends React.Component {
                                         loading: false
                                     }
 
+                                    var bar=  {
+
+                                        labels: [...new Set(jsonArrForGraph.map(ele1 => (ele1.month)))],
+                                        datasets: [
+                                            {
+                                                label: i18n.t('static.supplyPlan.planned'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#a7c6ed',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.planned)),
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.ordered'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#205493',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.ordered)),
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.shipped'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#006789',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.shipped)),
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.delivered'),
+                                                stack: 1,
+                                                yAxisID: 'A',
+                                                backgroundColor: '#002f6c',
+                                                borderColor: 'rgba(179,181,198,1)',
+                                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                                data: jsonArrForGraph.map((item, index) => (item.delivered)),
+                                            }, {
+                                                label: i18n.t('static.report.stock'),
+                                                stack: 2,
+                                                type: 'line',
+                                                yAxisID: 'A',
+                                                borderColor: '#cfcdc9',
+                                                borderStyle: 'dotted',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                data: jsonArrForGraph.map((item, index) => (item.stock))
+                                            }, {
+                                                label: i18n.t('static.supplyPlan.consumption'),
+                                                type: 'line',
+                                                stack: 3,
+                                                yAxisID: 'A',
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#ba0c2f',
+                                                borderStyle: 'dotted',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                data: jsonArrForGraph.map((item, index) => (item.consumption))
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.monthsOfStock'),
+                                                type: 'line',
+                                                stack: 4,
+                                                yAxisID: 'B',
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#118b70',
+                                                borderStyle: 'dotted',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                data:jsonArrForGraph.map((item, index) => (item.mos))
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.minStockMos'),
+                                                type: 'line',
+                                                stack: 5,
+                                                yAxisID: 'B',
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#59cacc',
+                                                borderStyle: 'dotted',
+                                                borderDash: [10, 10],
+                                                fill: '+1',
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                showInLegend: true,
+                                                pointStyle: 'line',
+                                                yValueFormatString: "$#,##0",
+                                                lineTension: 0,
+                                                data:jsonArrForGraph.map((item, index) => (item.minMos))
+                                            },
+                                            {
+                                                label: i18n.t('static.supplyPlan.maxStockMos'),
+                                                type: 'line',
+                                                stack: 6,
+                                                yAxisID: 'B',
+                                                backgroundColor: 'rgba(0,0,0,0)',
+                                                borderColor: '#59cacc',
+                                                borderStyle: 'dotted',
+                                                borderDash: [10, 10],
+                                                fill: true,
+                                                ticks: {
+                                                    fontSize: 2,
+                                                    fontColor: 'transparent',
+                                                },
+                                                lineTension: 0,
+                                                pointStyle: 'line',
+                                                showInLegend: true,
+                                                yValueFormatString: "$#,##0",
+                                                data: jsonArrForGraph.map((item, index) => (item.maxMos))
+                                            }
+                                        ]}
+                                        var chartOptions = {
+                                            title: {
+                                                display: true,
+                                                text: entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label,this.state.lang)
+                                            },
+                                            scales: {
+                                                yAxes: [{
+                                                    id: 'A',
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: i18n.t('static.shipment.qty'),
+                                                        fontColor: 'black'
+                                                    },
+                                                    stacked: false,
+                                                    ticks: {
+                                                        beginAtZero: true,
+                                                        fontColor: 'black',
+                                                        callback: function (value) {
+                                                            return value.toLocaleString();
+                                                        }
+                                                    },
+                                                    gridLines: {
+                                                        drawBorder: true, lineWidth: 0
+                                                    },
+                                                    position: 'left',
+                                                },
+                                                {
+                                                    id: 'B',
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                                                        fontColor: 'black'
+                                                    },
+                                                    stacked: false,
+                                                    ticks: {
+                                                        beginAtZero: true,
+                                                        fontColor: 'black'
+                                                    },
+                                                    gridLines: {
+                                                        drawBorder: true, lineWidth: 0
+                                                    },
+                                                    position: 'right',
+                                                }
+                                                ],
+                                                xAxes: [{
+                                                    ticks: {
+                                                        fontColor: 'black'
+                                                    },
+                                                    gridLines: {
+                                                        drawBorder: true, lineWidth: 0
+                                                    }
+                                                }]
+                                            },
+                                            tooltips: {
+                                                callbacks: {
+                                                    label: function (tooltipItems, data) {
+                                                        return (tooltipItems.yLabel.toLocaleString());
+                                                    }
+                                                },
+                                                enabled: false,
+                                                custom: CustomTooltips
+                                            },
+                                            maintainAspectRatio: false
+                                            ,
+                                            legend: {
+                                                display: true,
+                                                position: 'bottom',
+                                                labels: {
+                                                    usePointStyle: true,
+                                                    fontColor: 'black'
+                                                }
+                                            }
+                                        }
                                     var planningUnitDataforExport = {
                                         planningUnit: programPlanningUnit.planningUnit,
                                         info: planningUnitInfo,
-                                        data: exportData
+                                        data: exportData,
+                                        bar:bar,
+                                        chartOptions:chartOptions
+                                        
                                     }
-                                    planningUnitData.push(planningUnitDataforExport)
+
+                                        if(this.state.planningUnitId!=programPlanningUnit.planningUnit.id){
+                                            planningUnitData.push(planningUnitDataforExport) 
+                                            // this.setState({
+                                            //     planningUnitData: planningUnitData,
+                                            //         loading: false
+                                            // })
+                                           }
+                                   else{
+                                    selectedPlanningUnitdata=planningUnitDataforExport
+                                   }
                                     pcnt = pcnt + 1
                                     if (pcnt == this.state.planningUnitList.length) {
-
+                                        planningUnitData.push(selectedPlanningUnitdata)
                                         this.setState({
                                             planningUnitData: planningUnitData,
                                             loading: false
-                                        }, () => {
+                                        },()=>{
+                                            setTimeout(() => {
                                             report == 1 ? this.exportPDF() : this.exportCSV()
+                                            document.getElementById("bars_div").style.display='none';
+                                        },2000)
                                         })
-                                    }
+
+                                     
+                                     
+                                    }   
                                     // } else {
                                     //     this.setState({ loading: false })
                                     //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);
@@ -4835,5 +5115,4 @@ export default class SupplyPlanComponent extends React.Component {
         })
 
     }
-
 }
