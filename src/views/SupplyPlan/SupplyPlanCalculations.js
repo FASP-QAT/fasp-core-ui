@@ -775,7 +775,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             qtyWps: Number(myArray[ma].qtyWps),
                                             expiredQty: Number(myArray[ma].expiredQty),
                                             expiredQtyWps: Number(myArray[ma].expiredQtyWps),
-                                            createdDate: myArray[ma].createdDate
+                                            createdDate: myArray[ma].createdDate,
+                                            openingBalance: myArray[ma].openingBalance,
+                                            unallocatedQty: Number(myArray[ma].calculatedFEFO)+(myArray[ma].calculatedLEFO!=undefined && myArray[ma].calculatedLEFO!="" && myArray[ma].calculatedLEFO!=null?myArray[ma].calculatedLEFO:0 ),
+                                            consumptionQty:myArray[ma].consumption==0?null:myArray[ma].consumption,
+                                            adjustmentQty: myArray[ma].adjustment==0?null:myArray[ma].adjustment,
+                                            stockQty: myArray[ma].stock==0?null:myArray[ma].stock,
+                                            shipmentQty: myArray[ma].shipment
                                         }
                                         finalBatchDetails.push(finalBatch)
                                     }
