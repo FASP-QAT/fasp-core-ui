@@ -5246,6 +5246,10 @@ export default class WhatIfReportComponent extends React.Component {
                 }, () => {
                     if (this.refs.shipmentChild != undefined) {
                         this.refs.shipmentChild.showShipmentData();
+                    }else{
+                        this.setState({
+                            loading:false
+                        })
                     }
                 })
             }.bind(this)
