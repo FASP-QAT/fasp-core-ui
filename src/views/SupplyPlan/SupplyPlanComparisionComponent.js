@@ -1834,6 +1834,10 @@ export default class SupplyPlanComponent extends React.Component {
                 }, () => {
                     if (this.refs.consumptionChild != undefined) {
                         this.refs.consumptionChild.showConsumptionData();
+                    }else{
+                        this.setState({
+                            loading:false
+                        })
                     }
                 })
             }.bind(this)
@@ -1918,6 +1922,10 @@ export default class SupplyPlanComponent extends React.Component {
                 }, () => {
                     if (this.refs.inventoryChild != undefined) {
                         this.refs.inventoryChild.showInventoryData();
+                    }else{
+                        this.setState({
+                            loading:false
+                        })
                     }
                 })
             }.bind(this)
@@ -3121,6 +3129,10 @@ export default class SupplyPlanComponent extends React.Component {
                 }, () => {
                     if (this.refs.shipmentChild != undefined) {
                         this.refs.shipmentChild.showShipmentData();
+                    }else{
+                        this.setState({
+                            loading:false
+                        })
                     }
                 })
             }.bind(this)
