@@ -1118,7 +1118,8 @@ export default class syncPage extends Component {
             var programJson = {
               label: myResult[i].programCode + "~v" + myResult[i].version,
               value: myResult[i].id,
-              version: myResult[i].version
+              version: myResult[i].version,
+              programId:myResult[i].programId
             }
             proList.push(programJson)
           }
@@ -1163,7 +1164,7 @@ export default class syncPage extends Component {
               if (error.message === "Network Error") {
                 console.log("+++in catch 1")
                 this.setState({
-                  message: 'static.unkownError',
+                  message: 'static.common.networkError',
                   loading: false,
                   statuses: [],
                 });
@@ -1237,20 +1238,30 @@ export default class syncPage extends Component {
     console.log("@@@ProgramId", programId);
     console.log("@@@this.state.programList", this.state.programList);
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
+    var singleProgramId=(this.state.programList).filter(c => c.value == programId)[0].programId;
+
     if (programId != 0) {
       localStorage.setItem("sesProgramId", programId);
       AuthenticationService.setupAxiosInterceptors();
-      var programRequestJson = { programId: (programId.split("_"))[0], versionId: -1 }
-      ProgramService.getProgramData(programRequestJson)
+      ProgramService.getLatestVersionForProgram((singleProgramId)).then(response1 => {
+        if (response1.status == 200) {
+          var latestVersion=response1.data;
+          var programRequestJson=[];
+          programRequestJson.push({ programId: (programId.split("_"))[0], versionId: -1 })
+          if(latestVersion==programVersion){
+          }else{
+            programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion });
+          }
+      ProgramService.getAllProgramData(programRequestJson)
         .then(response => {
           if (response.status == 200) {
             console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
             AuthenticationService.setupAxiosInterceptors();
-            var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
-            ProgramService.getProgramData(programRequestJson1)
-              .then(response1 => {
-                if (response1.status == 200) {
+            // var programRequestJson1 = { programId: (programId.split("_"))[0], versionId: programVersion }
+            // ProgramService.getProgramData(programRequestJson1)
+            //   .then(response1 => {
+            //     if (response1.status == 200) {
                   console.log("+++Response for downloaded version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                   var db1;
@@ -1500,13 +1511,13 @@ export default class syncPage extends Component {
                                         currencyListAll: currencyResult
                                       })
 
-                                      var latestProgramData = response.data;
+                                      var latestProgramData = response.data[0];
                                       this.setState({
                                         comparedLatestVersion: latestProgramData.currentVersion.versionId,
                                         singleProgramId: latestProgramData.programId
                                       })
                                       var oldProgramData = programJson;
-                                      var downloadedProgramData = response1.data;
+                                      var downloadedProgramData = response.data.length>1?response.data[1]:response.data[0];
                                       var regionList = [];
                                       for (var i = 0; i < latestProgramData.regionList.length; i++) {
                                         var regionJson = {
@@ -2088,7 +2099,7 @@ export default class syncPage extends Component {
                   // }.bind(this)
                 } else {
                   this.setState({
-                    message: response1.data.messageCode,
+                    message: response.data.messageCode,
                     loading: false,
                     color: "red"
                   },
@@ -2102,7 +2113,7 @@ export default class syncPage extends Component {
                   if (error.message === "Network Error") {
                     console.log("+++in catch 3")
                     this.setState({
-                      message: 'static.unkownError',
+                      message: 'static.common.networkError',
                       loading: false
                     });
                   } else {
@@ -2141,7 +2152,7 @@ export default class syncPage extends Component {
               );
           } else {
             this.setState({
-              message: response.data.messageCode,
+              message: response1.data.messageCode,
               loading: false,
               color: "red"
             },
@@ -2155,7 +2166,7 @@ export default class syncPage extends Component {
             if (error.message === "Network Error") {
               console.log("+++in catch 5")
               this.setState({
-                message: 'static.unkownError',
+                message: 'static.common.networkError',
                 loading: false
               });
             } else {
@@ -3237,7 +3248,7 @@ export default class syncPage extends Component {
                         if (error.message === "Network Error") {
                           console.log("+++in catch 7")
                           this.setState({
-                            message: 'static.unkownError',
+                            message: 'static.common.networkError',
                             color: "red",
                             loading: false
                           }, () => {
@@ -3312,7 +3323,7 @@ export default class syncPage extends Component {
                   if (error.message === "Network Error") {
                     console.log("+++in catch 9")
                     this.setState({
-                      message: 'static.unkownError',
+                      message: 'static.common.networkError',
                       color: "red",
                       loading: false
                     }, () => {
