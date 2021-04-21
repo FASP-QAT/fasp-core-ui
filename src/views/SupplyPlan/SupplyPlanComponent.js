@@ -1070,6 +1070,22 @@ export default class SupplyPlanComponent extends React.Component {
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                 datasets: [
                     {
+                        label: i18n.t('static.supplyplan.exipredStock'),
+                        yAxisID: 'A',
+                        type: 'line',
+                        stack: 7,
+                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        showLine: false,
+                        pointStyle: 'triangle',
+                        pointBackgroundColor: '#ffff00',
+                        pointBorderColor: '#ffff00',
+                        pointRadius: 10
+
+                    },
+                    {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
@@ -1204,22 +1220,6 @@ export default class SupplyPlanComponent extends React.Component {
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
-                    },
-                    {
-                        label: i18n.t('static.supplyplan.exipredStock'),
-                        yAxisID: 'A',
-                        type: 'line',
-                        stack: 7,
-                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        showLine: false,
-                        pointStyle: 'triangle',
-                        pointBackgroundColor: '#ffff00',
-                        pointBorderColor: '#ffff00',
-                        pointRadius: 10
-
                     }
                 ]
 
@@ -4988,6 +4988,22 @@ export default class SupplyPlanComponent extends React.Component {
                                         labels: [...new Set(jsonArrForGraph.map(ele1 => (ele1.month)))],
                                         datasets: [
                                             {
+                                                label: i18n.t('static.supplyplan.exipredStock'),
+                                                yAxisID: 'A',
+                                                type: 'line',
+                                                stack: 7,
+                                                data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                                                fill: false,
+                                                borderColor: 'rgb(75, 192, 192)',
+                                                tension: 0.1,
+                                                showLine: false,
+                                                pointStyle: 'triangle',
+                                                pointBackgroundColor: '#ffff00',
+                                                pointBorderColor: '#ffff00',
+                                                pointRadius: 10
+                        
+                                            },
+                                            {
                                                 label: i18n.t('static.supplyPlan.planned'),
                                                 stack: 1,
                                                 yAxisID: 'A',
@@ -5122,22 +5138,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 showInLegend: true,
                                                 yValueFormatString: "$#,##0",
                                                 data: jsonArrForGraph.map((item, index) => (item.maxMos))
-                                            },
-                                            {
-                                                label: i18n.t('static.supplyplan.exipredStock'),
-                                                yAxisID: 'A',
-                                                type: 'line',
-                                                stack: 7,
-                                                data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
-                                                fill: false,
-                                                borderColor: 'rgb(75, 192, 192)',
-                                                tension: 0.1,
-                                                showLine: false,
-                                                pointStyle: 'triangle',
-                                                pointBackgroundColor: '#ffff00',
-                                                pointBorderColor: '#ffff00',
-                                                pointRadius: 10
-                        
                                             }
                                         ]}
                                         var chartOptions = {
