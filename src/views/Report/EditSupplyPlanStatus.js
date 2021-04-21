@@ -2339,6 +2339,22 @@ class EditSupplyPlanStatus extends Component {
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
                 datasets: [
                     {
+                        label: i18n.t('static.supplyplan.exipredStock'),
+                        yAxisID: 'A',
+                        type: 'line',
+                        stack: 7,
+                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        showLine: false,
+                        pointStyle: 'triangle',
+                        pointBackgroundColor: '#ffff00',
+                        pointBorderColor: '#ffff00',
+                        pointRadius: 10
+
+                    },
+                    {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
@@ -2473,22 +2489,6 @@ class EditSupplyPlanStatus extends Component {
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
-                    },
-                    {
-                        label: i18n.t('static.supplyplan.exipredStock'),
-                        yAxisID: 'A',
-                        type: 'line',
-                        stack: 7,
-                        data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        showLine: false,
-                        pointStyle: 'triangle',
-                        pointBackgroundColor: '#ffff00',
-                        pointBorderColor: '#ffff00',
-                        pointRadius: 10
-
                     }
                 ]
 
