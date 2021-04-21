@@ -1,6 +1,6 @@
 import moment, { months } from 'moment';
 
-export default function createProcurementScheduleProblems(programObj,versionID,problemObj,planningUnitObj,shipmentId,newAddShipment,problemActionIndex,userId,username,problemActionList,shipmentDetailsJson){
+export default function createProcurementScheduleProblems(programObj, versionID, problemObj, planningUnitObj, shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson,openProblemStatusObj) {
     var json = {
         problemReportId: 0,
         program: {
@@ -26,20 +26,9 @@ export default function createProcurementScheduleProblems(programObj,versionID,p
         newAdded: newAddShipment,
         problemActionIndex: problemActionIndex,
         index: 0,
-        problemCategory: {
-            id: 2,
-            label: { label_en: 'Procurement Schedule' }
-        },
-        problemStatus: {
-            id: 1,
-            label: { label_en: 'Open' }
-        },
-        problemType: {
-            id: 1,
-            label: {
-                label_en: 'Automatic'
-            }
-        },
+        problemCategory: problemObj.problem.problemCategory,
+        problemStatus: openProblemStatusObj,
+        problemType: problemObj.problemType,
         reviewed: false,
         reviewNotes: '',
         reviewedDate: '',
@@ -56,17 +45,7 @@ export default function createProcurementScheduleProblems(programObj,versionID,p
         problemTransList: [
             {
                 problemReportTransId: '',
-                problemStatus: {
-                    id: 1,
-                    label: {
-                        active: true,
-                        labelId: 461,
-                        label_en: "Open",
-                        label_sp: null,
-                        label_fr: null,
-                        label_pr: null
-                    }
-                },
+                problemStatus: openProblemStatusObj,
                 notes: "",
                 reviewed: false,
                 createdBy: {
