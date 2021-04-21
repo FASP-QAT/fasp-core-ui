@@ -1897,11 +1897,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         <Table  className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
-                                                    <td>{i18n.t("static.supplyPlan.batchId")}</td>
+                                                    <th>{i18n.t("static.supplyPlan.batchId")}</th>
                                                     <th>{i18n.t('static.report.createdDate')}</th>
                                                     <th>{i18n.t('static.inventory.expireDate')}</th>
                                                     <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
-                                                    <td>{i18n.t("static.report.qty")}</td>
+                                                    <th>{i18n.t("static.report.qty")}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

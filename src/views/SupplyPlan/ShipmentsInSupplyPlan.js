@@ -1542,12 +1542,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
             if (!autoPopup && document.getElementById("shipmentDetailsPopCancelButton") != null) {
-                if (this.props.items.page == "shipmentDataEntry") {
+                if (this.props.shipmentPage == "shipmentDataEntry") {
                     document.getElementById("shipmentModalHeader").classList.remove('hideCross')
                 }
                 document.getElementById("shipmentDetailsPopCancelButton").style.display = 'block';
             } else {
-                if (this.props.items.page == "shipmentDataEntry") {
+                if (this.props.shipmentPage == "shipmentDataEntry") {
                     document.getElementById("shipmentModalHeader").classList.add('hideCross')
                 }
                 document.getElementById("shipmentDetailsPopCancelButton").style.display = 'none';
