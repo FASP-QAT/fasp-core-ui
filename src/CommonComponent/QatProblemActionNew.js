@@ -20,6 +20,7 @@ import incomplianceProblem from '../CommonComponent/incomplianceProblem.js';
 import createDataQualityProblems from '../CommonComponent/createDataQualityProblems.js';
 import createProcurementScheduleProblems from '../CommonComponent/createProcurementScheduleProblems.js';
 import createSupplyPlanningProblems from '../CommonComponent/createSupplyPlanningProblems.js';
+import createMissingGapsProblem from '../CommonComponent/createMissingGapsProblem';
 import getProblemCriticality from '../CommonComponent/getProblemCriticality.js';
 import { dbInitial } from "../views/ApplicationDashboard/ApplicationDashboard";
 import createMinMaxProblems from "./createMinMaxProblems";
@@ -1264,7 +1265,8 @@ export default class QatProblemActionNew extends Component {
                                                                         if (actualCauseMonths.length > 0) {
                                                                             if (index == -1) {
                                                                                 // console.log("in create logic+++");
-                                                                                createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList);
+                                                                                createMissingGapsProblem(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList);
+                                                                                // createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 // problemActionList[index].isFound = 1===== auto open logic;
@@ -1354,7 +1356,7 @@ export default class QatProblemActionNew extends Component {
                                             putRequest.onsuccess = function (event) {
                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                // console.log("programQPLDetailsJson***", programQPLDetailsJson);
+                                                console.log("programQPLDetailsJson***", programQPLDetailsJson);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                 programQPLDetailsRequest.onsuccess = function (event) {
                                                     if (this.props.updateState != undefined) {

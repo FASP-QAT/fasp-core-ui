@@ -1,7 +1,7 @@
 import moment, { months } from 'moment';
 import getProblemStatusObj from '../CommonComponent/getProblemStatusObj.js';
 
-export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList) {
+export default function createMissingGapsProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList) {
 
     var json = {
         problemReportId: 0,
@@ -28,12 +28,10 @@ export default function createDataQualityProblems(programObj, versionID, problem
         planningUnitActive: true,
         regionActive: true,
         newAdded: false,
-
         problemActionIndex: problemActionIndex,
-
         problemCategory: {
-            id: 1,
-            label: { label_en: 'Data Quality' }
+            id: 3,
+            label: { label_en: 'Supply Planning' }
         },
         problemStatus: {
             id: 1,
@@ -78,10 +76,11 @@ export default function createDataQualityProblems(programObj, versionID, problem
                     userId: userId,
                     username: username
                 },
-                createdDate: moment(Date.now()).utcOffset('-0500').format("YYYY-MM-DD HH:mm:ss")
+                createdDate: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
             }
         ]
     }
+    console.log("json+++",json)
     problemActionList.push(json);
     // problemActionIndex++;
 
