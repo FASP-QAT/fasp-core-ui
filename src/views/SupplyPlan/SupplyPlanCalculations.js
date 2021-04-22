@@ -785,7 +785,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             consumptionQty: myArray[ma].consumption == 0 ? null : myArray[ma].consumption,
                                             adjustmentQty: myArray[ma].adjustment == 0 ? null : myArray[ma].adjustment,
                                             stockQty: myArray[ma].stock == 0 ? null : myArray[ma].stock,
-                                            shipmentQty: myArray[ma].shipment
+                                            shipmentQty: myArray[ma].shipment,
+                                            openingBalanceWps: myArray[ma].openingBalanceWps,
+                                            unallocatedQtyWps: Number(myArray[ma].calculatedFEFOWps) + (myArray[ma].calculatedLEFOWps != undefined && myArray[ma].calculatedLEFOWps != "" && myArray[ma].calculatedLEFOWps != null ? myArray[ma].calculatedLEFOWps : 0),
+                                            shipmentQtyWps: myArray[ma].shipmentWps,
                                         }
                                         finalBatchDetails.push(finalBatch)
                                     }

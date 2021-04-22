@@ -75,8 +75,8 @@ export default class ExpiredInventory extends Component {
             loading: true,
             programId: '',
             versionId: '',
-            ledgerForBatch:[],
-            expiredStockModal:false
+            ledgerForBatch: [],
+            expiredStockModal: false
         }
     }
 
@@ -774,6 +774,19 @@ export default class ExpiredInventory extends Component {
         console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
+    showBatchLedgerClickedServer(batchId) {
+        this.setState({ loading: true })
+        var outPutList = this.state.outPutList.filter(c => c.batchInfo.batchId == batchId);
+        var ledgerForBatch = [];
+        if (outPutList.length > 0) {
+            ledgerForBatch = outPutList[0].batchHistory;
+        }
+        this.setState({
+            ledgerForBatch: ledgerForBatch,
+            loading: false
+        })
+    }
+
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
     }
@@ -914,6 +927,7 @@ export default class ExpiredInventory extends Component {
             data[4] = (outPutList[j].batchInfo.createdDate ? moment(outPutList[j].batchInfo.createdDate).format(`YYYY-MM-DD`) : null)
             data[5] = outPutList[j].shelfLife
             data[6] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`YYYY-MM-DD`) : null)
+            data[7] = outPutList[j].batchInfo.batchId;
 
             outPutListArray[count] = data;
             count++;
@@ -971,6 +985,9 @@ export default class ExpiredInventory extends Component {
                     options: { format: JEXCEL_DATE_FORMAT_SM },
                     readOnly: true
                 },
+                {
+                    type: 'hidden'
+                }
             ],
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -1008,16 +1025,15 @@ export default class ExpiredInventory extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
-        console.log("X++++",x,"Y+++",y);
         var elInstance = instance.jexcel;
         var rowData = elInstance.getRowData(x);
         if (y == 1) {
             console.log("+++in y==1")
-            this.toggleLarge(rowData[2], rowData[4], rowData[6]);
+            this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
         }
     }.bind(this);
 
-    toggleLarge(batchNo, createdDate, expiryDate) {
+    toggleLarge(batchNo, createdDate, expiryDate, batchId) {
         console.log("+++in toggle large")
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
@@ -1025,10 +1041,12 @@ export default class ExpiredInventory extends Component {
         let versionId = document.getElementById("versionId").value;
         if (versionId.includes('Local')) {
             this.showBatchLedgerClickedLocal(batchNo, createdDate, expiryDate);
+        } else {
+            this.showBatchLedgerClickedServer(batchId)
         }
     }
 
-    actionCanceledExpiredStock(){
+    actionCanceledExpiredStock() {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
         })
@@ -1348,48 +1366,48 @@ export default class ExpiredInventory extends Component {
                         <strong>{i18n.t('static.supplyPlan.batchLedger')}</strong>
                     </ModalHeader>
                     <ModalBody>
-                            <>
-                                {this.state.ledgerForBatch.length>0?i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo:""}
-                                <br></br>
-                                {i18n.t("static.batchLedger.note")}
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
-                                        <tr>
-                                            <th style={{ width: "100px" }} rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
-                                            <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated") + " (+/-)"}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
-                                        </tr>
-                                        <tr>
-                                            <th align="center">{i18n.t("static.supplyPlan.consumption") + " (-)"}</th>
-                                            <th align="center">{i18n.t("static.inventoryType.adjustment") + " (+/-)"}</th>
-                                            <th align="center">{i18n.t("static.shipment.shipment") + " (+)"}</th>
-                                        </tr>
-                                    </thead>
-                                    {this.state.ledgerForBatch.length>0 && <tbody>
-                                        {
-                                            ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length-1].expiryDate).format("YYYY-MM")==moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length-1].transDate).format("YYYY-MM"))?this.state.ledgerForBatch.slice(0, -1):this.state.ledgerForBatch).map(item => (
-                                                <tr>
-                                                    <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
-                                                    <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
-                                                    {item.stockQty != null && Number(item.stockQty) > 0 ? <b><td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td></b> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
-                                                </tr>
-                                            ))
-                                        }
-                                    </tbody>}
-                                    {this.state.ledgerForBatch.length>0 && <tfoot>
-                                        <tr>
-                                            <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                            <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length-1].expiredQty} /></b></td>
-                                        </tr>
-                                    </tfoot>}
-                                </Table>
-                            </>
+                        <>
+                            {this.state.ledgerForBatch.length > 0 ? i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo : ""}
+                            <br></br>
+                            {i18n.t("static.batchLedger.note")}
+                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: "100px" }} rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
+                                        <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
+                                        <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
+                                        <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated") + " (+/-)"}</th>
+                                        <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
+                                    </tr>
+                                    <tr>
+                                        <th align="center">{i18n.t("static.supplyPlan.consumption") + " (-)"}</th>
+                                        <th align="center">{i18n.t("static.inventoryType.adjustment") + " (+/-)"}</th>
+                                        <th align="center">{i18n.t("static.shipment.shipment") + " (+)"}</th>
+                                    </tr>
+                                </thead>
+                                {this.state.ledgerForBatch.length > 0 && <tbody>
+                                    {
+                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
+                                            <tr>
+                                                <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.openingBalance : item.openingBalanceWps} /></td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
+                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.shipmentQty : item.shipmentQtyWps} />}</td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? (0 - Number(item.unallocatedQty)) : (0 - Number(item.unallocatedQtyWps))} /></td>
+                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <b><td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.qty : item.qtyWps} /></td></b> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.qty : item.qtyWps} /></td>}
+                                            </tr>
+                                        ))
+                                    }
+                                </tbody>}
+                                {this.state.ledgerForBatch.length > 0 && <tfoot>
+                                    <tr>
+                                        <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
+                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
+                                    </tr>
+                                </tfoot>}
+                            </Table>
+                        </>
                     </ModalBody>
                     <ModalFooter>
                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
