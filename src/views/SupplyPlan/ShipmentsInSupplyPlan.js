@@ -1882,6 +1882,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     batchDetails[b].batch.createdDate = moment(rowData[4]).startOf('month').format("YYYY-MM-DD");
                 }
                 elInstance.setValueFromCoords(25, y, batchDetails, true);
+                this.batchDetailsClicked(elInstance, x, y, true, true);
             }
         }
         if (x == 4) {
@@ -2175,6 +2176,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         batchDetails[0].shipmentQty = elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         elInstance.setValueFromCoords(25, y, batchDetails, true);
                         elInstance.setValueFromCoords(26, y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), true);
+                        this.batchDetailsClicked(elInstance, x, y, true, true);
                     }
                 }
             }
