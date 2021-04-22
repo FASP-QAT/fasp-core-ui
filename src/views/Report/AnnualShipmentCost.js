@@ -552,7 +552,7 @@ class AnnualShipmentCost extends Component {
 
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
                     var y = 80 + splittext.length * 10
-                    splittext = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
+                    splittext = doc.splitTextToSize(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
 
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
                     y = y + splittext.length * 10
@@ -1431,7 +1431,7 @@ class AnnualShipmentCost extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1614,7 +1614,7 @@ class AnnualShipmentCost extends Component {
                                         </FormGroup> */}
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
