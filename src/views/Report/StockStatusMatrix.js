@@ -1561,7 +1561,7 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                   <div className="controls ">
                     <InputGroup>
                       <Input
