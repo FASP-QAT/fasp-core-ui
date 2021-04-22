@@ -35,6 +35,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            selectedRowPlanningUnit: '',
             programId1: '',
             fundingSourceId: '',
             budgetId: '',
@@ -134,7 +135,7 @@ export default class ManualTagging extends Component {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.planningUnit.id == selectedPlanningUnitId));
         }
         this.setState({
-            finalShipmentId:'',
+            finalShipmentId: '',
             selectedShipment
         })
     }
@@ -413,18 +414,18 @@ export default class ManualTagging extends Component {
                 this.getProductCategories();
                 this.getBudgetList();
                 this.getFundingSourceList();
-                RealmCountryService.getRealmCountryrealmIdById(realmId)
+                RealmCountryService.getRealmCountryForProgram(realmId)
                     .then(response => {
                         console.log("RealmCountryService---->", response.data)
                         if (response.status == 200) {
-                            var listArray = response.data;
-                            listArray.sort((a, b) => {
-                                var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                return itemLabelA > itemLabelB ? 1 : -1;
-                            });
+                            var listArray = response.data.map(ele => ele.realmCountry);
+                            // listArray.sort((a, b) => {
+                            //     var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            //     var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            //     return itemLabelA > itemLabelB ? 1 : -1;
+                            // });
                             this.setState({
-                                countryList: listArray
+                                countryList: response.data
                             })
                         } else {
                             this.setState({ message: response.data.messageCode })
@@ -836,12 +837,14 @@ export default class ManualTagging extends Component {
 
         console.log("combo box value-------------------------------", this.state.searchedValue);
 
-        var roNoOrderNo = this.state.searchedValue;
+        var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
         console.log("roNoOrderNo--->>>", roNoOrderNo);
         var programId = (this.state.active3 ? 0 : document.getElementById("programId").value);
-        var erpPlanningUnitId = this.state.planningUnitIdUpdated;
+        var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
-        if (roNoOrderNo != "" && erpPlanningUnitId != null && erpPlanningUnitId != "") {
+        console.log("condition 1---",(roNoOrderNo != "" && roNoOrderNo != 0))
+        console.log("condition 2---",(erpPlanningUnitId != null && erpPlanningUnitId != "" && erpPlanningUnitId == 0))
+        if ((roNoOrderNo != "" && roNoOrderNo != 0) || (erpPlanningUnitId != 0)) {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
                     console.log("artmis response===", response.data);
@@ -895,9 +898,12 @@ export default class ManualTagging extends Component {
                     }
                 );
         } else {
+            console.log("inside else hurrey")
             this.setState({
                 artmisList: [],
                 displayButton: false
+            }, () => {
+                this.buildJExcelERP();
             })
         }
         // else if (orderNo == "" && primeLineNo == "") {
@@ -1263,7 +1269,7 @@ export default class ManualTagging extends Component {
             console.log("programId ---", programId);
             console.log("selected erpPlanningUnitId ---", erpPlanningUnitId);
 
-            ManualTaggingService.searchErpOrderData(term.toUpperCase(), programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
+            ManualTaggingService.searchErpOrderData(term.toUpperCase(), programId, (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
                     console.log("searchErpOrderData response===", response);
 
@@ -1344,14 +1350,14 @@ export default class ManualTagging extends Component {
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-
+                    console.log("program response data---", response.data)
                     if (response.data.length == 1) {
                         this.setState({
                             programs: response.data,
                             loading: false,
                             programId: response.data[0].programId
                         }, () => {
-                            this.getPlanningUnitList();
+                            // this.getPlanningUnitList();
                         })
                     } else {
                         this.setState({
@@ -1420,6 +1426,7 @@ export default class ManualTagging extends Component {
         console.log("erpDataList---->", erpDataList);
         let erpDataArray = [];
         let count = 0;
+        let qty=0;
 
         for (var j = 0; j < erpDataList.length; j++) {
             data = [];
@@ -1953,7 +1960,8 @@ export default class ManualTagging extends Component {
                 this.setState({
                     roNoOrderNo: json,
                     searchedValue: '',
-                    planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                    selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
+                    // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
                 });
             } else if (this.state.active2) {
                 console.log("my out put list---", this.state.outputList)
@@ -1967,7 +1975,8 @@ export default class ManualTagging extends Component {
                     parentShipmentId: outputListAfterSearch[0].parentShipmentId,
                     roNoOrderNo: json,
                     searchedValue: outputListAfterSearch[0].roNo,
-                    planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
+                    selectedRowPlanningUnit: outputListAfterSearch[0].erpPlanningUnit.id
+                    // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
 
                     this.getOrderDetails();
@@ -2013,10 +2022,12 @@ export default class ManualTagging extends Component {
 
     getPlanningUnitList() {
         var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
-        if (programId != -1) {
+        console.log("programid---" + programId);
+        if (programId != -1 && programId != null && programId != "") {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
                     if (response.status == 200) {
+                        console.log("response.data---" + response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2106,7 +2117,7 @@ export default class ManualTagging extends Component {
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
             displaySubmitButton: false,
-            planningUnitIdUpdated: this.state.planningUnitId,
+            selectedRowPlanningUnit: this.state.planningUnitId,
             artmisList: [],
             reason: "1",
             totalQuantity: '',
@@ -2484,8 +2495,8 @@ export default class ManualTagging extends Component {
         let countries = countryList.length > 0
             && countryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.realmCountry.realmCountryId}>
+                        {getLabelText(item.realmCountry.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -2846,7 +2857,7 @@ export default class ManualTagging extends Component {
                                                         <Autocomplete
                                                             id="combo-box-demo1"
                                                             // value={this.state.selectedPlanningUnit}
-                                                            defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
+                                                            // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
                                                             options={this.state.tracercategoryPlanningUnit}
                                                             getOptionLabel={(option) => option.label}
                                                             style={{ width: 300 }}
@@ -2854,6 +2865,7 @@ export default class ManualTagging extends Component {
                                                                 // this.getOrderDetails()
                                                                 console.log("demo2 value---", value);
                                                                 if (value != null) {
+                                                                    console.log("Inside ");
                                                                     this.setState({
                                                                         erpPlanningUnitId: value.value,
                                                                         planningUnitIdUpdated: value.value,
@@ -2874,20 +2886,7 @@ export default class ManualTagging extends Component {
                                                                 variant="outlined"
                                                                 onChange={(e) => this.getPlanningUnitListByTracerCategory(e.target.value)} />}
                                                         />
-                                                        {/* <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="erpPlanningUnitId"
-                                                            id="erpPlanningUnitId"
-                                                            bsSize="sm"
-                                                            autocomplete="off"
-                                                            onChange={this.getOrderDetails}
-                                                        >
-                                                            <option value="">All</option>
-                                                            {tracerCategoryPlanningUnitList}
 
-                                                        </Input>
-                                                    </InputGroup> */}
                                                     </div>
                                                 </FormGroup>
 
@@ -2903,7 +2902,7 @@ export default class ManualTagging extends Component {
                                                             getOptionLabel={(option) => option.label}
                                                             style={{ width: 300 }}
                                                             onChange={(event, value) => {
-                                                                console.log("ro combo box---", value)
+                                                                console.log("combo 2 ro combo box---", value)
                                                                 if (value != null) {
                                                                     console.log("Inside if");
                                                                     this.setState({
@@ -2912,7 +2911,7 @@ export default class ManualTagging extends Component {
                                                                         roNoOrderNo: value.label
                                                                     }, () => { this.getOrderDetails() });
                                                                 } else {
-                                                                    console.log("Inside else");
+                                                                    console.log("combo 2 Inside else");
                                                                     this.setState({
                                                                         searchedValue: ''
                                                                         // , roNoOrderNo: '' 
@@ -2921,7 +2920,10 @@ export default class ManualTagging extends Component {
 
                                                             }} // prints the selected value
                                                             renderInput={(params) => <TextField {...params} variant="outlined"
-                                                                onChange={(e) => this.searchErpOrderData(e.target.value)} />}
+                                                                onChange={(e) => {
+                                                                    console.log("combo 2 input change called ");
+                                                                    this.searchErpOrderData(e.target.value)
+                                                                }} />}
                                                         />
 
                                                     </div>
@@ -2941,7 +2943,7 @@ export default class ManualTagging extends Component {
                                     <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
                                 </ModalBody>
                                 <ModalFooter>
-                                    {/* {this.state.displaySubmitButton && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>} */}
+                                    {this.state.displaySubmitButton && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
 
                                     {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>}
 

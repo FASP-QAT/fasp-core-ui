@@ -627,7 +627,7 @@ class DefaultLayout extends Component {
     this.state = {
       businessFunctions: [],
       name: "",
-      notificationCount: 4,
+      notificationCount: 0,
       //Timer
       // 15 min
       // timeout: 1000 * 450 * 1,
