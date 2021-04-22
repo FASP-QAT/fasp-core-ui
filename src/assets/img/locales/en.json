@@ -1412,6 +1412,7 @@
     "static.reports.forecastMetrics.noConsumptionAcrossPeriod": "No months in this period contain both forecast and actual consumption",
     "static.realm.realm": "Realm",
     "static.addProblem.problemError": "Select Problem",
+    "static.supplyPlan.batchLedger": "Batch Ledger",
     "static.program.dataexportsuccess": "Data exported successfully",
     "static.product.productcategory": "Planning unit category",
     "static.commit.shipmentTransId": " Shipment transaction ID",

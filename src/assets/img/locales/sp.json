@@ -1412,6 +1412,7 @@
     "static.reports.forecastMetrics.noConsumptionAcrossPeriod": "Ningún mes del período contiene tanto el consumo estimado como el real",
     "static.realm.realm": "Ámbito",
     "static.addProblem.problemError": "Seleccionar problema",
+    "static.supplyPlan.batchLedger": "Libro mayor de lotes",
     "static.program.dataexportsuccess": "Datos exportados con éxito",
     "static.product.productcategory": "Categoria de producto",
     "static.commit.shipmentTransId": "No. de transacción de pedido",

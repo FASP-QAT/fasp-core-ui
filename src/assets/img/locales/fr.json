@@ -1412,6 +1412,7 @@
     "static.reports.forecastMetrics.noConsumptionAcrossPeriod": "Aucun mois de la période ne contient à la fansis la consommation prévue et la consommation réelle",
     "static.realm.realm": "Domaine",
     "static.addProblem.problemError": "Sélectionnez un problème",
+    "static.supplyPlan.batchLedger": "Grand livre de lots",
     "static.program.dataexportsuccess": "Données exportées avec succès",
     "static.product.productcategory": "Catégorie d`unité de planification",
     "static.commit.shipmentTransId": "Nº de transaction de l`envoi",
