@@ -1682,6 +1682,54 @@ export default class ManualTagging extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed,
+            // updateTable: function (el, cell, x, y, source, value, id) {
+            //     var elInstance = el.jexcel;
+            //     if (y != null) {
+            //         console.log("y--------------",y)
+            //         var rowData = elInstance.getRowData(y);
+            //         console.log("row data---", rowData);
+            //         console.log("rowData[0]---",rowData[0]);
+            //         console.log("rowData[1]---",rowData[1]);
+            //         console.log("rowData[2]---",rowData[2]);
+            //         console.log("rowData[3]---",rowData[3]);
+                    
+            //         if (rowData[7]) {
+            //             var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+            //             cell.classList.remove('readonly');
+            //         }
+            //         else if (rowData[9]) {
+            //             var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+            //             cell.classList.remove('readonly');
+            //         }
+            //         else {
+            //             var cell;
+
+            //             cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+            //             cell.classList.add('readonly');
+
+            //             cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+            //             cell.classList.add('readonly');
+
+            //             cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+            //             cell.classList.add('readonly');
+
+            //             cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
+            //             cell.classList.add('readonly');
+
+            //             cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
+            //             cell.classList.add('readonly');
+
+            //             cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+            //             cell.classList.add('readonly');
+            //         }
+            //     }
+            // }.bind(this),
+            // onsearch: function (el) {
+            //     el.jexcel.updateTable();
+            // },
+            // onfilter: function (el) {
+            //     el.jexcel.updateTable();
+            // },
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -3092,7 +3140,7 @@ export default class ManualTagging extends Component {
 
                                             </div>
                                         </Col>
-                                        <div id="tableDiv1" className="jexcelremoveReadonlybackground">
+                                        <div id="tableDiv1" className="RemoveStriped">
                                         </div>
 
                                     </div><br />
