@@ -479,7 +479,26 @@ class StockStatus extends Component {
       headStyles:{fillColor: "#e5edf5",textColor:"#000",fontStyle:"normal"},
       columnStyles: {
         5: { cellWidth: 156.89 },
-      }
+      },
+      didParseCell: function(data) {
+        if (data.column.index === 8 && data.row.section!="head") {
+          if(this.state.stockStatusList[data.row.index].regionCount==this.state.stockStatusList[data.row.index].regionCountForStock){
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+        if (data.column.index === 1 && data.row.section!="head") {
+          if(data.row.index==0){
+            if(this.state.firstMonthRegionCount==this.state.firstMonthRegionCountForStock){
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }else{
+            if(this.state.stockStatusList[data.row.index-1].regionCount==this.state.stockStatusList[data.row.index-1].regionCountForStock){
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+
+      }.bind(this)
     };
     doc.autoTable(content);
 
@@ -663,7 +682,26 @@ class StockStatus extends Component {
           headStyles:{fillColor: "#e5edf5",textColor:"#000",fontStyle:"normal"},
           columnStyles: {
             5: { cellWidth: 156.89 },
-          }
+          },
+          didParseCell: function(data) {
+            if (data.column.index === 8 && data.row.section!="head") {
+              if(item.data[data.row.index].regionCount==item.data[data.row.index].regionCountForStock){
+                data.cell.styles.fontStyle = 'bold';
+              }
+            }
+            if (data.column.index === 1 && data.row.section!="head") {
+              if(data.row.index==0){
+                if(item.firstMonthRegionCount==item.firstMonthRegionCountForStock){
+                  data.cell.styles.fontStyle = 'bold';
+                }
+              }else{
+                if(item.data[data.row.index-1].regionCount==item.data[data.row.index-1].regionCountForStock){
+                  data.cell.styles.fontStyle = 'bold';
+                }
+              }
+            }
+    
+          }.bind(this)
         };
         doc.autoTable(content);
 
@@ -1275,6 +1313,13 @@ console.log("PageArray+++",pageArray);
 
               let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
               let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+              var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1,'months').format("YYYY-MM-DD"));
+              var firstMonthRegionCount=1;
+              var firstMonthRegionCountForStock=0;
+              if(prevMonthSupplyPlan.length>0){
+                firstMonthRegionCount=prevMonthSupplyPlan[0].regionCount;
+                firstMonthRegionCountForStock=prevMonthSupplyPlan[0].regionCountForStock
+              }
               var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag=="true"));
               var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id);
               var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active=="true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));              
@@ -1289,6 +1334,7 @@ console.log("PageArray+++",pageArray);
                   console.log(dtstr, ' ', enddtStr)
                   var dt = dtstr
                   var list = programJson.supplyPlan.filter(c => c.planningUnitId == pu.planningUnit.id && c.transDate == dt)
+
                   console.log(list)
                   if (list.length > 0) {
                     var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
@@ -1325,7 +1371,9 @@ console.log("PageArray+++",pageArray);
                       minMos: minStockMoS,
                       maxMos: maxStockMoS,
                       expiredStock:list[0].expiredStock,
-                      unmetDemand:list[0].unmetDemand
+                      unmetDemand:list[0].unmetDemand,
+                      regionCount:list[0].regionCount,
+                      regionCountForStock:list[0].regionCountForStock
                     }
                   } else {
                     var json = {
@@ -1342,7 +1390,9 @@ console.log("PageArray+++",pageArray);
                       minMos: minStockMoS,
                       maxMos: maxStockMoS,
                       expiredStock:0,
-                      unmetDemand:0
+                      unmetDemand:0,
+                      regionCount:1,
+                      regionCountForStock:0
                     }
                   }
                   data.push(json)
@@ -1652,7 +1702,9 @@ console.log("PageArray+++",pageArray);
                       chartOptions:chartOptions,
                       inList:inList,
                       coList:coList,
-                      shList:shList
+                      shList:shList,
+                      firstMonthRegionCount:firstMonthRegionCount,
+                      firstMonthRegionCountForStock:firstMonthRegionCountForStock
                     }
                     if (pu.planningUnit.id != document.getElementById("planningUnitId").value) {
                       PlanningUnitDataForExport.push(planningUnitexport)
@@ -1717,7 +1769,7 @@ console.log("PageArray+++",pageArray);
         var inputjson = {
           "programId": programId,
           "versionId": versionId,
-          "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
+          "startDate": startDate.startOf('month').subtract(1,'months').format('YYYY-MM-DD'),
           "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
           "planningUnitId": planningUnitId,
           "allPlanningUnits":true
@@ -2030,12 +2082,14 @@ console.log("PageArray+++",pageArray);
                   console.log("Consum:List+++",conList);
                   var planningUnitexport = {
                     planningUnit: planningUnit,
-                    data: data,
+                    firstMonthRegionCount:data.length>0?data[0].regionCount:1,
+                    firstMonthRegionCountForStock:data.length>0?data[0].regionCountForStock:0,
+                    data: data.slice(1),
                     bar: bar,
                     chartOptions:chartOptions,
                     inList:invList,
                     coList:conList,
-                    shList:shipList
+                    shList:shipList,
                   }
                   PlanningUnitDataForExport.push(planningUnitexport)
                 })
