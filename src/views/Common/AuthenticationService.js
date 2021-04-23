@@ -1254,10 +1254,14 @@ class AuthenticationService {
     validateRequest(checkOnline) {
         console.log("inside validate request");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+            console.log("validate 1----------------------");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             if (this.checkTypeOfSession(checkOnline)) {
+                console.log("validate 2----------------------");
                 if (checkOnline) {
+                    console.log("validate 3----------------------");
                     if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+                        console.log("validate 4----------------------");
                         // if (this.checkLastActionTaken()) {
                         //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                         //     var lastActionTaken = moment(lastActionTakenStorage);
@@ -1273,10 +1277,12 @@ class AuthenticationService {
                         //     return "/logout/static.message.sessionExpired";
                         // }
                     } else {
+                        console.log("validate 5----------------------");
                         console.log("common component token error");
                         return "/logout/static.message.tokenError";
                     }
                 } else {
+                    console.log("validate 6----------------------");
                     return "";
                 }
                 // else {
@@ -1290,14 +1296,18 @@ class AuthenticationService {
                 //     }
                 // }
             } else {
+                console.log("validate 7----------------------");
                 localStorage.setItem("sessionChanged", 1)
                 return "/login/static.message.sessionChange";
             }
         } else {
+            console.log("validate 8----------------------");
             console.log("offline to online ");
             if (localStorage.getItem("sessionChanged") == 1) {
+                console.log("validate 9----------------------");
                 return "/login/static.message.sessionChange";
             } else {
+                console.log("validate 10----------------------");
                 return "/accessDenied";
             }
         }
