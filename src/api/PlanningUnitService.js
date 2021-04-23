@@ -60,5 +60,10 @@ class PlanningUnitService {
         return axios.post(`${API_URL}/api/planningUnit/productCategoryList/active`, json, {}
         );
     }
+
+    getActivePlanningUnitByRealmCountryId(realmCountryId) {
+        return axios.get(`${API_URL}/api/planningUnit/realmCountry/${realmCountryId}`, {}
+        );
+    }
 }
 export default new PlanningUnitService();

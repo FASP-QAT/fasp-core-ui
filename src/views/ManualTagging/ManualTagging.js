@@ -35,6 +35,8 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            active4: false,
+            active5: false,
             selectedRowPlanningUnit: '',
             programId1: '',
             fundingSourceId: '',
@@ -83,7 +85,8 @@ export default class ManualTagging extends Component {
             roNoOrderNo: '',
             notLinkedShipments: [],
             fundingSourceList: [],
-            displaySubmitButton: false
+            displaySubmitButton: false,
+            countryId: ''
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -99,12 +102,14 @@ export default class ManualTagging extends Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.buildJExcelERP = this.buildJExcelERP.bind(this);
         this.programChange = this.programChange.bind(this);
+        this.countryChange = this.countryChange.bind(this);
 
         this.programChangeModal = this.programChangeModal.bind(this);
         this.fundingSourceModal = this.fundingSourceModal.bind(this);
         this.budgetChange = this.budgetChange.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
+        this.dataChange1 = this.dataChange1.bind(this);
         this.changed = this.changed.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
@@ -114,8 +119,59 @@ export default class ManualTagging extends Component {
         this.getFundingSourceList = this.getFundingSourceList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.displayButton = this.displayButton.bind(this);
+        this.getPlanningUnitListByRealmCountryId = this.getPlanningUnitListByRealmCountryId.bind(this);
 
     }
+
+    getPlanningUnitListByRealmCountryId() {
+        PlanningUnitService.getActivePlanningUnitByRealmCountryId(this.state.countryId)
+            .then(response => {
+                console.log("realm country-->3", response.data);
+                this.setState({
+                    planningUnits1: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
     cancelClicked() {
         if (this.state.active1 || this.state.active2) {
             this.filterData(this.state.planningUnitIds);
@@ -252,41 +308,36 @@ export default class ManualTagging extends Component {
 
 
                 var col = ("H").concat(parseInt(y) + 1);
-                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                value = value.replace(/,/g, "");
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
+                if (this.el.getValueFromCoords(0, y)) {
+                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                    var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    value = value.replace(/,/g, "");
+                    if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
                     } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
+                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
 
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                 }
 
             }
         }
         return valid;
-    }
-
-    SUMCOL = function (instance, columnId) {
-        var total = 0;
-        for (var j = 0; j < instance.options.data.length; j++) {
-            if (Number(instance.records[j][columnId - 1].innerHTML)) {
-                total += Number(instance.records[j][columnId - 1].innerHTML);
-            }
-        }
-        return total;
     }
 
     // -----------start of changed function
@@ -371,6 +422,23 @@ export default class ManualTagging extends Component {
     // this.el.setValueFromCoords(7, y, 1, true);
 
     // }
+
+    dataChange1(event) {
+        console.log("radio button event---", event.target)
+
+        if (event.target.id == 'active4') {
+            this.setState({
+                active4: true,
+                active5: false
+            });
+        } else if (event.target.id == 'active5') {
+            this.setState({
+                // finalShipmentId:'',
+                active4: false,
+                active5: true
+            });
+        }
+    }
 
     dataChange(event) {
         console.log("radio button event---", event.target)
@@ -478,10 +546,20 @@ export default class ManualTagging extends Component {
         // this.buildJExcel();
     }
 
+    getBudgetListByProgramId = (e) => {
+        let programId1 = document.getElementById("programId1").value;
+        console.log("programId1--->>>>>>>>>>", programId1)
+        const filteredBudgetList = this.state.budgetList.filter(c => c.program.id == programId1)
+        console.log("filteredBudgetList---", filteredBudgetList);
+        this.setState({
+            filteredBudgetList
+        });
+    }
+
     getBudgetListByFundingSourceId = (e) => {
         let fundingSourceId = document.getElementById("fundingSourceId").value;
         console.log("programId--->>>>>>>>>>", fundingSourceId)
-        const filteredBudgetList = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+        const filteredBudgetList = this.state.filteredBudgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
         console.log("filteredBudgetList---", filteredBudgetList);
         this.setState({
             filteredBudgetList
@@ -622,6 +700,17 @@ export default class ManualTagging extends Component {
         })
     }
 
+    countryChange = (event) => {
+        console.log("country change event ---", event.target.value);
+        let planningUnits1 = this.state.planningUnits1;
+        this.setState({
+            planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
+            countryId: event.target.value
+        }, () => {
+            this.getPlanningUnitListByRealmCountryId();
+        })
+    }
+
 
     programChangeModal(event) {
         this.setState({
@@ -644,13 +733,14 @@ export default class ManualTagging extends Component {
 
     displayButton() {
         var validation = this.checkValidation();
+        console.log("check validation---", validation)
         if (validation == true) {
             var tableJson = this.state.instance.getJson(null, false);
             console.log("tableJson---", tableJson);
             let count = 0, qty = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                if (this.state.active2 && parseInt(map1.get("10")) === 1) {
+                if (this.state.active2) {
                     count++;
                     if (map1.get("0")) {
                         qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
@@ -665,7 +755,12 @@ export default class ManualTagging extends Component {
             }
             this.setState({
                 displaySubmitButton: (count > 0 ? true : false),
-                totalQuantity: this.addCommas(qty)
+                totalQuantity: this.addCommas(qty),
+                displayTotalQty: (count > 0 ? true : false)
+            })
+        } else {
+            this.setState({
+                displaySubmitButton: false
             })
         }
     }
@@ -674,9 +769,14 @@ export default class ManualTagging extends Component {
         let valid = false;
         var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
         if (this.state.active3) {
-            if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
-                valid = true;
-            } else {
+            if (this.state.active5) {
+                if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
+                    valid = true;
+                } else {
+                    alert("Please select shipment id");
+                }
+
+            } else if (this.state.active4) {
                 if (programId == -1) {
                     alert("Please select program");
                 } else if (document.getElementById("fundingSourceId").value == -1) {
@@ -684,7 +784,7 @@ export default class ManualTagging extends Component {
                 } else if (document.getElementById("budgetId").value == -1) {
                     alert("Please select budget");
                 } else {
-                    var cf = window.confirm("You are about to create a new shipment.Are you sure you want to continue?");
+                    var cf = window.confirm("You are about to create a new shipment. Are you sure you want to continue?");
                     if (cf == true) {
                         valid = true;
                     } else { }
@@ -842,8 +942,8 @@ export default class ManualTagging extends Component {
         var programId = (this.state.active3 ? 0 : document.getElementById("programId").value);
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
-        console.log("condition 1---",(roNoOrderNo != "" && roNoOrderNo != 0))
-        console.log("condition 2---",(erpPlanningUnitId != null && erpPlanningUnitId != "" && erpPlanningUnitId == 0))
+        console.log("condition 1---", (roNoOrderNo != "" && roNoOrderNo != 0))
+        console.log("condition 2---", (erpPlanningUnitId != null && erpPlanningUnitId != "" && erpPlanningUnitId == 0))
         if ((roNoOrderNo != "" && roNoOrderNo != 0) || (erpPlanningUnitId != 0)) {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
@@ -1022,7 +1122,7 @@ export default class ManualTagging extends Component {
 
     filterErpData() {
         document.getElementById('div2').style.display = 'block';
-        var countryId = document.getElementById("countryId").value;
+        var countryId = this.state.countryId;
 
         // if (countryId != -1) {
         this.setState({
@@ -1033,7 +1133,7 @@ export default class ManualTagging extends Component {
         })
         console.log("pl value---", this.state.planningUnitValues.map(ele => (ele.value).toString()));
         var json = {
-            countryId: parseInt(document.getElementById("countryId").value),
+            countryId: countryId,
             productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
             planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
             linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
@@ -1041,7 +1141,7 @@ export default class ManualTagging extends Component {
 
         ManualTaggingService.getShipmentListForManualTagging(json)
             .then(response => {
-                console.log("manual tagging response===", response);
+                console.log("manual tagging response===new----", response);
                 this.setState({
                     outputList: response.data
                 }, () => {
@@ -1426,7 +1526,8 @@ export default class ManualTagging extends Component {
         console.log("erpDataList---->", erpDataList);
         let erpDataArray = [];
         let count = 0;
-        let qty=0;
+        let qty = 0;
+        let convertedQty = 0;
 
         for (var j = 0; j < erpDataList.length; j++) {
             data = [];
@@ -1444,13 +1545,15 @@ export default class ManualTagging extends Component {
                 data[4] = this.formatDate(erpDataList[j].expectedDeliveryDate);
                 data[5] = erpDataList[j].erpStatus;
                 data[6] = this.addCommas(erpDataList[j].shipmentQty);
-                data[7] = 1;
-                data[8] = this.addCommas(erpDataList[j].shipmentQty * 1);
+                data[7] = '';
+                // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
+                data[8] = this.addCommas(erpDataList[j].shipmentQty);
                 data[9] = '';
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
                 data[12] = erpDataList[j].primeLineNo;
                 data[13] = erpDataList[j].erpPlanningUnit.id;
+
             } else {
                 data[0] = erpDataList[j].active;
                 data[1] = erpDataList[j].erpOrderId;
@@ -1459,17 +1562,26 @@ export default class ManualTagging extends Component {
                 data[4] = this.formatDate(erpDataList[j].currentEstimatedDeliveryDate);
                 data[5] = erpDataList[j].status;
                 data[6] = this.addCommas(erpDataList[j].quantity);
-                data[7] = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : 1);
-                data[8] = this.addCommas(erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1));
+                let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : '');
+                data[7] = conversionFactor;
+                convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
+                data[8] = this.addCommas(convertedQty);
                 data[9] = erpDataList[j].notes;
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
                 data[12] = erpDataList[j].primeLineNo;
                 data[13] = 0;
+                if (erpDataList[j].active) {
+                    qty = parseInt(qty) + convertedQty;
+                }
             }
             erpDataArray[count] = data;
             count++;
         }
+        this.setState({
+            totalQuantity: this.addCommas(qty),
+            displayTotalQty: (qty > 0 ? true : false)
+        });
 
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         this.el.destroy();
@@ -2117,6 +2229,7 @@ export default class ManualTagging extends Component {
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
         this.setState({
             displaySubmitButton: false,
+            displayTotalQty: false,
             selectedRowPlanningUnit: this.state.planningUnitId,
             artmisList: [],
             reason: "1",
@@ -2188,6 +2301,8 @@ export default class ManualTagging extends Component {
                 </option>
             )
         }, this);
+
+
         const { fundingSourceList } = this.state;
         let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
             return (
@@ -2495,7 +2610,7 @@ export default class ManualTagging extends Component {
         let countries = countryList.length > 0
             && countryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountry.realmCountryId}>
+                    <option key={i} value={item.realmCountry.id}>
                         {getLabelText(item.realmCountry.label, this.state.lang)}
                     </option>
                 )
@@ -2580,9 +2695,10 @@ export default class ManualTagging extends Component {
                                                         name="countryId"
                                                         id="countryId"
                                                         bsSize="sm"
-                                                    // onChange={this.filterData}
+                                                        value={this.state.countryId}
+                                                        onChange={(e) => { this.countryChange(e); }}
                                                     >
-                                                        <option value="0">{i18n.t('static.common.all')}</option>
+                                                        <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {countries}
                                                     </Input>
                                                 </InputGroup>
@@ -2722,128 +2838,173 @@ export default class ManualTagging extends Component {
                                             <>
                                                 <div className="col-md-12">
                                                     <Row>
-                                                        <FormGroup className="col-md-3 ">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="programId1"
-                                                                        id="programId1"
-                                                                        bsSize="sm"
-                                                                        value={this.state.programId1}
-                                                                        // onChange={this.getPlanningUnitList}
-                                                                        onChange={(e) => { this.programChangeModal(e); this.getNotLinkedShipments(e); this.getPlanningUnitList(e); }}
-                                                                    >
-                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                        {programList}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
+
+                                                        <FormGroup className="pl-3">
+                                                            {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
+                                                            <FormGroup check inline style={{ 'marginLeft': '-52px' }}>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="active4"
+                                                                    name="active"
+                                                                    value={true}
+                                                                    //checked={this.state.user.active === true}
+                                                                    onChange={(e) => { this.dataChange1(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio1">
+                                                                    {'Create New Shipment'}
+                                                                </Label>
+                                                            </FormGroup>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="active5"
+                                                                    name="active"
+                                                                    value={false}
+                                                                    //checked={this.state.user.active === false}
+                                                                    onChange={(e) => { this.dataChange1(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2">
+                                                                    {'Select Existing Shipment'}
+                                                                </Label>
+                                                            </FormGroup>
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-3 pl-0">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="notLinkedShipmentId"
-                                                                        id="notLinkedShipmentId"
-                                                                        bsSize="sm"
-                                                                        onChange={this.displayShipmentData}
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.all')}</option>
-                                                                        {shipmentIdList}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3 ">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="planningUnitId1"
-                                                                        id="planningUnitId1"
-                                                                        bsSize="sm"
-                                                                        // value={this.state.programId}
-                                                                        onChange={this.displayShipmentData}
-                                                                    // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
-                                                                    >
-                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                        {planningUnitList}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3 ">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="fundingSourceId"
-                                                                        id="fundingSourceId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.fundingSourceId}
-                                                                        // onChange={this.getBudgetListByFundingSourceId}
-                                                                        onChange={(e) => { this.fundingSourceModal(e); this.getBudgetListByFundingSourceId(e) }}
-                                                                    >
-                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                        {newFundingSourceList}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3 ">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budget')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="budgetId"
-                                                                        id="budgetId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.budgetId}
-                                                                        // onChange={this.getPlanningUnitList}
-                                                                        onChange={(e) => { this.budgetChange(e) }}
-                                                                    >
-                                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                        {newBudgetList}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
+
+                                                    </Row>
+                                                    <Row>
+                                                        {(this.state.active4 || this.state.active5) &&
+                                                            <FormGroup className="col-md-3 ">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="programId1"
+                                                                            id="programId1"
+                                                                            bsSize="sm"
+                                                                            value={this.state.programId1}
+                                                                            // onChange={this.getPlanningUnitList}
+                                                                            onChange={(e) => { this.programChangeModal(e); this.getNotLinkedShipments(e); this.getPlanningUnitList(e); this.getBudgetListByProgramId(e) }}
+                                                                        >
+                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                            {programList}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>}
+                                                        {this.state.active5 &&
+                                                            <FormGroup className="col-md-3 pl-0">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="notLinkedShipmentId"
+                                                                            id="notLinkedShipmentId"
+                                                                            bsSize="sm"
+                                                                            onChange={this.displayShipmentData}
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.all')}</option>
+                                                                            {shipmentIdList}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>}
+                                                        {(this.state.active4 || this.state.active5) &&
+                                                            <FormGroup className="col-md-3 ">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="planningUnitId1"
+                                                                            id="planningUnitId1"
+                                                                            bsSize="sm"
+                                                                            // value={this.state.programId}
+                                                                            onChange={this.displayShipmentData}
+                                                                        // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
+                                                                        >
+                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                            {planningUnitList}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>}
+                                                        {this.state.active4 &&
+                                                            <FormGroup className="col-md-3 ">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="fundingSourceId"
+                                                                            id="fundingSourceId"
+                                                                            bsSize="sm"
+                                                                            value={this.state.fundingSourceId}
+                                                                            // onChange={this.getBudgetListByFundingSourceId}
+                                                                            onChange={(e) => { this.fundingSourceModal(e); this.getBudgetListByFundingSourceId(e) }}
+                                                                        >
+                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                            {newFundingSourceList}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>}
+                                                        {this.state.active4 &&
+                                                            <FormGroup className="col-md-3 ">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budget')}</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="budgetId"
+                                                                            id="budgetId"
+                                                                            bsSize="sm"
+                                                                            value={this.state.budgetId}
+                                                                            // onChange={this.getPlanningUnitList}
+                                                                            onChange={(e) => { this.budgetChange(e) }}
+                                                                        >
+                                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                                            {newBudgetList}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>}
                                                     </Row>
                                                 </div>
-                                                <ToolkitProvider
-                                                    keyField="shipmentId"
-                                                    data={this.state.selectedShipment}
-                                                    columns={columns}
-                                                    search={{ searchFormatted: true }}
-                                                    hover
-                                                    filter={filterFactory()}
-                                                >
-                                                    {
-                                                        props => (
-                                                            <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
+                                                {this.state.active5 &&
+                                                    <ToolkitProvider
+                                                        keyField="shipmentId"
+                                                        data={this.state.selectedShipment}
+                                                        columns={columns}
+                                                        search={{ searchFormatted: true }}
+                                                        hover
+                                                        filter={filterFactory()}
+                                                    >
+                                                        {
+                                                            props => (
+                                                                <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
 
-                                                                <BootstrapTable
-                                                                    // keyField='erpOrderId'
-                                                                    ref={n => this.node = n}
-                                                                    selectRow={selectRow}
-                                                                    hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                    <BootstrapTable
+                                                                        // keyField='erpOrderId'
+                                                                        ref={n => this.node = n}
+                                                                        selectRow={selectRow}
+                                                                        hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
 
-                                                                    rowEvents={{
+                                                                        rowEvents={{
 
-                                                                    }}
-                                                                    {...props.baseProps}
-                                                                />
-                                                            </div>
-                                                        )
-                                                    }
-                                                </ToolkitProvider>
+                                                                        }}
+                                                                        {...props.baseProps}
+                                                                    />
+                                                                </div>
+                                                            )
+                                                        }
+                                                    </ToolkitProvider>}
                                             </>
                                         }
                                     </div><br />
@@ -2943,7 +3104,7 @@ export default class ManualTagging extends Component {
                                     <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
                                 </ModalBody>
                                 <ModalFooter>
-                                    {this.state.displaySubmitButton && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
+                                    {this.state.displayTotalQty && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
 
                                     {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>}
 
