@@ -180,7 +180,7 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch:[]
+            ledgerForBatch: []
         }
 
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
@@ -1821,7 +1821,7 @@ export default class WhatIfReportComponent extends React.Component {
         // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)),expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
             margin: { top: 80, bottom: 70 },
@@ -1998,7 +1998,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var programJson = {
                             label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id,
-                            programId:myResult[i].programId
+                            programId: myResult[i].programId
                         }
                         proList.push(programJson);
                     }
@@ -2125,7 +2125,7 @@ export default class WhatIfReportComponent extends React.Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
+                            myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -2276,8 +2276,8 @@ export default class WhatIfReportComponent extends React.Component {
             localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
-        var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
-        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
+        var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
+        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;
         var consumptionTotalData = [];
         var shipmentsTotalData = [];
@@ -2424,7 +2424,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                             }
                             this.setState({
-                                supplyPlanDataForAllTransDate:supplyPlanData
+                                supplyPlanDataForAllTransDate: supplyPlanData
                             })
                             // if (supplyPlanData.length > 0) {
                             var lastClosingBalance = 0;
@@ -2909,12 +2909,12 @@ export default class WhatIfReportComponent extends React.Component {
                                             suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                         }
                                         if (suggestedOrd <= 0) {
-                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder,"totalShipmentQty":Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                         } else {
-                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder,"totalShipmentQty":Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData)+Number(suggestedOrd) };
+                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                         }
                                     } else {
-                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder,"totalShipmentQty":Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                     }
                                     suggestedShipmentsTotalData.push(sstd);
 
@@ -3187,12 +3187,12 @@ export default class WhatIfReportComponent extends React.Component {
                         expiredStockDetails: details[0].details,
                         expiredStockDetailsTotal: details[0].qty,
                         loading: false,
-                        ledgerForBatch:[]
+                        ledgerForBatch: []
                     })
                 } else {
                     this.setState({
                         expiredStockModal: !this.state.expiredStockModal,
-                        ledgerForBatch:[]
+                        ledgerForBatch: []
                     })
                 }
             }
@@ -3553,8 +3553,8 @@ export default class WhatIfReportComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var planningUnitId = document.getElementById("planningUnitId").value;
-                var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
-                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
+                var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
                 var shelfLife = programPlanningUnit.shelfLife;
                 if (month != "" && quantity != 0) {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
@@ -3613,7 +3613,7 @@ export default class WhatIfReportComponent extends React.Component {
                     isSuggested: 1,
                     shelfLife: programPlanningUnit.shelfLife,
                     catalogPrice: programPlanningUnit.catalogPrice,
-                    programPlanningUnitForPrice:programPlanningUnit
+                    programPlanningUnitForPrice: programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)
@@ -3691,7 +3691,16 @@ export default class WhatIfReportComponent extends React.Component {
             tooltips: {
                 callbacks: {
                     label: function (tooltipItems, data) {
-                        return (tooltipItems.yLabel.toLocaleString());
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
                     }
                 },
                 enabled: false,
@@ -3725,8 +3734,8 @@ export default class WhatIfReportComponent extends React.Component {
                         tension: 0.1,
                         showLine: false,
                         pointStyle: 'triangle',
-                        pointBackgroundColor: '#ffff00',
-                        pointBorderColor: '#ffff00',
+                        pointBackgroundColor: '#ED8944',
+                        pointBorderColor: '#212721',
                         pointRadius: 10
 
                     },
@@ -4677,7 +4686,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             this.state.closingBalanceArray.map((item, count) => {
                                                 if (count < 7) {
                                                     return (
-                                                        <td colSpan="2"  className="hoverTd" onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                        <td colSpan="2" className="hoverTd" onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                     )
                                                 }
                                             })
@@ -4686,32 +4695,32 @@ export default class WhatIfReportComponent extends React.Component {
                                 </tbody>
                             </Table>
                             {this.state.batchInfoInInventoryPopUp.length > 0 &&
-                                    <>
-                                        <Table  className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                            <thead>
+                                <>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <thead>
+                                            <tr>
+                                                <th>{i18n.t("static.supplyPlan.batchId")}</th>
+                                                <th>{i18n.t('static.report.createdDate')}</th>
+                                                <th>{i18n.t('static.inventory.expireDate')}</th>
+                                                <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
+                                                <th>{i18n.t("static.report.qty")}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {this.state.batchInfoInInventoryPopUp.map(item => (
                                                 <tr>
-                                                    <th>{i18n.t("static.supplyPlan.batchId")}</th>
-                                                    <th>{i18n.t('static.report.createdDate')}</th>
-                                                    <th>{i18n.t('static.inventory.expireDate')}</th>
-                                                    <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
-                                                    <th>{i18n.t("static.report.qty")}</th>
+                                                    <td>{item.batchNo}</td>
+                                                    <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
+                                                    <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                    <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
+                                                    <td>{item.qty}</td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.batchInfoInInventoryPopUp.map(item => (
-                                                    <tr>
-                                                        <td>{item.batchNo}</td>
-                                                        <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                        <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
-                                                        <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td>{item.qty}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table><br/>
-                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br/>
-                                    </>
-                                }
+                                            ))}
+                                        </tbody>
+                                    </Table><br />
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
+                                </>
+                            }
                             {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="whatIf" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                             <div className="table-responsive mt-3">
                                 <div id="adjustmentsTable" className="table-responsive " />
@@ -4799,7 +4808,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                <Button size="md" color="danger"  id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
@@ -4850,7 +4859,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                <td className="hoverTd" onClick={()=>this.showBatchLedgerClicked(item.batchNo,item.createdDate,item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
+                                                <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                             </tr>
                                         )
                                         )
@@ -4863,38 +4872,38 @@ export default class WhatIfReportComponent extends React.Component {
                                     </tr>
                                 </tfoot>
                             </Table>
-                            {this.state.ledgerForBatch.length>0 && 
-                                    <> 
+                            {this.state.ledgerForBatch.length > 0 &&
+                                <>
                                     <br></br>
-                                    {i18n.t("static.inventory.batchNumber")+" : "+this.state.ledgerForBatch[0].batchNo}   
+                                    {i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo}
                                     <br></br>
                                     {i18n.t("static.batchLedger.note")}
-                                    <Table  className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
-                                            <th  style={{width:"60px"}}  rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
-                                            <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated")+" (+/-)"}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
+                                                <th style={{ width: "60px" }} rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
+                                                <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
+                                                <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
+                                                <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated") + " (+/-)"}</th>
+                                                <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
                                             </tr>
                                             <tr>
-                                                <th  align="center">{i18n.t("static.supplyPlan.consumption")+" (-)"}</th>
-                                                <th align="center">{i18n.t("static.inventoryType.adjustment")+" (+/-)"}</th>
-                                                <th align="center">{i18n.t("static.shipment.shipment")+" (+)"}</th>
+                                                <th align="center">{i18n.t("static.supplyPlan.consumption") + " (-)"}</th>
+                                                <th align="center">{i18n.t("static.inventoryType.adjustment") + " (+/-)"}</th>
+                                                <th align="center">{i18n.t("static.shipment.shipment") + " (+)"}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
-                                                this.state.ledgerForBatch.slice(0, -1).map(item=>(
-                                                 <tr>
+                                                this.state.ledgerForBatch.slice(0, -1).map(item => (
+                                                    <tr>
                                                         <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
-                                                        <td>{item.shipmentQty==0?null:<NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0-Number(item.unallocatedQty)} /></td>
-                                                        {item.stockQty!=null && Number(item.stockQty)>0?<b><td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td></b>:<td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                        <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
+                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
+                                                        {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
                                                     </tr>
                                                 ))
                                             }
@@ -4902,12 +4911,12 @@ export default class WhatIfReportComponent extends React.Component {
                                         <tfoot>
                                             <tr>
                                                 <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                                <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length-2].qty} /></b></td>
+                                                <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 2].qty} /></b></td>
                                             </tr>
                                         </tfoot>
                                     </Table>
-                                    </>
-                                    }
+                                </>
+                            }
                         </ModalBody>
                         <ModalFooter>
                             <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -4933,22 +4942,22 @@ export default class WhatIfReportComponent extends React.Component {
         );
     }
 
-    showBatchLedgerClicked(batchNo,createdDate,expiryDate){
-        this.setState({loading:true})
-        var supplyPlanForAllDate=this.state.supplyPlanDataForAllTransDate.filter(c=>moment(c.transDate).format("YYYY-MM")>=moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM")<=moment(expiryDate).format("YYYY-MM"));
-        var allBatchLedger=[];
-        supplyPlanForAllDate.map(c=>
-            c.batchDetails.map(bd=> {
-                var batchInfo=bd;
-                batchInfo.transDate=c.transDate;
+    showBatchLedgerClicked(batchNo, createdDate, expiryDate) {
+        this.setState({ loading: true })
+        var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
+        var allBatchLedger = [];
+        supplyPlanForAllDate.map(c =>
+            c.batchDetails.map(bd => {
+                var batchInfo = bd;
+                batchInfo.transDate = c.transDate;
                 allBatchLedger.push(batchInfo);
             }));
-        var ledgerForBatch=allBatchLedger.filter(c=>c.batchNo==batchNo && moment(c.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
+        var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
         this.setState({
-            ledgerForBatch:ledgerForBatch,
-            loading:false
+            ledgerForBatch: ledgerForBatch,
+            loading: false
         })
-        console.log("ledgerForBatch+++",ledgerForBatch)
+        console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
     render() {
@@ -5222,10 +5231,10 @@ export default class WhatIfReportComponent extends React.Component {
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
                     isSuggested: 0,
-                    programJson:programJson,
+                    programJson: programJson,
                     shelfLife: programPlanningUnit.shelfLife,
                     catalogPrice: programPlanningUnit.catalogPrice,
-                    programPlanningUnitForPrice:programPlanningUnit
+                    programPlanningUnitForPrice: programPlanningUnit
                 })
                 this.refs.shipmentChild.showShipmentData();
             }.bind(this)

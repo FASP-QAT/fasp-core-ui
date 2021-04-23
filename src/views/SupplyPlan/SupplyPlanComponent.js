@@ -1041,8 +1041,17 @@ export default class SupplyPlanComponent extends React.Component {
             tooltips: {
                 callbacks: {
                     label: function (tooltipItems, data) {
-                        return (tooltipItems.yLabel.toLocaleString());
-                    }
+                        if(tooltipItems.datasetIndex==0){
+                            var details=this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow=[];
+                            details.map(c=>{
+                                infoToShow.push(c.batchNo+" - "+c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));    
+                        }else{
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
+                    }.bind(this)
                 },
                 enabled: false,
                 custom: CustomTooltips
@@ -1077,8 +1086,8 @@ export default class SupplyPlanComponent extends React.Component {
                         tension: 0.1,
                         showLine: false,
                         pointStyle: 'triangle',
-                        pointBackgroundColor: '#ffff00',
-                        pointBorderColor: '#ffff00',
+                        pointBackgroundColor: '#ED8944',
+                        pointBorderColor: '#212721',
                         pointRadius: 10
 
                     },
@@ -2101,7 +2110,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
                                                         <td>{item.shipmentQty==0?null:<NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0-Number(item.unallocatedQty)} /></td>
-                                                        {item.stockQty!=null && Number(item.stockQty)>0?<b><td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td></b>:<td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                        {item.stockQty!=null && Number(item.stockQty)>0?<td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td>:<td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
                                                     </tr>
                                                 ))
                                             }
@@ -4983,8 +4992,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                 tension: 0.1,
                                                 showLine: false,
                                                 pointStyle: 'triangle',
-                                                pointBackgroundColor: '#ffff00',
-                                                pointBorderColor: '#ffff00',
+                                                pointBackgroundColor: '#ED8944',
+                                                pointBorderColor: '#212721',
                                                 pointRadius: 10
                         
                                             },
