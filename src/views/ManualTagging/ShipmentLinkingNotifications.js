@@ -1328,7 +1328,7 @@ console.log("message ------------------"+this.state.message);
                                 </FormGroup>
                             </Row>
                             <div className="ReportSearchMarginTop">
-                                <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                                <div id="tableDiv" className="RemoveStriped">
                                 </div>
                                 {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">
                                         </div> */}

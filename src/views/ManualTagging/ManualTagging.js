@@ -557,7 +557,7 @@ export default class ManualTagging extends Component {
     }
 
     getBudgetListByFundingSourceId = (e) => {
-        let fundingSourceId = document.getElementById("fundingSourceId").value;
+        let fundingSourceId = this.state.fundingSourceId;
         console.log("programId--->>>>>>>>>>", fundingSourceId)
         const filteredBudgetList = this.state.filteredBudgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
         console.log("filteredBudgetList---", filteredBudgetList);
@@ -779,11 +779,12 @@ export default class ManualTagging extends Component {
             } else if (this.state.active4) {
                 if (programId == -1) {
                     alert("Please select program");
-                } else if (document.getElementById("fundingSourceId").value == -1) {
+                } else if (this.state.fundingSourceId == -1) {
                     alert("Please select funding source");
-                } else if (document.getElementById("budgetId").value == -1) {
+                } else if (this.state.budgetId == -1) {
                     alert("Please select budget");
-                } else {
+                }
+                else {
                     var cf = window.confirm("You are about to create a new shipment. Are you sure you want to continue?");
                     if (cf == true) {
                         valid = true;
@@ -808,8 +809,8 @@ export default class ManualTagging extends Component {
                         let json = {
                             parentShipmentId: (this.state.active2 ? this.state.parentShipmentId : 0),
                             programId: programId,
-                            fundingSourceId: (this.state.active3 ? document.getElementById("fundingSourceId").value : 0),
-                            budgetId: (this.state.active3 ? document.getElementById("budgetId").value : 0),
+                            fundingSourceId: (this.state.active3 ? this.state.fundingSourceId : 0),
+                            budgetId: (this.state.active3 ? this.state.budgetId : 0),
                             shipmentId: (this.state.active3 ? this.state.finalShipmentId : this.state.shipmentId),
                             conversionFactor: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                             notes: (map1.get("9") === '' ? null : map1.get("9")),
@@ -823,79 +824,83 @@ export default class ManualTagging extends Component {
                     }
                 }
                 console.log("FINAL SUBMIT changedmtList---", changedmtList);
-                ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
-                    .then(response => {
-                        console.log("response m tagging---", response)
-                        this.setState({
-                            message: (this.state.active2 ? "Shipment linking updated successfully" : i18n.t('static.shipment.linkingsuccess')),
-                            color: 'green',
-                            haslinked: true,
-                            loading: false,
-                            loading1: false,
-                            alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
-                        },
-                            () => {
-                                console.log("changedmtList length---", changedmtList.length);
-                                console.log("data length---", response.data.length);
+                if (this.state.active4 && changedmtList.length > 1) {
+                    alert("Please select only 1 order at a time.");
+                } else {
+                    ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
+                        .then(response => {
+                            console.log("response m tagging---", response)
+                            this.setState({
+                                message: (this.state.active2 ? "Shipment linking updated successfully" : i18n.t('static.shipment.linkingsuccess')),
+                                color: 'green',
+                                haslinked: true,
+                                loading: false,
+                                loading1: false,
+                                alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
+                            },
+                                () => {
+                                    console.log("changedmtList length---", changedmtList.length);
+                                    console.log("data length---", response.data.length);
 
-                                console.log(this.state.message, "success 1")
-                                this.hideSecondComponent();
-                                document.getElementById('div2').style.display = 'block';
-                                console.log("Going to call toggle large 1");
-                                this.toggleLarge();
+                                    console.log(this.state.message, "success 1")
+                                    this.hideSecondComponent();
+                                    document.getElementById('div2').style.display = 'block';
+                                    console.log("Going to call toggle large 1");
+                                    this.toggleLarge();
 
-                                (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+                                    (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
 
-                            })
+                                })
 
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    color: 'red',
-                                    loading: false,
-                                    loading1: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        color: 'red',
+                                        loading: false,
+                                        loading1: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
 
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false,
-                                            loading1: false,
-                                            color: 'red',
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false,
-                                            loading1: false,
-                                            color: 'red',
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false,
-                                            loading1: false,
-                                            color: 'red',
-                                        });
-                                        break;
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false,
+                                                loading1: false,
+                                                color: 'red',
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false,
+                                                loading1: false,
+                                                color: 'red',
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false,
+                                                loading1: false,
+                                                color: 'red',
+                                            });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                }
             }
         }
     }
@@ -1132,62 +1137,70 @@ export default class ManualTagging extends Component {
             budgetId: -1
         })
         console.log("pl value---", this.state.planningUnitValues.map(ele => (ele.value).toString()));
+        let productCategoryIdList = this.state.productCategoryValues.map(ele => (ele.value).toString())
+        let planningUnitIdList = this.state.planningUnitValues.map(ele => (ele.value).toString());
         var json = {
             countryId: countryId,
-            productCategoryIdList: this.state.productCategoryValues.map(ele => (ele.value).toString()),
-            planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
+            productCategoryIdList: productCategoryIdList,
+            planningUnitIdList: planningUnitIdList,
             linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
         }
+        if ((productCategoryIdList != null && productCategoryIdList != "") || (planningUnitIdList != null && planningUnitIdList != "")) {
+            ManualTaggingService.getShipmentListForManualTagging(json)
+                .then(response => {
+                    console.log("manual tagging response===new----", response);
+                    this.setState({
+                        outputList: response.data
+                    }, () => {
+                        this.buildJExcel();
+                    });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-        ManualTaggingService.getShipmentListForManualTagging(json)
-            .then(response => {
-                console.log("manual tagging response===new----", response);
-                this.setState({
-                    outputList: response.data
-                }, () => {
-                    this.buildJExcel();
-                });
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-        // }
+                );
+        } else {
+            this.setState({
+                outputList: []
+            }, () => {
+                this.buildJExcel();
+            });
+        }
 
 
     }
@@ -1692,7 +1705,7 @@ export default class ManualTagging extends Component {
             //         console.log("rowData[1]---",rowData[1]);
             //         console.log("rowData[2]---",rowData[2]);
             //         console.log("rowData[3]---",rowData[3]);
-                    
+
             //         if (rowData[7]) {
             //             var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
             //             cell.classList.remove('readonly');
