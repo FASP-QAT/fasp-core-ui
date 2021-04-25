@@ -35,6 +35,8 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            getPlanningUnitArray: [],
+            countryWisePrograms: [],
             active4: false,
             active5: false,
             selectedRowPlanningUnit: '',
@@ -86,7 +88,8 @@ export default class ManualTagging extends Component {
             notLinkedShipments: [],
             fundingSourceList: [],
             displaySubmitButton: false,
-            countryId: ''
+            countryId: '',
+            hasSelectAll: true
         }
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
@@ -120,9 +123,27 @@ export default class ManualTagging extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.displayButton = this.displayButton.bind(this);
         this.getPlanningUnitListByRealmCountryId = this.getPlanningUnitListByRealmCountryId.bind(this);
+        this.filterProgramByCountry = this.filterProgramByCountry.bind(this);
+        this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
 
     }
-
+    filterProgramByCountry() {
+        let programList = this.state.programs;
+        let countryId = this.state.countryId;
+        if (countryId != -1) {
+            console.log("programList---", programList);
+            console.log("countryId---", countryId);
+            const countryWisePrograms = programList.filter(c => c.realmCountry.realmCountryId == countryId)
+            console.log("countryWisePrograms---", countryWisePrograms);
+            this.setState({
+                countryWisePrograms
+            });
+        } else {
+            this.setState({
+                countryWisePrograms: programList
+            });
+        }
+    }
     getPlanningUnitListByRealmCountryId() {
         PlanningUnitService.getActivePlanningUnitByRealmCountryId(this.state.countryId)
             .then(response => {
@@ -197,7 +218,7 @@ export default class ManualTagging extends Component {
     }
     getNotLinkedShipments() {
 
-        let programId1 = parseInt(document.getElementById("programId1").value);
+        let programId1 = parseInt(this.state.programId1);
         let planningUnitId = this.state.planningUnitIdUpdated;
         ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
             .then(response => {
@@ -342,22 +363,27 @@ export default class ManualTagging extends Component {
 
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
-        console.log("changed 1---")
+        console.log("changed 1---", x)
 
         //conversion factor
         if (x == 7) {
+            console.log("y-------", this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var col = ("H").concat(parseInt(y) + 1);
+            console.log("col-----------", col);
+            console.log("value---------", this.el.getValue(`H${parseInt(y) + 1}`));
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
 
             if (value == "") {
+                console.log("--------1--------");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 if (!(reg.test(value))) {
+                    console.log("--------2--------");
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -365,7 +391,8 @@ export default class ManualTagging extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.state.instance.setValueFromCoords(8, y, this.addCommas(qty * value), true);
+                    console.log("qty-------------------" + qty);
+                    this.state.instance.setValueFromCoords(8, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
                 }
 
             }
@@ -410,19 +437,6 @@ export default class ManualTagging extends Component {
         // }
     }
 
-
-    // oneditionend = function (instance, cell, x, y, value) {
-    // var elInstance = instance.jexcel;
-    // var rowData = elInstance.getRowData(y);
-
-    // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-    //     // console.log("RESP---------", parseFloat(rowData[2]));
-    //     elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
-    // }
-    // this.el.setValueFromCoords(7, y, 1, true);
-
-    // }
-
     dataChange1(event) {
         console.log("radio button event---", event.target)
 
@@ -453,6 +467,14 @@ export default class ManualTagging extends Component {
                 active1: true,
                 active2: false,
                 active3: false
+            }, () => {
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.getPlanningUnitList();
+                    });
+                }
             });
         } else if (event.target.id == 'active2') {
             this.setState({
@@ -464,6 +486,14 @@ export default class ManualTagging extends Component {
                 active2: true,
                 active1: false,
                 active3: false
+            }, () => {
+                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                    this.setState({
+                        programId: localStorage.getItem("sesProgramIdReport")
+                    }, () => {
+                        this.getPlanningUnitList();
+                    });
+                }
             });
         } else {
 
@@ -547,7 +577,7 @@ export default class ManualTagging extends Component {
     }
 
     getBudgetListByProgramId = (e) => {
-        let programId1 = document.getElementById("programId1").value;
+        let programId1 = this.state.programId1;
         console.log("programId1--->>>>>>>>>>", programId1)
         const filteredBudgetList = this.state.budgetList.filter(c => c.program.id == programId1)
         console.log("filteredBudgetList---", filteredBudgetList);
@@ -696,8 +726,32 @@ export default class ManualTagging extends Component {
             planningUnits: [],
             planningUnitValues: [],
             planningUnitLabels: [],
-            programId: event.target.value
+            programId: event.target.value,
+            hasSelectAll: true
+        }
+            , () => {
+                console.log("new program id----", this.state.programId)
+                this.getPlanningUnitList();
+            }
+        )
+    }
+
+    getPlanningUnitArray() {
+        let planningUnits = this.state.planningUnits;
+        console.log("planningUnitArray1---", planningUnits);
+        let planningUnitArray = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
+
+        this.setState({
+            planningUnitArray
+        }, () => {
+            this.filterData(planningUnitArray);
         })
+
+        console.log("planningUnitArray2---", planningUnitArray);
     }
 
     countryChange = (event) => {
@@ -715,6 +769,10 @@ export default class ManualTagging extends Component {
     programChangeModal(event) {
         this.setState({
             programId1: event.target.value
+        }, () => {
+            this.getNotLinkedShipments();
+            this.getPlanningUnitList();
+            this.getBudgetListByProgramId();
         })
     }
 
@@ -767,7 +825,7 @@ export default class ManualTagging extends Component {
 
     link() {
         let valid = false;
-        var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
+        var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
         if (this.state.active3) {
             if (this.state.active5) {
                 if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
@@ -1055,6 +1113,8 @@ export default class ManualTagging extends Component {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
+
+        console.log("planningUnitIds.map(ele => ele)----", planningUnitIds.map(ele => ele))
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -1209,13 +1269,14 @@ export default class ManualTagging extends Component {
 
         console.log("planningUnitIds---", planningUnitIds);
         document.getElementById('div2').style.display = 'block';
-        var programId = document.getElementById("programId").value;
+        var programId = this.state.programId;
 
         planningUnitIds = planningUnitIds;
         // .sort(function (a, b) {
         //     return parseInt(a.value) - parseInt(b.value);
         // })
         this.setState({
+            hasSelectAll: false,
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
@@ -1224,17 +1285,17 @@ export default class ManualTagging extends Component {
                     loading: true,
                     planningUnitIds
                 })
-                if (this.state.haslinked) {
-                    this.setState({ haslinked: false })
-                } else {
-                    this.setState({ message: '' })
-                }
+                // if (this.state.haslinked) {
+                //     this.setState({ haslinked: false })
+                // } else {
+                //     this.setState({ message: '' })
+                // }
                 var json = {
-                    programId: parseInt(document.getElementById("programId").value),
+                    programId: parseInt(this.state.programId),
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
                     linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
                 }
-
+                console.log("my json---------------------", json);
                 ManualTaggingService.getShipmentListForManualTagging(json)
                     .then(response => {
                         console.log("manual tagging response===", response);
@@ -1245,6 +1306,9 @@ export default class ManualTagging extends Component {
                             // planningUnitName: planningUnitName
                             // message: ''
                         }, () => {
+                            if (!this.state.active3) {
+                                localStorage.setItem("sesProgramIdReport", programId)
+                            }
                             // this.getPlanningUnitListByTracerCategory(planningUnitId);
                             this.buildJExcel();
                         });
@@ -1288,6 +1352,13 @@ export default class ManualTagging extends Component {
                             }
                         }
                     );
+            } else {
+
+                this.setState({
+                    outputList: []
+                }, () => {
+                    this.state.languageEl.destroy();
+                })
             }
             // else if (programId == -1) {
             //     console.log("2-programId------>", programId);
@@ -1695,54 +1766,6 @@ export default class ManualTagging extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed,
-            // updateTable: function (el, cell, x, y, source, value, id) {
-            //     var elInstance = el.jexcel;
-            //     if (y != null) {
-            //         console.log("y--------------",y)
-            //         var rowData = elInstance.getRowData(y);
-            //         console.log("row data---", rowData);
-            //         console.log("rowData[0]---",rowData[0]);
-            //         console.log("rowData[1]---",rowData[1]);
-            //         console.log("rowData[2]---",rowData[2]);
-            //         console.log("rowData[3]---",rowData[3]);
-
-            //         if (rowData[7]) {
-            //             var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-            //             cell.classList.remove('readonly');
-            //         }
-            //         else if (rowData[9]) {
-            //             var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-            //             cell.classList.remove('readonly');
-            //         }
-            //         else {
-            //             var cell;
-
-            //             cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-            //             cell.classList.add('readonly');
-
-            //             cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-            //             cell.classList.add('readonly');
-
-            //             cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
-            //             cell.classList.add('readonly');
-
-            //             cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
-            //             cell.classList.add('readonly');
-
-            //             cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
-            //             cell.classList.add('readonly');
-
-            //             cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-            //             cell.classList.add('readonly');
-            //         }
-            //     }
-            // }.bind(this),
-            // onsearch: function (el) {
-            //     el.jexcel.updateTable();
-            // },
-            // onfilter: function (el) {
-            //     el.jexcel.updateTable();
-            // },
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -2168,9 +2191,8 @@ export default class ManualTagging extends Component {
                     searchedValue: outputListAfterSearch[0].orderNo,
                     planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
-
+                    this.filterProgramByCountry();
                     this.getOrderDetails();
-                    // this.getNotLinkedShipments();
                 });
             }
             // outputListAfterSearch.push(row);
@@ -2194,8 +2216,8 @@ export default class ManualTagging extends Component {
     }
 
     getPlanningUnitList() {
-        var programId = (this.state.active3 ? document.getElementById("programId1").value : document.getElementById("programId").value);
-        console.log("programid---" + programId);
+        var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
+        console.log("programid---" + this.state.programId);
         if (programId != -1 && programId != null && programId != "") {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
@@ -2209,6 +2231,10 @@ export default class ManualTagging extends Component {
                         });
                         this.setState({
                             planningUnits: listArray
+                        }, () => {
+                            if (!this.state.active3) {
+                                this.getPlanningUnitArray();
+                            }
                         })
                     }
                     else {
@@ -2261,6 +2287,12 @@ export default class ManualTagging extends Component {
                         }
                     }
                 );
+        } else {
+            this.setState({
+                outputList: []
+            }, () => {
+                this.state.languageEl.destroy();
+            })
         }
         // this.filterData();
 
@@ -2298,6 +2330,8 @@ export default class ManualTagging extends Component {
             result: '',
             alreadyLinkedmessage: '',
             manualTag: !this.state.manualTag,
+            active4: false,
+            active5: false
         })
     }
 
@@ -2353,6 +2387,16 @@ export default class ManualTagging extends Component {
                 </option>
             )
         }, this);
+
+        const { countryWisePrograms } = this.state;
+        let filteredProgramList = countryWisePrograms.length > 0 && countryWisePrograms.map((item, i) => {
+            return (
+                <option key={i} value={item.programId}>
+                    {getLabelText(item.label, this.state.lang)}
+                </option>
+            )
+        }, this);
+
 
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0 && planningUnits.map((item, i) => {
@@ -2794,7 +2838,7 @@ export default class ManualTagging extends Component {
                                                     bsSize="sm"
                                                     value={this.state.programId}
                                                     // onChange={this.getPlanningUnitList}
-                                                    onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
+                                                    onChange={(e) => { this.programChange(e); }}
                                                 >
                                                     <option value="-1">{i18n.t('static.common.select')}</option>
                                                     {programList}
@@ -2836,7 +2880,7 @@ export default class ManualTagging extends Component {
                                                 name="planningUnitId"
                                                 id="planningUnitId"
                                                 bsSize="sm"
-                                                value={this.state.planningUnitValues}
+                                                value={this.state.hasSelectAll ? planningUnitMultiList : this.state.planningUnitValues}
                                                 onChange={(e) => { this.filterData(e) }}
                                                 options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                                 labelledBy={i18n.t('static.common.select')}
@@ -2950,10 +2994,10 @@ export default class ManualTagging extends Component {
                                                                             bsSize="sm"
                                                                             value={this.state.programId1}
                                                                             // onChange={this.getPlanningUnitList}
-                                                                            onChange={(e) => { this.programChangeModal(e); this.getNotLinkedShipments(e); this.getPlanningUnitList(e); this.getBudgetListByProgramId(e) }}
+                                                                            onChange={(e) => { this.programChangeModal(e); }}
                                                                         >
                                                                             <option value="-1">{i18n.t('static.common.select')}</option>
-                                                                            {programList}
+                                                                            {filteredProgramList}
                                                                         </Input>
                                                                     </InputGroup>
                                                                 </div>

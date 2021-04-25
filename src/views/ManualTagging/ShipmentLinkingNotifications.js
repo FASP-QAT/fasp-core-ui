@@ -30,8 +30,8 @@ export default class ShipmentLinkingNotifications extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            color:'',
-            message:'',
+            color: '',
+            message: '',
             loading: true,
             loading1: false,
             programs: [],
@@ -39,7 +39,9 @@ export default class ShipmentLinkingNotifications extends Component {
             instance: '',
             artmisHistory: [],
             lang: 'en',
-            displaySubmitButton: false
+            displaySubmitButton: false,
+            planningUnitArray: [],
+            hasSelectAll: true
         }
         this.displayButton = this.displayButton.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -57,6 +59,25 @@ export default class ShipmentLinkingNotifications extends Component {
         this.filterData1 = this.filterData1.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
+        this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
+    }
+
+    getPlanningUnitArray() {
+        let planningUnits = this.state.planningUnits;
+        console.log("planningUnitArray1---", planningUnits);
+        let planningUnitArray = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
+
+        this.setState({
+            planningUnitArray
+        }, () => {
+            this.filterData(planningUnitArray);
+        })
+
+        console.log("planningUnitArray2---", planningUnitArray);
     }
 
     displayButton() {
@@ -90,7 +111,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     updateDetails() {
 
-        var programId = document.getElementById("programId").value;
+        var programId = this.state.programId;
 
         this.setState({ loading1: true })
         var validation = this.checkValidation();
@@ -125,13 +146,14 @@ export default class ShipmentLinkingNotifications extends Component {
                     console.log("response m tagging---", response)
                     document.getElementById('div2').style.display = 'block';
                     this.setState({
-                        message : "Data updated successfully.",
+                        message: "Data updated successfully.",
                         color: 'green',
                         loading: false,
-                        loading1: false
+                        loading1: false,
+                        displaySubmitButton: false
                     },
                         () => {
-console.log("message ------------------"+this.state.message);
+                            console.log("message ------------------" + this.state.message);
                             // this.hideSecondComponent();
                             document.getElementById('div2').style.display = 'block';
                             console.log("Going to call toggle large 1");
@@ -311,7 +333,10 @@ console.log("message ------------------"+this.state.message);
 
     programChange(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            hasSelectAll: true
+        }, () => {
+            this.getPlanningUnitList();
         })
     }
 
@@ -339,7 +364,7 @@ console.log("message ------------------"+this.state.message);
 
         console.log("planningUnitIds---", planningUnitIds);
         // document.getElementById('div2').style.display = 'block';
-        var programId = document.getElementById("programId").value;
+        var programId = this.state.programId;
         var addressed = document.getElementById("addressed").value;
 
         planningUnitIds = planningUnitIds;
@@ -347,6 +372,7 @@ console.log("message ------------------"+this.state.message);
         //     return parseInt(a.value) - parseInt(b.value);
         // })
         this.setState({
+            hasSelectAll: false,
             planningUnitIds,
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -362,7 +388,7 @@ console.log("message ------------------"+this.state.message);
                 //     this.setState({ message: '' })
                 // }
                 var json = {
-                    programId: parseInt(document.getElementById("programId").value),
+                    programId: parseInt(this.state.programId),
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString())
                 }
 
@@ -374,7 +400,7 @@ console.log("message ------------------"+this.state.message);
                         this.setState({
                             outputList: list
                         }, () => {
-                            // this.getPlanningUnitListByTracerCategory(planningUnitId);
+                            localStorage.setItem("sesProgramIdReport", programId)
                             this.buildJExcel();
                         });
                     }).catch(
@@ -417,6 +443,12 @@ console.log("message ------------------"+this.state.message);
                             }
                         }
                     );
+            } else {
+                this.setState({
+                    outputList: []
+                }, () => {
+                    this.state.languageEl.destroy();
+                })
             }
             // else if (programId == -1) {
             //     console.log("2-programId------>", programId);
@@ -466,10 +498,20 @@ console.log("message ------------------"+this.state.message);
                             this.getPlanningUnitList();
                         })
                     } else {
-                        this.setState({
-                            programs: listArray,
-                            loading: false
-                        })
+                        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                            this.setState({
+                                programs: listArray,
+                                loading: false,
+                                programId: localStorage.getItem("sesProgramIdReport")
+                            }, () => {
+                                this.getPlanningUnitList();
+                            });
+                        } else {
+                            this.setState({
+                                programs: listArray,
+                                loading: false
+                            })
+                        }
                     }
 
                 }
@@ -663,8 +705,12 @@ console.log("message ------------------"+this.state.message);
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[7] = manualTaggingList[j].erpStatus
             data[8] = this.addCommas(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
-            data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-            data[10] = this.addCommas((manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+            if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2) || manualTaggingList[j].notificationType.id == 1) {
+                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
+            } else {
+                data[9] = ""
+            }
+            data[10] = this.addCommas((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
             data[11] = manualTaggingList[j].notes
             data[12] = 0
             data[13] = manualTaggingList[j].orderNo
@@ -685,7 +731,7 @@ console.log("message ------------------"+this.state.message);
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 40, 20, 50, 50, 50, 30, 30, 35, 25, 35, 35],
+            colWidths: [45, 45, 40, 50, 60, 60, 45, 45, 40, 30, 45, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -791,6 +837,47 @@ console.log("message ------------------"+this.state.message);
             allowDeleteRow: false,
             onselection: this.selected,
             onchange: this.changed,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (y != null) {
+                    var rowData = elInstance.getRowData(y);
+                    if (rowData[0] && rowData[12] != 1) {
+                        var cell;
+                        cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+
+
+                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+
+                        cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    else if (rowData[17] == 1) {
+                        var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    else {
+                        var cell;
+
+                        cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+
+                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+
+                        cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                }
+            }.bind(this),
+            onsearch: function (el) {
+                el.jexcel.updateTable();
+            },
+            onfilter: function (el) {
+                el.jexcel.updateTable();
+            },
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -965,7 +1052,7 @@ console.log("message ------------------"+this.state.message);
     }
 
     getPlanningUnitList() {
-        var programId = document.getElementById("programId").value;
+        var programId = this.state.programId;
         if (programId != -1) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
@@ -978,6 +1065,8 @@ console.log("message ------------------"+this.state.message);
                         });
                         this.setState({
                             planningUnits: listArray
+                        }, () => {
+                            this.getPlanningUnitArray();
                         })
                     }
                     else {
@@ -1030,6 +1119,13 @@ console.log("message ------------------"+this.state.message);
                         }
                     }
                 );
+        } else {
+            this.setState({
+                outputList: [],
+                planningUnits: []
+            }, () => {
+                this.state.languageEl.destroy();
+            })
         }
         // this.filterData();
 
@@ -1280,7 +1376,7 @@ console.log("message ------------------"+this.state.message);
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 // onChange={this.getPlanningUnitList}
-                                                onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
+                                                onChange={(e) => { this.programChange(e); }}
                                             >
                                                 <option value="-1">{i18n.t('static.common.select')}</option>
                                                 {programList}
@@ -1299,7 +1395,7 @@ console.log("message ------------------"+this.state.message);
                                             name="planningUnitId"
                                             id="planningUnitId"
                                             bsSize="sm"
-                                            value={this.state.planningUnitValues}
+                                            value={this.state.hasSelectAll ? planningUnitMultiList : this.state.planningUnitValues}
                                             onChange={(e) => { this.filterData(e) }}
                                             options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                         />
@@ -1321,7 +1417,7 @@ console.log("message ------------------"+this.state.message);
                                             >
                                                 <option value="-1">All</option>
                                                 <option value="1">Addressed</option>
-                                                <option value="0">Not Addressed</option>
+                                                <option value="0" selected>Not Addressed</option>
                                             </Input>
                                         </InputGroup>
                                     </div>
