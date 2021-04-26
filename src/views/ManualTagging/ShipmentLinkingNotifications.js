@@ -98,9 +98,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
     }
 
-    cancelClicked() {
-        this.toggleLarge();
-    }
+    
 
     filterData1() {
         this.filterData(this.state.planningUnitIds);
@@ -317,19 +315,6 @@ export default class ShipmentLinkingNotifications extends Component {
         //     }
         // }
     }
-
-
-    // oneditionend = function (instance, cell, x, y, value) {
-    // var elInstance = instance.jexcel;
-    // var rowData = elInstance.getRowData(y);
-
-    // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-    //     // console.log("RESP---------", parseFloat(rowData[2]));
-    //     elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
-    // }
-    // this.el.setValueFromCoords(7, y, 1, true);
-
-    // }
 
     programChange(event) {
         this.setState({
@@ -574,23 +559,6 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("artmisHistoryList---->", artmisHistoryList);
         let artmisHistoryArray = [];
         let count = 0;
-
-        // for (var j = 0; j < artmisHistoryList.length; j++) {
-        //     data = [];
-
-        //     data[0] = artmisHistoryList[j].roNo;
-        //     data[1] = artmisHistoryList[j].roPrimeLineNo;
-        //     data[2] = artmisHistoryList[j].orderNo;
-        //     data[3] = artmisHistoryList[j].primeLineNo;
-        //     data[4] = getLabelText(artmisHistoryList[j].erpPlanningUnit.label, this.state.lang)
-        //     data[5] = this.formatDate(artmisHistoryList[j].expectedDeliveryDate);
-        //     data[6] = artmisHistoryList[j].erpStatus
-        //     data[7] = this.addCommas(artmisHistoryList[j].shipmentQty);
-        //     data[8] = this.formatDate(artmisHistoryList[j].receivedOn);
-
-        //     artmisHistoryArray[count] = data;
-        //     count++;
-        // }
         console.log("jexcel this------", this);
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         this.el.destroy();

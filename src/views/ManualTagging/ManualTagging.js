@@ -91,8 +91,7 @@ export default class ManualTagging extends Component {
             countryId: '',
             hasSelectAll: true
         }
-        this.addNewCountry = this.addNewCountry.bind(this);
-        this.editCountry = this.editCountry.bind(this);
+        
         this.filterData = this.filterData.bind(this);
         this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -1449,7 +1448,7 @@ export default class ManualTagging extends Component {
     searchErpOrderData = (term) => {
         if (term != null && term != "") {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
-            var programId = document.getElementById("programId").value;
+            var programId = this.state.programId;
             console.log("programId ---", programId);
             console.log("selected erpPlanningUnitId ---", erpPlanningUnitId);
 
@@ -1507,23 +1506,7 @@ export default class ManualTagging extends Component {
                 );
         }
     }
-    addNewCountry() {
-        if (isSiteOnline()) {
-            this.props.history.push(`/country/addCountry`)
-        } else {
-            alert("You must be Online.")
-        }
-
-    }
-    editCountry(country) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
-            console.log(country);
-            this.props.history.push({
-                pathname: `/country/editCountry/${country.countryId}`,
-                // state: { country: country }
-            });
-        }
-    }
+   
     getProgramList() {
         ProgramService.getProgramList()
             .then(response => {
@@ -2336,7 +2319,6 @@ export default class ManualTagging extends Component {
     }
 
     addCommas(cell, row) {
-        console.log("row---------->", row);
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -2350,11 +2332,8 @@ export default class ManualTagging extends Component {
 
     formatDate(cell, row) {
         if (cell != null && cell != "") {
-            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
-            console.log("date-----", date);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-            console.log("dateMonthAsWord-----", dateMonthAsWord);
             return dateMonthAsWord;
         } else {
             return "";
@@ -2365,7 +2344,7 @@ export default class ManualTagging extends Component {
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,
-            selectionHeaderRenderer: () => 'Link?',
+            selectionHeaderRenderer: () => 'Select shipment id',
             headerColumnStyle: {
                 headerAlign: 'center'
                 // align:  function callback(cell, row, rowIndex, colIndex) { 
@@ -3203,10 +3182,10 @@ export default class ManualTagging extends Component {
                                     </div><br />
 
 
-                                    <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5>
-                                    <h5><div style={{ color: 'red' }} >
-                                        {i18n.t(this.state.result)}</div></h5>
-                                    <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5>
+                                    {/* <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5> */}
+                                    {/* <h5><div style={{ color: 'red' }} >
+                                        {i18n.t(this.state.result)}</div></h5> */}
+                                    {/* <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5> */}
                                 </ModalBody>
                                 <ModalFooter>
                                     {this.state.displayTotalQty && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
