@@ -2175,6 +2175,8 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     showShipmentWithBatch(batchNo,expiryDate){
+        localStorage.setItem("batchNo","");
+        localStorage.setItem("expiryDate","");
         var shipmentList=this.state.allShipmentsList;
         shipmentList.map(sl=>{
             var batchInfoList=sl.batchInfoList;
@@ -3337,8 +3339,8 @@ console.log("PlanningList+++",planningList)
                             console.log("MonthsOfStockArray+++", monthsOfStockArray);
                             console.log("this.props.match.params.batchNo+++",this.props.match.params.batchNo);
                             console.log("this.props.match.params.batchNo+++",this.props.match.params.expiryDate);
-                            if (this.props.match.params.batchNo != '' && this.props.match.params.expiryDate != ''){
-                                this.showShipmentWithBatch(this.props.match.params.batchNo,this.props.match.params.expiryDate);
+                            if (localStorage.getItem("batchNo") != '' && localStorage.getItem("expiryDate") != ''){
+                                this.showShipmentWithBatch(localStorage.getItem("batchNo"),localStorage.getItem("expiryDate"));
                             }
                             // this.compareChild.formSubmit(this.state.monthCount);
                             // } else {
