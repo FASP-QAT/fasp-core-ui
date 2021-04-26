@@ -1046,6 +1046,8 @@ export default class ExpiredInventory extends Component {
         if(y==2){
             let versionId = document.getElementById("versionId").value;
         if (versionId.includes('Local')) {
+            localStorage.setItem("batchNo",rowData[2]);
+            localStorage.setItem("expiryDate",rowData[6]);
             window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
         }
     }
