@@ -638,6 +638,7 @@ export default class AddInventory extends Component {
                         <div className="table-responsive">
                             <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
+                        <br/><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                     </ModalBody>
                     <ModalFooter>
                         <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">

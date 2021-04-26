@@ -180,6 +180,7 @@
     "static.planningUnit.associatedForecastingUnit": "Unidade de previsão associada",
     "static.healtharea.healtharea": "Área Técnica",
     "static.batchLedger.note": "*Alocado automaticamente: Consumo ou ajuste conforme calculado pelo QAT",
+    "static.dataEntry.missingBatchNote": "Os lotes são criados por remessas. Se você não vir o lote desejado na lista suspensa, edite os dados de envio.",
     "static.program.realmcountrydashboard": "País",
     "static.realm.maxMosMaxGaurdrail": "Insira o Guardrail para Max MOS (meses máximos)",
     "static.manualTagging.link": "Ligação",

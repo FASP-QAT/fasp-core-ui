@@ -180,6 +180,7 @@
     "static.planningUnit.associatedForecastingUnit": "Producto (estimación) asociado",
     "static.healtharea.healtharea": "Área técnica",
     "static.batchLedger.note": "*Asignación automática: consumo o ajuste calculado por QAT",
+    "static.dataEntry.missingBatchNote": "Los lotes se crean mediante envíos. Si no ve el lote deseado en el menú desplegable, edite los datos del envío.",
     "static.program.realmcountrydashboard": "País",
     "static.realm.maxMosMaxGaurdrail": "Ingresar límite superior para el nivel MAX de meses de existencias",
     "static.manualTagging.link": "Vincular pedido",

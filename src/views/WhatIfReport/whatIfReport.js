@@ -2339,6 +2339,9 @@ export default class WhatIfReportComponent extends React.Component {
                 var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
                 var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
                 var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
+                this.setState({
+                    allShipmentsList:programJson.shipmentList
+                })
                 var realmTransaction = db1.transaction(['realm'], 'readwrite');
                 var realmOs = realmTransaction.objectStore('realm');
                 var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
@@ -4541,6 +4544,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
 
                             <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                            <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 {this.refs.consumptionChild != undefined && <Button color="info" id="consumptionBatchAddRow" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
@@ -4753,6 +4757,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
 
                             <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                                <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
@@ -4863,7 +4868,7 @@ export default class WhatIfReportComponent extends React.Component {
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
-                            <span style={{float:"right"}}>{i18n.t("static.supplyPlan.batchInfoNote")}</span>
+                            <span style={{float:"right"}}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                 <thead>
                                     <tr>
@@ -4878,7 +4883,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     {
                                         this.state.expiredStockDetails.map(item => (
                                             <tr>
-                                                <td>{item.batchNo}</td>
+                                                <td  className="hoverTd" onClick={()=>this.showShipmentWithBatch(item.batchNo,item.expiryDate)}>{item.batchNo}</td>
                                                 <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
@@ -4981,6 +4986,45 @@ export default class WhatIfReportComponent extends React.Component {
             loading: false
         })
         console.log("ledgerForBatch+++", ledgerForBatch)
+    }
+
+    showShipmentWithBatch(batchNo,expiryDate){
+        var shipmentList=this.state.allShipmentsList;
+        shipmentList.map(sl=>{
+            var batchInfoList=sl.batchInfoList;
+            var bi=batchInfoList.filter(c=>c.batch.batchNo==batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
+            if(bi.length>0) {
+                var shipmentStatus=sl.shipmentStatus.id;
+                var date="";
+                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date"){
+                    date=moment(sl.receivedDate).format("YYYY-MM-DD");
+                }else{
+                    date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+                }
+                // Open toggleLarge
+                var supplyPlanType="";
+                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
+                    supplyPlanType = 'deliveredShipments'
+                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false){
+                    supplyPlanType = 'shippedShipments'
+                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                    supplyPlanType = 'orderedShipments'
+                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == false){
+                    supplyPlanType = 'plannedShipments'
+                }else if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true){
+                    supplyPlanType = 'deliveredErpShipments'
+                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true){
+                    supplyPlanType = 'shippedErpShipments'
+                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                    supplyPlanType = 'orderedErpShipments'
+                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == true){
+                    supplyPlanType = 'plannedErpShipments'
+                }
+                if(supplyPlanType!=""){
+                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, 'deliveredShipments');
+                }
+            }
+        })
     }
 
     render() {

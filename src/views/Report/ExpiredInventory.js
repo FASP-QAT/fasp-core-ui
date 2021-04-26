@@ -611,6 +611,9 @@ export default class ExpiredInventory extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
                         console.log("2----", programRequest)
+                        this.setState({
+                            localProgramId:programRequest.result.id
+                        })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
 
@@ -933,6 +936,7 @@ export default class ExpiredInventory extends Component {
             data[5] = moment(outPutList[j].batchInfo.expiryDate).startOf('month').diff(moment(outPutList[j].batchInfo.createdDate).startOf('month'), 'months', true)
             data[6] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`YYYY-MM-DD`) : null)
             data[7] = outPutList[j].batchInfo.batchId;
+            data[8] = outPutList[j].planningUnit.id;
 
             outPutListArray[count] = data;
             count++;
@@ -992,6 +996,9 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     type: 'hidden'
+                },
+                {
+                    type: 'hidden'
                 }
             ],
             text: {
@@ -1036,6 +1043,12 @@ export default class ExpiredInventory extends Component {
             console.log("+++in y==1")
             this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
         }
+        if(y==2){
+            let versionId = document.getElementById("versionId").value;
+        if (versionId.includes('Local')) {
+            window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+        }
+    }
     }.bind(this);
 
     toggleLarge(batchNo, createdDate, expiryDate, batchId) {
@@ -1359,7 +1372,7 @@ export default class ExpiredInventory extends Component {
 
                             </div>
                         </div>
-                        {this.state.outPutList.length>0 && <span style={{float:"left"}}>{i18n.t("static.expiryReport.batchInfoNote")}</span>}
+                        {this.state.outPutList.length>0 && <span style={{float:"left"}}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
                         <div className="">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>

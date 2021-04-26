@@ -180,6 +180,7 @@
     "static.planningUnit.associatedForecastingUnit": "Associated Forecasting Unit",
     "static.healtharea.healtharea": "Technical Area",
     "static.batchLedger.note": "*Auto-Allocated: Consumption or Adjustment as calculated by QAT",
+    "static.dataEntry.missingBatchNote": "Batches are created by shipments. If you don't see the desired batch in the dropdown, please edit shipment data.",
     "static.program.realmcountrydashboard": "Country",
     "static.realm.maxMosMaxGaurdrail": "Enter guardrail for MAX MOS (max months)",
     "static.manualTagging.link": "Link Shipment",

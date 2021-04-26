@@ -478,7 +478,9 @@ const routes = [
   { path: '/translations/labelTranslations', name: 'static.label.labelTranslations', component: LabelTranslation },
 
   { path: '/supplyPlan', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
-  { path: '/supplyPlan/:programId/:versionId/:planningUnitId', name: 'static.dashboard.supplyPlan', component: SupplyPlan },
+  { path: '/supplyPlan/:programId/:versionId/:planningUnitId', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
+  { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
+
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
   { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
