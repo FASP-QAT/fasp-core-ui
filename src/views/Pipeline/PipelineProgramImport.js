@@ -60,6 +60,7 @@ export default class PipelineProgramImport extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.toggleModalView = this.toggleModalView.bind(this);
+        this.deleteProgramConfirmBox = this.deleteProgramConfirmBox.bind(this);
     }
 
     componentDidMount() {
@@ -95,7 +96,7 @@ export default class PipelineProgramImport extends Component {
         }, 8000);
     }
     showPipelineProgramInfo() {
-        
+
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.message.negativeInventoryMessage'),
@@ -105,15 +106,17 @@ export default class PipelineProgramImport extends Component {
                     onClick: () => {
                         var myJson = JSON.parse(this.state.jsonText);
                         var fileName = this.state.fileName;
+
+                        // console.log("myJson programName+++", myJson.programinfo[0].programname);
                         // alert(myJson);
                         // alert(fileName);
                         // AuthenticationService.setupAxiosInterceptors();
-                        this.setState({loading:true});
+                        this.setState({ loading: true });
                         PipelineService.savePipelineJson(myJson, fileName)
                             .then(response => {
                                 console.log("response--------->", response);
                                 console.log("messageCode-->", response.data.messageCode);
-                                
+
                                 if (response.status == 200) {
                                     this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
                                 }
@@ -154,9 +157,10 @@ export default class PipelineProgramImport extends Component {
                                                 break;
                                             case 412:
                                                 this.setState({
-                                                    message: error.response.data.messageCode,
+                                                    // message: error.response.data.messageCode,
                                                     loading: false
                                                 });
+                                                this.deleteProgramConfirmBox(myJson, fileName);
                                                 break;
                                             default:
                                                 this.setState({
@@ -184,6 +188,66 @@ export default class PipelineProgramImport extends Component {
 
     }
 
+    deleteProgramConfirmBox(myJson, fieldName) {
+        confirmAlert({
+            title: "Program Already Exist !",
+            message: "The program you are trying to import already exist do you want to reimport the program.",
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        var programName = myJson.programinfo[0].programname;
+                        console.log("in delete confirm+++", programName);
+                        PipelineService.deletePipelineProgramData(programName)
+                            .then(response => {
+                                console.log("delete response+++", response);
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
+                    }
+                }, {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        this.props.history.push(`/pipeline/pieplineProgramList/` + 'red/' + i18n.t('static.message.cancelled', { entityname }));
+                    }
+                }
+            ]
+        })
+
+    }
     showFile = async (e) => {
         e.preventDefault()
         const reader = new FileReader();

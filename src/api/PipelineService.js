@@ -120,6 +120,11 @@ class PipelineService {
         return axios.put(`${API_URL}/api/pipeline/realmCountryPlanningUnit/${pipelineId}/${realmCountryId}`, {}
         );
     }
+
+    deletePipelineProgramData(programName) {
+        return axios.put(`${API_URL}/api/pipeline/deletePipelineProgramData/${programName}`,{}
+        );
+    }
 }
 
 export default new PipelineService();
