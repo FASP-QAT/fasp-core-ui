@@ -1359,6 +1359,7 @@ export default class ExpiredInventory extends Component {
 
                             </div>
                         </div>
+                        {this.state.outPutList.length>0 && <span style={{float:"left"}}>{i18n.t("static.expiryReport.batchInfoNote")}</span>}
                         <div className="">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>

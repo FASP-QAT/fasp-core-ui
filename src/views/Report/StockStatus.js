@@ -1539,6 +1539,7 @@ console.log("PageArray+++",pageArray);
                           },
                           showInLegend: true,
                           pointStyle: 'line',
+                          pointRadius:0,
                           yValueFormatString: "$#,##0",
                           lineTension: 0,
                           data: data.map((item, index) => (item.minMos))
@@ -1559,6 +1560,7 @@ console.log("PageArray+++",pageArray);
                           },
                           lineTension: 0,
                           pointStyle: 'line',
+                          pointRadius:0,
                           showInLegend: true,
                           yValueFormatString: "$#,##0",
                           data: data.map((item, index) => (item.maxMos))
@@ -1576,6 +1578,7 @@ console.log("PageArray+++",pageArray);
                           lineTension: 0,
                           showInLegend: true,
                           pointStyle: 'line',
+                          pointRadius:0,
                           yValueFormatString: "$#,##0",
                           data: data.map((item, index) => {
                             if (item.mos != '') {
@@ -1598,6 +1601,7 @@ console.log("PageArray+++",pageArray);
                           lineTension: 0,
                           showInLegend: true,
                           pointStyle: 'line',
+                          pointRadius:0,
                           yValueFormatString: "$#,##0",
                           data: data.map((item, index) => (item.finalConsumptionQty))
                         },
@@ -1612,6 +1616,7 @@ console.log("PageArray+++",pageArray);
                           },
                           lineTension: 0,
                           pointStyle: 'line',
+                          pointRadius:0,
                           showInLegend: true,
                           data: data.map((item, index) => (item.closingBalance))
                         }
@@ -1920,6 +1925,7 @@ console.log("PageArray+++",pageArray);
                         },
                         showInLegend: true,
                         pointStyle: 'line',
+                        pointRadius:0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: plannningUnitItem.map((item, index) => (item.minMos))
@@ -1940,6 +1946,7 @@ console.log("PageArray+++",pageArray);
                         },
                         lineTension: 0,
                         pointStyle: 'line',
+                        pointRadius:0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: plannningUnitItem.map((item, index) => (item.maxMos))
@@ -1957,6 +1964,7 @@ console.log("PageArray+++",pageArray);
                         lineTension: 0,
                         showInLegend: true,
                         pointStyle: 'line',
+                        pointRadius:0,
                         yValueFormatString: "$#,##0",
                         data: plannningUnitItem.map((item, index) => (this.roundN(item.mos)))
                       }
@@ -1973,6 +1981,7 @@ console.log("PageArray+++",pageArray);
                         lineTension: 0,
                         showInLegend: true,
                         pointStyle: 'line',
+                        pointRadius:0,
                         yValueFormatString: "$#,##0",
                         data: plannningUnitItem.map((item, index) => (item.finalConsumptionQty))
                       },
@@ -1987,6 +1996,7 @@ console.log("PageArray+++",pageArray);
                         },
                         lineTension: 0,
                         pointStyle: 'line',
+                        pointRadius:0,
                         showInLegend: true,
                         data: plannningUnitItem.map((item, index) => (item.closingBalance))
                       }
@@ -3063,6 +3073,7 @@ console.log("PageArray+++",pageArray);
           },
           showInLegend: true,
           pointStyle: 'line',
+          pointRadius:0,
           yValueFormatString: "$#,##0",
           lineTension: 0,
           data: this.state.stockStatusList.map((item, index) => (item.minMos))
@@ -3083,6 +3094,7 @@ console.log("PageArray+++",pageArray);
           },
           lineTension: 0,
           pointStyle: 'line',
+          pointRadius:0,
           showInLegend: true,
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.maxMos))
@@ -3100,6 +3112,7 @@ console.log("PageArray+++",pageArray);
           lineTension: 0,
           showInLegend: true,
           pointStyle: 'line',
+          pointRadius:0,
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.mos != null ? this.roundN(item.mos) : item.mos))
         }
@@ -3116,6 +3129,7 @@ console.log("PageArray+++",pageArray);
           lineTension: 0,
           showInLegend: true,
           pointStyle: 'line',
+          pointRadius:0,
           yValueFormatString: "$#,##0",
           data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
         },
@@ -3130,6 +3144,7 @@ console.log("PageArray+++",pageArray);
           },
           lineTension: 0,
           pointStyle: 'line',
+          pointRadius:0,
           showInLegend: true,
           data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
         }
