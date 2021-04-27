@@ -11,6 +11,7 @@ import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import imageNotificationCount from '../../assets/img/icons-truck.png';
 import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
 import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
 import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
@@ -93,17 +94,12 @@ class DefaultHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown> */}
           {checkOnline === 'Online' &&
-          <NavItem className="">
-            <NavLink to="#" className="nav-link">
-            
-              <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
-                
-                <span className="icon-wrapper-bg"></span>
-                <span class="badge badge-danger" style={{'zIndex': '6'}}>{this.props.notificationCount}</span>
-                <i className="cui-bell icons HomeIcon icon-anim-pulse text-primary " onClick={this.props.shipmentLinkingAlerts} title={"Shipment Linking Notification"}></i>
-              </span>
-            </NavLink>
-          </NavItem>}
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                  {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
+                  <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={"Shipment Linking Notification"} style={{ width: '30px', height: '30px',marginTop: '-1px' }} />
+              </NavLink>
+            </NavItem>}
           <DefaultHeaderDropdown mssgs />
 
           {/* <NavItem className="">

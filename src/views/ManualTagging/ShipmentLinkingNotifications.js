@@ -30,8 +30,8 @@ export default class ShipmentLinkingNotifications extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            color:'',
-            message:'',
+            color: '',
+            message: '',
             loading: true,
             loading1: false,
             programs: [],
@@ -39,7 +39,9 @@ export default class ShipmentLinkingNotifications extends Component {
             instance: '',
             artmisHistory: [],
             lang: 'en',
-            displaySubmitButton: false
+            displaySubmitButton: false,
+            planningUnitArray: [],
+            hasSelectAll: true
         }
         this.displayButton = this.displayButton.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -57,6 +59,25 @@ export default class ShipmentLinkingNotifications extends Component {
         this.filterData1 = this.filterData1.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
+        this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
+    }
+
+    getPlanningUnitArray() {
+        let planningUnits = this.state.planningUnits;
+        console.log("planningUnitArray1---", planningUnits);
+        let planningUnitArray = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
+
+        this.setState({
+            planningUnitArray
+        }, () => {
+            this.filterData(planningUnitArray);
+        })
+
+        console.log("planningUnitArray2---", planningUnitArray);
     }
 
     displayButton() {
@@ -77,9 +98,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
     }
 
-    cancelClicked() {
-        this.toggleLarge();
-    }
+
 
     filterData1() {
         this.filterData(this.state.planningUnitIds);
@@ -89,8 +108,8 @@ export default class ShipmentLinkingNotifications extends Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     updateDetails() {
-
-        var programId = document.getElementById("programId").value;
+        document.getElementById('div2').style.display = 'block';
+        var programId = this.state.programId;
 
         this.setState({ loading1: true })
         var validation = this.checkValidation();
@@ -125,15 +144,15 @@ export default class ShipmentLinkingNotifications extends Component {
                     console.log("response m tagging---", response)
                     document.getElementById('div2').style.display = 'block';
                     this.setState({
-                        message : "Data updated successfully.",
+                        message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: 'green',
                         loading: false,
-                        loading1: false
+                        loading1: false,
+                        displaySubmitButton: false
                     },
                         () => {
-console.log("message ------------------"+this.state.message);
-                            // this.hideSecondComponent();
-                            document.getElementById('div2').style.display = 'block';
+                            console.log("message ------------------" + this.state.message);
+                            this.hideSecondComponent();
                             console.log("Going to call toggle large 1");
 
                             this.filterData(this.state.planningUnitIds);
@@ -296,22 +315,12 @@ console.log("message ------------------"+this.state.message);
         // }
     }
 
-
-    // oneditionend = function (instance, cell, x, y, value) {
-    // var elInstance = instance.jexcel;
-    // var rowData = elInstance.getRowData(y);
-
-    // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-    //     // console.log("RESP---------", parseFloat(rowData[2]));
-    //     elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
-    // }
-    // this.el.setValueFromCoords(7, y, 1, true);
-
-    // }
-
     programChange(event) {
         this.setState({
-            programId: event.target.value
+            programId: event.target.value,
+            hasSelectAll: true
+        }, () => {
+            this.getPlanningUnitList();
         })
     }
 
@@ -339,7 +348,7 @@ console.log("message ------------------"+this.state.message);
 
         console.log("planningUnitIds---", planningUnitIds);
         // document.getElementById('div2').style.display = 'block';
-        var programId = document.getElementById("programId").value;
+        var programId = this.state.programId;
         var addressed = document.getElementById("addressed").value;
 
         planningUnitIds = planningUnitIds;
@@ -347,6 +356,7 @@ console.log("message ------------------"+this.state.message);
         //     return parseInt(a.value) - parseInt(b.value);
         // })
         this.setState({
+            hasSelectAll: false,
             planningUnitIds,
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
@@ -362,7 +372,7 @@ console.log("message ------------------"+this.state.message);
                 //     this.setState({ message: '' })
                 // }
                 var json = {
-                    programId: parseInt(document.getElementById("programId").value),
+                    programId: parseInt(this.state.programId),
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString())
                 }
 
@@ -374,7 +384,7 @@ console.log("message ------------------"+this.state.message);
                         this.setState({
                             outputList: list
                         }, () => {
-                            // this.getPlanningUnitListByTracerCategory(planningUnitId);
+                            localStorage.setItem("sesProgramIdReport", programId)
                             this.buildJExcel();
                         });
                     }).catch(
@@ -417,6 +427,12 @@ console.log("message ------------------"+this.state.message);
                             }
                         }
                     );
+            } else {
+                this.setState({
+                    outputList: []
+                }, () => {
+                    this.state.languageEl.destroy();
+                })
             }
             // else if (programId == -1) {
             //     console.log("2-programId------>", programId);
@@ -466,10 +482,20 @@ console.log("message ------------------"+this.state.message);
                             this.getPlanningUnitList();
                         })
                     } else {
-                        this.setState({
-                            programs: listArray,
-                            loading: false
-                        })
+                        if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                            this.setState({
+                                programs: listArray,
+                                loading: false,
+                                programId: localStorage.getItem("sesProgramIdReport")
+                            }, () => {
+                                this.getPlanningUnitList();
+                            });
+                        } else {
+                            this.setState({
+                                programs: listArray,
+                                loading: false
+                            })
+                        }
                     }
 
                 }
@@ -532,23 +558,6 @@ console.log("message ------------------"+this.state.message);
         console.log("artmisHistoryList---->", artmisHistoryList);
         let artmisHistoryArray = [];
         let count = 0;
-
-        // for (var j = 0; j < artmisHistoryList.length; j++) {
-        //     data = [];
-
-        //     data[0] = artmisHistoryList[j].roNo;
-        //     data[1] = artmisHistoryList[j].roPrimeLineNo;
-        //     data[2] = artmisHistoryList[j].orderNo;
-        //     data[3] = artmisHistoryList[j].primeLineNo;
-        //     data[4] = getLabelText(artmisHistoryList[j].erpPlanningUnit.label, this.state.lang)
-        //     data[5] = this.formatDate(artmisHistoryList[j].expectedDeliveryDate);
-        //     data[6] = artmisHistoryList[j].erpStatus
-        //     data[7] = this.addCommas(artmisHistoryList[j].shipmentQty);
-        //     data[8] = this.formatDate(artmisHistoryList[j].receivedOn);
-
-        //     artmisHistoryArray[count] = data;
-        //     count++;
-        // }
         console.log("jexcel this------", this);
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         this.el.destroy();
@@ -563,27 +572,28 @@ console.log("message ------------------"+this.state.message);
             columns: [
 
                 {
-                    title: "RO No.",
+                    title: i18n.t('static.mt.roNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "RO Prime Line No",
+                    title: i18n.t('static.mt.roPrimeLineNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Order No.",
+                    title: i18n.t('static.mt.orderNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Prime Line No.",
+                    title: i18n.t('static.mt.primeLineNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "ERP Planning Unit",
+
+                    title: i18n.t('static.manualTagging.erpPlanningUnit'),
                     type: 'text',
                     readOnly: true
                 },
@@ -663,8 +673,12 @@ console.log("message ------------------"+this.state.message);
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[7] = manualTaggingList[j].erpStatus
             data[8] = this.addCommas(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
-            data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-            data[10] = this.addCommas((manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+            if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2) || manualTaggingList[j].notificationType.id == 1) {
+                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
+            } else {
+                data[9] = ""
+            }
+            data[10] = this.addCommas((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
             data[11] = manualTaggingList[j].notes
             data[12] = 0
             data[13] = manualTaggingList[j].orderNo
@@ -685,16 +699,15 @@ console.log("message ------------------"+this.state.message);
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 40, 20, 50, 50, 50, 30, 30, 35, 25, 35, 35],
+            colWidths: [45, 45, 40, 50, 60, 60, 45, 45, 40, 30, 45, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: "Addressed?",
+                    title: i18n.t('static.mt.isAddressed'),
                     type: 'checkbox',
                 },
                 {
-                    // title: i18n.t('static.mt.notificationType'),
-                    title: "Notification Type",
+                    title: i18n.t('static.mt.notificationType'),
                     type: 'text',
                     readOnly: true
                 },
@@ -791,6 +804,47 @@ console.log("message ------------------"+this.state.message);
             allowDeleteRow: false,
             onselection: this.selected,
             onchange: this.changed,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (y != null) {
+                    var rowData = elInstance.getRowData(y);
+                    if (rowData[0] && rowData[12] != 1) {
+                        var cell;
+                        cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+
+
+                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+
+                        cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    else if (rowData[17] == 1) {
+                        var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    else {
+                        var cell;
+
+                        cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+
+                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+
+                        cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                }
+            }.bind(this),
+            onsearch: function (el) {
+                el.jexcel.updateTable();
+            },
+            onfilter: function (el) {
+                el.jexcel.updateTable();
+            },
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -804,7 +858,7 @@ console.log("message ------------------"+this.state.message);
                     if (obj.options.allowInsertRow == true) {
                         items.push({
                             // title: i18n.t('static.dashboard.linkShipment'),
-                            title: "View ARTMIS History",
+                            title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
                                 var outputListAfterSearch = [];
                                 let orderNo = this.el.getValueFromCoords(13, y);
@@ -880,11 +934,16 @@ console.log("message ------------------"+this.state.message);
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        console.log("asterisk123---", asterisk);
+        var tr = asterisk.firstChild;
+        console.log("tr-------------",tr)
+        tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
-    loadedERP = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance, 1);
-    }
+    // loadedERP = function (instance, cell, x, y, value) {
+    //     jExcelLoadedFunction(instance, 1);
+    // }
 
     // selected = function (instance, cell, x, y, value) {
 
@@ -965,7 +1024,7 @@ console.log("message ------------------"+this.state.message);
     }
 
     getPlanningUnitList() {
-        var programId = document.getElementById("programId").value;
+        var programId = this.state.programId;
         if (programId != -1) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
@@ -978,6 +1037,8 @@ console.log("message ------------------"+this.state.message);
                         });
                         this.setState({
                             planningUnits: listArray
+                        }, () => {
+                            this.getPlanningUnitArray();
                         })
                     }
                     else {
@@ -1030,6 +1091,13 @@ console.log("message ------------------"+this.state.message);
                         }
                     }
                 );
+        } else {
+            this.setState({
+                outputList: [],
+                planningUnits: []
+            }, () => {
+                this.state.languageEl.destroy();
+            })
         }
         // this.filterData();
 
@@ -1148,7 +1216,7 @@ console.log("message ------------------"+this.state.message);
             },
             {
                 dataField: 'receivedOn',
-                text: "Data Received On",
+                text: i18n.t('static.mt.dataReceivedOn'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1280,7 +1348,7 @@ console.log("message ------------------"+this.state.message);
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 // onChange={this.getPlanningUnitList}
-                                                onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
+                                                onChange={(e) => { this.programChange(e); }}
                                             >
                                                 <option value="-1">{i18n.t('static.common.select')}</option>
                                                 {programList}
@@ -1299,7 +1367,7 @@ console.log("message ------------------"+this.state.message);
                                             name="planningUnitId"
                                             id="planningUnitId"
                                             bsSize="sm"
-                                            value={this.state.planningUnitValues}
+                                            value={this.state.hasSelectAll ? planningUnitMultiList : this.state.planningUnitValues}
                                             onChange={(e) => { this.filterData(e) }}
                                             options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                         />
@@ -1307,7 +1375,7 @@ console.log("message ------------------"+this.state.message);
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3 ">
-                                    <Label htmlFor="appendedInputButton">Addressed</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.mt.addressed')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -1317,18 +1385,17 @@ console.log("message ------------------"+this.state.message);
                                                 bsSize="sm"
                                                 // value={this.state.addressed}
                                                 onChange={this.filterData1}
-                                            // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
                                             >
-                                                <option value="-1">All</option>
-                                                <option value="1">Addressed</option>
-                                                <option value="0">Not Addressed</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                <option value="1">{i18n.t('static.mt.addressed')}</option>
+                                                <option value="0" selected>{i18n.t('static.mt.notAddressed')}</option>
                                             </Input>
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
                             </Row>
                             <div className="ReportSearchMarginTop">
-                                <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                                <div id="tableDiv" className="RemoveStriped">
                                 </div>
                                 {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">
                                         </div> */}
