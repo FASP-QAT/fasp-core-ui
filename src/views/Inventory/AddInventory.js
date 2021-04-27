@@ -298,8 +298,8 @@ export default class AddInventory extends Component {
                         }.bind(this);
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
-                            myResult = planningunitRequest.result;
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -610,7 +610,7 @@ export default class AddInventory extends Component {
                                     )} />
 
                         <div>
-                            <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" />
+                            <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
                             <div className="table-responsive" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable" />
                             </div>

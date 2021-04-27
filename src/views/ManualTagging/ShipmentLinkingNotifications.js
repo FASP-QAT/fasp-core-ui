@@ -144,7 +144,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     console.log("response m tagging---", response)
                     document.getElementById('div2').style.display = 'block';
                     this.setState({
-                        message: "Data updated successfully.",
+                        message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: 'green',
                         loading: false,
                         loading1: false,
@@ -573,27 +573,28 @@ export default class ShipmentLinkingNotifications extends Component {
             columns: [
 
                 {
-                    title: "RO No.",
+                    title: i18n.t('static.mt.roNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "RO Prime Line No",
+                    title: i18n.t('static.mt.roPrimeLineNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Order No.",
+                    title: i18n.t('static.mt.orderNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Prime Line No.",
+                    title: i18n.t('static.mt.primeLineNo'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "ERP Planning Unit",
+                    
+                    title: i18n.t('static.manualTagging.erpPlanningUnit'),
                     type: 'text',
                     readOnly: true
                 },
@@ -703,12 +704,11 @@ export default class ShipmentLinkingNotifications extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: "Addressed?",
+                    title: i18n.t('static.mt.isAddressed'),
                     type: 'checkbox',
                 },
                 {
-                    // title: i18n.t('static.mt.notificationType'),
-                    title: "Notification Type",
+                    title: i18n.t('static.mt.notificationType'),
                     type: 'text',
                     readOnly: true
                 },
@@ -859,7 +859,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
                             // title: i18n.t('static.dashboard.linkShipment'),
-                            title: "View ARTMIS History",
+                            title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
                                 var outputListAfterSearch = [];
                                 let orderNo = this.el.getValueFromCoords(13, y);
@@ -1212,7 +1212,7 @@ export default class ShipmentLinkingNotifications extends Component {
             },
             {
                 dataField: 'receivedOn',
-                text: "Data Received On",
+                text: i18n.t('static.mt.dataReceivedOn'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1371,7 +1371,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3 ">
-                                    <Label htmlFor="appendedInputButton">Addressed</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.mt.addressed')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input
@@ -1381,11 +1381,10 @@ export default class ShipmentLinkingNotifications extends Component {
                                                 bsSize="sm"
                                                 // value={this.state.addressed}
                                                 onChange={this.filterData1}
-                                            // onChange={(e) => { this.programChange(e); this.getPlanningUnitList(e) }}
                                             >
-                                                <option value="-1">All</option>
-                                                <option value="1">Addressed</option>
-                                                <option value="0" selected>Not Addressed</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                <option value="1">{i18n.t('static.mt.addressed')}</option>
+                                                <option value="0" selected>{i18n.t('static.mt.notAddressed')}</option>
                                             </Input>
                                         </InputGroup>
                                     </div>

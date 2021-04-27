@@ -65,6 +65,7 @@ class AddprogramPlanningUnit extends Component {
         // this.disableRow = this.disableRow.bind(this);
         // this.updateRow = this.updateRow.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.changed = this.changed.bind(this);
@@ -72,6 +73,7 @@ class AddprogramPlanningUnit extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
@@ -117,7 +119,15 @@ class AddprogramPlanningUnit extends Component {
         }, 8000);
     }
 
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
     componentDidMount() {
+        this.hideFirstComponent();
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
@@ -178,13 +188,39 @@ class AddprogramPlanningUnit extends Component {
                 }
             );
         // this.buildJexcel();
+        if (this.props.match.params.programId != null) {
+            let programId = this.props.match.params.programId;
+            this.setState({
+                programId: programId,
+                loading: true
+            },
+                () => {
+                    if (programId != 0 && programId != '' && programId != null) {
+                        console.log("CONSOLE-------->1", programId);
+                        this.buildJexcel();
+                    }
+                })
+        }
+
+    }
+
+    setProgramId() {
+        var programId = document.getElementById("programId").value;
+        this.setState({
+            programId: programId,
+        },
+            () => {
+                this.buildJexcel();
+            })
     }
 
     buildJexcel() {
         var list = [];
         var productCategoryListNew = [];
         var programObj;
-        var programId = document.getElementById("programId").value;
+        // var programId = document.getElementById("programId").value;
+        let programId = this.state.programId;
+        console.log("CONSOLE-------->2", programId);
         this.setState({
             programId: programId,
             loading: true
@@ -599,6 +635,31 @@ class AddprogramPlanningUnit extends Component {
                                                                         //         });
                                                                         //     }
                                                                         // }
+                                                                    }
+
+                                                                    //wr
+                                                                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                                        let cordsValue = `${this.el.getValueFromCoords(9, y)}`;
+                                                                        // console.log("CHECK--------->", cordsValue);
+                                                                        // if (cordsValue.length != 0) {
+                                                                        //     console.log("CHECK--------->not empty", cordsValue);
+                                                                        // } else {
+                                                                        //     console.log("CHECK--------->empty", cordsValue);
+                                                                        // }
+                                                                        if (obj.options.allowInsertRow == true) {
+                                                                            if (cordsValue.length != 0) {
+                                                                                items.push({
+                                                                                    title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
+                                                                                    onclick: function () {
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        this.props.history.push({
+                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(9, y)}/${programId}`,
+                                                                                        });
+
+                                                                                    }.bind(this)
+                                                                                });
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
 
@@ -1558,7 +1619,8 @@ class AddprogramPlanningUnit extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
-                                                onChange={this.buildJexcel}
+                                                onChange={this.setProgramId}
+                                                value={this.state.programId}
                                             >
                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                 {programList}

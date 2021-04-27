@@ -54,6 +54,17 @@ class ProgramIntegration extends Component {
         }, 8000);
     }
 
+    filterVersionStatus = function (instance, cell, c, r, source) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(r);
+        console.log("RESPO---------2", rowData[2]);
+        // return this.state.countryArr.filter(c => c.active.toString() == "true");
+        // if (rowData[2] == 1) {
+        //     elInstance.setValueFromCoords(3, r, 1, true);
+        // }
+        return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 1) : this.state.versionStatusArr);
+    }.bind(this);
+
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         IntegrationService.getProgramIntegrationByProgramId(this.props.match.params.programId).then(response => {
@@ -226,6 +237,7 @@ class ProgramIntegration extends Component {
                                                                 title: i18n.t('static.integration.versionStatus'),
                                                                 type: 'autocomplete',
                                                                 source: versionStatusArr,
+                                                                filter: this.filterVersionStatus
                                                             },
                                                             {
                                                                 title: i18n.t('static.checkbox.active'),
@@ -902,6 +914,12 @@ class ProgramIntegration extends Component {
     onedit = function (instance, cell, x, y, value) {
         console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
+
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+        if (x == 2 && rowData[2] == 1) {
+            elInstance.setValueFromCoords(3, y, 1, true);
+        }
     }.bind(this);
 
     checkValidation = function () {

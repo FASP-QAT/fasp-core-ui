@@ -908,6 +908,11 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                case "/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId":
+                    if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
+                        return true;
+                    }
+                    break;
                 case "/consumptionDetails":
                     if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
                         localStorage.setItem("isOfflinePage", 1);
@@ -960,6 +965,7 @@ class AuthenticationService {
                     break;
                 // case "/programProduct/addProgramProduct/:programId":
                 case "/programProduct/addProgramProduct":
+                case "/programProduct/addProgramProduct/:programId/:color/:message":
                     if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
                         return true;
                     }

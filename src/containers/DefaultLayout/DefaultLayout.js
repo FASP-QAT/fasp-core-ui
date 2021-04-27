@@ -69,6 +69,7 @@ const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListR
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
+const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProgramProduct/AddCountrySpecificPrice'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
 const Logout = React.lazy(() => import('../../views/Pages/Login/LogoutComponent'));
 const AddRole = React.lazy(() => import('../../views/Role/AddRoleComponent'));
@@ -321,7 +322,8 @@ const routes = [
 
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   // { path: '/programProduct/addProgramProduct', name: 'static.breadcrum.add', entityname: 'static.dashboard.programPlanningUnit', component: AddProgramProduct },
-  { path: '/programProduct/addProgramProduct', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct', exact: true, name: 'static.Update.PlanningUnits', component: AddProgramProduct },
+  { path: '/programProduct/addProgramProduct/:programId/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
 
 
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
@@ -404,6 +406,7 @@ const routes = [
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'static.breadcrum.add', entityname: 'static.dashboard.realmcountry', component: AddRealmCountry },
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
+  { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
 
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -1039,7 +1042,7 @@ class DefaultLayout extends Component {
                         attributes: {
                           hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT'))
                             ? false : true)
                         },
                         children: [
@@ -1099,12 +1102,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT') ? false : true) }
                           }
                           ,
-                          {
-                            name: i18n.t('static.integration.integration'),
-                            url: '/integration/listIntegration',
-                            icon: 'fa fa-map',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') ? false : true) }
-                          },
+                          
                           // {
                           //   name: i18n.t('static.dashboard.realmheader'),
                           //   icon: 'fa fa-list',
@@ -1259,6 +1257,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
                           },
 
+                          {
+                            name: i18n.t('static.integration.integration'),
+                            url: '/integration/listIntegration',
+                            icon: 'fa fa-map',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') ? false : true) }
+                          },
                           // {
 
                           //   name: 'Product Category',
@@ -1522,8 +1526,7 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
                         attributes: {
-                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
                         },
                         children: [
                           {

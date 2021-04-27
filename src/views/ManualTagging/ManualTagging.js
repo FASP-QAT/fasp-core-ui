@@ -68,8 +68,6 @@ export default class ManualTagging extends Component {
             artmisList: [],
             shipmentId: '',
             reason: "1",
-            haslinked: false,
-            alreadyLinkedmessage: "",
             tracercategoryPlanningUnit: [],
             planningUnitId: '',
             planningUnitName: '',
@@ -91,7 +89,7 @@ export default class ManualTagging extends Component {
             countryId: '',
             hasSelectAll: true
         }
-        
+
         this.filterData = this.filterData.bind(this);
         this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
@@ -218,7 +216,7 @@ export default class ManualTagging extends Component {
     getNotLinkedShipments() {
 
         let programId1 = parseInt(this.state.programId1);
-        let planningUnitId = this.state.planningUnitIdUpdated;
+        // let planningUnitId = this.state.planningUnitIdUpdated;
         ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
             .then(response => {
                 console.log("notLinkedShipments response===", response.data);
@@ -778,6 +776,8 @@ export default class ManualTagging extends Component {
     fundingSourceModal(event) {
         this.setState({
             fundingSourceId: event.target.value
+        }, () => {
+            this.getBudgetListByFundingSourceId();
         })
     }
 
@@ -830,19 +830,23 @@ export default class ManualTagging extends Component {
                 if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
                     valid = true;
                 } else {
-                    alert("Please select shipment id");
+                    alert(i18n.t('static.mt.selectShipmentId'));
                 }
 
             } else if (this.state.active4) {
                 if (programId == -1) {
-                    alert("Please select program");
+                    alert(i18n.t('static.mt.selectProgram'));
                 } else if (this.state.fundingSourceId == -1) {
-                    alert("Please select funding source");
+                    alert(i18n.t('static.mt.selectFundingSource'));
                 } else if (this.state.budgetId == -1) {
-                    alert("Please select budget");
+                    alert(i18n.t('static.mt.selectBudget'));
                 }
+                else if (document.getElementById("planningUnitId1") == -1) {
+                    alert(i18n.t('static.mt.selectPlanninfUnit'));
+                }
+
                 else {
-                    var cf = window.confirm("You are about to create a new shipment. Are you sure you want to continue?");
+                    var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
                     if (cf == true) {
                         valid = true;
                     } else { }
@@ -874,7 +878,8 @@ export default class ManualTagging extends Component {
                             active: map1.get("0"),
                             orderNo: map1.get("11"),
                             primeLineNo: parseInt(map1.get("12")),
-                            planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
+                            // planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
+                            planningUnitId: (this.state.active3 ? document.getElementById("planningUnitId1").value : 0),
                             quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
                         }
                         changedmtList.push(json);
@@ -882,18 +887,16 @@ export default class ManualTagging extends Component {
                 }
                 console.log("FINAL SUBMIT changedmtList---", changedmtList);
                 if (this.state.active4 && changedmtList.length > 1) {
-                    alert("Please select only 1 order at a time.");
+                    alert(i18n.t('static.mt.oneOrderAtATime'));
                 } else {
                     ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
                         .then(response => {
                             console.log("response m tagging---", response)
                             this.setState({
-                                message: (this.state.active2 ? "Shipment linking updated successfully" : i18n.t('static.shipment.linkingsuccess')),
+                                message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
                                 color: 'green',
-                                haslinked: true,
                                 loading: false,
                                 loading1: false,
-                                alreadyLinkedmessage: i18n.t('static.message.alreadyTagged'),
                             },
                                 () => {
                                     console.log("changedmtList length---", changedmtList.length);
@@ -1284,11 +1287,7 @@ export default class ManualTagging extends Component {
                     loading: true,
                     planningUnitIds
                 })
-                // if (this.state.haslinked) {
-                //     this.setState({ haslinked: false })
-                // } else {
-                //     this.setState({ message: '' })
-                // }
+
                 var json = {
                     programId: parseInt(this.state.programId),
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
@@ -1388,6 +1387,7 @@ export default class ManualTagging extends Component {
     }
     getPlanningUnitListByTracerCategory = (term) => {
         console.log("planning unit term---", term)
+        console.log("tracer category planning unit---", this.state.planningUnitId);
         this.setState({ planningUnitName: term });
         PlanningUnitService.getPlanningUnitByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId, term.toUpperCase())
             .then(response => {
@@ -1452,7 +1452,7 @@ export default class ManualTagging extends Component {
             console.log("programId ---", programId);
             console.log("selected erpPlanningUnitId ---", erpPlanningUnitId);
 
-            ManualTaggingService.searchErpOrderData(term.toUpperCase(), programId, (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
+            ManualTaggingService.searchErpOrderData(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
                     console.log("searchErpOrderData response===", response);
 
@@ -1506,7 +1506,7 @@ export default class ManualTagging extends Component {
                 );
         }
     }
-   
+
     getProgramList() {
         ProgramService.getProgramList()
             .then(response => {
@@ -1598,12 +1598,6 @@ export default class ManualTagging extends Component {
 
         for (var j = 0; j < erpDataList.length; j++) {
             data = [];
-
-            // data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
-            // data[4] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-            // data[5] = manualTaggingList[j].procurementAgent.code;
-            // data[6] = manualTaggingList[j].orderNo
-            // data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
             if (this.state.active3) {
                 data[0] = 0;
                 data[1] = erpDataList[j].erpOrderId;
@@ -1660,14 +1654,10 @@ export default class ManualTagging extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            // colWidths: [20, 40, 50, 50, 25, 30, 30, 20, 30, 25],
             colHeaderClasses: ["Reqasterisk"],
-            // minDimensions: [9],
-
             columns: [
                 {
-                    // title: i18n.t('static.manualTagging.linkColumn'),
-                    title: "Link?",
+                    title: i18n.t('static.mt.linkColumn'),
                     type: 'checkbox',
                 },
                 {
@@ -1736,7 +1726,7 @@ export default class ManualTagging extends Component {
                 show: '',
                 entries: '',
             },
-            // onload: this.loaded,
+            onload: this.loadedERP,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1761,7 +1751,7 @@ export default class ManualTagging extends Component {
                 show: '',
                 entries: '',
             },
-            onload: this.loadedERP,
+
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -1896,36 +1886,9 @@ export default class ManualTagging extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                // contextMenu: function (obj, x, y, e) {
-                //     var items = [];
-                //     if (y != null) {
-                //         if (obj.options.allowInsertRow == true) {
-                //             items.push({
-                //                 title: i18n.t('static.dashboard.linkShipment'),
-                //                 onclick: function () {
-                //                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                //                     var outputListAfterSearch = [];
-                //                     let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
-                //                     console.log("row---------***----", row);
-                //                     outputListAfterSearch.push(row);
-
-                //                     this.setState({
-                //                         planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                //                         shipmentId: this.el.getValueFromCoords(0, y),
-                //                         outputListAfterSearch,
-                //                         procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
-                //                         planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
-                //                     })
-                //                     console.log("Going to call toggle large 2");
-                //                     this.toggleLarge();
-
-                //                 }.bind(this)
-                //             });
-                //         }
-                //     }
-
-                //     return items;
-                // }.bind(this)
+                contextMenu: function (obj, x, y, e) {
+                    return [];
+                }.bind(this),
             };
         }
 
@@ -1937,7 +1900,7 @@ export default class ManualTagging extends Component {
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
-                        title: "Parent Shipment Id",
+                        title: i18n.t('static.mt.parentShipmentId'),
                         type: 'text',
                     },
                     {
@@ -2013,36 +1976,9 @@ export default class ManualTagging extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                // contextMenu: function (obj, x, y, e) {
-                //     var items = [];
-                //     if (y != null) {
-                //         if (obj.options.allowInsertRow == true) {
-                //             items.push({
-                //                 title: i18n.t('static.dashboard.linkShipment'),
-                //                 onclick: function () {
-                //                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                //                     var outputListAfterSearch = [];
-                //                     let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, y)))[0];
-                //                     console.log("row---------***----", row);
-                //                     outputListAfterSearch.push(row);
-
-                //                     this.setState({
-                //                         planningUnitId: outputListAfterSearch[0].planningUnit.id,
-                //                         shipmentId: this.el.getValueFromCoords(0, y),
-                //                         outputListAfterSearch,
-                //                         procurementAgentId: outputListAfterSearch[0].procurementAgent.id,
-                //                         planningUnitName: row.planningUnit.label.label_en + '(' + row.skuCode + ')'
-                //                     })
-                //                     console.log("Going to call toggle large 2");
-                //                     this.toggleLarge();
-
-                //                 }.bind(this)
-                //             });
-                //         }
-                //     }
-
-                //     return items;
-                // }.bind(this)
+                contextMenu: function (obj, x, y, e) {
+                    return [];
+                }.bind(this),
             };
         }
         else if (this.state.active3) {
@@ -2104,6 +2040,9 @@ export default class ManualTagging extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
+                contextMenu: function (obj, x, y, e) {
+                    return [];
+                }.bind(this),
             };
         }
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -2115,9 +2054,20 @@ export default class ManualTagging extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        // console.log("asterisk123---", asterisk);
+        // var tr = asterisk.firstChild;
+        // console.log("tr-------------",tr)
+        // tr.children[6].classList.add('AsteriskTheadtrTd');
     }
     loadedERP = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
+        // console.log("instance---", instance)
+        // var asterisk = document.getElementsByClassName("resizable")[1];
+        // console.log("asterisk---", asterisk);
+        // var tr = asterisk.firstChild;
+        // console.log("tr-------------", tr)
+        // tr.children[9].classList.add('AsteriskTheadtrTd');
     }
 
     selected = function (instance, cell, x, y, value) {
@@ -2127,20 +2077,24 @@ export default class ManualTagging extends Component {
         } else {
             var outputListAfterSearch = [];
             let row;
-            console.log("instance---", instance);
-            console.log("cell---", cell);
-            console.log("this.state.outputList---", this.state.outputList);
+            let json;
             if (this.state.active1) {
                 row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
-                console.log("row id----------------------->", this.el.getValueFromCoords(0, x));
-                console.log("row----------------------->", row);
                 outputListAfterSearch.push(row);
-                let json = { id: '', label: '' };
+                console.log("order no my---", outputListAfterSearch[0].orderNo);
+                if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
+                    json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
+                } else {
+                    json = { id: '', label: '' };
+                }
                 this.setState({
                     roNoOrderNo: json,
-                    searchedValue: '',
+                    searchedValue: outputListAfterSearch[0].orderNo,
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
+                }, () => {
+
+                    this.getOrderDetails();
                 });
             } else if (this.state.active2) {
                 console.log("my out put list---", this.state.outputList)
@@ -2149,7 +2103,7 @@ export default class ManualTagging extends Component {
                 console.log()
                 outputListAfterSearch.push(row);
                 console.log("selected planning unit id--", outputListAfterSearch[0].erpPlanningUnit.id);
-                let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
+                json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
                 this.setState({
                     parentShipmentId: outputListAfterSearch[0].parentShipmentId,
                     roNoOrderNo: json,
@@ -2166,13 +2120,13 @@ export default class ManualTagging extends Component {
                 row = this.state.outputList.filter(c => (c.erpOrderId == this.el.getValueFromCoords(0, x)))[0];
                 console.log()
                 outputListAfterSearch.push(row);
-                let json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
+                json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
 
                 this.setState({
                     selectedShipment: [],
                     roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].orderNo,
-                    planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
+                    searchedValue: outputListAfterSearch[0].roNo,
+                    // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
                     this.filterProgramByCountry();
                     this.getOrderDetails();
@@ -2311,7 +2265,6 @@ export default class ManualTagging extends Component {
             reason: "1",
             totalQuantity: '',
             result: '',
-            alreadyLinkedmessage: '',
             manualTag: !this.state.manualTag,
             active4: false,
             active5: false
@@ -2344,7 +2297,7 @@ export default class ManualTagging extends Component {
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,
-            selectionHeaderRenderer: () => 'Select shipment id',
+            selectionHeaderRenderer: () => i18n.t('static.mt.selectShipment'),
             headerColumnStyle: {
                 headerAlign: 'center'
                 // align:  function callback(cell, row, rowIndex, colIndex) { 
@@ -2938,7 +2891,7 @@ export default class ManualTagging extends Component {
                                                                 <Label
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio1">
-                                                                    {'Create New Shipment'}
+                                                                    {i18n.t('static.mt.createNewShipment')}
                                                                 </Label>
                                                             </FormGroup>
                                                             <FormGroup check inline>
@@ -2954,7 +2907,7 @@ export default class ManualTagging extends Component {
                                                                 <Label
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2">
-                                                                    {'Select Existing Shipment'}
+                                                                    {i18n.t('static.mt.selectExistingShipment')}
                                                                 </Label>
                                                             </FormGroup>
                                                         </FormGroup>
@@ -3031,7 +2984,7 @@ export default class ManualTagging extends Component {
                                                                             bsSize="sm"
                                                                             value={this.state.fundingSourceId}
                                                                             // onChange={this.getBudgetListByFundingSourceId}
-                                                                            onChange={(e) => { this.fundingSourceModal(e); this.getBudgetListByFundingSourceId(e) }}
+                                                                            onChange={(e) => { this.fundingSourceModal(e); }}
                                                                         >
                                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                                             {newFundingSourceList}
@@ -3120,7 +3073,8 @@ export default class ManualTagging extends Component {
                                                                     this.setState({
                                                                         erpPlanningUnitId: '',
                                                                         planningUnitIdUpdated: '',
-                                                                        planningUnitName: ''
+                                                                        planningUnitName: '',
+                                                                        tracercategoryPlanningUnit: []
                                                                     }, () => { this.getOrderDetails() });
                                                                 }
 
@@ -3159,7 +3113,7 @@ export default class ManualTagging extends Component {
                                                                     console.log("combo 2 Inside else");
                                                                     this.setState({
                                                                         searchedValue: ''
-                                                                        // , roNoOrderNo: '' 
+                                                                        , autocompleteData: []
                                                                     }, () => { this.getOrderDetails() });
                                                                 }
 
@@ -3180,17 +3134,11 @@ export default class ManualTagging extends Component {
                                         </div>
 
                                     </div><br />
-
-
-                                    {/* <h5> {this.state.reason != "" && this.state.reason != 1 && <div style={{ color: 'red' }}>Note : {i18n.t(this.state.reason)}</div>}</h5> */}
-                                    {/* <h5><div style={{ color: 'red' }} >
-                                        {i18n.t(this.state.result)}</div></h5> */}
-                                    {/* <h5 style={{ color: 'red' }}>{i18n.t(this.state.alreadyLinkedmessage)}</h5> */}
                                 </ModalBody>
                                 <ModalFooter>
-                                    {this.state.displayTotalQty && <b><h3 className="float-right">Total Quantity : {this.state.totalQuantity}</h3></b>}
+                                    {this.state.displayTotalQty && <b><h3 className="float-right">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
 
-                                    {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? "Update" : i18n.t('static.manualTagging.link'))}</Button>}
+                                    {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
 
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>

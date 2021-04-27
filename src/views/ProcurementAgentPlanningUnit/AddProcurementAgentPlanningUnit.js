@@ -922,7 +922,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             data[11] = papuList[j].procurementAgentPlanningUnitId;
                                                             data[12] = 0;
                                                             papuDataArr[count] = data;
-                                                            console.log("data---",papuList[j].volume)
+                                                            console.log("data---", papuList[j].volume)
                                                             count++;
 
 
@@ -1215,6 +1215,31 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                                     //     }
                                                                     // }
                                                                 }
+
+                                                                //wr
+                                                                // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                                //     let cordsValue = `${this.el.getValueFromCoords(11, y)}`;
+                                                                //     // console.log("CHECK--------->", cordsValue);
+                                                                //     // if (cordsValue.length != 0) {
+                                                                //     //     console.log("CHECK--------->not empty", cordsValue);
+                                                                //     // } else {
+                                                                //     //     console.log("CHECK--------->empty", cordsValue);
+                                                                //     // }
+                                                                //     if (obj.options.allowInsertRow == true) {
+                                                                //         if (cordsValue.length != 0) {
+                                                                //             items.push({
+                                                                //                 title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
+                                                                //                 onclick: function () {
+                                                                //                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                //                     this.props.history.push({
+                                                                //                         pathname: `/procurementAgentPlanningUnit/addCountrySpecificPrice/${this.state.procurementAgentId}/${this.el.getValueFromCoords(1, y)}/${this.el.getValueFromCoords(11, y)}`,
+                                                                //                     });
+
+                                                                //                 }.bind(this)
+                                                                //             });
+                                                                //         }
+                                                                //     }
+                                                                // }
                                                             }
 
                                                             // Line
@@ -1464,7 +1489,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("value ---",this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                console.log("value ---", this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         planningUnit: {

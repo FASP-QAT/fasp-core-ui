@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -51,6 +51,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.oneditionend = this.oneditionend.bind(this);
     }
 
+    formatter = value => {
+        if (value != null && value !== '' && !isNaN(Number(value))) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        } else if (value != null && isNaN(Number(value))) {
+            return value;
+        } else {
+            return ''
+        }
+    }
+
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
@@ -72,6 +91,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(30, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(32, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(33, data[i].y, 0, true);
                 }
                 z = data[i].y;
             }
@@ -79,15 +99,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var rowData = (instance.jexcel).getRowData(data[i].y);
                 var pricePerUnit = "";
                 var planningUnitId = document.getElementById("planningUnitId").value;
-                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId && c.active);
                 // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
                 //     elInstance.setValueFromCoords(8, y, "", true);
                 // }
                 // if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
-                if (procurementAgentPlanningUnit.length > 0) {
-                    pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId && c.active);
+                if (programPriceList.length > 0) {
+                    pricePerUnit = Number(programPriceList[0].price);
                 } else {
-                    pricePerUnit = this.props.items.catalogPrice
+                    if (procurementAgentPlanningUnit.length > 0) {
+                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                    } else {
+                        pricePerUnit = this.props.items.catalogPrice
+                    }
                 }
                 if (rowData[14] != "") {
                     var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);
@@ -147,6 +172,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
         var programJson = this.props.items.programJson;
+        this.setState({
+            actualProgramId: programJson.programId
+        })
         var db1;
         var shipmentStatusList = [];
         var procurementAgentList = [];
@@ -330,6 +358,24 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             currencyList.push(currencyJson);
                                         }
+                                        if (this.props.useLocalData == 0) {
+                                            dataSourceList = this.props.items.dataSourceList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            currencyList = this.props.items.currencyList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            fundingSourceList = this.props.items.fundingSourceList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            budgetList = this.props.items.budgetList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            shipmentStatusList = this.props.items.shipmentStatusList;
+                                        }
+                                        if (this.props.useLocalData == 0) {
+                                            procurementAgentList = this.props.items.procurementAgentList;
+                                        }
                                         this.setState({
                                             currencyListAll: currencyResult,
                                             currencyList: currencyList,
@@ -455,6 +501,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = shipmentList[i].active;//AE
                                             data[31] = 0;//AF
                                             data[32] = shipmentList[i].currency.conversionRateToUsd;//Conversionratetousdenterhere//AG
+                                            data[33] = shipmentList[i].shipmentQty;
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -492,6 +539,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = true;
                                             data[31] = 0;
                                             data[32] = 1;
+                                            data[33] = 0
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
@@ -529,6 +577,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: "Suggested order Qty" },
                                                 { type: 'hidden', title: "Is changed" },
                                                 { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
+                                                { type: 'hidden' },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' }
                                             ],
@@ -608,8 +657,126 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         });
                                                     }
 
-                                                    // Add shipment batch info
+
                                                     var rowData = obj.getRowData(y);
+                                                    if(rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1){
+                                                    var expectedDeliveryDate = rowData[4];
+                                                    var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                    var expectedTotalShipmentQty=this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty!=""?(this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty):0;
+                                                    var existingShipmentQty=0;
+                                                    var shipmentsJson=(obj.getJson(null,false));
+                                                    shipmentsJson.map((item,index)=>{
+                                                        existingShipmentQty += Number(obj.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
+                                                    })
+                                                    var suggestedQty=Number(expectedTotalShipmentQty)-Number(existingShipmentQty);
+                                                    if (suggestedQty>0) {
+                                                        items.push({
+                                                            title: i18n.t("static.qpl.recalculate"),
+                                                            onclick: function () {
+                                                                // var expectedDeliveryDate = rowData[4];
+                                                                // var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                                // var endingBalance = Number(this.props.items.closingBalanceArray[index].balance);
+                                                                // var unmetDemand = this.props.items.unmetDemand[index];
+                                                                var originalShipmentQty = Number(obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                                                                // var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
+                                                                // if (newEndingBalance < 0) {
+                                                                //     var tempEndingBalance = Number(newEndingBalance)+Number(unmetDemand);
+                                                                //     unmetDemand += (0 - Number(tempEndingBalance));
+                                                                //     newEndingBalance = 0;
+                                                                // }
+                                                                // var amc = Number(this.props.items.amcTotalData[index]);
+                                                                // var mosForMonth1 = "";
+                                                                // if (newEndingBalance != 0 && amc != 0) {
+                                                                //     mosForMonth1 = Number(newEndingBalance / amc).toFixed(1);
+                                                                // } else if (amc == 0) {
+                                                                //     mosForMonth1 = null;
+                                                                // } else {
+                                                                //     mosForMonth1 = 0;
+                                                                // }
+
+                                                                // var endingBalance1 = Number(this.props.items.closingBalanceArray[index+1].balance);
+                                                                // var unmetDemand1 = this.props.items.unmetDemand[index+1];
+                                                                // var newEndingBalance1 = Number(endingBalance1) - Number(originalShipmentQty);
+                                                                // if (newEndingBalance1 < 0) {
+                                                                //     var tempEndingBalance1 = Number(newEndingBalance1)+Number(unmetDemand1);
+                                                                //     unmetDemand1 += (0 - Number(tempEndingBalance1));
+                                                                //     newEndingBalance1 = 0;
+                                                                // }
+                                                                // var amc1 = Number(this.props.items.amcTotalData[index+1]);
+                                                                // var mosForMonth2 = "";
+                                                                // if (newEndingBalance1 != 0 && amc1 != 0) {
+                                                                //     mosForMonth2 = Number(newEndingBalance1 / amc1).toFixed(1);
+                                                                // } else if (amc1 == 0) {
+                                                                //     mosForMonth2 = null;
+                                                                // } else {
+                                                                //     mosForMonth2 = 0;
+                                                                // }
+
+                                                                // var endingBalance2 = Number(this.props.items.closingBalanceArray[index+2].balance);
+                                                                // var unmetDemand2 = this.props.items.unmetDemand[index+2];
+                                                                // var newEndingBalance2 = Number(endingBalance2) - Number(originalShipmentQty);
+                                                                // if (newEndingBalance2 < 0) {
+                                                                //     var tempEndingBalance2 = Number(newEndingBalance2)+Number(unmetDemand2);
+                                                                //     unmetDemand2 += (0 - Number(tempEndingBalance2));
+                                                                //     newEndingBalance2 = 0;
+                                                                // }
+                                                                // var amc2 = Number(this.props.items.amcTotalData[index+2]);
+                                                                // var mosForMonth3 = "";
+                                                                // if (newEndingBalance2 != 0 && amc2 != 0) {
+                                                                //     mosForMonth3 = Number(newEndingBalance2 / amc2).toFixed(1);
+                                                                // } else if (amc2 == 0) {
+                                                                //     mosForMonth3 = null;
+                                                                // } else {
+                                                                //     mosForMonth3 = 0;
+                                                                // }
+
+                                                                // var minStockMoSQty = this.props.items.minStockMoSQty;
+                                                                // var maxStockMoSQty = this.props.items.maxStockMoSQty;
+                                                                // var suggestShipment = false;
+                                                                // var useMax = false;
+                                                                // if (Number(amc) == 0) {
+                                                                //     suggestShipment = false;
+                                                                // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                                                //     suggestShipment = false;
+                                                                // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                //     suggestShipment = true;
+                                                                //     useMax = true;
+                                                                // } else if (Number(mosForMonth1) == 0) {
+                                                                //     suggestShipment = true;
+                                                                //     if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                //         useMax = true;
+                                                                //     } else {
+                                                                //         useMax = false;
+                                                                //     }
+                                                                // }
+                                                                // var newSuggestedShipmentQty = 0;
+                                                                // if (suggestShipment) {
+                                                                //     var suggestedOrd = 0;
+                                                                //     if (useMax) {
+                                                                //         suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                //     } else {
+                                                                //         suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                //     }
+                                                                //     if (suggestedOrd <= 0) {
+                                                                //         newSuggestedShipmentQty = 0;
+                                                                //     } else {
+                                                                //         newSuggestedShipmentQty = suggestedOrd;
+                                                                //     }
+                                                                // } else {
+                                                                //     newSuggestedShipmentQty = 0;
+                                                                // }
+                                                                var newSuggestedShipmentQty=Number(originalShipmentQty)+Number(suggestedQty);
+                                                                var cf = window.confirm(i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm1')+" "+this.formatter(suggestedQty)+" "+i18n.t("static.shipmentDataEntry.suggestedShipmentQtyConfirm2")+" "+this.formatter(newSuggestedShipmentQty));
+                                                                if (cf == true) {
+                                                                    obj.setValueFromCoords(10, y, newSuggestedShipmentQty, true);
+                                                                } else {
+
+                                                                }
+                                                            }.bind(this)
+                                                        })
+                                                    }
+                                                    }
+                                                    // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                                                     if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
@@ -1218,6 +1385,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[30] = true;
         data[31] = 0;
         data[32] = 1;
+        data[33] = 0;
         obj.insertRow(data);
         obj.setValueFromCoords(1, json.length, 0, true);
         obj.setValueFromCoords(10, json.length, 0, true);
@@ -1785,16 +1953,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(31, y, 1, true);
             }
             if (valid == true) {
-                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId);
+                var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId && c.active);
                 // if (procurementAgentPlanningUnit.length > 0 && ((procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro1 != null) || (procurementAgentPlanningUnit[0].moq != 0 && procurementAgentPlanningUnit[0].moq != null) || (procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != 0 && procurementAgentPlanningUnit[0].unitsPerPalletEuro2 != null) || (procurementAgentPlanningUnit[0].unitsPerContainer != 0 && procurementAgentPlanningUnit[0].unitsPerContainer != null))) {
                 //     elInstance.setValueFromCoords(8, y, "", true);
                 // }
                 var pricePerUnit = elInstance.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
-                    if (procurementAgentPlanningUnit.length > 0) {
-                        pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                    var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[6] && c.planningUnit.id == planningUnitId && c.active);
+                    if (programPriceList.length > 0) {
+                        pricePerUnit = Number(programPriceList[0].price);
                     } else {
-                        pricePerUnit = this.props.items.catalogPrice
+                        if (procurementAgentPlanningUnit.length > 0) {
+                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                        } else {
+                            pricePerUnit = this.props.items.catalogPrice
+                        }
                     }
                     if (rowData[14] != "") {
                         var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[14])[0]).conversionRateToUsd);

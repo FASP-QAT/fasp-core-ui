@@ -108,6 +108,7 @@ class DefaultHeader extends Component {
             </NavLink>
           </NavItem> */}
           {checkOnline === 'Online' &&
+            AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
@@ -121,22 +122,24 @@ class DefaultHeader extends Component {
             </NavItem>
           }
           {/* <Online> */}
-          <NavItem className="">
-            <NavLink to="#" className="nav-link">
-              {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
+          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') &&
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
 
-              {this.props.changeIcon &&
-                // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: 'red' }}></i>
+                {this.props.changeIcon &&
+                  // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
+                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: 'red' }}></i>
 
-              }
-              {!this.props.changeIcon &&
-                // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#20a8d8' }}></i>
+                }
+                {!this.props.changeIcon &&
+                  // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
+                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#20a8d8' }}></i>
 
-              }
-            </NavLink>
-          </NavItem>
+                }
+              </NavLink>
+            </NavItem>
+          }
           {/* </Online> */}
           <NavItem className="">
             <span className="nav-link">

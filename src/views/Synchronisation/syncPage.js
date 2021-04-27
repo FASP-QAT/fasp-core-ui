@@ -820,19 +820,21 @@ export default class syncPage extends Component {
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
-    // for (var j = 0; j < 17; j++) {
-    var col = (colArr[10]).concat(1);
-    var col1 = (colArr[10]).concat(2);
-    var valueToCompare = (jsonData[0])[10];
-    var valueToCompareWith = (jsonData[1])[10];
-    if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-      elInstance.setStyle(col, "background-color", "transparent");
-      elInstance.setStyle(col1, "background-color", "transparent");
-    } else {
-      elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-      elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+    for (var j = 0; j < 17; j++) {
+      if (j == 10 || j==8 || j==9 || j==11) {
+        var col = (colArr[j]).concat(1);
+        var col1 = (colArr[j]).concat(2);
+        var valueToCompare = (jsonData[0])[j];
+        var valueToCompareWith = (jsonData[1])[j];
+        if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col1, "background-color", "transparent");
+        } else {
+          elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+          elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+        }
+      }
     }
-    // }
   }
 
   acceptCurrentChangesProblem() {
@@ -845,10 +847,10 @@ export default class syncPage extends Component {
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
-      if (j == 10) {
-        var col = ("K").concat(parseInt(index) + 1);
-        var valueToCompare = (jsonData[0])[10];
-        var valueToCompareWith = (jsonData[1])[10];
+      if (j == 10 || j==8 || j==9 || j==11) {
+        var col = (colArr[j]).concat(parseInt(index) + 1);
+        var valueToCompare = (jsonData[0])[j];
+        var valueToCompareWith = (jsonData[1])[j];
         if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
           problemInstance.setStyle(col, "background-color", "transparent");
         } else {
@@ -888,18 +890,18 @@ export default class syncPage extends Component {
     oldRowData[10] = latestRowData[10];
     oldRowData[11] = latestRowData[11];
     oldRowData[12] = latestRowData[12];
-    console.log("OldRowData@@@", oldRowData)
     problemInstance.setRowData(index, oldRowData);
     var jsonData = resolveConflictsInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
-      if (j == 10) {
+      if (j == 10 || j==8 || j==9 || j==11) {
         var col = (colArr[j]).concat(parseInt(index) + 1);
         var valueToCompare = (jsonData[0])[j];
         var valueToCompareWith = (jsonData[1])[j];
         if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
           problemInstance.setStyle(col, "background-color", "transparent");
         } else {
+          problemInstance.setStyle(col, "background-color", "transparent");
           problemInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           problemInstance.setValueFromCoords(20, (index), 3, true);
         }
@@ -2644,6 +2646,52 @@ export default class syncPage extends Component {
           }
         }
       }
+      var rowData=jsonData[c];
+      if (rowData[20] != 1) {
+        var oldData = rowData[17];
+        var latestData = rowData[18];
+        if (rowData[18] != "" && rowData[17] != "") {
+          if ((oldData[8] == latestData[8]) || (oldData[8] == "" && latestData[8] == null) || (oldData[8] == null && latestData[8] == "")) {
+          } else {
+            if (rowData[8] == oldData[8]) {
+              var col = ("I").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else if (rowData[8] == latestData[8]) {
+              var col = ("I").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            }
+          }
+          if ((oldData[9] == latestData[9]) || (oldData[9] == "" && latestData[9] == null) || (oldData[9] == null && latestData[9] == "")) {
+          } else {
+            if (rowData[9] == oldData[9]) {
+              var col = ("J").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else if (rowData[9] == latestData[9]) {
+              var col = ("J").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            }
+        }
+          console.log("RowData[11+++",rowData[11]);
+          console.log("OldData[11+++",oldData[11]);
+          console.log("LatestData[11]+++",latestData[11]);
+          if ((oldData[11] == latestData[11]) || (oldData[11] == "" && latestData[11] == null) || (oldData[11] == null && latestData[11] == "")) {
+          } else {
+            if (rowData[11] == oldData[11]) {
+              var col = ("L").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else if (rowData[11] == latestData[11]) {
+              var col = ("L").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            }
+          }
+        }
+      }
     }
     elInstance.orderBy(20, 0);
     elInstance.options.editable = false;
@@ -2781,7 +2829,7 @@ export default class syncPage extends Component {
                         </FormGroup>
                         <FormGroup className="tab-ml-1 mt-4">
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount==0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                           &nbsp;
                 </FormGroup>
                       </div>

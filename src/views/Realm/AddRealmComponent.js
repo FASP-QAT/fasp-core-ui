@@ -15,7 +15,10 @@ const initialValues = {
     label: '',
     minMosMinGaurdrail: '',
     minMosMaxGaurdrail: '',
-    maxMosMaxGaurdrail: ''
+    maxMosMaxGaurdrail: '',
+    minQplTolerance: '',
+    minQplToleranceCutOff: '',
+    maxQplTolerance: ''
 }
 
 const validationSchema = function (values) {
@@ -47,6 +50,25 @@ const validationSchema = function (values) {
             .integer(i18n.t('static.realm.decimalNotAllow'))
             // .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
             .required(i18n.t('static.realm.maxMosMaxGaurdrail')),
+
+        minQplTolerance: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.minQplTolerance'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        minQplToleranceCutOff: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.minQplToleranceCutOff'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        maxQplTolerance: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.maxQplTolerance'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         // .min(0, i18n.t('static.program.validvaluetext')),
         /*monthInPastForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
@@ -99,7 +121,10 @@ export default class AddRealmComponent extends Component {
                 defaultRealm: true,
                 minMosMinGaurdrail: '',
                 minMosMaxGaurdrail: '',
-                maxMosMaxGaurdrail: ''
+                maxMosMaxGaurdrail: '',
+                minQplTolerance: '',
+                minQplToleranceCutOff: '',
+                maxQplTolerance: ''
             },
             message: ''
         }
@@ -127,6 +152,15 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "maxMosMaxGaurdrail") {
             realm.maxMosMaxGaurdrail = event.target.value
         }
+        if (event.target.name === "minQplTolerance") {
+            realm.minQplTolerance = event.target.value
+        }
+        if (event.target.name === "minQplToleranceCutOff") {
+            realm.minQplToleranceCutOff = event.target.value
+        }
+        if (event.target.name === "maxQplTolerance") {
+            realm.maxQplTolerance = event.target.value
+        }
         /*  if (event.target.name === "monthInPastForAmc") {
               realm.monthInPastForAmc = event.target.value
           }
@@ -152,7 +186,10 @@ export default class AddRealmComponent extends Component {
             label: true,
             minMosMinGaurdrail: true,
             minMosMaxGaurdrail: true,
-            maxMosMaxGaurdrail: true
+            maxMosMaxGaurdrail: true,
+            minQplTolerance :true,
+            minQplToleranceCutOff :true,
+            maxQplTolerance :true
         }
         )
         this.validateForm(errors)
@@ -351,6 +388,51 @@ export default class AddRealmComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minQplTolerance">{i18n.t('static.realm.minQplTolerance')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            // min="0"
+                                                            name="minQplTolerance"
+                                                            id="minQplTolerance"
+                                                            bsSize="sm"
+                                                            valid={!errors.minQplTolerance && this.state.realm.minQplTolerance != ''}
+                                                            invalid={touched.minQplTolerance && !!errors.minQplTolerance}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minQplTolerance}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minQplTolerance}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="minQplToleranceCutOff">{i18n.t('static.realm.minQplToleranceCutOff')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            // min="0"
+                                                            name="minQplToleranceCutOff"
+                                                            id="minQplToleranceCutOff"
+                                                            bsSize="sm"
+                                                            valid={!errors.minQplToleranceCutOff && this.state.realm.minQplToleranceCutOff != ''}
+                                                            invalid={touched.minQplToleranceCutOff && !!errors.minQplToleranceCutOff}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.minQplToleranceCutOff}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.minQplToleranceCutOff}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="maxQplTolerance">{i18n.t('static.realm.maxQplTolerance')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="number"
+                                                            // min="0"
+                                                            name="maxQplTolerance"
+                                                            id="maxQplTolerance"
+                                                            bsSize="sm"
+                                                            valid={!errors.maxQplTolerance && this.state.realm.maxQplTolerance != ''}
+                                                            invalid={touched.maxQplTolerance && !!errors.maxQplTolerance}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.maxQplTolerance}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.maxQplTolerance}</FormFeedback>
+                                                    </FormGroup>
                                                     {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
@@ -472,6 +554,9 @@ export default class AddRealmComponent extends Component {
         realm.minMosMinGaurdrail = ''
         realm.minMosMaxGaurdrail = ''
         realm.maxMosMaxGaurdrail = ''
+        realm.minQplTolerance = ''
+        realm.minQplToleranceCutOff = ''
+        realm.maxQplTolerance = ''
         realm.defaultRealm = true
         this.setState(
             {

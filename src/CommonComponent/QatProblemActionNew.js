@@ -197,7 +197,7 @@ export default class QatProblemActionNew extends Component {
                                                 problemActionList = programList[pp].problemReportList;
                                                 problemActionIndex = programList[pp].problemReportList.length;
                                                 actionList = programList[pp].actionList;
-                                                // console.log("actionList+++", actionList);
+                                                console.log("actionList+++", actionList);
 
                                                 // ******* update logic for active inactive planning units===========================================================
                                                 planningUnitListAll.filter(
@@ -206,7 +206,7 @@ export default class QatProblemActionNew extends Component {
                                                         actionPlanningUnitIds.push(parseInt(m.planningUnitId));
                                                     });
                                                 programPlanningUnitList.filter(
-                                                    c => c.active == false).map(m => {
+                                                    c => c.active == false && c.program.id == programList[pp].programId).map(m => {
                                                         actionPlanningUnitIds.push(parseInt(m.planningUnit.id));
                                                     });
                                                 programList[pp].problemReportList.filter(
@@ -218,7 +218,7 @@ export default class QatProblemActionNew extends Component {
                                                     actionPlanningUnitIds.push(parseInt(actionObj.planningUnitId));
                                                 });
 
-                                                // console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
+                                                console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
 
                                                 //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
                                                 var regionIdArray = [];
@@ -254,7 +254,7 @@ export default class QatProblemActionNew extends Component {
                                                 if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && moment(qplLastModifiedDate).format("YYYY-MM-DD") >= moment(curDate).format("YYYY-MM-DD")) {
                                                     planningUnitList = planningUnitList.filter(c =>
                                                         actionPlanningUnitIds.includes(c.planningUnit.id)
-                                                         || moment(c.createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD")
+                                                        || moment(c.createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD")
                                                     );
                                                 }
 
@@ -281,6 +281,7 @@ export default class QatProblemActionNew extends Component {
 
                                                         var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
                                                         var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+
                                                         if (DEFAULT_MIN_MONTHS_OF_STOCK > planningUnitList[p].minMonthsOfStock) {
                                                             maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
                                                         } else {
@@ -306,7 +307,7 @@ export default class QatProblemActionNew extends Component {
                                                         filteredActionListForType.map(actionForTypeObj => {
                                                             actionTypeIds.push(parseInt(actionForTypeObj.type));
                                                         });
-                                                        // console.log("actionTypeIds+++", actionTypeIds);
+                                                        console.log("actionTypeIds+++", actionTypeIds);
                                                         var typeProblemList = problemList;
                                                         if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && !(moment(planningUnitList[p].createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD"))) {
                                                             typeProblemList = problemList.filter(
@@ -319,7 +320,7 @@ export default class QatProblemActionNew extends Component {
                                                                     (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                             );
                                                         }
-                                                        // console.log("typeProblemList+++", typeProblemList);
+                                                        console.log("typeProblemList+++", typeProblemList);
                                                         for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                             // for (var prob = 0; prob < problemList.length; prob++) {
                                                             // console.log("in problemlist for+++");
@@ -555,7 +556,7 @@ export default class QatProblemActionNew extends Component {
                                                                     // console.log("submited status list===>", filteredShipmentList);
                                                                     if (filteredShipmentList.length > 0) {
                                                                         var shipmentIdsFromShipmnetList = [];
-                                                                        
+
                                                                         for (var s = 0; s < filteredShipmentList.length; s++) {
 
                                                                             var papuResult = procurementAgentListForProblemActionreport.filter(c => c.procurementAgentId == filteredShipmentList[s].procurementAgent.id)[0];
@@ -565,7 +566,10 @@ export default class QatProblemActionNew extends Component {
                                                                             var arrivedDate = filteredShipmentList[s].arrivedDate;
                                                                             var expectedDeliveryDate = filteredShipmentList[s].expectedDeliveryDate;
                                                                             if (filteredShipmentList[s].localProcurement) {
-                                                                                var addLeadTimes = programPlanningUnitList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id)[0].localProcurementLeadTime;
+                                                                                var addLeadTimes = programPlanningUnitList.filter(c =>
+                                                                                    c.planningUnit.id == filteredShipmentList[s].planningUnit.id
+                                                                                    && c.program.id == programList[pp].programId
+                                                                                )[0].localProcurementLeadTime;
                                                                                 var leadTimesPerStatus = addLeadTimes / 5;
                                                                                 arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                 shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -621,7 +625,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 );
                                                                                 if (indexShipment == -1) {
                                                                                     var index = 0;
-                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList,shipmentDetailsJson);
+                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // make shipmet problem status eual to open========
@@ -819,8 +823,10 @@ export default class QatProblemActionNew extends Component {
                                                                                     }
                                                                                 }
                                                                                 // console.log("cause+++", cause);
-                                                                                if (check == true) {
-                                                                                    // //console.log("flag problem=====>");
+                                                                                // console.log("check+++", check);
+                                                                                // if (check == true) {
+                                                                                if (cause.length > 0) {
+                                                                                    // console.log("flag problem=====>", index);
                                                                                     if (index == -1) {
                                                                                         createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList);
                                                                                         problemActionIndex++;
@@ -960,6 +966,21 @@ export default class QatProblemActionNew extends Component {
                                                                     var monthWithMosAboveThenMaxWithing7to18months = [];
                                                                     var filteredShipmentListWithin7to18Months = shipmentListForMonths.filter(c => moment(c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(parseInt(typeProblemList[prob].data1) + 1, "months").format('YYYY-MM') && moment(c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data2), "months").format('YYYY-MM'));
 
+                                                                    // var toleranceAndCutoffValues = typeProblemList[prob].data3;
+                                                                    // var toleranceAndCutoffArray = [];
+                                                                    // if (toleranceAndCutoffValues != null && toleranceAndCutoffValues != "") {
+                                                                    //     var toleranceAndCutoffSplit = toleranceAndCutoffValues.split(',');
+                                                                    //     for (var t = 0; t < toleranceAndCutoffSplit.length; t++) {
+                                                                    //         toleranceAndCutoffArray.push(parseInt(toleranceAndCutoffSplit[t]));
+                                                                    //     }
+                                                                    // }
+
+                                                                    var toleranceNoOfMonthsBelowMin = realm.minQplTolerance;//2
+                                                                    var toleranceCutoffMinMoS = realm.minQplToleranceCutOff;//5
+                                                                    var toleranceNoOfMonthsOverMax = realm.maxQplTolerance;//2
+
+                                                                    // console.log("toleranceNoOfMonthsBelowMin+++",toleranceNoOfMonthsBelowMin,"toleranceCutoffMinMoS+++",toleranceCutoffMinMoS,"toleranceNoOfMonthsOverMax+++",toleranceNoOfMonthsOverMax);
+
                                                                     for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                         var m = moment(curDate).add(mosCounter, 'months');
                                                                         var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
@@ -976,11 +997,30 @@ export default class QatProblemActionNew extends Component {
                                                                             minForMonths = minStockMoSQty;
                                                                             // closingBalance = supplyPlanJson[0].closingBalance;
                                                                             // amcCalcualted = supplyPlanJson[0].amc;
-                                                                            if (mos < minForMonths && mos != 0) {
-                                                                                monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
-                                                                            } else if (mos > maxForMonths && mos != 0) {
+
+                                                                            // *****new  logic of buffer for monts with mos less then min 1-6 months
+                                                                            if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                if (mos < minForMonths && mos != 0) {
+                                                                                    monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                }
+
+                                                                            } else {
+                                                                                if (mos < (minForMonths - parseInt(toleranceNoOfMonthsBelowMin)) && mos != 0) {
+                                                                                    monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                                }
+                                                                            }
+
+                                                                            if (mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0) {
                                                                                 monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
                                                                             }
+                                                                            // *****new  logic of buffer for monts with mos less then min 1-6 months
+
+
+                                                                            // if (mos < minForMonths && mos != 0) {
+                                                                            //     monthWithMosLessThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                            // } else if (mos > maxForMonths && mos != 0) {
+                                                                            //     monthWithMosAboveThenMinWithing6months.push(moment(m).format('YYYY-MM'));
+                                                                            // }
                                                                         }
                                                                     }
                                                                     for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
@@ -999,11 +1039,30 @@ export default class QatProblemActionNew extends Component {
                                                                             minForMonths7to18 = minStockMoSQty;
                                                                             // closingBalance = supplyPlanJson[0].closingBalance;
                                                                             // amcCalcualted = supplyPlanJson[0].amc;
-                                                                            if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
-                                                                                monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
-                                                                            } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+
+                                                                            // *****new  logic of buffer for monts with mos less then min 7-18 months
+                                                                            if (minForMonths7to18 <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                                    monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                }
+
+                                                                            } else {
+                                                                                if (mos7to18 < (minForMonths7to18 - parseInt(toleranceNoOfMonthsBelowMin)) && mos7to18 != 0) {
+                                                                                    monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                                }
+                                                                            }
+
+                                                                            if (mos7to18 > (maxForMonths7to18 + parseInt(toleranceNoOfMonthsOverMax)) && mos7to18 != 0) {
                                                                                 monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
                                                                             }
+                                                                            // *****new  logic of buffer for monts with mos less then min 7-18 months
+
+
+                                                                            // if (mos7to18 < minForMonths7to18 && mos7to18 != 0) {
+                                                                            //     monthWithMosLessThenMinWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                            // } else if (mos7to18 > maxForMonths7to18 && mos7to18 != 0) {
+                                                                            //     monthWithMosAboveThenMaxWithing7to18months.push(moment(m7to18).format('YYYY-MM'));
+                                                                            // }
                                                                         }
                                                                     }
 
@@ -1084,9 +1143,9 @@ export default class QatProblemActionNew extends Component {
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                         var mos = "";
-                                                                        if (supplyPlanJson.length > 0) {
-                                                                            // mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
-                                                                            mos = Number(supplyPlanJson[0].closingBalance);
+                                                                        if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
+                                                                            mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                            // mos = Number(supplyPlanJson[0].closingBalance);
                                                                             if (mos == 0) {
                                                                                 stockoutsWithing6months.push(moment(m).format('MMM-YY'));
                                                                             }
@@ -1099,8 +1158,8 @@ export default class QatProblemActionNew extends Component {
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                         var mos7to18 = "";
                                                                         if (supplyPlanJson7to18.length > 0) {
-                                                                            // mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
-                                                                            mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
+                                                                            mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                            // mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
                                                                             if (mos7to18 == 0) {
                                                                                 stockoutsWithing7to18months.push(moment(m7to18).format('MMM-YY'));
                                                                             }

@@ -805,31 +805,34 @@ class ListProcurementAgentComponent extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.program.mapPlanningUnit'),
-                            onclick: function () {
-                                console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
+
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
+                            items.push({
+                                title: i18n.t('static.program.mapPlanningUnit'),
+                                onclick: function () {
+                                    console.log("onclick------>", this.el.getValueFromCoords(0, y));
+
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${this.el.getValueFromCoords(0, y)}`,
                                     });
-                                }
 
-                            }.bind(this)
-                        });
+                                }.bind(this)
+                            });
+                        }
 
-                        items.push({
-                            title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
-                            onclick: function () {
-                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
+                            items.push({
+                                title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
+                                onclick: function () {
+                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${this.el.getValueFromCoords(0, y)}`,
                                     });
-                                }
 
-                            }.bind(this)
-                        });
+                                }.bind(this)
+                            });
+                        }
                     }
                 }
 

@@ -304,8 +304,8 @@ export default class ConsumptionDetails extends React.Component {
                         }.bind(this);
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
-                            myResult = planningunitRequest.result;
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
+                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -689,7 +689,7 @@ export default class ConsumptionDetails extends React.Component {
                                     )} />
 
                         <div className="shipmentconsumptionSearchMarginTop">
-                            <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" />
+                            <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />
                             <div className="table-responsive" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
                             </div>
