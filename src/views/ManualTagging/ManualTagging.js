@@ -35,6 +35,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            buildJexcelRequired: true,
             getPlanningUnitArray: [],
             countryWisePrograms: [],
             active4: false,
@@ -191,14 +192,17 @@ export default class ManualTagging extends Component {
     }
 
     cancelClicked() {
+        document.getElementById('div2').style.display = 'block';
         if (this.state.active1 || this.state.active2) {
             this.filterData(this.state.planningUnitIds);
         } else {
             this.filterErpData();
         }
         this.setState({
-            message: i18n.t('static.actionCancelled')
+            message: i18n.t('static.actionCancelled'),
+            color: "red"
         }, () => {
+            this.hideSecondComponent();
             this.toggleLarge();
         })
 
@@ -832,6 +836,7 @@ export default class ManualTagging extends Component {
     }
 
     link() {
+        document.getElementById('div2').style.display = 'block';
         let valid = false;
         var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
         if (this.state.active3) {
@@ -913,7 +918,7 @@ export default class ManualTagging extends Component {
 
                                     console.log(this.state.message, "success 1")
                                     this.hideSecondComponent();
-                                    document.getElementById('div2').style.display = 'block';
+                                    
                                     console.log("Going to call toggle large 1");
                                     this.toggleLarge();
 
@@ -1018,7 +1023,7 @@ export default class ManualTagging extends Component {
         console.log("de select erpPlanningUnitId---", erpPlanningUnitId)
         console.log("condition 1---", (roNoOrderNo != "" && roNoOrderNo != 0))
         console.log("condition 2---", (erpPlanningUnitId != null && erpPlanningUnitId != "" && erpPlanningUnitId == 0))
-        if ((roNoOrderNo != "" && roNoOrderNo != 0) || (erpPlanningUnitId != 0)) {
+        if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
                 .then(response => {
                     console.log("artmis response===", response.data);
@@ -1077,7 +1082,9 @@ export default class ManualTagging extends Component {
                 artmisList: [],
                 displayButton: false
             }, () => {
-                this.buildJExcelERP();
+                if (this.state.buildJexcelRequired) {
+                    this.buildJExcelERP();
+                }
             })
         }
         // else if (orderNo == "" && primeLineNo == "") {
@@ -1605,7 +1612,7 @@ export default class ManualTagging extends Component {
         let count = 0;
         let qty = 0;
         let convertedQty = 0;
-
+        // if (erpDataList.length > 0) {
         for (var j = 0; j < erpDataList.length; j++) {
             data = [];
             if (this.state.active3) {
@@ -1771,8 +1778,10 @@ export default class ManualTagging extends Component {
         var instance = jexcel(document.getElementById("tableDiv1"), options);
         this.el = instance;
         this.setState({
-            instance, loading: false
+            instance, loading: false,
+            buildJexcelRequired: true
         })
+        // }
     }
 
     buildJExcel() {
@@ -2088,18 +2097,21 @@ export default class ManualTagging extends Component {
             var outputListAfterSearch = [];
             let row;
             let json;
+            let buildJexcelRequired = true;
             if (this.state.active1) {
                 row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
                 outputListAfterSearch.push(row);
-                console.log("order no my---", outputListAfterSearch[0].orderNo);
+                // console.log("order no my---", outputListAfterSearch[0].orderNo);
                 if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                     json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
                 } else {
                     json = { id: '', label: '' };
+                    buildJexcelRequired = false;
                 }
                 this.setState({
+                    buildJexcelRequired,
                     roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].orderNo,
+                    searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
                 }, () => {
@@ -2311,7 +2323,7 @@ export default class ManualTagging extends Component {
             selectionHeaderRenderer: () => i18n.t('static.mt.selectShipment'),
             headerColumnStyle: {
                 headerAlign: 'center'
-                
+
                 // align:  function callback(cell, row, rowIndex, colIndex) { 
                 //     console.log("my row----------------------")
                 //     return "center" }
@@ -2853,6 +2865,7 @@ export default class ManualTagging extends Component {
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
                                 <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
+                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>

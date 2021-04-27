@@ -108,7 +108,7 @@ export default class ShipmentLinkingNotifications extends Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     updateDetails() {
-
+        document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
 
         this.setState({ loading1: true })
@@ -152,8 +152,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     },
                         () => {
                             console.log("message ------------------" + this.state.message);
-                            // this.hideSecondComponent();
-                            document.getElementById('div2').style.display = 'block';
+                            this.hideSecondComponent();
                             console.log("Going to call toggle large 1");
 
                             this.filterData(this.state.planningUnitIds);
