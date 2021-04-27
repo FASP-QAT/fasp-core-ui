@@ -803,7 +803,7 @@ export default class ExpiredInventory extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20')) + '"')
-        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
@@ -871,7 +871,7 @@ export default class ExpiredInventory extends Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
@@ -1090,7 +1090,7 @@ export default class ExpiredInventory extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1331,7 +1331,7 @@ export default class ExpiredInventory extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input

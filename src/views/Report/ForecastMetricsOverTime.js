@@ -201,7 +201,7 @@ class ForcastMatrixOverTime extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ': ' + (document.getElementById("programId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -279,7 +279,7 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
           doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
@@ -1117,7 +1117,7 @@ class ForcastMatrixOverTime extends Component {
       && versions.map((item, i) => {
         return (
           <option key={i} value={item.versionId}>
-            {item.versionId}
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
           </option>
         )
       }, this);
@@ -1409,7 +1409,7 @@ class ForcastMatrixOverTime extends Component {
 
                             </FormGroup>*/}
                           <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                             <div className="controls">
                               <InputGroup>
                                 <Input
