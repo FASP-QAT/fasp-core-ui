@@ -3188,7 +3188,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         expiredStockModal: !this.state.expiredStockModal,
                         loading: false,
-                        ledgerForBatch:[]
+                        ledgerForBatch: []
                     })
                 }
             }

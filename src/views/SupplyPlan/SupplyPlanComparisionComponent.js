@@ -1668,7 +1668,7 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     expiredStockModal: !this.state.expiredStockModal,
                     loading: false,
-                    ledgerForBatch:[]
+                    ledgerForBatch: []
                 })
             }
         }
