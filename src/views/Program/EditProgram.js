@@ -256,15 +256,18 @@ export default class EditProgram extends Component {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
+            var realmCountryCode=splitCode[0];
+            var healthAreaCode=splitCode[1];
+            var organisationCode=splitCode[2];
             if (uniqueCode == undefined) {
                 uniqueCode = ""
             }
             this.setState({
                 program: response.data, loading: false,
                 uniqueCode: uniqueCode,
-                healthAreaCode: response.data.healthArea.code,
-                organisationCode: response.data.organisation.code,
-                realmCountryCode: response.data.realmCountry.country.countryCode
+                healthAreaCode: healthAreaCode,
+                organisationCode: organisationCode,
+                realmCountryCode: realmCountryCode
             })
             // initialValues = {
             //     programName: getLabelText(this.state.program.label, lang),
