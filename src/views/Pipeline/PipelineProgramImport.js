@@ -188,19 +188,93 @@ export default class PipelineProgramImport extends Component {
 
     }
 
-    deleteProgramConfirmBox(myJson, fieldName) {
+    deleteProgramConfirmBox(myJson) {
         confirmAlert({
-            title: "Program Already Exist !",
-            message: "The program you are trying to import already exist do you want to reimport the program.",
+            title: i18n.t('static.problem.allreadyExist'),
+            message: i18n.t('static.pipeline.reImportPipelineProgram'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
                     onClick: () => {
                         var programName = myJson.programinfo[0].programname;
-                        console.log("in delete confirm+++", programName);
+                        var fileNameUsed=this.state.fileName;
+                        // console.log("in delete confirm+++", programName);
                         PipelineService.deletePipelineProgramData(programName)
                             .then(response => {
                                 console.log("delete response+++", response);
+                                if (response.status == 200) {
+                                    this.setState({ loading: true }, () => {
+                                        PipelineService.savePipelineJson(myJson, fileNameUsed)
+                                            .then(response => {
+                                                console.log("response--------->", response);
+                                                console.log("messageCode-->", response.data.messageCode);
+                                                if (response.status == 200) {
+                                                    this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
+                                                }
+                                                else {
+                                                    // alert("in else");
+                                                    this.setState({
+                                                        message: response.data.messageCode,
+                                                        loading: false
+                                                    },
+                                                        () => {
+                                                            this.hideSecondComponent();
+                                                        })
+                                                }
+
+                                            }).catch(
+                                                error => {
+                                                    if (error.message === "Network Error") {
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                    } else {
+                                                        switch (error.response ? error.response.status : "") {
+
+                                                            case 401:
+                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                break;
+                                                            case 403:
+                                                                this.props.history.push(`/accessDenied`)
+                                                                break;
+                                                            case 500:
+                                                            case 404:
+                                                            case 406:
+                                                                this.setState({
+                                                                    message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                            case 412:
+                                                                this.setState({
+                                                                    // message: error.response.data.messageCode,
+                                                                    loading: false
+                                                                });
+                                                                this.deleteProgramConfirmBox(myJson);
+                                                                break;
+                                                            default:
+                                                                this.setState({
+                                                                    message: 'static.unkownError',
+                                                                    loading: false
+                                                                });
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                            );
+                                    });
+
+                                }
+                                else {
+                                    this.setState({
+                                        message: response.data.messageCode,
+                                        loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
                             }).catch(
                                 error => {
                                     if (error.message === "Network Error") {
@@ -217,7 +291,10 @@ export default class PipelineProgramImport extends Component {
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
                                                 break;
-                                            case 500:
+                                            case 500: this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
                                             case 404:
                                             case 406:
                                                 this.setState({
