@@ -1033,7 +1033,7 @@ export default class QatProblemActionNew extends Component {
                                                                         var minForMonths7to18 = "";
                                                                         // var closingBalance = "";
                                                                         // var amcCalcualted = "";
-                                                                        if (supplyPlanJson7to18.length > 0) {
+                                                                        if (supplyPlanJson7to18.length > 0 && supplyPlanJson7to18[0].mos != null) {
                                                                             mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
                                                                             maxForMonths7to18 = maxStockMoSQty;
                                                                             minForMonths7to18 = minStockMoSQty;
@@ -1157,7 +1157,7 @@ export default class QatProblemActionNew extends Component {
                                                                             c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                             && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                         var mos7to18 = "";
-                                                                        if (supplyPlanJson7to18.length > 0) {
+                                                                        if (supplyPlanJson7to18.length > 0 && supplyPlanJson7to18[0].mos != null) {
                                                                             mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
                                                                             // mos7to18 = Number(supplyPlanJson7to18[0].closingBalance);
                                                                             if (mos7to18 == 0) {
