@@ -49,6 +49,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.onPaste = this.onPaste.bind(this);
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
     }
 
     formatter = value => {
@@ -92,6 +93,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(31, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(32, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(33, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(34, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(35, data[i].y, "", true);
                 }
                 z = data[i].y;
             }
@@ -415,6 +418,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
                                         var erpType = "hidden";
                                         shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate))) });
+                                        console.log("ShipmentList++++", shipmentList);
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var shipmentMode = 1;
                                             if (shipmentList[i].shipmentMode == "Air") {
@@ -502,6 +506,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[31] = 0;//AF
                                             data[32] = shipmentList[i].currency.conversionRateToUsd;//Conversionratetousdenterhere//AG
                                             data[33] = shipmentList[i].shipmentQty;
+                                            data[34] = shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? 1 : 0;
+                                            data[35] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;//E
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -539,7 +545,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[30] = true;
                                             data[31] = 0;
                                             data[32] = 1;
-                                            data[33] = 0
+                                            data[33] = 0;
+                                            data[34] = 0;
+                                            data[35] = "";
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
@@ -577,6 +585,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: "Suggested order Qty" },
                                                 { type: 'hidden', title: "Is changed" },
                                                 { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
+                                                { type: 'hidden' },
+                                                { type: 'hidden' },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' }
@@ -659,122 +669,122 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
                                                     var rowData = obj.getRowData(y);
-                                                    if(rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1){
-                                                    var expectedDeliveryDate = rowData[4];
-                                                    var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
-                                                    var expectedTotalShipmentQty=this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty!=""?(this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty):0;
-                                                    var existingShipmentQty=0;
-                                                    var shipmentsJson=(obj.getJson(null,false));
-                                                    shipmentsJson.map((item,index)=>{
-                                                        existingShipmentQty += Number(obj.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
-                                                    })
-                                                    var suggestedQty=Number(expectedTotalShipmentQty)-Number(existingShipmentQty);
-                                                    if (suggestedQty>0) {
-                                                        items.push({
-                                                            title: i18n.t("static.qpl.recalculate"),
-                                                            onclick: function () {
-                                                                // var expectedDeliveryDate = rowData[4];
-                                                                // var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
-                                                                // var endingBalance = Number(this.props.items.closingBalanceArray[index].balance);
-                                                                // var unmetDemand = this.props.items.unmetDemand[index];
-                                                                var originalShipmentQty = Number(obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
-                                                                // var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
-                                                                // if (newEndingBalance < 0) {
-                                                                //     var tempEndingBalance = Number(newEndingBalance)+Number(unmetDemand);
-                                                                //     unmetDemand += (0 - Number(tempEndingBalance));
-                                                                //     newEndingBalance = 0;
-                                                                // }
-                                                                // var amc = Number(this.props.items.amcTotalData[index]);
-                                                                // var mosForMonth1 = "";
-                                                                // if (newEndingBalance != 0 && amc != 0) {
-                                                                //     mosForMonth1 = Number(newEndingBalance / amc).toFixed(1);
-                                                                // } else if (amc == 0) {
-                                                                //     mosForMonth1 = null;
-                                                                // } else {
-                                                                //     mosForMonth1 = 0;
-                                                                // }
-
-                                                                // var endingBalance1 = Number(this.props.items.closingBalanceArray[index+1].balance);
-                                                                // var unmetDemand1 = this.props.items.unmetDemand[index+1];
-                                                                // var newEndingBalance1 = Number(endingBalance1) - Number(originalShipmentQty);
-                                                                // if (newEndingBalance1 < 0) {
-                                                                //     var tempEndingBalance1 = Number(newEndingBalance1)+Number(unmetDemand1);
-                                                                //     unmetDemand1 += (0 - Number(tempEndingBalance1));
-                                                                //     newEndingBalance1 = 0;
-                                                                // }
-                                                                // var amc1 = Number(this.props.items.amcTotalData[index+1]);
-                                                                // var mosForMonth2 = "";
-                                                                // if (newEndingBalance1 != 0 && amc1 != 0) {
-                                                                //     mosForMonth2 = Number(newEndingBalance1 / amc1).toFixed(1);
-                                                                // } else if (amc1 == 0) {
-                                                                //     mosForMonth2 = null;
-                                                                // } else {
-                                                                //     mosForMonth2 = 0;
-                                                                // }
-
-                                                                // var endingBalance2 = Number(this.props.items.closingBalanceArray[index+2].balance);
-                                                                // var unmetDemand2 = this.props.items.unmetDemand[index+2];
-                                                                // var newEndingBalance2 = Number(endingBalance2) - Number(originalShipmentQty);
-                                                                // if (newEndingBalance2 < 0) {
-                                                                //     var tempEndingBalance2 = Number(newEndingBalance2)+Number(unmetDemand2);
-                                                                //     unmetDemand2 += (0 - Number(tempEndingBalance2));
-                                                                //     newEndingBalance2 = 0;
-                                                                // }
-                                                                // var amc2 = Number(this.props.items.amcTotalData[index+2]);
-                                                                // var mosForMonth3 = "";
-                                                                // if (newEndingBalance2 != 0 && amc2 != 0) {
-                                                                //     mosForMonth3 = Number(newEndingBalance2 / amc2).toFixed(1);
-                                                                // } else if (amc2 == 0) {
-                                                                //     mosForMonth3 = null;
-                                                                // } else {
-                                                                //     mosForMonth3 = 0;
-                                                                // }
-
-                                                                // var minStockMoSQty = this.props.items.minStockMoSQty;
-                                                                // var maxStockMoSQty = this.props.items.maxStockMoSQty;
-                                                                // var suggestShipment = false;
-                                                                // var useMax = false;
-                                                                // if (Number(amc) == 0) {
-                                                                //     suggestShipment = false;
-                                                                // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
-                                                                //     suggestShipment = false;
-                                                                // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
-                                                                //     suggestShipment = true;
-                                                                //     useMax = true;
-                                                                // } else if (Number(mosForMonth1) == 0) {
-                                                                //     suggestShipment = true;
-                                                                //     if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
-                                                                //         useMax = true;
-                                                                //     } else {
-                                                                //         useMax = false;
-                                                                //     }
-                                                                // }
-                                                                // var newSuggestedShipmentQty = 0;
-                                                                // if (suggestShipment) {
-                                                                //     var suggestedOrd = 0;
-                                                                //     if (useMax) {
-                                                                //         suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
-                                                                //     } else {
-                                                                //         suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
-                                                                //     }
-                                                                //     if (suggestedOrd <= 0) {
-                                                                //         newSuggestedShipmentQty = 0;
-                                                                //     } else {
-                                                                //         newSuggestedShipmentQty = suggestedOrd;
-                                                                //     }
-                                                                // } else {
-                                                                //     newSuggestedShipmentQty = 0;
-                                                                // }
-                                                                var newSuggestedShipmentQty=Number(originalShipmentQty)+Number(suggestedQty);
-                                                                var cf = window.confirm(i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm1')+" "+this.formatter(suggestedQty)+" "+i18n.t("static.shipmentDataEntry.suggestedShipmentQtyConfirm2")+" "+this.formatter(newSuggestedShipmentQty));
-                                                                if (cf == true) {
-                                                                    obj.setValueFromCoords(10, y, newSuggestedShipmentQty, true);
-                                                                } else {
-
-                                                                }
-                                                            }.bind(this)
+                                                    if (rowData[3] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[4]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1) {
+                                                        var expectedDeliveryDate = rowData[4];
+                                                        var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                        var expectedTotalShipmentQty = this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty != "" ? (this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty) : 0;
+                                                        var existingShipmentQty = 0;
+                                                        var shipmentsJson = (obj.getJson(null, false));
+                                                        shipmentsJson.map((item, index) => {
+                                                            existingShipmentQty += Number(obj.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
                                                         })
-                                                    }
+                                                        var suggestedQty = Number(expectedTotalShipmentQty) - Number(existingShipmentQty);
+                                                        if (suggestedQty > 0) {
+                                                            items.push({
+                                                                title: i18n.t("static.qpl.recalculate"),
+                                                                onclick: function () {
+                                                                    // var expectedDeliveryDate = rowData[4];
+                                                                    // var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
+                                                                    // var endingBalance = Number(this.props.items.closingBalanceArray[index].balance);
+                                                                    // var unmetDemand = this.props.items.unmetDemand[index];
+                                                                    var originalShipmentQty = Number(obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                                                                    // var newEndingBalance = Number(endingBalance) - Number(originalShipmentQty);
+                                                                    // if (newEndingBalance < 0) {
+                                                                    //     var tempEndingBalance = Number(newEndingBalance)+Number(unmetDemand);
+                                                                    //     unmetDemand += (0 - Number(tempEndingBalance));
+                                                                    //     newEndingBalance = 0;
+                                                                    // }
+                                                                    // var amc = Number(this.props.items.amcTotalData[index]);
+                                                                    // var mosForMonth1 = "";
+                                                                    // if (newEndingBalance != 0 && amc != 0) {
+                                                                    //     mosForMonth1 = Number(newEndingBalance / amc).toFixed(1);
+                                                                    // } else if (amc == 0) {
+                                                                    //     mosForMonth1 = null;
+                                                                    // } else {
+                                                                    //     mosForMonth1 = 0;
+                                                                    // }
+
+                                                                    // var endingBalance1 = Number(this.props.items.closingBalanceArray[index+1].balance);
+                                                                    // var unmetDemand1 = this.props.items.unmetDemand[index+1];
+                                                                    // var newEndingBalance1 = Number(endingBalance1) - Number(originalShipmentQty);
+                                                                    // if (newEndingBalance1 < 0) {
+                                                                    //     var tempEndingBalance1 = Number(newEndingBalance1)+Number(unmetDemand1);
+                                                                    //     unmetDemand1 += (0 - Number(tempEndingBalance1));
+                                                                    //     newEndingBalance1 = 0;
+                                                                    // }
+                                                                    // var amc1 = Number(this.props.items.amcTotalData[index+1]);
+                                                                    // var mosForMonth2 = "";
+                                                                    // if (newEndingBalance1 != 0 && amc1 != 0) {
+                                                                    //     mosForMonth2 = Number(newEndingBalance1 / amc1).toFixed(1);
+                                                                    // } else if (amc1 == 0) {
+                                                                    //     mosForMonth2 = null;
+                                                                    // } else {
+                                                                    //     mosForMonth2 = 0;
+                                                                    // }
+
+                                                                    // var endingBalance2 = Number(this.props.items.closingBalanceArray[index+2].balance);
+                                                                    // var unmetDemand2 = this.props.items.unmetDemand[index+2];
+                                                                    // var newEndingBalance2 = Number(endingBalance2) - Number(originalShipmentQty);
+                                                                    // if (newEndingBalance2 < 0) {
+                                                                    //     var tempEndingBalance2 = Number(newEndingBalance2)+Number(unmetDemand2);
+                                                                    //     unmetDemand2 += (0 - Number(tempEndingBalance2));
+                                                                    //     newEndingBalance2 = 0;
+                                                                    // }
+                                                                    // var amc2 = Number(this.props.items.amcTotalData[index+2]);
+                                                                    // var mosForMonth3 = "";
+                                                                    // if (newEndingBalance2 != 0 && amc2 != 0) {
+                                                                    //     mosForMonth3 = Number(newEndingBalance2 / amc2).toFixed(1);
+                                                                    // } else if (amc2 == 0) {
+                                                                    //     mosForMonth3 = null;
+                                                                    // } else {
+                                                                    //     mosForMonth3 = 0;
+                                                                    // }
+
+                                                                    // var minStockMoSQty = this.props.items.minStockMoSQty;
+                                                                    // var maxStockMoSQty = this.props.items.maxStockMoSQty;
+                                                                    // var suggestShipment = false;
+                                                                    // var useMax = false;
+                                                                    // if (Number(amc) == 0) {
+                                                                    //     suggestShipment = false;
+                                                                    // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                                                    //     suggestShipment = false;
+                                                                    // } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                    //     suggestShipment = true;
+                                                                    //     useMax = true;
+                                                                    // } else if (Number(mosForMonth1) == 0) {
+                                                                    //     suggestShipment = true;
+                                                                    //     if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                                                    //         useMax = true;
+                                                                    //     } else {
+                                                                    //         useMax = false;
+                                                                    //     }
+                                                                    // }
+                                                                    // var newSuggestedShipmentQty = 0;
+                                                                    // if (suggestShipment) {
+                                                                    //     var suggestedOrd = 0;
+                                                                    //     if (useMax) {
+                                                                    //         suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                    //     } else {
+                                                                    //         suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(newEndingBalance) + Number(unmetDemand));
+                                                                    //     }
+                                                                    //     if (suggestedOrd <= 0) {
+                                                                    //         newSuggestedShipmentQty = 0;
+                                                                    //     } else {
+                                                                    //         newSuggestedShipmentQty = suggestedOrd;
+                                                                    //     }
+                                                                    // } else {
+                                                                    //     newSuggestedShipmentQty = 0;
+                                                                    // }
+                                                                    var newSuggestedShipmentQty = Number(originalShipmentQty) + Number(suggestedQty);
+                                                                    var cf = window.confirm(i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm1') + " " + this.formatter(suggestedQty) + " " + i18n.t("static.shipmentDataEntry.suggestedShipmentQtyConfirm2") + " " + this.formatter(newSuggestedShipmentQty));
+                                                                    if (cf == true) {
+                                                                        obj.setValueFromCoords(10, y, newSuggestedShipmentQty, true);
+                                                                    } else {
+
+                                                                    }
+                                                                }.bind(this)
+                                                            })
+                                                        }
                                                     }
                                                     // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
@@ -783,171 +793,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                             onclick: function () {
-                                                                this.props.updateState("loading", true);
-                                                                if (this.props.shipmentPage == "shipmentDataEntry") {
-                                                                    this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
-                                                                    this.props.toggleLarge();
-                                                                }
-                                                                var rowData = obj.getRowData(y)
-                                                                var batchInfoListAll = this.props.items.programJson.batchInfoList;
-                                                                this.setState({
-                                                                    batchInfoListAll: batchInfoListAll
-                                                                })
-                                                                if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
-                                                                    document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
-                                                                }
-                                                                this.el = jexcel(document.getElementById("shipmentBatchInfoTable"), '');
-                                                                this.el.destroy();
-                                                                var json = [];
-                                                                // var elInstance=this.state.plannedPsmShipmentsEl;
-
-                                                                var batchInfo = rowData[25];
-                                                                var tableEditable = shipmentEditable;
-                                                                if (rowData[22].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
-                                                                    tableEditable = false;
-                                                                }
-                                                                if (this.props.shipmentPage != "shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
-                                                                    if (rowData[22].toString() == "false" && tableEditable == true) {
-                                                                        document.getElementById("addRowBatchId").style.display = "block";
-                                                                    } else {
-                                                                        document.getElementById("addRowBatchId").style.display = "none";
-                                                                    }
-                                                                }
-
-                                                                if (this.props.shipmentPage == "shipmentDataEntry" && document.getElementById("addShipmentBatchRowId") != null) {
-                                                                    if (tableEditable == false) {
-                                                                        document.getElementById("addShipmentBatchRowId").style.display = "none";
-                                                                    } else {
-                                                                        document.getElementById("addShipmentBatchRowId").style.display = "block";
-                                                                    }
-                                                                }
-                                                                for (var sb = 0; sb < batchInfo.length; sb++) {
-                                                                    var data = [];
-                                                                    data[0] = batchInfo[sb].batch.batchNo;
-                                                                    data[1] = batchInfo[sb].batch.expiryDate;
-                                                                    data[2] = batchInfo[sb].shipmentQty;
-                                                                    data[3] = batchInfo[sb].shipmentTransBatchInfoId;
-                                                                    data[4] = y;
-                                                                    data[5] = batchInfoListAll.findIndex(c => c.batchNo == batchInfo[sb].batch.batchNo && moment(c.expiryDate).format("YYYY-MM-DD") == moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"))
-                                                                    data[6] = batchInfo[sb].batch.autoGenerated;
-                                                                    data[7] = batchInfo[sb].batch.batchNo;
-                                                                    data[8] = batchInfo[sb].batch.expiryDate;
-                                                                    data[9] = batchInfo[sb].batch.autoGenerated;
-                                                                    json.push(data);
-                                                                }
-                                                                if (batchInfo.length == 0) {
-                                                                    var data = [];
-                                                                    data[0] = "";
-                                                                    data[1] = expiryDate;
-                                                                    data[2] = ""
-                                                                    data[3] = 0;
-                                                                    data[4] = y;
-                                                                    data[5] = -1;
-                                                                    data[6] = false;
-                                                                    data[7] = "";
-                                                                    data[8] = "";
-                                                                    data[9] = "";
-                                                                    json.push(data)
-                                                                }
-                                                                var options = {
-                                                                    data: json,
-                                                                    columnDrag: true,
-                                                                    colWidths: [100, 150, 100],
-                                                                    columns: [
-                                                                        {
-                                                                            title: i18n.t('static.supplyPlan.batchId'),
-                                                                            type: 'text',
-                                                                        },
-                                                                        {
-                                                                            title: i18n.t('static.supplyPlan.expiryDate'),
-                                                                            type: 'calendar',
-                                                                            options: {
-                                                                                format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
-                                                                                validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), null]
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            title: i18n.t('static.supplyPlan.shipmentQty'),
-                                                                            type: 'numeric',
-                                                                            textEditor: true,
-                                                                            disabledMaskOnEdition: true,
-                                                                            mask: '#,##.00', decimal: '.'
-                                                                        },
-                                                                        {
-                                                                            title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
-                                                                            type: 'hidden',
-                                                                        },
-                                                                        {
-                                                                            title: i18n.t('static.supplyPlan.rowNumber'),
-                                                                            type: 'hidden',
-                                                                        },
-                                                                        {
-                                                                            title: i18n.t('static.supplyPlan.index'),
-                                                                            type: 'hidden',
-                                                                        },
-                                                                        { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
-                                                                        { type: 'hidden' },
-                                                                        { type: 'hidden' },
-                                                                        { type: 'hidden' }
-                                                                    ],
-                                                                    pagination: false,
-                                                                    search: false,
-                                                                    columnSorting: true,
-                                                                    tableOverflow: true,
-                                                                    wordWrap: true,
-                                                                    allowInsertColumn: false,
-                                                                    allowManualInsertColumn: false,
-                                                                    allowDeleteRow: true,
-                                                                    oneditionend: this.onedit,
-                                                                    copyCompatibility: true,
-                                                                    allowInsertRow: true,
-                                                                    allowManualInsertRow: false,
-                                                                    editable: tableEditable,
-                                                                    onchange: this.batchInfoChangedShipment,
-                                                                    allowExport: false,
-                                                                    text: {
-                                                                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
-                                                                        show: '',
-                                                                        entries: '',
-                                                                    },
-                                                                    onload: this.loadedBatchInfoShipment,
-                                                                    license: JEXCEL_PRO_KEY,
-                                                                    updateTable: function (el, cell, x, y, source, value, id) {
-                                                                    }.bind(this),
-                                                                    contextMenu: function (obj, x, y, e) {
-                                                                        var items = [];
-                                                                        if (y == null) {
-                                                                        } else {
-                                                                            // Insert new row
-                                                                            if (shipmentEditable && obj.options.allowInsertRow == true) {
-                                                                                items.push({
-                                                                                    title: i18n.t('static.supplyPlan.addNewBatchInfo'),
-                                                                                    onclick: function () {
-                                                                                        this.addBatchRowInJexcel()
-                                                                                    }.bind(this)
-                                                                                });
-                                                                            }
-                                                                            if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
-                                                                                // region id
-                                                                                if (obj.getRowData(y)[5] == -1) {
-                                                                                    items.push({
-                                                                                        title: i18n.t("static.common.deleterow"),
-                                                                                        onclick: function () {
-                                                                                            this.props.updateState("shipmentBatchInfoChangedFlag", 1);
-                                                                                            obj.deleteRow(parseInt(y));
-                                                                                        }.bind(this)
-                                                                                    });
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        return items;
-                                                                    }.bind(this)
-                                                                };
-                                                                var elVar = jexcel(document.getElementById("shipmentBatchInfoTable"), options);
-                                                                this.el = elVar;
-                                                                this.setState({ shipmentBatchInfoTableEl: elVar });
-                                                                this.props.updateState("loading", false);
+                                                                this.batchDetailsClicked(obj, x, y, shipmentEditable, false);
                                                             }.bind(this)
                                                         });
                                                     }
@@ -1386,6 +1232,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[31] = 0;
         data[32] = 1;
         data[33] = 0;
+        data[34] = 0;
+        data[35] = "";
         obj.insertRow(data);
         obj.setValueFromCoords(1, json.length, 0, true);
         obj.setValueFromCoords(10, json.length, 0, true);
@@ -1678,6 +1526,188 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         });
     }
 
+    batchDetailsClicked(obj, x, y, shipmentEditable, autoPopup) {
+        this.props.updateState("loading", true);
+        if (this.props.shipmentPage == "shipmentDataEntry") {
+            this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
+            this.props.toggleLarge();
+        }
+        var rowData = obj.getRowData(y)
+        var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
+        var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+        var batchInfoListAll = this.props.items.programJson.batchInfoList;
+        this.setState({
+            batchInfoListAll: batchInfoListAll
+        })
+        if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
+            document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
+            if (!autoPopup && document.getElementById("shipmentDetailsPopCancelButton") != null) {
+                if (this.props.shipmentPage == "shipmentDataEntry") {
+                    document.getElementById("shipmentModalHeader").classList.remove('hideCross')
+                }
+                document.getElementById("shipmentDetailsPopCancelButton").style.display = 'block';
+            } else {
+                if (this.props.shipmentPage == "shipmentDataEntry") {
+                    document.getElementById("shipmentModalHeader").classList.add('hideCross')
+                }
+                document.getElementById("shipmentDetailsPopCancelButton").style.display = 'none';
+            }
+        }
+        this.el = jexcel(document.getElementById("shipmentBatchInfoTable"), '');
+        this.el.destroy();
+        var json = [];
+        // var elInstance=this.state.plannedPsmShipmentsEl;
+
+        var batchInfo = rowData[25];
+        console.log("Batch Info+++", batchInfo);
+        var tableEditable = shipmentEditable;
+        if (rowData[22].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
+            tableEditable = false;
+        }
+        if (this.props.shipmentPage != "shipmentDataEntry" && document.getElementById("addRowBatchId") != null) {
+            if (rowData[22].toString() == "false" && tableEditable == true) {
+                document.getElementById("addRowBatchId").style.display = "block";
+            } else {
+                document.getElementById("addRowBatchId").style.display = "none";
+            }
+        }
+
+        if (this.props.shipmentPage == "shipmentDataEntry" && document.getElementById("addShipmentBatchRowId") != null) {
+            if (tableEditable == false) {
+                document.getElementById("addShipmentBatchRowId").style.display = "none";
+            } else {
+                document.getElementById("addShipmentBatchRowId").style.display = "block";
+            }
+        }
+        for (var sb = 0; sb < batchInfo.length; sb++) {
+            var data = [];
+            data[0] = batchInfo[sb].batch.batchNo;
+            data[1] = batchInfo[sb].batch.expiryDate;
+            data[2] = batchInfo[sb].shipmentQty;
+            data[3] = batchInfo[sb].shipmentTransBatchInfoId;
+            data[4] = y;
+            data[5] = batchInfoListAll.findIndex(c => c.batchNo == batchInfo[sb].batch.batchNo && moment(c.expiryDate).format("YYYY-MM-DD") == moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"))
+            data[6] = batchInfo[sb].batch.autoGenerated;
+            data[7] = batchInfo[sb].batch.batchNo;
+            data[8] = batchInfo[sb].batch.expiryDate;
+            data[9] = batchInfo[sb].batch.autoGenerated;
+            json.push(data);
+        }
+        if (batchInfo.length == 0) {
+            var data = [];
+            data[0] = "";
+            data[1] = expiryDate;
+            data[2] = ""
+            data[3] = 0;
+            data[4] = y;
+            data[5] = -1;
+            data[6] = false;
+            data[7] = "";
+            data[8] = "";
+            data[9] = "";
+            json.push(data)
+        }
+        var options = {
+            data: json,
+            columnDrag: true,
+            colWidths: [100, 150, 100],
+            columns: [
+                {
+                    title: i18n.t('static.supplyPlan.batchId'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.supplyPlan.expiryDate'),
+                    type: 'calendar',
+                    options: {
+                        format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
+                        validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), null]
+                    }
+                },
+                {
+                    title: i18n.t('static.supplyPlan.shipmentQty'),
+                    type: 'numeric',
+                    textEditor: true,
+                    disabledMaskOnEdition: true,
+                    mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.supplyPlan.shipmentTransBatchInfoId'),
+                    type: 'hidden',
+                },
+                {
+                    title: i18n.t('static.supplyPlan.rowNumber'),
+                    type: 'hidden',
+                },
+                {
+                    title: i18n.t('static.supplyPlan.index'),
+                    type: 'hidden',
+                },
+                { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
+                { type: 'hidden' },
+                { type: 'hidden' },
+                { type: 'hidden' }
+            ],
+            pagination: false,
+            search: false,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowInsertRow: true,
+            allowManualInsertRow: false,
+            editable: tableEditable,
+            onchange: this.batchInfoChangedShipment,
+            allowExport: false,
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedBatchInfoShipment,
+            license: JEXCEL_PRO_KEY,
+            updateTable: function (el, cell, x, y, source, value, id) {
+            }.bind(this),
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y == null) {
+                } else {
+                    // Insert new row
+                    if (shipmentEditable && obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.supplyPlan.addNewBatchInfo'),
+                            onclick: function () {
+                                this.addBatchRowInJexcel()
+                            }.bind(this)
+                        });
+                    }
+                    if (shipmentEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
+                        // region id
+                        if (obj.getRowData(y)[5] == -1) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    this.props.updateState("shipmentBatchInfoChangedFlag", 1);
+                                    obj.deleteRow(parseInt(y));
+                                }.bind(this)
+                            });
+                        }
+                    }
+                }
+                return items;
+            }.bind(this)
+        };
+        var elVar = jexcel(document.getElementById("shipmentBatchInfoTable"), options);
+        this.el = elVar;
+        this.setState({ shipmentBatchInfoTableEl: elVar });
+        this.props.updateState("loading", false);
+    }
+
     calculateEmergencyOrder(y) {
         var shipmentInstance = this.state.shipmentsEl;
         var rowData = shipmentInstance.getRowData(y);
@@ -1825,11 +1855,36 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var selectedDate = moment(rowData[4]).format("YYYY-MM-DD");
                     if (selectedDate > curDate) {
                         inValid("E", y, i18n.t('static.supplyPlan.dateustBeLessThanCurDate'), elInstance);
+                        validation = false;
                     } else {
                         positiveValidation("E", y, elInstance);
                     }
                 } else {
                     positiveValidation("E", y, elInstance);
+                }
+            }
+            if (validation && rowData[25] != "") {
+                var batchDetails = rowData[25].filter(c => moment(c.batch.expiryDate).format("YYYY-MM") <= moment(rowData[4]).format("YYYY-MM"));
+                if (batchDetails.length > 0) {
+                    inValid("E", y, i18n.t('static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD'), elInstance);
+                    validation = false;
+                } else {
+                    positiveValidation("E", y, elInstance);
+                }
+            }
+            if (validation && rowData[25] != "") {
+                var batchDetails = rowData[25];
+                for (var b = 0; b < batchDetails.length; b++) {
+                    var bd = batchDetails[b];
+                    if (bd.batch.autoGenerated.toString() == "true") {
+                        batchDetails[b].batch.expiryDate = moment(rowData[4]).add(this.props.items.shelfLife, 'months').format("YYYY-MM-DD");
+                    }
+                    batchDetails[b].batch.createdDate = moment(rowData[4]).startOf('month').format("YYYY-MM-DD");
+                }
+                elInstance.setValueFromCoords(25, y, batchDetails, true);
+                elInstance.setValueFromCoords(34, y, 0, true);
+                if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+                    this.batchDetailsClicked(elInstance, x, y, true, true);
                 }
             }
         }
@@ -1871,9 +1926,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         if (x == 3) {
             var valid = checkValidtion("text", "D", y, value, elInstance);
+            elInstance.setValueFromCoords(34, y, 0, true);
             if (valid == true) {
                 var shipmentDates = rowData[27];
                 if (value == DELIVERED_SHIPMENT_STATUS) {
+                    this.batchDetailsClicked(elInstance, x, y, true, true);
                 } else {
                     if (shipmentDates.expectedDeliveryDate != "" && shipmentDates.expectedDeliveryDate != null && shipmentDates.expectedDeliveryDate != "Invalid date") {
                         elInstance.setValueFromCoords(4, y, shipmentDates.expectedDeliveryDate, true);
@@ -2122,6 +2179,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         batchDetails[0].shipmentQty = elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         elInstance.setValueFromCoords(25, y, batchDetails, true);
                         elInstance.setValueFromCoords(26, y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), true);
+                        elInstance.setValueFromCoords(34, y, 0, true);
+                        if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+                            this.batchDetailsClicked(elInstance, x, y, true, true);
+                        }
                     }
                 }
             }
@@ -2377,7 +2438,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(6, y, 1, true);
                 }
             }
-            checkValidtion("text", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("text", "B", y, rowData[1], elInstance);
+            if (valid) {
+                var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
+                if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
+                    inValid("B", y, i18n.t("static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD"), elInstance);
+                } else {
+                    positiveValidation("B", y, elInstance);
+                }
+            }
+
         }
         if (x == 2) {
             checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
@@ -2444,6 +2514,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                 if (validation.toString() == "false") {
                     valid = false;
+                } else {
+                    var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
+                    if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
+                        inValid("B", y, i18n.t("static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD"), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("B", y, elInstance);
+                    }
                 }
                 var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation.toString() == "false") {
@@ -2456,6 +2534,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
     saveShipmentBatchInfo() {
         this.props.updateState("loading", true);
+        this.props.updateState("shipmentBatchError", "");
         var validation = this.checkValidationShipmentBatchInfo();
         if (validation == true) {
             var elInstance = this.state.shipmentBatchInfoTableEl;
@@ -2493,7 +2572,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         batchNo: batchNo,
                         expiryDate: moment(map.get("1")).startOf('month').format("YYYY-MM-DD"),
                         batchId: batchId,
-                        autoGenerated: autoGenerated
+                        autoGenerated: autoGenerated,
+                        createdDate: moment(rowData[4]).format("YYYY-MM-DD")
                     },
                     shipmentQty: map.get("2").toString().replaceAll("\,", ""),
                 }
@@ -2502,6 +2582,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
             shipmentInstance.setValueFromCoords(25, rowNumber, batchInfoArray, true);
             shipmentInstance.setValueFromCoords(26, rowNumber, totalShipmentQty, true);
+            if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+                shipmentInstance.setValueFromCoords(34, rowNumber, 1, true);
+            }
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("shipmentBatchInfoChangedFlag", 0);
             this.props.updateState("shipmentBatchInfoTableEl", "");
@@ -2928,7 +3011,16 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var valid = true;
         var elInstance = this.state.shipmentsEl;
         var json = elInstance.getJson(null, false);
+        console.log("Json+++",json);
+        var checkIfShipmentBatchIsConfirmed = json.filter(c => c[3] == DELIVERED_SHIPMENT_STATUS && c[34] == 0);
+        console.log("Check if shipment batch info is confirmed+++",checkIfShipmentBatchIsConfirmed);
         var checkOtherValidation = true;
+        if (checkIfShipmentBatchIsConfirmed.length > 0) {
+            checkOtherValidation = false;
+            this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.confirmBatchInfo'));
+        } else {
+            checkOtherValidation = true;
+        }
         var negativeBudget = 0;
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
@@ -3051,6 +3143,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         positiveValidation("E", y, elInstance);
                     }
                 }
+                if (valid && rowData[25] != "") {
+                    var batchDetails = rowData[25].filter(c => moment(c.batch.expiryDate).format("YYYY-MM") <= moment(rowData[4]).format("YYYY-MM"));
+                    if (batchDetails.length > 0) {
+                        inValid("E", y, i18n.t('static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD'), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("E", y, elInstance);
+                    }
+                }
 
                 var validation = checkValidtion("text", "T", y, rowData[19], elInstance);
                 if (validation == false) {
@@ -3127,6 +3228,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                     }
                 }
+            }else{
+                valid=false;
             }
         }
         if (negativeBudget > 0 && valid == true) {
@@ -3204,6 +3307,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 minDate = moment(map.get("4")).format("YYYY-MM-DD");
                             } else if (minDate != "" && moment(map.get("4")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                 minDate = moment(map.get("4")).format("YYYY-MM-DD");
+                            }
+                            if (minDate != "" && map.get("35") != "" && moment(map.get("35")).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                minDate = moment(map.get("35")).format("YYYY-MM-DD");
                             }
                         }
                         var selectedShipmentStatus = map.get("3");
@@ -3305,8 +3411,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var totalShipmentQty = (map.get("26"));
                                 var adjustedOrderQty = elInstance.getValue(`K${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                 var eBatchInfoList = map.get("25")
-                                for (var a = 0; a < eBatchInfoList.length; a++) {
-                                }
                                 var remainingBatchQty = Number(adjustedOrderQty) - Number(totalShipmentQty);
                                 if (totalShipmentQty < adjustedOrderQty) {
                                     var indexBatchNo = eBatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
@@ -3324,7 +3428,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 batchNo: batchNo,
                                                 expiryDate: expiryDate,
                                                 batchId: 0,
-                                                autoGenerated: true
+                                                autoGenerated: true,
+                                                createdDate: moment(map.get("4")).format("YYYY-MM-DD")
                                             },
                                             shipmentQty: remainingBatchQty,
                                         }
@@ -3379,7 +3484,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
                                 // Push shipment batch details in program json batch info list
-                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
+                                var index = -1;
+                                if (shipmentBatchInfoList[bi].batch.batchId != 0) {
+                                    index = batchInfoList.findIndex(c => c.batchId == shipmentBatchInfoList[bi].batch.batchId);
+                                } else {
+                                    index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
+                                }
                                 if (index == -1) {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,
@@ -3488,7 +3598,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 batchNo: batchNo,
                                                 expiryDate: expiryDate,
                                                 batchId: 0,
-                                                autoGenerated: true
+                                                autoGenerated: true,
+                                                createdDate: moment(map.get("4")).format("YYYY-MM-DD")
                                             },
                                             shipmentQty: remainingBatchQty,
                                         }
@@ -3541,7 +3652,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 batchInfoList.push(batchDetails);
                             }
                             for (var bi = 0; bi < shipmentBatchInfoList.length; bi++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
+                                var index = -1;
+                                if (shipmentBatchInfoList[bi].batch.batchId != 0) {
+                                    index = batchInfoList.findIndex(c => c.batchId == shipmentBatchInfoList[bi].batch.batchId);
+                                } else {
+                                    index = batchInfoList.findIndex(c => c.batchNo == shipmentBatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
+                                }
                                 if (index == -1) {
                                     var batchDetails = {
                                         batchId: shipmentBatchInfoList[bi].batch.batchId,

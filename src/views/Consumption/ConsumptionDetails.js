@@ -717,6 +717,7 @@ export default class ConsumptionDetails extends React.Component {
                         <div className="table-responsive">
                             <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
+                        <br/><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                     </ModalBody>
                     <ModalFooter>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
