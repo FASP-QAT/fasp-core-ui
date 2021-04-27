@@ -61,13 +61,13 @@ export default class ConsumptionDetails extends React.Component {
             loading: false,
             problemCategoryList: [],
             problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
-            programId:localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
+            // programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
             showUpdateButton: false,
             problemDetail: {},
-            problemTypeId:localStorage.getItem("sesProblemType") != "" ? localStorage.getItem("sesProblemType") : -1,
-            productCategoryId:localStorage.getItem("sesProblemCategory") != "" ? localStorage.getItem("sesProblemCategory") : -1,
-            reviewedStatusId:localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1
+            problemTypeId: localStorage.getItem("sesProblemType") != "" ? localStorage.getItem("sesProblemType") : -1,
+            productCategoryId: localStorage.getItem("sesProblemCategory") != "" ? localStorage.getItem("sesProblemCategory") : -1,
+            reviewedStatusId: localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1
 
         }
 
@@ -190,6 +190,30 @@ export default class ConsumptionDetails extends React.Component {
                     this.setState({
                         problemListForUpdate: myResult,
                         problemStatusList: proListProblemStatus
+                    }, () => {
+                        if (localStorage.getItem("sesProblemStatus") != '' && localStorage.getItem("sesProblemStatus") != undefined) {
+                            let sessionProblemList = JSON.parse(localStorage.getItem("sesProblemStatus"));
+                            let sessionProgramListStored = [];
+                            for (var i = 0; i < sessionProblemList.length; i++) {
+                                let objA = proListProblemStatus.filter(c => c.id == sessionProblemList[i].value)[0];
+                                var Json = {
+                                    label: objA.name,
+                                    value: objA.id
+                                }
+                                sessionProgramListStored.push(Json);
+                            }
+                            this.setState({
+                                problemStatusValues: sessionProgramListStored
+                            })
+                        } else {
+                            let statusA = proListProblemStatus.filter(c => c.id == 1)[0];
+                            let statusB = proListProblemStatus.filter(c => c.id == 3)[0];
+                            var Json1 = { label: statusA.name, value: statusA.id }
+                            var Json2 = { label: statusB.name, value: statusB.id }
+                            this.setState({
+                                problemStatusValues: [Json1, Json2]
+                            })
+                        }
                     })
 
 
@@ -1135,7 +1159,7 @@ export default class ConsumptionDetails extends React.Component {
                 loading: true,
                 showProblemDashboard: 0,
                 showUpdateButton: false,
-                programId:document.getElementById('programId').value,
+                programId: document.getElementById('programId').value,
                 problemTypeId: document.getElementById('problemTypeId').value,
                 productCategoryId: document.getElementById('problemCategoryId').value,
                 reviewedStatusId: document.getElementById('reviewedStatusId').value
@@ -1615,7 +1639,7 @@ export default class ConsumptionDetails extends React.Component {
             <div className="animated">
                 {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions> */}
                 <Prompt
-                    when={this.state.showUpdateButton == true }
+                    when={this.state.showUpdateButton == true}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
