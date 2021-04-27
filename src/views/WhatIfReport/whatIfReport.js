@@ -1996,7 +1996,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var programJson = {
                             label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id,
-                            programId:myResult[i].programId
+                            programId: myResult[i].programId
                         }
                         proList.push(programJson);
                     }
@@ -2123,7 +2123,7 @@ export default class WhatIfReportComponent extends React.Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
+                            myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -2274,8 +2274,8 @@ export default class WhatIfReportComponent extends React.Component {
             localStorage.setItem("sesPlanningUnitId", planningUnitId);
         }
 
-        var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
-        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
+        var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
+        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;
         var consumptionTotalData = [];
         var shipmentsTotalData = [];
@@ -2902,12 +2902,12 @@ export default class WhatIfReportComponent extends React.Component {
                                             suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                         }
                                         if (suggestedOrd <= 0) {
-                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder,"totalShipmentQty":Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                         } else {
-                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder,"totalShipmentQty":Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData)+Number(suggestedOrd) };
+                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                         }
                                     } else {
-                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder,"totalShipmentQty":Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                     }
                                     suggestedShipmentsTotalData.push(sstd);
 
@@ -3400,8 +3400,15 @@ export default class WhatIfReportComponent extends React.Component {
                         consumptionMonth: month,
                         consumptionStartDate: startDate,
                         consumptionRegion: region
+                    }, () => {
+                        if (this.refs.consumptionChild != undefined) {
+                            this.refs.consumptionChild.showConsumptionData();
+                        }else{
+                            this.setState({
+                                loading:false
+                            })
+                        }
                     })
-                    this.refs.consumptionChild.showConsumptionData();
                 }.bind(this)
             }.bind(this)
         }
@@ -3496,8 +3503,15 @@ export default class WhatIfReportComponent extends React.Component {
                         inventoryMonth: month,
                         inventoryEndDate: endDate,
                         inventoryRegion: region
+                    }, () => {
+                        if (this.refs.inventoryChild != undefined) {
+                            this.refs.inventoryChild.showInventoryData();
+                        }else{
+                            this.setState({
+                                loading:false
+                            })
+                        }
                     })
-                    this.refs.inventoryChild.showInventoryData();
                 }.bind(this)
             }.bind(this)
         }
@@ -3542,8 +3556,8 @@ export default class WhatIfReportComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var planningUnitId = document.getElementById("planningUnitId").value;
-                var actualProgramId=this.state.programList.filter(c=>c.value==document.getElementById("programId").value)[0].programId;
-                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id==actualProgramId && p.planningUnit.id == planningUnitId))[0];
+                var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
+                var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
                 var shelfLife = programPlanningUnit.shelfLife;
                 if (month != "" && quantity != 0) {
                     var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month && c.suggestedOrderQty != "");
@@ -3603,8 +3617,15 @@ export default class WhatIfReportComponent extends React.Component {
                     shelfLife: programPlanningUnit.shelfLife,
                     catalogPrice: programPlanningUnit.catalogPrice,
                     programPlanningUnitForPrice:programPlanningUnit
+                }, () => {
+                    if (this.refs.shipmentChild != undefined) {
+                        this.refs.shipmentChild.showShipmentData();
+                    }else{
+                        this.setState({
+                            loading:false
+                        })
+                    }
                 })
-                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
@@ -5109,8 +5130,15 @@ export default class WhatIfReportComponent extends React.Component {
                     shelfLife: programPlanningUnit.shelfLife,
                     catalogPrice: programPlanningUnit.catalogPrice,
                     programPlanningUnitForPrice:programPlanningUnit
+                }, () => {
+                    if (this.refs.shipmentChild != undefined) {
+                        this.refs.shipmentChild.showShipmentData();
+                    }else{
+                        this.setState({
+                            loading:false
+                        })
+                    }
                 })
-                this.refs.shipmentChild.showShipmentData();
             }.bind(this)
         }.bind(this)
     }
