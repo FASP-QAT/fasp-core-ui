@@ -453,10 +453,10 @@ export default class ManualTagging extends Component {
 
     dataChange(event) {
         console.log("radio button event---", event.target)
-
+        console.log("program id datachange---", this.state.programId)
         if (event.target.id == 'active1') {
             this.setState({
-                programId: -1,
+                programId: (this.state.programId != null && this.state.programId != "" && this.state.programId != -1 ? this.state.programId : -1),
                 planningUnitValues: [],
                 planningUnitLabels: [],
                 planningUnits: [],
@@ -471,11 +471,13 @@ export default class ManualTagging extends Component {
                     }, () => {
                         this.getPlanningUnitList();
                     });
+                } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
+                    this.getPlanningUnitList();
                 }
             });
         } else if (event.target.id == 'active2') {
             this.setState({
-                programId: -1,
+                programId: (this.state.programId != null && this.state.programId != "" && this.state.programId != -1 ? this.state.programId : -1),
                 planningUnitValues: [],
                 planningUnitLabels: [],
                 planningUnits: [],
@@ -490,6 +492,8 @@ export default class ManualTagging extends Component {
                     }, () => {
                         this.getPlanningUnitList();
                     });
+                } else if (this.state.programId != null && this.state.programId != "" && this.state.programId != -1) {
+                    this.getPlanningUnitList();
                 }
             });
         } else {
@@ -1293,6 +1297,7 @@ export default class ManualTagging extends Component {
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString()),
                     linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
                 }
+                console.log("linking type my---", this.state.active1);
                 console.log("my json---------------------", json);
                 ManualTaggingService.getShipmentListForManualTagging(json)
                     .then(response => {
@@ -2062,12 +2067,12 @@ export default class ManualTagging extends Component {
     }
     loadedERP = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        // console.log("instance---", instance)
-        // var asterisk = document.getElementsByClassName("resizable")[1];
-        // console.log("asterisk---", asterisk);
-        // var tr = asterisk.firstChild;
-        // console.log("tr-------------", tr)
-        // tr.children[9].classList.add('AsteriskTheadtrTd');
+        console.log("resizable class---",document.getElementsByClassName("resizable"))
+        var asterisk = document.getElementsByClassName("resizable")[2];
+        console.log("asterisk---", asterisk);
+        var tr = asterisk.firstChild;
+        console.log("tr-------------", tr)
+        tr.children[8].classList.add('AsteriskTheadtrTd');
     }
 
     selected = function (instance, cell, x, y, value) {

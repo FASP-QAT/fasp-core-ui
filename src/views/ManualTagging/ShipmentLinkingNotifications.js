@@ -98,7 +98,7 @@ export default class ShipmentLinkingNotifications extends Component {
         }
     }
 
-    
+
 
     filterData1() {
         this.filterData(this.state.planningUnitIds);
@@ -593,7 +593,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     readOnly: true
                 },
                 {
-                    
+
                     title: i18n.t('static.manualTagging.erpPlanningUnit'),
                     type: 'text',
                     readOnly: true
@@ -935,11 +935,16 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        console.log("asterisk123---", asterisk);
+        var tr = asterisk.firstChild;
+        console.log("tr-------------",tr)
+        tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
-    loadedERP = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance, 1);
-    }
+    // loadedERP = function (instance, cell, x, y, value) {
+    //     jExcelLoadedFunction(instance, 1);
+    // }
 
     // selected = function (instance, cell, x, y, value) {
 
