@@ -196,7 +196,12 @@ export default class ManualTagging extends Component {
         } else {
             this.filterErpData();
         }
-        this.toggleLarge();
+        this.setState({
+            message: i18n.t('static.actionCancelled')
+        }, () => {
+            this.toggleLarge();
+        })
+
     }
     displayShipmentData() {
         let selectedShipmentId = parseInt(document.getElementById("notLinkedShipmentId").value);
@@ -2067,7 +2072,7 @@ export default class ManualTagging extends Component {
     }
     loadedERP = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        console.log("resizable class---",document.getElementsByClassName("resizable"))
+        console.log("resizable class---", document.getElementsByClassName("resizable"))
         var asterisk = document.getElementsByClassName("resizable")[2];
         console.log("asterisk---", asterisk);
         var tr = asterisk.firstChild;
@@ -2302,9 +2307,11 @@ export default class ManualTagging extends Component {
         const selectRow = {
             mode: 'radio',
             clickToSelect: true,
+            // columnWidth: '10px',
             selectionHeaderRenderer: () => i18n.t('static.mt.selectShipment'),
             headerColumnStyle: {
                 headerAlign: 'center'
+                
                 // align:  function callback(cell, row, rowIndex, colIndex) { 
                 //     console.log("my row----------------------")
                 //     return "center" }
@@ -2406,7 +2413,7 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '20px' },
+                style: { width: '40px' },
                 formatter: this.formatPlanningUnitLabel
             },
             {
@@ -2436,7 +2443,7 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatDate,
-                style: { width: '20px' }
+                style: { width: '30px' }
             },
             {
                 dataField: 'shipmentStatus.label',
@@ -2452,7 +2459,7 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '40px' }
+                style: { width: '30px' }
                 // formatter: this.formatLabel
             },
             //  {
@@ -3030,7 +3037,7 @@ export default class ManualTagging extends Component {
                                                     >
                                                         {
                                                             props => (
-                                                                <div className="TableCust FortablewidthMannualtaggingtable1 height-auto">
+                                                                <div className="FortablewidthMannualtaggingtable1 height-auto">
 
                                                                     <BootstrapTable
                                                                         // keyField='erpOrderId'
