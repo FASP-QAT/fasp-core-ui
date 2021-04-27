@@ -61,13 +61,13 @@ export default class ConsumptionDetails extends React.Component {
             loading: false,
             problemCategoryList: [],
             problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
-            programId:localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
+            programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
             showUpdateButton: false,
             problemDetail: {},
-            problemTypeId:localStorage.getItem("sesProblemType") != "" ? localStorage.getItem("sesProblemType") : -1,
-            productCategoryId:localStorage.getItem("sesProblemCategory") != "" ? localStorage.getItem("sesProblemCategory") : -1,
-            reviewedStatusId:localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1
+            problemTypeId: localStorage.getItem("sesProblemType") != "" ? localStorage.getItem("sesProblemType") : -1,
+            productCategoryId: localStorage.getItem("sesProblemCategory") != "" ? localStorage.getItem("sesProblemCategory") : -1,
+            reviewedStatusId: localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1
 
         }
 
@@ -404,122 +404,127 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this)
 
     updateChangedProblems = function () {
-        var isDataValid = this.checkValidation();
-        if (isDataValid == true) {
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                var programId = this.state.programId;
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var program = transaction.objectStore('programData');
-                var getRequest = program.get(programId.toString());
-                getRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    });
-                };
-                getRequest.onsuccess = function (event) {
-                    var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
-                    var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
-                    var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
-                    programQPLDetailsGetRequest.onsuccess = function (event) {
-                        var programObj = getRequest.result;
-                        var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        var programQPLDetails = programQPLDetailsGetRequest.result;
-                        //=========================================================================
-                        var elInstance = this.state.languageEl;
-                        var json = elInstance.getJson();
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                        let username = decryptedUser.username;
+        this.setState({
+            showUpdateButton: false
+        }, () => {
+            var isDataValid = this.checkValidation();
+            if (isDataValid == true) {
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    var programId = this.state.programId;
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var program = transaction.objectStore('programData');
+                    var getRequest = program.get(programId.toString());
+                    getRequest.onerror = function (event) {
+                        this.setState({
+                            supplyPlanError: i18n.t('static.program.errortext')
+                        });
+                    };
+                    getRequest.onsuccess = function (event) {
+                        var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+                        var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+                        var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
+                        programQPLDetailsGetRequest.onsuccess = function (event) {
+                            var programObj = getRequest.result;
+                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson = JSON.parse(programData);
+                            var programQPLDetails = programQPLDetailsGetRequest.result;
+                            //=========================================================================
+                            var elInstance = this.state.languageEl;
+                            var json = elInstance.getJson();
+                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-                        var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                            let username = decryptedUser.username;
 
-                        var changedProblemsList = json.filter(c => c[21] == 1);
-                        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
-                        let problemList = this.state.data;
-                        let problemReportListForUpdate = this.state.problemReportListForUpdate;
-                        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
-                        console.log("changedProblemsList+++", changedProblemsList);
-                        for (var i = 0; i < changedProblemsList.length; i++) {
-                            if ((changedProblemsList[i])[0] != 0) {
-                                console.log("in if+++");
-                                var indexToUpdate = problemReportListForUpdate.findIndex(c =>
-                                    c.problemReportId == (changedProblemsList[i])[0]
-                                );
-                            } else {
-                                console.log("in else+++", (changedProblemsList[i])[1]);
-                                // var indexToUpdate = problemReportListForUpdate.findIndex(c =>
-                                //     c.problemActionIndex == (changedProblemsList[i])[1]
-                                // );
-                                var indexToUpdate = (changedProblemsList[i])[1];
+                            var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+
+                            var changedProblemsList = json.filter(c => c[21] == 1);
+                            var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+                            let problemList = this.state.data;
+                            let problemReportListForUpdate = this.state.problemReportListForUpdate;
+                            problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false);
+                            console.log("changedProblemsList+++", changedProblemsList);
+                            for (var i = 0; i < changedProblemsList.length; i++) {
+                                if ((changedProblemsList[i])[0] != 0) {
+                                    console.log("in if+++");
+                                    var indexToUpdate = problemReportListForUpdate.findIndex(c =>
+                                        c.problemReportId == (changedProblemsList[i])[0]
+                                    );
+                                } else {
+                                    console.log("in else+++", (changedProblemsList[i])[1]);
+                                    // var indexToUpdate = problemReportListForUpdate.findIndex(c =>
+                                    //     c.problemActionIndex == (changedProblemsList[i])[1]
+                                    // );
+                                    var indexToUpdate = (changedProblemsList[i])[1];
+                                }
+
+                                var probObj = problemReportListForUpdate[indexToUpdate];
+                                // var probObj = (changedProblemsList[i])[0] != 0 ? problemList.filter(c => c.problemReportId == indexToUpdate)[0] : problemList.filter(c => c.problemActionIndex == indexToUpdate)[0];
+                                probObj.lastModifiedBy = { userId: userId, username: username }
+                                probObj.lastModifiedDate = curDate;
+
+                                var probTransList = probObj.problemTransList;
+                                var changedProblemStatusId = parseInt((changedProblemsList[i])[10]);
+                                var statusObj = this.state.problemListForUpdate.filter(c => parseInt(c.id) == changedProblemStatusId)[0];
+                                let tempProblemTransObj = {
+                                    problemReportTransId: '',
+                                    problemStatus: statusObj,
+                                    notes: (changedProblemsList[i])[11],
+                                    reviewed: false,
+                                    createdBy: {
+                                        userId: userId,
+                                        username: username
+                                    },
+                                    createdDate: curDate
+                                }
+                                probTransList.push(tempProblemTransObj);
+                                probObj.problemTransList = probTransList;
+                                probObj.reviewed = false;
+                                var problemStatusObject = statusObj
+                                probObj.problemStatus = problemStatusObject;
+                                problemReportListForUpdate[indexToUpdate] = probObj;
                             }
-
-                            var probObj = problemReportListForUpdate[indexToUpdate];
-                            // var probObj = (changedProblemsList[i])[0] != 0 ? problemList.filter(c => c.problemReportId == indexToUpdate)[0] : problemList.filter(c => c.problemActionIndex == indexToUpdate)[0];
-                            probObj.lastModifiedBy = { userId: userId, username: username }
-                            probObj.lastModifiedDate = curDate;
-
-                            var probTransList = probObj.problemTransList;
-                            var changedProblemStatusId = parseInt((changedProblemsList[i])[10]);
-                            var statusObj = this.state.problemListForUpdate.filter(c => parseInt(c.id) == changedProblemStatusId)[0];
-                            let tempProblemTransObj = {
-                                problemReportTransId: '',
-                                problemStatus: statusObj,
-                                notes: (changedProblemsList[i])[11],
-                                reviewed: false,
-                                createdBy: {
-                                    userId: userId,
-                                    username: username
-                                },
-                                createdDate: curDate
-                            }
-                            probTransList.push(tempProblemTransObj);
-                            probObj.problemTransList = probTransList;
-                            probObj.reviewed = false;
-                            var problemStatusObject = statusObj
-                            probObj.problemStatus = problemStatusObject;
-                            problemReportListForUpdate[indexToUpdate] = probObj;
-                        }
-                        //=========================================================================
-                        programJson.problemReportList = problemReportListForUpdate;
-                        var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
-                        var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
-                        programQPLDetails.openCount = openCount;
-                        programQPLDetails.addressedCount = addressedCount;
-                        programObj.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                        var problemTransaction = db1.transaction(['programData'], 'readwrite');
-                        var problemOs = problemTransaction.objectStore('programData');
-                        var putRequest = problemOs.put(programObj);
-                        putRequest.onerror = function (event) {
-                            this.setState({
-                                message: i18n.t('static.program.errortext'),
-                                color: 'red'
-                            })
-                        }.bind(this);
-                        putRequest.onsuccess = function (event) {
-                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                            var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetails);
-                            programQPLDetailsRequest.onsuccess = function (event) {
-                                this.fetchData();
-
+                            //=========================================================================
+                            programJson.problemReportList = problemReportListForUpdate;
+                            var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
+                            var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
+                            programQPLDetails.openCount = openCount;
+                            programQPLDetails.addressedCount = addressedCount;
+                            programObj.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                            var problemTransaction = db1.transaction(['programData'], 'readwrite');
+                            var problemOs = problemTransaction.objectStore('programData');
+                            var putRequest = problemOs.put(programObj);
+                            putRequest.onerror = function (event) {
+                                this.setState({
+                                    message: i18n.t('static.program.errortext'),
+                                    color: 'red'
+                                })
                             }.bind(this);
-                        }.bind(this);
+                            putRequest.onsuccess = function (event) {
+                                var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetails);
+                                programQPLDetailsRequest.onsuccess = function (event) {
+                                    this.fetchData();
+
+                                }.bind(this);
+                            }.bind(this);
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({ message: i18n.t('static.label.validData') });
-        }
+            } else {
+                this.setState({ message: i18n.t('static.label.validData') });
+            }
+        });
     }.bind(this)
 
     toggleLarge(problemReportId, problemActionIndex) {
@@ -1135,7 +1140,7 @@ export default class ConsumptionDetails extends React.Component {
                 loading: true,
                 showProblemDashboard: 0,
                 showUpdateButton: false,
-                programId:document.getElementById('programId').value,
+                programId: document.getElementById('programId').value,
                 problemTypeId: document.getElementById('problemTypeId').value,
                 productCategoryId: document.getElementById('problemCategoryId').value,
                 reviewedStatusId: document.getElementById('reviewedStatusId').value
@@ -1615,7 +1620,7 @@ export default class ConsumptionDetails extends React.Component {
             <div className="animated">
                 {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActions> */}
                 <Prompt
-                    when={this.state.showUpdateButton == true }
+                    when={this.state.showUpdateButton == true}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>

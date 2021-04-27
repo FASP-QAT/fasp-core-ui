@@ -91,7 +91,7 @@ class Program extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: 'static.common.networkError',
                             loading: false,
                             color: "red"
                         }, () => {
@@ -196,7 +196,7 @@ class Program extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                message: 'static.common.networkError',
                                 loading: false,
                                 color: "red"
                             }, () => {
@@ -355,7 +355,7 @@ class Program extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            message: 'static.common.networkError',
                                             loading: false,
                                             color: "red"
                                         }, () => {
@@ -447,7 +447,7 @@ class Program extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                message: 'static.common.networkError',
                                 loading: false,
                                 color: "red"
                             }, () => {
@@ -1128,7 +1128,7 @@ class Program extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    message: 'static.common.networkError',
                                     loading: false,
                                     color: "red"
                                 }, () => {

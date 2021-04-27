@@ -1,22 +1,12 @@
 import moment, { months } from 'moment';
 
-export default function openProblem(index,username,userId,problemActionList) {
+export default function openProblem(index,username,userId,problemActionList,openProblemStatusObj) {
 
     var filterObj = problemActionList[index];
     var transList = filterObj.problemTransList;
     let tempProblemTransObj = {
         problemReportTransId: '',
-        problemStatus: {
-            id: 1,
-            label: {
-                active: true,
-                labelId: 461, 
-                label_en: "Open",
-                label_sp: null,
-                label_fr: null,
-                label_pr: null
-            }
-        },
+        problemStatus: openProblemStatusObj,
         notes: '',
         reviewed: false,
         createdBy: {
@@ -30,17 +20,7 @@ export default function openProblem(index,username,userId,problemActionList) {
     // reviewed: false,
     filterObj.reviewed = false; 
 
-    var problemStatusObject = {
-        id: 1,
-        label: {
-            active: true,
-            labelId: 461,
-            label_en: "Open",
-            label_sp: null,
-            label_fr: null,
-            label_pr: null
-        }
-    }
+    var problemStatusObject = openProblemStatusObj
     filterObj.problemStatus = problemStatusObject;
 
 }
