@@ -1323,7 +1323,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
 
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
-                                    totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails, month: m[n] });
+                                    totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
                                     amcTotalData.push(Math.round(Number(jsonList[0].amc)))
                                     minStockMoS.push(jsonList[0].minStockMoS)
@@ -1654,7 +1654,8 @@ export default class SupplyPlanComponent extends React.Component {
                 })
             } else {
                 this.setState({
-                    expiredStockModal: !this.state.expiredStockModal
+                    expiredStockModal: !this.state.expiredStockModal,
+                    loading: false
                 })
             }
         }
