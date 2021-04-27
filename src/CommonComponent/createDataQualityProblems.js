@@ -1,6 +1,6 @@
 import moment, { months } from 'moment';
 
-export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList) {
+export default function createDataQualityProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList ,openProblemStatusObj) {
 
     var json = {
         problemReportId: 0,
@@ -30,20 +30,9 @@ export default function createDataQualityProblems(programObj, versionID, problem
 
         problemActionIndex: problemActionIndex,
 
-        problemCategory: {
-            id: 1,
-            label: { label_en: 'Data Quality' }
-        },
-        problemStatus: {
-            id: 1,
-            label: { label_en: 'Open' }
-        },
-        problemType: {
-            id: 1,
-            label: {
-                label_en: 'Automatic'
-            }
-        },
+        problemCategory: problemObj.problem.problemCategory,
+        problemStatus: openProblemStatusObj,
+        problemType: problemObj.problemType,
         reviewed: false,
         reviewNotes: '',
         reviewedDate: '',
@@ -60,17 +49,7 @@ export default function createDataQualityProblems(programObj, versionID, problem
         problemTransList: [
             {
                 problemReportTransId: '',
-                problemStatus: {
-                    id: 1,
-                    label: {
-                        active: true,
-                        labelId: 461,
-                        label_en: "Open",
-                        label_sp: null,
-                        label_fr: null,
-                        label_pr: null
-                    }
-                },
+                problemStatus: openProblemStatusObj,
                 notes: "",
                 reviewed: false,
                 createdBy: {
