@@ -1,22 +1,12 @@
 import moment, { months } from 'moment';
 
-export default function incomplianceProblem(index,username,userId,problemActionList) {
+export default function incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj) {
     // console.log("000000=====>in ");
     var filterObj = problemActionList[index];
     var transList = filterObj.problemTransList;
     let tempProblemTransObj = {
         problemReportTransId: '',
-        problemStatus: {
-            id: 4,
-            label: {
-                active: true,
-                labelId: 27104,
-                label_en: "In-Compliance",
-                label_sp: null,
-                label_fr: null,
-                label_pr: null
-            }
-        },
+        problemStatus: incomplianceProblemStatusObj,
         notes: '',
         reviewed: false,
         createdBy: {
@@ -28,17 +18,7 @@ export default function incomplianceProblem(index,username,userId,problemActionL
     transList.push(tempProblemTransObj);
     filterObj.problemTransList = transList;
     filterObj.reviewed = false;
-    var problemStatusObject = {
-        id: 4,
-        label: {
-            active: true,
-            labelId: 27104,
-            label_en: "In-Compliance",
-            label_sp: null,
-            label_fr: null,
-            label_pr: null
-        }
-    }
+    var problemStatusObject = incomplianceProblemStatusObj
     filterObj.problemStatus = problemStatusObject;
 
 }

@@ -304,7 +304,7 @@ export default class ShipmentDetails extends React.Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                        myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
+                        myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -420,6 +420,7 @@ export default class ShipmentDetails extends React.Component {
                         this.setState({
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
+                        console.log("ShowBatchInfoList+++",programJson.batchInfoList);
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
                         if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
@@ -463,14 +464,14 @@ export default class ShipmentDetails extends React.Component {
         }
         if (cont == true) {
             this.setState({
-                shipmentChangedFlag:0,
-                shipmentBatchInfoChangedFlag:0,
-                shipmentQtyChangedFlag:0,
-                shipmentDatesChangedFlag:0
-            },()=>{
+                shipmentChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentQtyChangedFlag: 0,
+                shipmentDatesChangedFlag: 0
+            }, () => {
                 let id = AuthenticationService.displayDashboardBasedOnRole();
                 this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-            })            
+            })
         }
     }
 
@@ -558,7 +559,7 @@ export default class ShipmentDetails extends React.Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                {checkOnline === 'Online' && 
+                    {checkOnline === 'Online' &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -569,7 +570,7 @@ export default class ShipmentDetails extends React.Component {
                                 </div>
                             </div>
                         </div>
-    }
+                    }
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Formik
                             render={
@@ -673,7 +674,7 @@ export default class ShipmentDetails extends React.Component {
 
                 <Modal isOpen={this.state.batchInfo}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
-                    <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                    <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
                         <strong>{this.state.shipmentModalTitle}</strong>
                     </ModalHeader>
                     <ModalBody>
@@ -697,16 +698,18 @@ export default class ShipmentDetails extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                            {this.state.shipmentBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                            <Button id="shipmentDetailsPopCancelButton" size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                            {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
+                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            {this.state.shipmentDatesChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsDate()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentDates')}</Button>}
                         </div>
                         <div id="showSaveQtyButtonDiv" style={{ display: 'none' }} className="mr-0">
-                            {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
+                            <Button size="md" color="danger" className="submitBtn float-right mr-2" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
                         </div>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
                 {/* Shipments modal */}
