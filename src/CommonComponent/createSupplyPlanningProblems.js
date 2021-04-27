@@ -1,6 +1,6 @@
 import moment, { months } from 'moment';
 
-export default function createSupplyPlanningProblems(programObj, versionID, problemObj, regionObj, planningUnitObj,causeJson, problemActionIndex, userId, username,problemActionList) {
+export default function createSupplyPlanningProblems(programObj, versionID, problemObj, regionObj, planningUnitObj, causeJson, problemActionIndex, userId, username, problemActionList,openProblemStatusObj) {
 
     var json = {
         problemReportId: 0,
@@ -28,20 +28,9 @@ export default function createSupplyPlanningProblems(programObj, versionID, prob
         regionActive: true,
         newAdded: false,
         problemActionIndex: problemActionIndex,
-        problemCategory: {
-            id: 3,
-            label: { label_en: 'Supply Planning' }
-        },
-        problemStatus: {
-            id: 1,
-            label: { label_en: 'Open' }
-        },
-        problemType: {
-            id: 1,
-            label: {
-                label_en: 'Automatic'
-            }
-        },
+        problemCategory: problemObj.problem.problemCategory,
+        problemStatus: openProblemStatusObj,
+        problemType: problemObj.problemType,
         reviewed: false,
         reviewNotes: '',
         reviewedDate: '',
@@ -58,17 +47,7 @@ export default function createSupplyPlanningProblems(programObj, versionID, prob
         problemTransList: [
             {
                 problemReportTransId: '',
-                problemStatus: {
-                    id: 1,
-                    label: {
-                        active: true,
-                        labelId: 461,
-                        label_en: "Open",
-                        label_sp: null,
-                        label_fr: null,
-                        label_pr: null
-                    }
-                },
+                problemStatus: openProblemStatusObj,
                 notes: "",
                 reviewed: false,
                 createdBy: {
