@@ -377,23 +377,23 @@ export default class ManualTagging extends Component {
 
         //conversion factor
         if (x == 7) {
-            console.log("y-------", this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            // console.log("y-------", this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var col = ("H").concat(parseInt(y) + 1);
-            console.log("col-----------", col);
-            console.log("value---------", this.el.getValue(`H${parseInt(y) + 1}`));
+            // console.log("col-----------", col);
+            // console.log("value---------", this.el.getValue(`H${parseInt(y) + 1}`));
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
 
             if (value == "") {
-                console.log("--------1--------");
+                // console.log("--------1--------");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 if (!(reg.test(value))) {
-                    console.log("--------2--------");
+                    // console.log("--------2--------");
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -401,8 +401,8 @@ export default class ManualTagging extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    console.log("qty-------------------" + qty);
-                    this.state.instance.setValueFromCoords(8, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
+                    // console.log("qty-------------------" + qty);
+                    this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty * (value != null && value != "" ? value : 1))), true);
                 }
 
             }
@@ -914,10 +914,11 @@ export default class ManualTagging extends Component {
                             planningUnitId: (this.state.active3 ? document.getElementById("planningUnitId1").value : 0),
                             quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
                         }
-                        if (this.state.active2 && map1.get("0")) {
-                            linkedShipmentCount++;
-                        }
+
                         changedmtList.push(json);
+                    }
+                    if (this.state.active2 && map1.get("0")) {
+                        linkedShipmentCount++;
                     }
                 }
                 console.log("FINAL SUBMIT changedmtList---", changedmtList);
@@ -936,7 +937,7 @@ export default class ManualTagging extends Component {
                         }
                         if (active2GoAhead) {
                             // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                            var cf1 = window.confirm("You have delinked all the shipments.Your data will be reverted to the original QAT shipment.Are yu sure you want to continue?");
+                            var cf1 = window.confirm("You have delinked all the shipments.Your data will be reverted to the original QAT shipment.Are you sure you want to continue?");
                             if (cf1 == true) {
                                 callApiActive2 = true;
                             } else {
@@ -1075,7 +1076,7 @@ export default class ManualTagging extends Component {
         console.log("condition 1---", (roNoOrderNo != "" && roNoOrderNo != 0))
         console.log("condition 2---", (erpPlanningUnitId != null && erpPlanningUnitId != "" && erpPlanningUnitId == 0))
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
-            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
+            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0))
                 .then(response => {
                     console.log("artmis response===", response.data);
                     // document.getElementById("erpShipmentQty").value = '';
@@ -1694,7 +1695,7 @@ export default class ManualTagging extends Component {
                 let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : '');
                 data[7] = conversionFactor;
                 convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = this.addCommas(convertedQty);
+                data[8] = this.addCommas(Math.round(convertedQty));
                 data[9] = erpDataList[j].notes;
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
@@ -1708,7 +1709,7 @@ export default class ManualTagging extends Component {
             count++;
         }
         this.setState({
-            totalQuantity: this.addCommas(qty),
+            totalQuantity: this.addCommas(Math.round(qty)),
             displayTotalQty: (qty > 0 ? true : false)
         });
 
@@ -1865,7 +1866,7 @@ export default class ManualTagging extends Component {
                 data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                 data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-                data[10] = this.addCommas(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+                data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[11] = manualTaggingList[j].notes
             }
             else {
@@ -2206,7 +2207,7 @@ export default class ManualTagging extends Component {
                 });
             }
             // outputListAfterSearch.push(row);
-            // console.log("1------------------------------>>>>", outputListAfterSearch[0].planningUnit.id)
+            console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
             this.setState({
                 planningUnitId: (this.state.active2 || this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                 shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),

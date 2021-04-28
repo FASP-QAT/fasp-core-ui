@@ -1229,7 +1229,7 @@
     "static.procurementUnit.unitsPerCase": "Units per Case",
     "static.procurementagent.submitToApproveLeadTime": "Enter `Submitted to Approved` lead time (in months)",
     "static.program.validorganisationtext": "Select organization",
-    "static.manualTagging.search": "Search",
+    "static.manualTagging.search": "Search By RO/Order No.",
     "static.planningUnit.duplicatePlanningUnit": "Duplicate Planning Unit Details Found",
     "static.dashboard.whatIf": "Scenario Planning",
     "static.unit.dimensiontext": "Select Dimension",
@@ -1293,6 +1293,7 @@
     "static.supplyPlan.artmisShipmentsDetails": "ARTMIS Shipment Details",
     "static.supplyPlan.quantityPU": " Quantity (PU)",
     "static.commitVersion.conflicts": " Conflicts",
+    "static.mt.selectPlanninfUnit": "Please select planning unit",
     "static.message.user.userNotFound": "User not found",
     "static.inventory.totalInvontory": "Total Inventory",
     "static.manualtagging.result": "Enter ERP shipment number. and prime line number.",
@@ -1312,6 +1313,7 @@
     "static.role.cancreaterole": "Can Create Role",
     "static.supplyPlan.addNewAdjustments": "Add new adjustments",
     "static.message.newPasswordRequired": "Enter new password",
+    "static.mt.filterByShipmentId": "Filter by QAT shipment id?",
     "static.report.problemAction.manual": "Manually Entered",
     "static.supplyplan.shipmentDataEntry": "Shipment data entry",
     "static.realm.no": "No",
@@ -1703,6 +1705,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.mt.selectShipment": "Select Shipment"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
 }
