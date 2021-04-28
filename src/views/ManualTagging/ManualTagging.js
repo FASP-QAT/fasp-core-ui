@@ -2207,7 +2207,7 @@ export default class ManualTagging extends Component {
                 });
             }
             // outputListAfterSearch.push(row);
-            console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
+            // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
             this.setState({
                 planningUnitId: (this.state.active2 || this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                 shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
