@@ -32,8 +32,9 @@ class ManualTaggingSerice {
         return axios.get(`${API_URL}/api/getNotificationCount`, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType) {
-        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
+    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType,parentShipmentId) {
+        console.log("parentShipmentId----",parentShipmentId);
+        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}/${parentShipmentId}`, {
         });
     }
     linkShipmentWithARTMIS(json) {

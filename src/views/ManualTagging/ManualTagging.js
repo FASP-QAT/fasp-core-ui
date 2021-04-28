@@ -35,6 +35,8 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            filteredBudgetListByProgram: [],
+            checkboxValue: true,
             buildJexcelRequired: true,
             getPlanningUnitArray: [],
             countryWisePrograms: [],
@@ -111,6 +113,7 @@ export default class ManualTagging extends Component {
 
         this.dataChange = this.dataChange.bind(this);
         this.dataChange1 = this.dataChange1.bind(this);
+        this.dataChangeCheckbox = this.dataChangeCheckbox.bind(this);
         this.changed = this.changed.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
@@ -200,7 +203,8 @@ export default class ManualTagging extends Component {
         }
         this.setState({
             message: i18n.t('static.actionCancelled'),
-            color: "red"
+            color: "red",
+            planningUnitIdUpdated: ''
         }, () => {
             this.hideSecondComponent();
             this.toggleLarge();
@@ -208,11 +212,11 @@ export default class ManualTagging extends Component {
 
     }
     displayShipmentData() {
-        let selectedShipmentId = parseInt(document.getElementById("notLinkedShipmentId").value);
-        let selectedPlanningUnitId = parseInt(document.getElementById("planningUnitId1").value);
+        let selectedShipmentId = (this.state.checkboxValue ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
+        let selectedPlanningUnitId = (!this.state.checkboxValue ? parseInt(document.getElementById("planningUnitId1").value) : 0);
         let selectedShipment;
         console.log("selectedShipmentId---", selectedShipmentId);
-        if (selectedShipmentId != null && selectedShipmentId != 0) {
+        if (selectedShipmentId != null && selectedShipmentId != 0 && this.state.checkboxValue) {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.shipmentId == selectedShipmentId));
         } else {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.planningUnit.id == selectedPlanningUnitId));
@@ -373,23 +377,23 @@ export default class ManualTagging extends Component {
 
         //conversion factor
         if (x == 7) {
-            console.log("y-------", this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+            // console.log("y-------", this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var col = ("H").concat(parseInt(y) + 1);
-            console.log("col-----------", col);
-            console.log("value---------", this.el.getValue(`H${parseInt(y) + 1}`));
+            // console.log("col-----------", col);
+            // console.log("value---------", this.el.getValue(`H${parseInt(y) + 1}`));
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
 
             if (value == "") {
-                console.log("--------1--------");
+                // console.log("--------1--------");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 if (!(reg.test(value))) {
-                    console.log("--------2--------");
+                    // console.log("--------2--------");
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -397,8 +401,8 @@ export default class ManualTagging extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    console.log("qty-------------------" + qty);
-                    this.state.instance.setValueFromCoords(8, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
+                    // console.log("qty-------------------" + qty);
+                    this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty * (value != null && value != "" ? value : 1))), true);
                 }
 
             }
@@ -443,19 +447,31 @@ export default class ManualTagging extends Component {
         // }
     }
 
+    dataChangeCheckbox(event) {
+        console.log("radio button event---", event.target)
+        console.log("radio button event id---", event.target.id)
+        console.log("radio button event value---", event.target.value)
+        this.setState({
+            selectedShipment: [],
+            checkboxValue: (event.target.checked ? true : false)
+        })
+    }
+
     dataChange1(event) {
         console.log("radio button event---", event.target)
 
         if (event.target.id == 'active4') {
             this.setState({
                 active4: true,
-                active5: false
+                active5: false,
+                checkboxValue: false
             });
         } else if (event.target.id == 'active5') {
             this.setState({
                 // finalShipmentId:'',
                 active4: false,
-                active5: true
+                active5: true,
+                checkboxValue: true
             });
         }
     }
@@ -592,14 +608,15 @@ export default class ManualTagging extends Component {
         const filteredBudgetList = this.state.budgetList.filter(c => c.program.id == programId1)
         console.log("filteredBudgetList---", filteredBudgetList);
         this.setState({
-            filteredBudgetList
+            filteredBudgetList,
+            filteredBudgetListByProgram: filteredBudgetList
         });
     }
 
     getBudgetListByFundingSourceId = (e) => {
         let fundingSourceId = this.state.fundingSourceId;
         console.log("programId--->>>>>>>>>>", fundingSourceId)
-        const filteredBudgetList = this.state.filteredBudgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+        const filteredBudgetList = this.state.filteredBudgetListByProgram.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
         console.log("filteredBudgetList---", filteredBudgetList);
         this.setState({
             filteredBudgetList
@@ -872,6 +889,7 @@ export default class ManualTagging extends Component {
         if (valid) {
             this.setState({ loading1: true })
             var validation = this.checkValidation();
+            let linkedShipmentCount = 0;
             if (validation == true) {
                 var tableJson = this.state.instance.getJson(null, false);
                 console.log("tableJson---", tableJson);
@@ -896,84 +914,118 @@ export default class ManualTagging extends Component {
                             planningUnitId: (this.state.active3 ? document.getElementById("planningUnitId1").value : 0),
                             quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
                         }
+
                         changedmtList.push(json);
+                    }
+                    if (this.state.active2 && map1.get("0")) {
+                        linkedShipmentCount++;
                     }
                 }
                 console.log("FINAL SUBMIT changedmtList---", changedmtList);
                 if (this.state.active4 && changedmtList.length > 1) {
                     alert(i18n.t('static.mt.oneOrderAtATime'));
                 } else {
-                    ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
-                        .then(response => {
-                            console.log("response m tagging---", response)
-                            this.setState({
-                                message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
-                                color: 'green',
-                                loading: false,
-                                loading1: false,
-                            },
-                                () => {
-                                    console.log("changedmtList length---", changedmtList.length);
-                                    console.log("data length---", response.data.length);
+                    let callApiActive2 = false;
+                    if (this.state.active2) {
+                        let active2GoAhead = false;
 
-                                    console.log(this.state.message, "success 1")
-                                    this.hideSecondComponent();
-                                    
-                                    console.log("Going to call toggle large 1");
-                                    this.toggleLarge();
+                        if (linkedShipmentCount > 0) {
+                            active2GoAhead = false
+                            callApiActive2 = true
+                        } else {
+                            active2GoAhead = true
+                        }
+                        if (active2GoAhead) {
+                            // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
+                            var cf1 = window.confirm("You have delinked all the shipments.Your data will be reverted to the original QAT shipment.Are you sure you want to continue?");
+                            if (cf1 == true) {
+                                callApiActive2 = true;
+                            } else {
+                                callApiActive2 = false;
+                            }
+                        }
+                    }
+                    if (!callApiActive2) {
+                        this.setState({
+                            loading: false,
+                            loading1: false
+                        });
+                    }
+                    console.log("callApiActive2---", callApiActive2);
+                    if (this.state.active1 || this.state.active3 || callApiActive2) {
+                        ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
+                            .then(response => {
+                                console.log("response m tagging---", response)
+                                this.setState({
+                                    message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
+                                    color: 'green',
+                                    loading: false,
+                                    loading1: false,
+                                    planningUnitIdUpdated: ''
+                                },
+                                    () => {
+                                        console.log("changedmtList length---", changedmtList.length);
+                                        console.log("data length---", response.data.length);
 
-                                    (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+                                        console.log(this.state.message, "success 1")
+                                        this.hideSecondComponent();
 
-                                })
+                                        console.log("Going to call toggle large 1");
+                                        this.toggleLarge();
 
-                        }).catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        color: 'red',
-                                        loading: false,
-                                        loading1: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false,
-                                                loading1: false,
-                                                color: 'red',
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: error.response.data.messageCode,
-                                                loading: false,
-                                                loading1: false,
-                                                color: 'red',
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false,
-                                                loading1: false,
-                                                color: 'red',
-                                            });
-                                            break;
+                                    })
+
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            color: 'red',
+                                            loading: false,
+                                            loading1: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false,
+                                                    loading1: false,
+                                                    color: 'red',
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false,
+                                                    loading1: false,
+                                                    color: 'red',
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false,
+                                                    loading1: false,
+                                                    color: 'red',
+                                                });
+                                                break;
+                                        }
                                     }
                                 }
-                            }
-                        );
+                            );
+                    }
                 }
             }
         }
@@ -1024,7 +1076,7 @@ export default class ManualTagging extends Component {
         console.log("condition 1---", (roNoOrderNo != "" && roNoOrderNo != 0))
         console.log("condition 2---", (erpPlanningUnitId != null && erpPlanningUnitId != "" && erpPlanningUnitId == 0))
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
-            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)))
+            ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0))
                 .then(response => {
                     console.log("artmis response===", response.data);
                     // document.getElementById("erpShipmentQty").value = '';
@@ -1643,7 +1695,7 @@ export default class ManualTagging extends Component {
                 let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : '');
                 data[7] = conversionFactor;
                 convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = this.addCommas(convertedQty);
+                data[8] = this.addCommas(Math.round(convertedQty));
                 data[9] = erpDataList[j].notes;
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
@@ -1657,7 +1709,7 @@ export default class ManualTagging extends Component {
             count++;
         }
         this.setState({
-            totalQuantity: this.addCommas(qty),
+            totalQuantity: this.addCommas(Math.round(qty)),
             displayTotalQty: (qty > 0 ? true : false)
         });
 
@@ -1814,7 +1866,7 @@ export default class ManualTagging extends Component {
                 data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                 data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-                data[10] = this.addCommas(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+                data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[11] = manualTaggingList[j].notes
             }
             else {
@@ -2155,7 +2207,7 @@ export default class ManualTagging extends Component {
                 });
             }
             // outputListAfterSearch.push(row);
-            // console.log("1------------------------------>>>>", outputListAfterSearch[0].planningUnit.id)
+            console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
             this.setState({
                 planningUnitId: (this.state.active2 || this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                 shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
@@ -2960,24 +3012,42 @@ export default class ManualTagging extends Component {
                                                                 </div>
                                                             </FormGroup>}
                                                         {this.state.active5 &&
-                                                            <FormGroup className="col-md-3 pl-0">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
-                                                                <div className="controls ">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="notLinkedShipmentId"
-                                                                            id="notLinkedShipmentId"
-                                                                            bsSize="sm"
-                                                                            onChange={this.displayShipmentData}
-                                                                        >
-                                                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                                                            {shipmentIdList}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>}
-                                                        {(this.state.active4 || this.state.active5) &&
+                                                            <>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="active6"
+                                                                        name="active"
+                                                                        checked={this.state.checkboxValue}
+                                                                        onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        <b>{i18n.t('static.mt.filterByShipmentId')}</b>
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                {this.state.checkboxValue &&
+                                                                    <FormGroup className="col-md-3 pl-0">
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.commit.qatshipmentId')}</Label>
+                                                                        <div className="controls ">
+                                                                            <InputGroup>
+                                                                                <Input
+                                                                                    type="select"
+                                                                                    name="notLinkedShipmentId"
+                                                                                    id="notLinkedShipmentId"
+                                                                                    bsSize="sm"
+                                                                                    onChange={this.displayShipmentData}
+                                                                                >
+                                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                                    {shipmentIdList}
+                                                                                </Input>
+                                                                            </InputGroup>
+                                                                        </div>
+                                                                    </FormGroup>}
+                                                            </>}
+                                                        {(this.state.active4 || (this.state.active5 && !this.state.checkboxValue)) &&
                                                             <FormGroup className="col-md-3 ">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
                                                                 <div className="controls ">
