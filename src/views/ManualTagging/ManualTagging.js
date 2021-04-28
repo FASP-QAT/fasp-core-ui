@@ -377,16 +377,11 @@ export default class ManualTagging extends Component {
 
         //conversion factor
         if (x == 7) {
-            // console.log("y-------", this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             var col = ("H").concat(parseInt(y) + 1);
-            // console.log("col-----------", col);
-            // console.log("value---------", this.el.getValue(`H${parseInt(y) + 1}`));
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
 
             if (value == "") {
-                // console.log("--------1--------");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -867,20 +862,22 @@ export default class ManualTagging extends Component {
             } else if (this.state.active4) {
                 if (programId == -1) {
                     alert(i18n.t('static.mt.selectProgram'));
-                } else if (this.state.fundingSourceId == -1) {
+                }
+                else if (document.getElementById("planningUnitId1").value == -1) {
+                    alert(i18n.t('static.mt.selectPlanninfUnit'));
+                }
+                else if (this.state.fundingSourceId == -1) {
                     alert(i18n.t('static.mt.selectFundingSource'));
                 } else if (this.state.budgetId == -1) {
                     alert(i18n.t('static.mt.selectBudget'));
                 }
-                else if (document.getElementById("planningUnitId1") == -1) {
-                    alert(i18n.t('static.mt.selectPlanninfUnit'));
-                }
+
 
                 else {
-                    var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                    if (cf == true) {
-                        valid = true;
-                    } else { }
+                    // var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
+                    // if (cf == true) {
+                    valid = true;
+                    // } else { }
                 }
             }
         } else {
@@ -911,20 +908,37 @@ export default class ManualTagging extends Component {
                             orderNo: map1.get("11"),
                             primeLineNo: parseInt(map1.get("12")),
                             // planningUnitId: (this.state.active3 ? this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", "") : 0),
-                            planningUnitId: (this.state.active3 ? document.getElementById("planningUnitId1").value : 0),
+                            planningUnitId: (this.state.active3 ? (this.state.active4 ? document.getElementById("planningUnitId1").value : 0) : 0),
                             quantity: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")
                         }
 
                         changedmtList.push(json);
                     }
-                    if (this.state.active2 && map1.get("0")) {
+                    if ((this.state.active2 || this.state.active4) && map1.get("0")) {
                         linkedShipmentCount++;
                     }
                 }
                 console.log("FINAL SUBMIT changedmtList---", changedmtList);
-                if (this.state.active4 && changedmtList.length > 1) {
+                if (this.state.active4 && linkedShipmentCount > 1) {
                     alert(i18n.t('static.mt.oneOrderAtATime'));
+                    this.setState({
+                        loading1: false
+                    })
+
                 } else {
+                    let goAhead = false;
+                    if (this.state.active4) {
+                        var cf = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
+                        if (cf == true) {
+                            goAhead = true;
+                        } else {
+                            this.setState({
+                                loading1: false
+                            })
+                         }
+                    } else {
+                        goAhead = true;
+                    }
                     let callApiActive2 = false;
                     if (this.state.active2) {
                         let active2GoAhead = false;
@@ -937,7 +951,7 @@ export default class ManualTagging extends Component {
                         }
                         if (active2GoAhead) {
                             // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                            var cf1 = window.confirm("You have delinked all the shipments.Your data will be reverted to the original QAT shipment.Are you sure you want to continue?");
+                            var cf1 = window.confirm(i18n.t("static.mt.delinkAllShipments"));
                             if (cf1 == true) {
                                 callApiActive2 = true;
                             } else {
@@ -945,14 +959,14 @@ export default class ManualTagging extends Component {
                             }
                         }
                     }
-                    if (!callApiActive2) {
+                    if (!callApiActive2 && this.state.active2) {
                         this.setState({
                             loading: false,
                             loading1: false
                         });
                     }
                     console.log("callApiActive2---", callApiActive2);
-                    if (this.state.active1 || this.state.active3 || callApiActive2) {
+                    if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
                         ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
                             .then(response => {
                                 console.log("response m tagging---", response)
