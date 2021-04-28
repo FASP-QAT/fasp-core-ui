@@ -2189,6 +2189,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }else{
                     date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
+                console.log("Date+++",date);
                 // Open toggleLarge
                 var supplyPlanType="";
                 if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
@@ -2209,7 +2210,7 @@ export default class SupplyPlanComponent extends React.Component {
                     supplyPlanType = 'plannedErpShipments'
                 }
                 if(supplyPlanType!=""){
-                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, 'deliveredShipments');
+                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }
         })
