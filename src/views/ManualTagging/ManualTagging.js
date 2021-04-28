@@ -951,7 +951,7 @@ export default class ManualTagging extends Component {
                         }
                         if (active2GoAhead) {
                             // var cf1 = window.confirm(i18n.t('static.mt.confirmNewShipmentCreation'));
-                            var cf1 = window.confirm("You have delinked all the shipments.Your data will be reverted to the original QAT shipment.Are you sure you want to continue?");
+                            var cf1 = window.confirm(i18n.t("static.mt.delinkAllShipments"));
                             if (cf1 == true) {
                                 callApiActive2 = true;
                             } else {
