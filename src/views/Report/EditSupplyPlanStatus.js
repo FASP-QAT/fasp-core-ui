@@ -4580,7 +4580,7 @@ class EditSupplyPlanStatus extends Component {
                     supplyPlanType = 'plannedErpShipments'
                 }
                 if(supplyPlanType!=""){
-                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, 'deliveredShipments');
+                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }
         })
