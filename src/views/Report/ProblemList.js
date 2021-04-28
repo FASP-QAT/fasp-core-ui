@@ -60,7 +60,7 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
-            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            // problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             // programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
             showUpdateButton: false,
