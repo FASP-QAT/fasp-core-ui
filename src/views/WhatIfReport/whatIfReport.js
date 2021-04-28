@@ -262,7 +262,7 @@ export default class WhatIfReportComponent extends React.Component {
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
-        this.formSubmit(this.state.planningUnit, value);
+        // this.formSubmit(this.state.planningUnit, value);
     }
 
     _handleClickRangeBox(e) {
@@ -609,6 +609,11 @@ export default class WhatIfReportComponent extends React.Component {
                                     index = shipmentUnFundedList[i].index;
                                 }
                                 shipmentList[index].active = 0;
+                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                var curUser = AuthenticationService.getLoggedInUserId();
+                                shipmentList[index].lastModifiedBy.userId = curUser;
+                                shipmentList[index].lastModifiedDate = curDate;
+
                             }
                             actionList.push({
                                 planningUnitId: planningUnitId,
@@ -650,6 +655,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 }
                                 consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
                                 consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                var curUser = AuthenticationService.getLoggedInUserId();
+                                consumptionList[index].lastModifiedBy.userId = curUser;
+                                consumptionList[index].lastModifiedDate = curDate;
                             }
                             actionList.push({
                                 planningUnitId: planningUnitId,
@@ -691,6 +700,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 }
                                 consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
                                 consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                var curUser = AuthenticationService.getLoggedInUserId();
+                                consumptionList[index].lastModifiedBy.userId = curUser;
+                                consumptionList[index].lastModifiedDate = curDate;
                             }
                             actionList.push({
                                 planningUnitId: planningUnitId,
@@ -760,6 +773,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         index = shipmentUnFundedList[i].index;
                                     }
                                     shipmentList[index].accountFlag = 0;
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    shipmentList[index].lastModifiedBy.userId = curUser;
+                                    shipmentList[index].lastModifiedDate = curDate;
                                 }
                             }
                             actionList.push({
@@ -830,6 +847,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         index = shipmentUnFundedList[i].index;
                                     }
                                     shipmentList[index].accountFlag = 0;
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    shipmentList[index].lastModifiedBy.userId = curUser;
+                                    shipmentList[index].lastModifiedDate = curDate;
                                 }
                             }
                             actionList.push({
@@ -910,6 +931,10 @@ export default class WhatIfReportComponent extends React.Component {
                                         index = shipmentUnFundedList[i].index;
                                     }
                                     shipmentList[index].accountFlag = 0;
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    shipmentList[index].lastModifiedBy.userId = curUser;
+                                    shipmentList[index].lastModifiedDate = curDate;
                                 }
                             }
                             actionList.push({
@@ -997,6 +1022,10 @@ export default class WhatIfReportComponent extends React.Component {
                             index = shipmentUnFundedList[i].index;
                         }
                         shipmentList[index].active = 0;
+                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        shipmentList[index].lastModifiedBy.userId = curUser;
+                        shipmentList[index].lastModifiedDate = curDate;
                     }
                     actionList.push({
                         planningUnitId: planningUnitId,
@@ -1062,6 +1091,10 @@ export default class WhatIfReportComponent extends React.Component {
                         }
                         consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
                         consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        consumptionList[index].lastModifiedBy.userId = curUser;
+                        consumptionList[index].lastModifiedDate = curDate;
                     }
                     actionList.push({
                         planningUnitId: planningUnitId,
@@ -1129,6 +1162,10 @@ export default class WhatIfReportComponent extends React.Component {
                         }
                         consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
                         consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        consumptionList[index].lastModifiedBy.userId = curUser;
+                        consumptionList[index].lastModifiedDate = curDate;
                     }
                     actionList.push({
                         planningUnitId: planningUnitId,
@@ -1222,6 +1259,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 index = shipmentUnFundedList[i].index;
                             }
                             shipmentList[index].accountFlag = 0;
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            shipmentList[index].lastModifiedBy.userId = curUser;
+                            shipmentList[index].lastModifiedDate = curDate;
                         }
                     }
                     actionList.push({
@@ -1315,6 +1356,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 index = shipmentUnFundedList[i].index;
                             }
                             shipmentList[index].accountFlag = 0;
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            shipmentList[index].lastModifiedBy.userId = curUser;
+                            shipmentList[index].lastModifiedDate = curDate;
                         }
                     }
                     actionList.push({
@@ -1418,6 +1463,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 index = shipmentUnFundedList[i].index;
                             }
                             shipmentList[index].accountFlag = 0;
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            shipmentList[index].lastModifiedBy.userId = curUser;
+                            shipmentList[index].lastModifiedDate = curDate;
                         }
                     }
                     actionList.push({
@@ -5026,7 +5075,7 @@ export default class WhatIfReportComponent extends React.Component {
                     supplyPlanType = 'plannedErpShipments'
                 }
                 if(supplyPlanType!=""){
-                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, 'deliveredShipments');
+                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }
         })
