@@ -60,8 +60,8 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
-            problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
-            programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
+            // problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
+            // programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
             showUpdateButton: false,
             problemDetail: {},
@@ -190,6 +190,30 @@ export default class ConsumptionDetails extends React.Component {
                     this.setState({
                         problemListForUpdate: myResult,
                         problemStatusList: proListProblemStatus
+                    }, () => {
+                        if (localStorage.getItem("sesProblemStatus") != '' && localStorage.getItem("sesProblemStatus") != undefined) {
+                            let sessionProblemList = JSON.parse(localStorage.getItem("sesProblemStatus"));
+                            let sessionProgramListStored = [];
+                            for (var i = 0; i < sessionProblemList.length; i++) {
+                                let objA = proListProblemStatus.filter(c => c.id == sessionProblemList[i].value)[0];
+                                var Json = {
+                                    label: objA.name,
+                                    value: objA.id
+                                }
+                                sessionProgramListStored.push(Json);
+                            }
+                            this.setState({
+                                problemStatusValues: sessionProgramListStored
+                            })
+                        } else {
+                            let statusA = proListProblemStatus.filter(c => c.id == 1)[0];
+                            let statusB = proListProblemStatus.filter(c => c.id == 3)[0];
+                            var Json1 = { label: statusA.name, value: statusA.id }
+                            var Json2 = { label: statusB.name, value: statusB.id }
+                            this.setState({
+                                problemStatusValues: [Json1, Json2]
+                            })
+                        }
                     })
 
 
