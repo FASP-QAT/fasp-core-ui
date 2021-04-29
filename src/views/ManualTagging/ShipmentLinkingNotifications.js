@@ -253,8 +253,9 @@ export default class ShipmentLinkingNotifications extends Component {
 
         //conversion factor
         if (x == 9) {
-            console.log("-------------inside conversion factor change-------------------------")
+            
             var col = ("J").concat(parseInt(y) + 1);
+            // console.log("-------------inside conversion factor change-------------------------",col)
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
@@ -273,7 +274,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     console.log("qty-------" + qty);
-                    this.el.setValueFromCoords(10, y, this.addCommas(qty * value), true);
+                    this.el.setValueFromCoords(10, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
                 }
 
             }
@@ -286,6 +287,18 @@ export default class ShipmentLinkingNotifications extends Component {
         // //Active
         if (x != 12) {
             this.el.setValueFromCoords(12, y, 1, true);
+            // if (x == 0) {
+            //     value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            //     console.log("addressed value---", value);
+            //     var col = ("J").concat(parseInt(y) + 1);
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            //     if (value === "false") {
+            //         console.log("inside if---", ("J").concat(parseInt(y) + 1))
+            //         this.el.setStyle(("J").concat(parseInt(y) + 1), "background-color", "transparent");
+            //         this.el.setComments(("J").concat(parseInt(y) + 1), "");
+            //     }
+            // }
         }
         this.displayButton();
 
@@ -672,13 +685,13 @@ export default class ShipmentLinkingNotifications extends Component {
             data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[7] = manualTaggingList[j].erpStatus
-            data[8] = this.addCommas(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
+            data[8] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2) || manualTaggingList[j].notificationType.id == 1) {
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
             } else {
                 data[9] = ""
             }
-            data[10] = this.addCommas((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
+            data[10] = this.addCommas(Math.round(manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
             data[11] = manualTaggingList[j].notes
             data[12] = 0
             data[13] = manualTaggingList[j].orderNo
@@ -937,7 +950,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var asterisk = document.getElementsByClassName("resizable")[0];
         console.log("asterisk123---", asterisk);
         var tr = asterisk.firstChild;
-        console.log("tr-------------",tr)
+        console.log("tr-------------", tr)
         tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
