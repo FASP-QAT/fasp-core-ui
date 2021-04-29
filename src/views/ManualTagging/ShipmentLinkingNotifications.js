@@ -217,7 +217,8 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(12, y);
-            if (parseInt(value) == 1) {
+            console.log("value------------------->>>",this.el.getValueFromCoords(0, y))
+            if (parseInt(value) == 1 && this.el.getValueFromCoords(0, y) == true) {
 
 
                 var col = ("J").concat(parseInt(y) + 1);
@@ -253,7 +254,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
         //conversion factor
         if (x == 9) {
-            
+
             var col = ("J").concat(parseInt(y) + 1);
             // console.log("-------------inside conversion factor change-------------------------",col)
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -287,18 +288,18 @@ export default class ShipmentLinkingNotifications extends Component {
         // //Active
         if (x != 12) {
             this.el.setValueFromCoords(12, y, 1, true);
-            // if (x == 0) {
-            //     value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            //     console.log("addressed value---", value);
-            //     var col = ("J").concat(parseInt(y) + 1);
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setComments(col, "");
-            //     if (value === "false") {
-            //         console.log("inside if---", ("J").concat(parseInt(y) + 1))
-            //         this.el.setStyle(("J").concat(parseInt(y) + 1), "background-color", "transparent");
-            //         this.el.setComments(("J").concat(parseInt(y) + 1), "");
-            //     }
-            // }
+            if (x == 0) {
+                value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                console.log("addressed value---", this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+                // var col = ("J").concat(parseInt(y) + 1);
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setComments(col, "");
+                if (value === "false") {
+                    console.log("inside if---", ("J").concat(parseInt(y) + 1))
+                    this.el.setStyle(("J").concat(parseInt(y) + 1), "background-color", "transparent");
+                    this.el.setComments(("J").concat(parseInt(y) + 1), "");
+                }
+            }
         }
         this.displayButton();
 
@@ -1227,14 +1228,14 @@ export default class ShipmentLinkingNotifications extends Component {
                 headerAlign: 'center',
                 formatter: this.addCommas
             },
-            {
-                dataField: 'receivedOn',
-                text: i18n.t('static.mt.dataReceivedOn'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatDate
-            }
+            // {
+            //     dataField: 'receivedOn',
+            //     text: i18n.t('static.mt.dataReceivedOn'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     formatter: this.formatDate
+            // }
 
         ];
         const options = {
