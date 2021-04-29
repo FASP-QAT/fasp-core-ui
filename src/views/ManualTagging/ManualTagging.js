@@ -377,6 +377,7 @@ export default class ManualTagging extends Component {
 
         //conversion factor
         if (x == 7) {
+            console.log("conversn ttt---");
             var col = ("H").concat(parseInt(y) + 1);
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
@@ -935,7 +936,7 @@ export default class ManualTagging extends Component {
                             this.setState({
                                 loading1: false
                             })
-                         }
+                        }
                     } else {
                         goAhead = true;
                     }
@@ -1707,10 +1708,10 @@ export default class ManualTagging extends Component {
                 data[5] = erpDataList[j].status;
                 data[6] = this.addCommas(erpDataList[j].quantity);
                 let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : '');
-                data[7] = conversionFactor;
+                data[7] = (erpDataList[j].active ? conversionFactor : "");
                 convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = this.addCommas(Math.round(convertedQty));
-                data[9] = erpDataList[j].notes;
+                data[8] = this.addCommas(Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity)));
+                data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
                 data[12] = erpDataList[j].primeLineNo;
