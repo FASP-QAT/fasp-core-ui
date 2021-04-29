@@ -1561,7 +1561,8 @@ class ShipmentSummery extends Component {
             datasets: [{
                 label: i18n.t('static.supplyPlan.delivered'),
                 stack: 1,
-                backgroundColor: '#118b70',
+                // backgroundColor: '#118b70',
+                backgroundColor: '#002f6c',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -1586,7 +1587,8 @@ class ShipmentSummery extends Component {
             {
                 label: i18n.t('static.report.shipped'),
                 stack: 1,
-                backgroundColor: '#1d97c2',
+                // backgroundColor: '#1d97c2',
+                backgroundColor: '#006789',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -1625,7 +1627,8 @@ class ShipmentSummery extends Component {
             },
             {
                 label: i18n.t('static.report.planned'),
-                backgroundColor: '#a5c5ec',
+                // backgroundColor: '#a5c5ec',
+                backgroundColor: '#a7c6ed',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',

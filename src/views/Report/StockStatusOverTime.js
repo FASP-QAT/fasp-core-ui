@@ -1425,27 +1425,33 @@ class StockStatusOverTime extends Component {
             return color;
         }
         console.log(this.state.matricsList)
+        // const backgroundColor = [
+        //     '#4dbd74',
+        //     '#c8ced3',
+        //     '#000',
+        //     '#ffc107',
+        //     '#f86c6b',
+        //     '#205493',
+        //     '#20a8d8',
+        //     '#a6c4ec',
+        //     '#ca3828',
+        //     '#388b70',
+        //     '#f4862a',
+        //     '#ed5626',
+        //     '#4dbd74',
+        //     '#ffc107',
+        //     '#f86c6b'
+        // ]
         const backgroundColor = [
-            '#4dbd74',
-            '#c8ced3',
-            '#000',
-            '#ffc107',
-            '#f86c6b',
-            '#205493',
-            '#20a8d8',
-            '#a6c4ec',
-            '#ca3828',
-            '#388b70',
-            '#f4862a',
-            '#ed5626',
-            '#4dbd74',
-            '#ffc107',
-            '#f86c6b'
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
         ]
         console.log(this.state.matricsList)
 
         // var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : ele.mos!=null?this.roundN(ele.mos):i18n.t("static.supplyPlanFormula.na"))))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
         // var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
 
