@@ -38,6 +38,7 @@ class ManualTaggingSerice {
         });
     }
     linkShipmentWithARTMIS(json) {
+        console.log("my json------",json);
         return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, json, {}
         );
     }
