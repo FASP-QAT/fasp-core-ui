@@ -80,7 +80,7 @@ export default class ManualTagging extends Component {
             procurementAgentId: '',
             displayButton: false,
             programId: '',
-            active1: false,
+            active1: true,
             active2: false,
             active3: false,
             planningUnitValues: [],
@@ -1608,7 +1608,7 @@ export default class ManualTagging extends Component {
                             loading: false,
                             programId: response.data[0].programId
                         }, () => {
-                            // this.getPlanningUnitList();
+                            this.getPlanningUnitList();
                         })
                     } else {
                         this.setState({
@@ -2237,8 +2237,11 @@ export default class ManualTagging extends Component {
 
 
     componentDidMount() {
-        this.hideFirstComponent();
-        this.getProgramList();
+        this.setState({ active1: true }, () => {
+            this.hideFirstComponent();
+            this.getProgramList();
+        });
+
     }
 
     getPlanningUnitList() {
@@ -2763,7 +2766,7 @@ export default class ManualTagging extends Component {
                                             id="active1"
                                             name="active"
                                             value={true}
-                                            //checked={this.state.user.active === true}
+                                            checked={this.state.active1 == true}
                                             onChange={(e) => { this.dataChange(e) }}
                                         />
                                         <Label
