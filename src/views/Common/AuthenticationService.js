@@ -471,7 +471,7 @@ class AuthenticationService {
         console.log("route---" + route);
 
         localStorage.setItem("isOfflinePage", 0);
-        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity"];
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId","/program/importProgram","/program/exportProgram","/program/deleteLocalProgram","/supplyPlan","/supplyPlanFormulas","/supplyPlan/:programId/:versionId/:planningUnitId","/report/whatIf","/report/stockStatus","/report/problemList","/report/productCatalog","/report/stockStatusOverTime","/report/stockStatusMatrix","/report/stockStatusAcrossPlanningUnits","/report/consumption","/report/forecastOverTheTime","/report/shipmentSummery","/report/procurementAgentExport","/report/annualShipmentCost","/report/budgets","/report/supplierLeadTimes","/report/expiredInventory","/report/costOfInventory","/report/inventoryTurns","/report/stockAdjustment","/report/warehouseCapacity","/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
         if (urlarr.includes(route)) {
             localStorage.setItem("isOfflinePage", 1);
         }
@@ -978,6 +978,7 @@ class AuthenticationService {
                 case "/supplyPlan":
                 case "/supplyPlanFormulas":
                 case "/supplyPlan/:programId/:versionId/:planningUnitId":
+                case "/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate":
                     if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                         localStorage.setItem("isOfflinePage", 1);
                         console.log("offline 5---------------")
