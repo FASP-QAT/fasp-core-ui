@@ -4237,7 +4237,7 @@ class EditSupplyPlanStatus extends Component {
                                                 </thead>
                                                 <tbody>
                                                     {
-                                                        this.state.ledgerForBatch.slice(0, -1).map(item => (
+                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item=>(
                                                             <tr>
                                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
@@ -4253,7 +4253,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <tfoot>
                                                     <tr>
                                                         <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 2].qty} /></b></td>
+                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
                                                     </tr>
                                                 </tfoot>
                                             </Table>
